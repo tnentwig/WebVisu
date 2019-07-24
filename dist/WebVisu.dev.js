@@ -105,19 +105,31 @@ eval("var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!\n * jQ
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _pars_xml2json__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./pars/xml2json */ \"./src/pars/xml2json.ts\");\n\nvar objXMLParser = new _pars_xml2json__WEBPACK_IMPORTED_MODULE_0__[\"default\"](\"http://192.168.1.110/\");\nvar request = objXMLParser.getVisuXML(\"plc_visu.xml\");\n\n\n//# sourceURL=webpack:///./src/index.ts?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _pars_visuparser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./pars/visuparser */ \"./src/pars/visuparser.ts\");\n\nvar objXMLParser = new _pars_visuparser__WEBPACK_IMPORTED_MODULE_0__[\"default\"](\"http://192.168.1.110/\");\nvar request = objXMLParser.ParseVisu(\"plc_visu.xml\");\n\n\n//# sourceURL=webpack:///./src/index.ts?");
 
 /***/ }),
 
-/***/ "./src/pars/xml2json.ts":
-/*!******************************!*\
-  !*** ./src/pars/xml2json.ts ***!
-  \******************************/
+/***/ "./src/pars/elementparser.ts":
+/*!***********************************!*\
+  !*** ./src/pars/elementparser.ts ***!
+  \***********************************/
+/*! exports provided: ParseSimpleShape */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"ParseSimpleShape\", function() { return ParseSimpleShape; });\nfunction ParseSimpleShape(section) {\n    var shape = section.children(\"simple-shape\").text();\n    if (['round-rect', 'circle', 'line', 'rectangle'].includes(shape)) {\n        console.log('h');\n    }\n}\n\n\n//# sourceURL=webpack:///./src/pars/elementparser.ts?");
+
+/***/ }),
+
+/***/ "./src/pars/visuparser.ts":
+/*!********************************!*\
+  !*** ./src/pars/visuparser.ts ***!
+  \********************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ \"./node_modules/jquery/dist/jquery.js\");\n/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);\n\nvar VisuParser = (function () {\n    function VisuParser(rootDir) {\n        this.rootDir = rootDir;\n    }\n    VisuParser.prototype.getVisuXML = function (relPath) {\n        jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({\n            url: this.rootDir + relPath,\n            type: 'GET',\n            dataType: 'XML',\n            crossDomain: true,\n            async: false\n        })\n            .then(function (data) {\n            var $xml = jquery__WEBPACK_IMPORTED_MODULE_0___default()(data);\n            var title = $xml.text();\n            return title;\n        })\n            .then(function () {\n            ;\n        })\n            .fail(function () {\n            console.log(\"Getting the file failed!\");\n        });\n    };\n    return VisuParser;\n}());\n/* harmony default export */ __webpack_exports__[\"default\"] = (VisuParser);\n\n\n//# sourceURL=webpack:///./src/pars/xml2json.ts?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ \"./node_modules/jquery/dist/jquery.js\");\n/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _elementparser__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./elementparser */ \"./src/pars/elementparser.ts\");\n\n\nvar VisuParser = (function () {\n    function VisuParser(rootDir) {\n        this.rootDir = rootDir;\n    }\n    VisuParser.prototype.ParseVisu = function (relPath) {\n        var _this = this;\n        return jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({\n            url: this.rootDir + relPath,\n            type: 'GET',\n            dataType: 'XML',\n            crossDomain: true,\n            timeout: 1000,\n        })\n            .then(function (data) {\n            return _this.GetVisuElements(data);\n        })\n            .fail(function (error) {\n            return console.error(error);\n        });\n    };\n    VisuParser.prototype.GetVisuElements = function (XML) {\n        console.log(\"Start parsing...\");\n        var visuXML = jquery__WEBPACK_IMPORTED_MODULE_0___default()(XML);\n        visuXML.children(\"visualisation\").children(\"element\").each(function () {\n            var section = jquery__WEBPACK_IMPORTED_MODULE_0___default()(this);\n            switch (section.attr(\"type\")) {\n                case \"simple\":\n                    Object(_elementparser__WEBPACK_IMPORTED_MODULE_1__[\"ParseSimpleShape\"])(section);\n                    break;\n                case \"bitmap\":\n                    break;\n                case \"button\":\n                    break;\n                case \"polygon\":\n                    break;\n                case \"piechart\":\n                    break;\n                case \"group\":\n                    break;\n                case \"scrollbar\":\n                    break;\n                default:\n                    console.log(\"Type <\" + section.attr(\"type\") + \"> is not supported yet!\");\n            }\n        });\n        console.log(\"XMl-File parsed successfully!\");\n        return 0;\n    };\n    return VisuParser;\n}());\n/* harmony default export */ __webpack_exports__[\"default\"] = (VisuParser);\n\n\n//# sourceURL=webpack:///./src/pars/visuparser.ts?");
 
 /***/ })
 

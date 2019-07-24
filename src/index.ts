@@ -1,6 +1,6 @@
-import VisuParser from './pars/xml2json'
+import VisuParser from './pars/visuparser'
 
 var objXMLParser = new VisuParser("http://192.168.1.110/")
 
-var request = objXMLParser.getVisuXML("plc_visu.xml");
+var request = objXMLParser.ParseVisu("plc_visu.xml");
 
