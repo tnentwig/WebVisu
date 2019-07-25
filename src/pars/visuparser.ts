@@ -42,13 +42,13 @@ export default class VisuParser {
                 // Is a button
                 case "button":
                     break;
-                // Is a polygon - As polgon, polyline or bezier
+                // Is a polygon - As polygon, polyline or bezier
                 case "polygon":
                     break;
                 // Is a piechart
                 case "piechart":
                     break;
-                // Is a group
+                // Is a group (Dynamic elements like a graph)
                 case "group":
                     break;
                 // Is a Scrollbar

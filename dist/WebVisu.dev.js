@@ -109,6 +109,18 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _par
 
 /***/ }),
 
+/***/ "./src/obj/visuobjects.ts":
+/*!********************************!*\
+  !*** ./src/obj/visuobjects.ts ***!
+  \********************************/
+/*! exports provided: VisuBasicElement, VisuSimpleShapeElement */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"VisuBasicElement\", function() { return VisuBasicElement; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"VisuSimpleShapeElement\", function() { return VisuSimpleShapeElement; });\nvar __extends = (undefined && undefined.__extends) || (function () {\n    var extendStatics = function (d, b) {\n        extendStatics = Object.setPrototypeOf ||\n            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||\n            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };\n        return extendStatics(d, b);\n    };\n    return function (d, b) {\n        extendStatics(d, b);\n        function __() { this.constructor = d; }\n        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());\n    };\n})();\nvar VisuBasicElement = (function () {\n    function VisuBasicElement(has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, elem_id, rect, center, hidden_input, enable_text_input) {\n        this.has_inside_color = has_inside_color;\n        this.fill_color = fill_color;\n        this.fill_color_alarm = fill_color_alarm;\n        this.has_frame_color = has_frame_color;\n        this.frame_color = frame_color;\n        this.frame_color_alarm = frame_color_alarm;\n        this.line_width = line_width;\n        this.elem_id = elem_id;\n        this.rect = rect;\n        this.center = center;\n        this.hidden_input = hidden_input;\n        this.enable_text_input = enable_text_input;\n    }\n    VisuBasicElement.prototype.DrawObject = function () {\n        ;\n    };\n    return VisuBasicElement;\n}());\n\nvar VisuSimpleShapeElement = (function (_super) {\n    __extends(VisuSimpleShapeElement, _super);\n    function VisuSimpleShapeElement(simple_shape, has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, elem_id, rect, center, hidden_input, enable_text_input) {\n        var _this = _super.call(this, has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, elem_id, rect, center, hidden_input, enable_text_input) || this;\n        _this.simple_shape = simple_shape;\n        return _this;\n    }\n    return VisuSimpleShapeElement;\n}(VisuBasicElement));\n\n\n\n//# sourceURL=webpack:///./src/obj/visuobjects.ts?");
+
+/***/ }),
+
 /***/ "./src/pars/elementparser.ts":
 /*!***********************************!*\
   !*** ./src/pars/elementparser.ts ***!
@@ -117,7 +129,19 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _par
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"ParseSimpleShape\", function() { return ParseSimpleShape; });\nfunction ParseSimpleShape(section) {\n    var shape = section.children(\"simple-shape\").text();\n    if (['round-rect', 'circle', 'line', 'rectangle'].includes(shape)) {\n        console.log('h');\n    }\n}\n\n\n//# sourceURL=webpack:///./src/pars/elementparser.ts?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"ParseSimpleShape\", function() { return ParseSimpleShape; });\n/* harmony import */ var _obj_visuobjects__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../obj/visuobjects */ \"./src/obj/visuobjects.ts\");\n/* harmony import */ var _parserutils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./parserutils */ \"./src/pars/parserutils.ts\");\n\n\nfunction ParseSimpleShape(section) {\n    var shape = section.children(\"simple-shape\").text();\n    if (['round-rect', 'circle', 'line', 'rectangle'].includes(shape)) {\n        var obj = new _obj_visuobjects__WEBPACK_IMPORTED_MODULE_0__[\"VisuSimpleShapeElement\"](shape, Object(_parserutils__WEBPACK_IMPORTED_MODULE_1__[\"StringToBoolean\"])(section.children(\"has-inside-color\").text()), Object(_parserutils__WEBPACK_IMPORTED_MODULE_1__[\"RgbToHex\"])(section.children(\"fill-color\").text()), Object(_parserutils__WEBPACK_IMPORTED_MODULE_1__[\"RgbToHex\"])(section.children(\"fill-color-alarm\").text()), Object(_parserutils__WEBPACK_IMPORTED_MODULE_1__[\"StringToBoolean\"])(section.children(\"has-frame-color\").text()), Object(_parserutils__WEBPACK_IMPORTED_MODULE_1__[\"RgbToHex\"])(section.children(\"frame-color\").text()), Object(_parserutils__WEBPACK_IMPORTED_MODULE_1__[\"RgbToHex\"])(section.children(\"frame-color-alarm\").text()), Number(section.children(\"line-width\").text()), Number(section.children(\"elem-id\").text()), Object(_parserutils__WEBPACK_IMPORTED_MODULE_1__[\"StringToArray\"])(section.children(\"rect\").text()), Object(_parserutils__WEBPACK_IMPORTED_MODULE_1__[\"StringToArray\"])(section.children(\"center\").text()), Object(_parserutils__WEBPACK_IMPORTED_MODULE_1__[\"StringToBoolean\"])(section.children(\"hidden-input\").text()), Object(_parserutils__WEBPACK_IMPORTED_MODULE_1__[\"StringToBoolean\"])(section.children(\"enable-text-input\").text()));\n        console.dir(obj);\n    }\n    else {\n        (function () { return console.error(\"Simpel-Shape: <\" + shape + \"> is not supported!\"); });\n    }\n}\n\n\n//# sourceURL=webpack:///./src/pars/elementparser.ts?");
+
+/***/ }),
+
+/***/ "./src/pars/parserutils.ts":
+/*!*********************************!*\
+  !*** ./src/pars/parserutils.ts ***!
+  \*********************************/
+/*! exports provided: StringToBoolean, RgbToHex, StringToArray */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"StringToBoolean\", function() { return StringToBoolean; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"RgbToHex\", function() { return RgbToHex; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"StringToArray\", function() { return StringToArray; });\nfunction StringToBoolean(booleanExp) {\n    return JSON.parse(booleanExp);\n}\nfunction RgbToHex(rgb) {\n    var rgbClr = rgb.split(',');\n    var r = Number(rgbClr[0]);\n    var g = Number(rgbClr[1]);\n    var b = Number(rgbClr[2]);\n    return Number('0x' + (r << 16 | g << 8 | b).toString(16).toUpperCase());\n}\nfunction StringToArray(stringExp) {\n    return (stringExp.split(',')).map(Number);\n}\n\n\n//# sourceURL=webpack:///./src/pars/parserutils.ts?");
 
 /***/ }),
 
