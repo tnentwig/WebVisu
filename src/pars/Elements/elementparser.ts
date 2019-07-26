@@ -1,9 +1,10 @@
-import * as VisuObjects from '../obj/visuobjects'
-import { StringToBoolean, RgbToHex, StringToArray } from './parserutils';
+import * as VisuObjects from '../../obj/visuobjects'
+import { StringToBoolean, RgbToHex, StringToArray } from './parserconvert';
 
 export function ParseSimpleShape(section : JQuery<XMLDocument>) {
     // Check if its on of the allowed shapes like rectangle, round-rectangle, circle or line
     let shape = section.children("simple-shape").text();
+    // Parse the common informations
     if (['round-rect', 'circle', 'line', 'rectangle'].includes(shape)) {
         let obj = new VisuObjects.VisuSimpleShapeElement(
             shape,
@@ -20,7 +21,7 @@ export function ParseSimpleShape(section : JQuery<XMLDocument>) {
             StringToBoolean(section.children("hidden-input").text()),
             StringToBoolean(section.children("enable-text-input").text())
         )
-        console.dir(obj);
+        obj.DrawObject();
     }
     else {()=>console.error("Simple-Shape: <" + shape + "> is not supported!");}
 }

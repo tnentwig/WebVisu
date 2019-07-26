@@ -1,3 +1,4 @@
+import { drawplaceholder } from '../view/drawobjects';
 
 export class VisuBasicElement {
     protected has_inside_color : boolean;
@@ -29,7 +30,7 @@ export class VisuBasicElement {
     }
     
     DrawObject() {
-        ;
+        drawplaceholder(this.rect);
      }
 
 }

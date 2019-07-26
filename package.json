@@ -19,17 +19,25 @@
   "homepage": "https://github.com/tnentwig/WebVisu#readme",
   "devDependencies": {
     "@types/jquery": "^3.3.30",
+    "@types/react": "^16.8.23",
+    "@types/react-dom": "^16.8.5",
     "@types/xmltojson": "0.0.28",
     "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^3.1.0",
     "html-webpack-plugin": "^3.2.0",
+    "source-map-loader": "^0.2.4",
+    "style-loader": "^0.23.1",
     "typescript": "^3.5.3",
     "webpack": "^4.36.1",
-    "webpack-cli": "^3.3.6"
+    "webpack-cli": "^3.3.6",
+    "webpack-dev-server": "^3.7.2"
   },
   "dependencies": {
     "jquery": "^3.4.1",
     "konva": "^3.4.1",
-    "ts-loader": "^6.0.4",
-    "xmltojson": "^1.3.5"
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-konva": "^16.8.7-3",
+    "ts-loader": "^6.0.4"
   }
 }

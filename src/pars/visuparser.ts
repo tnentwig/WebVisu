@@ -1,5 +1,6 @@
-import $ from 'jquery';
-import {ParseSimpleShape} from './elementparser';
+import * as $ from 'jquery';
+import {ParseSimpleShape} from './Elements/elementparser';
+import { createStage } from '../view/drawobjects';
 
 export default class VisuParser {
     rootDir: string;
@@ -11,8 +12,7 @@ export default class VisuParser {
             url: this.rootDir+relPath,
             type: 'GET',
             dataType: 'XML', // if text => no pre-processing, if xml => parseXML preprocessing
-            crossDomain: true,
-            timeout: 1000,
+            crossDomain: true
         })
         .then((data) => {
             // Searching for elements
@@ -30,6 +30,7 @@ export default class VisuParser {
         // Rip all <element> sections
         visuXML.children("visualisation").children("element").each(function(){
             let section = $(this);
+            createStage([800,800]);
             // Determine the type of the element
             switch(section.attr("type")) {
                 // Is a simple shape like rectangle, round-rectangle, circle or line
