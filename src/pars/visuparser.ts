@@ -1,6 +1,5 @@
 import * as $ from 'jquery';
 import {ParseSimpleShape} from './Elements/elementparser';
-import { createStage } from '../view/drawobjects';
 
 export default class VisuParser {
     rootDir: string;
@@ -27,10 +26,11 @@ export default class VisuParser {
     GetVisuElements (XML : XMLDocument) : number {
         console.log("Start parsing...");
         let visuXML=$(XML);
+        // Create the React-Konva Stage
+        
         // Rip all <element> sections
         visuXML.children("visualisation").children("element").each(function(){
             let section = $(this);
-            createStage([800,800]);
             // Determine the type of the element
             switch(section.attr("type")) {
                 // Is a simple shape like rectangle, round-rectangle, circle or line
@@ -61,6 +61,7 @@ export default class VisuParser {
             }
         });
         console.log("XMl-File parsed successfully!");
+        
         return 0;
     }
 }

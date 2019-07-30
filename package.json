@@ -21,7 +21,6 @@
     "@types/jquery": "^3.3.30",
     "@types/react": "^16.8.23",
     "@types/react-dom": "^16.8.5",
-    "@types/xmltojson": "0.0.28",
     "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^3.1.0",
     "html-webpack-plugin": "^3.2.0",
@@ -33,11 +32,10 @@
     "webpack-dev-server": "^3.7.2"
   },
   "dependencies": {
+    "@material-ui/core": "^4.3.0",
     "jquery": "^3.4.1",
-    "konva": "^3.4.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-konva": "^16.8.7-3",
     "ts-loader": "^6.0.4"
   }
 }

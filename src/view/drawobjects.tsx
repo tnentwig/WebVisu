@@ -1,33 +1,42 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import Konva from 'konva';
-import { Stage, Layer, Rect, Text, Circle } from 'react-konva';
-
-export function createStage(Coordinates : Array<number>) {
-  function stage() {
-    return (
-    <Stage id ="ha" height={800} width={800}></Stage>)
-    }
-  ReactDOM.render(stage(),document.getElementById("visualisation"))
+export function App() {
+  ReactDOM.render(<Placeholder />,document.getElementById("visualisation"));
 }
 
-export function drawplaceholder(Coordinates : Array<number>) {
-  function demo() {
-      return (
-        <Layer>  
-          <Rect
-            id = "1" 
-            x={Coordinates[0]}
-            y={Coordinates[1]} 
-            width={Coordinates[2]-Coordinates[0]} 
-            height={Coordinates[3]-Coordinates[1]} 
-            fill="white"
-            stroke="black"
-            strokeWidth={1}
-            />
-          </Layer>
-    )
+export class Placeholder extends React.Component {
+  Coord: number[];
+  relCoord: { x1: number; y1: number; x2: number; y2: number; };
+  constructor(props: Readonly<{}>, Coord : Array<number>) {
+    super(props);
+    this.Coord = Coord;
+    this.relCoord = {x1:0, y1:0, x2:Coord[2]-Coord[0], y2:Coord[3]-Coord[1]};
   }
-  ReactDOM.render(demo(),document.getElementById("ha"));
+  render() : React.ReactNode {
+      return(
+        <div style={{position:"absolute", left:this.Coord[0], top:this.Coord[1]}}>
+          <svg width={this.relCoord.x2} height={this.relCoord.y2}>
+            <rect 
+              width={this.relCoord.x2}
+              height={this.relCoord.y2}
+              fill={"white"}
+              strokeWidth={2}
+              stroke={"black"}  />
+            <line 
+              x1={this.relCoord.x1}
+              y1={this.relCoord.y1}
+              x2={this.relCoord.x2}
+              y2={this.relCoord.y2}
+              stroke={"black"}/>
+            <line 
+              x1={this.relCoord.x1}
+              y1={this.relCoord.y2}
+              x2={this.relCoord.x2}
+              y2={this.relCoord.y1}
+              stroke={"black"}/>
+        </svg>
+      </div>
+      )
+  }
 };

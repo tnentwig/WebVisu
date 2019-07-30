@@ -1,5 +1,5 @@
 import * as VisuObjects from '../../obj/visuobjects'
-import { StringToBoolean, RgbToHex, StringToArray } from './parserconvert';
+import { StringToBoolean, RgbToHex, StringToArray } from './parserutils';
 
 export function ParseSimpleShape(section : JQuery<XMLDocument>) {
     // Check if its on of the allowed shapes like rectangle, round-rectangle, circle or line
