@@ -1,12 +1,14 @@
 import * as $ from 'jquery';
+import * as ReactDOM from "react-dom";
 import {ParseSimpleShape} from './Elements/elementparser';
+import * as React from 'react';
 
-export default class VisuParser {
+export default class HTML5Visu {
     rootDir: string;
     constructor(rootDir: string){
         this.rootDir= rootDir;
     }
-    ParseVisu (relPath: string) {
+    CreateVisu (relPath: string) {
         return $.ajax({
             url: this.rootDir+relPath,
             type: 'GET',
@@ -15,7 +17,7 @@ export default class VisuParser {
         })
         .then((data) => {
             // Searching for elements
-            return this.GetVisuElements(data);
+            return this.ConvertVisuElements(data);
             }
         )
         .fail((error) => {
@@ -23,11 +25,10 @@ export default class VisuParser {
         })
     }
 
-    GetVisuElements (XML : XMLDocument) : number {
+    ConvertVisuElements (XML : XMLDocument) : Array<(JSX.Element | undefined)> {
         console.log("Start parsing...");
         let visuXML=$(XML);
-        // Create the React-Konva Stage
-        
+        let VisuObjects: Array<(JSX.Element | undefined)> =[];
         // Rip all <element> sections
         visuXML.children("visualisation").children("element").each(function(){
             let section = $(this);
@@ -35,7 +36,7 @@ export default class VisuParser {
             switch(section.attr("type")) {
                 // Is a simple shape like rectangle, round-rectangle, circle or line
                 case "simple":
-                    ParseSimpleShape(section);
+                    VisuObjects.push(ParseSimpleShape(section));
                     break;
                 // Is a bitmap
                 case "bitmap":
@@ -61,7 +62,18 @@ export default class VisuParser {
             }
         });
         console.log("XMl-File parsed successfully!");
-        
-        return 0;
+        console.dir(VisuObjects);
+
+        function App() {
+            let array = [1,2,3,4];
+            return (
+                array.map((element, index) => (<React.Fragment key={index}> {element} </React.Fragment>))
+            )
+        }
+
+        ReactDOM.render(<App />, document.getElementById("visualisation"));
+
+        return VisuObjects;
     }
+
 }
