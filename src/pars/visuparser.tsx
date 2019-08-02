@@ -62,12 +62,14 @@ export default class HTML5Visu {
             }
         });
         console.log("XMl-File parsed successfully!");
-        console.dir(VisuObjects);
 
         function App() {
-            let array = [1,2,3,4];
             return (
-                array.map((element, index) => (<React.Fragment key={index}> {element} </React.Fragment>))
+                <React.Fragment>
+                    {
+                        VisuObjects.map((element, index)=><div key={index}>{element}</div>)
+                    }
+                </React.Fragment>
             )
         }
 
