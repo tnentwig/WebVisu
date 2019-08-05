@@ -35430,10 +35430,41 @@ objHTML5Visu.CreateVisu("plc_visu.xml");
 
 /***/ }),
 
-/***/ "./src/pars/Elements/elementparser.tsx":
-/*!*********************************************!*\
-  !*** ./src/pars/Elements/elementparser.tsx ***!
-  \*********************************************/
+/***/ "./src/pars/Elements/placeholder.tsx":
+/*!*******************************************!*\
+  !*** ./src/pars/Elements/placeholder.tsx ***!
+  \*******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+var utilfunctions_1 = __webpack_require__(/*! ../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
+function Placeholder(section) {
+    try {
+        var rect = utilfunctions_1.stringToArray(section.children("rect").text());
+        var relCoord = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
+        return (React.createElement("div", { style: { position: "absolute", left: rect[0], top: rect[1] } },
+            React.createElement("svg", { width: relCoord.x2, height: relCoord.y2 },
+                React.createElement("rect", { width: relCoord.x2, height: relCoord.y2, fill: "white", strokeWidth: 2, stroke: "black" }),
+                React.createElement("line", { x1: relCoord.x1, y1: relCoord.y1, x2: relCoord.x2, y2: relCoord.y2, stroke: "black" }),
+                React.createElement("line", { x1: relCoord.x1, y1: relCoord.y2, x2: relCoord.x2, y2: relCoord.y1, stroke: "black" }))));
+    }
+    catch (_a) {
+        (function () { return console.error("Object is not supported! No dimensions detected!"); });
+    }
+}
+exports.Placeholder = Placeholder;
+
+
+/***/ }),
+
+/***/ "./src/pars/Elements/polygon.tsx":
+/*!***************************************!*\
+  !*** ./src/pars/Elements/polygon.tsx ***!
+  \***************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -35442,71 +35473,176 @@ objHTML5Visu.CreateVisu("plc_visu.xml");
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
-var parserutils_1 = __webpack_require__(/*! ./parserutils */ "./src/pars/Elements/parserutils.ts");
-function ParseSimpleShape(section) {
-    var shape = section.children("simple-shape").text();
-    if (['round-rect', 'circle', 'line', 'rectangle'].includes(shape)) {
-        var has_inside_color = parserutils_1.StringToBoolean(section.children("has-inside-color").text());
-        var fill_color = parserutils_1.RgbToHex(section.children("fill-color").text());
-        var fill_color_alarm = parserutils_1.RgbToHex(section.children("fill-color-alarm").text());
-        var has_frame_color = parserutils_1.StringToBoolean(section.children("has-frame-color").text());
-        var frame_color = parserutils_1.RgbToHex(section.children("frame-color").text());
-        var frame_color_alarm = parserutils_1.RgbToHex(section.children("frame-color-alarm").text());
+var util = __webpack_require__(/*! ../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
+function parsePolygon(section) {
+    var shape = section.children('poly-shape').text();
+    if (['polygon', 'bezier', 'polyline'].includes(shape)) {
+        var has_inside_color = util.stringToBoolean(section.children("has-inside-color").text());
+        var fill_color_1 = util.rgbToHexString(section.children("fill-color").text());
+        var fill_color_alarm = util.rgbToHexString(section.children("fill-color-alarm").text());
+        var has_frame_color = util.stringToBoolean(section.children("has-frame-color").text());
+        var frame_color_1 = util.rgbToHexString(section.children("frame-color").text());
+        var frame_color_alarm = util.rgbToHexString(section.children("frame-color-alarm").text());
         var line_width = Number(section.children("line-width").text());
         var elem_id = Number(section.children("elem-id").text());
-        var rect = parserutils_1.StringToArray(section.children("rect").text());
-        var center = parserutils_1.StringToArray(section.children("center").text());
-        var hidden_input = parserutils_1.StringToBoolean(section.children("hidden-input").text());
-        var enable_text_input = parserutils_1.StringToBoolean(section.children("enable-text-input").text());
-        section.children("simple-shape").each(function () {
-            var simpleshape = $(this);
-            switch (simpleshape.text()) {
-                case "has-inside-color":
-                    ;
-            }
+        var center = util.stringToArray(section.children("center").text());
+        var hidden_input = util.stringToBoolean(section.children("hidden-input").text());
+        var enable_text_input = util.stringToBoolean(section.children("enable-text-input").text());
+        var pointCoord_1 = [];
+        section.children('point').each(function () {
+            pointCoord_1.push(util.stringToArray($(this).text()));
         });
-        var relCoord = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
-        return (React.createElement("div", { style: { position: "absolute", left: rect[0], top: rect[1] } },
-            React.createElement("svg", { width: relCoord.x2, height: relCoord.y2 },
-                React.createElement("rect", { width: relCoord.x2, height: relCoord.y2, fill: "white", strokeWidth: 2, stroke: "black" }),
-                React.createElement("line", { x1: relCoord.x1, y1: relCoord.y1, x2: relCoord.x2, y2: relCoord.y2, stroke: "black" }),
-                React.createElement("line", { x1: relCoord.x1, y1: relCoord.y2, x2: relCoord.x2, y2: relCoord.y1, stroke: "black" }))));
+        var rect_1 = util.computeRectCoord(pointCoord_1);
+        var relCornerCoord_1 = { x1: 0, y1: 0, x2: rect_1[2] - rect_1[0], y2: rect_1[3] - rect_1[1] };
+        var relCenterCoord = { x: center[0] - rect_1[0], y: center[1] - rect_1[1] };
+        var edge_1 = 1;
+        return (React.createElement("div", { style: { position: "absolute", left: rect_1[0], top: rect_1[1], width: relCornerCoord_1.x2 + 2 * edge_1, height: relCornerCoord_1.y2 + 2 * edge_1 } },
+            React.createElement("svg", { width: relCornerCoord_1.x2 + 2 * edge_1, height: relCornerCoord_1.y2 + 2 * edge_1 }, (function () {
+                switch (shape) {
+                    case 'polygon':
+                        return (React.createElement("polygon", { points: util.coordArrayToString(pointCoord_1, rect_1[0] - edge_1, rect_1[1] - edge_1), fill: fill_color_1, strokeWidth: edge_1, stroke: frame_color_1 }));
+                    case 'bezier':
+                        return (React.createElement("rect", { width: relCornerCoord_1.x2, height: relCornerCoord_1.y2 }));
+                    case 'polyline':
+                        return (React.createElement("polyline", { points: util.coordArrayToString(pointCoord_1, rect_1[0] - edge_1, rect_1[1] - edge_1), fill: fill_color_1, strokeWidth: edge_1, stroke: frame_color_1 }));
+                }
+            })())));
     }
     else {
-        (function () { return console.error("Simple-Shape: <" + shape + "> is not supported!"); });
+        (function () { return console.error("Poly-Shape: <" + shape + "> is not supported!"); });
     }
 }
-exports.ParseSimpleShape = ParseSimpleShape;
+exports.parsePolygon = parsePolygon;
 
 
 /***/ }),
 
-/***/ "./src/pars/Elements/parserutils.ts":
-/*!******************************************!*\
-  !*** ./src/pars/Elements/parserutils.ts ***!
-  \******************************************/
+/***/ "./src/pars/Elements/simpleshape.tsx":
+/*!*******************************************!*\
+  !*** ./src/pars/Elements/simpleshape.tsx ***!
+  \*******************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-function StringToBoolean(booleanExp) {
+var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+var utilfunctions_1 = __webpack_require__(/*! ../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
+function parseSimpleShape(section) {
+    var shape = section.children("simple-shape").text();
+    if (['round-rect', 'circle', 'line', 'rectangle'].includes(shape)) {
+        var has_inside_color = utilfunctions_1.stringToBoolean(section.children("has-inside-color").text());
+        var fill_color_1 = utilfunctions_1.rgbToHexString(section.children("fill-color").text());
+        var fill_color_alarm = utilfunctions_1.rgbToHexString(section.children("fill-color-alarm").text());
+        var has_frame_color = utilfunctions_1.stringToBoolean(section.children("has-frame-color").text());
+        var frame_color_1 = utilfunctions_1.rgbToHexString(section.children("frame-color").text());
+        var frame_color_alarm = utilfunctions_1.rgbToHexString(section.children("frame-color-alarm").text());
+        var line_width = Number(section.children("line-width").text());
+        var elem_id = Number(section.children("elem-id").text());
+        var rect = utilfunctions_1.stringToArray(section.children("rect").text());
+        var center = utilfunctions_1.stringToArray(section.children("center").text());
+        var hidden_input = utilfunctions_1.stringToBoolean(section.children("hidden-input").text());
+        var enable_text_input = utilfunctions_1.stringToBoolean(section.children("enable-text-input").text());
+        section.children("simple-shape").each(function () {
+            var simpleshape = $(this);
+            switch (simpleshape.text()) {
+                case "has-inside-color":
+                    ;
+                    break;
+            }
+        });
+        var relCornerCoord_1 = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
+        var relCenterCoord_1 = { x: center[0] - rect[0], y: center[1] - rect[1] };
+        var edge_1 = 1;
+        return (React.createElement("div", { style: { position: "absolute", left: rect[0], top: rect[1], width: relCornerCoord_1.x2 + 2 * edge_1, height: relCornerCoord_1.y2 + 2 * edge_1 } },
+            React.createElement("svg", { width: relCornerCoord_1.x2 + 2 * edge_1, height: relCornerCoord_1.y2 + 2 * edge_1 }, (function () {
+                switch (shape) {
+                    case 'round-rect':
+                        return (React.createElement("rect", { width: relCornerCoord_1.x2, height: relCornerCoord_1.y2, x: edge_1, y: edge_1, rx: 10, ry: 10, fill: fill_color_1, strokeWidth: edge_1, stroke: frame_color_1 }));
+                    case 'circle':
+                        return (React.createElement("circle", { cx: relCenterCoord_1.x + edge_1, cy: relCenterCoord_1.y + edge_1, fill: fill_color_1, strokeWidth: edge_1, stroke: frame_color_1, r: relCenterCoord_1.x }));
+                    case 'line':
+                        break;
+                    case 'rectangle':
+                        return (React.createElement("rect", { width: relCornerCoord_1.x2, height: relCornerCoord_1.y2, x: edge_1, y: edge_1, fill: fill_color_1, strokeWidth: edge_1, stroke: frame_color_1 }));
+                }
+            })())));
+    }
+    else {
+        (function () { return console.error("Simple-Shape: <" + shape + "> is not supported!"); });
+    }
+}
+exports.parseSimpleShape = parseSimpleShape;
+
+
+/***/ }),
+
+/***/ "./src/pars/Utils/utilfunctions.ts":
+/*!*****************************************!*\
+  !*** ./src/pars/Utils/utilfunctions.ts ***!
+  \*****************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+function stringToBoolean(booleanExp) {
     return JSON.parse(booleanExp);
 }
-exports.StringToBoolean = StringToBoolean;
-function RgbToHex(rgb) {
+exports.stringToBoolean = stringToBoolean;
+function rgbToHexString(rgb) {
     var rgbClr = rgb.split(',');
     var r = Number(rgbClr[0]);
     var g = Number(rgbClr[1]);
     var b = Number(rgbClr[2]);
-    return Number('0x' + (r << 16 | g << 8 | b).toString(16).toUpperCase());
+    var interim = (r << 16 | g << 8 | b).toString(16).toUpperCase();
+    while (interim.length != 6) {
+        interim = '0' + interim;
+    }
+    ;
+    return ('#' + interim);
 }
-exports.RgbToHex = RgbToHex;
-function StringToArray(stringExp) {
+exports.rgbToHexString = rgbToHexString;
+function stringToArray(stringExp) {
     return (stringExp.split(',')).map(Number);
 }
-exports.StringToArray = StringToArray;
+exports.stringToArray = stringToArray;
+function computeRectCoord(pointArray) {
+    var rect = [pointArray[0][0], pointArray[0][1], pointArray[0][0], pointArray[0][1]];
+    pointArray.forEach(function (element) {
+        if (element[0] < rect[0]) {
+            rect[0] = element[0];
+        }
+        ;
+        if (element[0] > rect[2]) {
+            rect[2] = element[0];
+        }
+        ;
+        if (element[1] < rect[1]) {
+            rect[1] = element[1];
+        }
+        ;
+        if (element[1] > rect[3]) {
+            rect[3] = element[1];
+        }
+        ;
+    });
+    return rect;
+}
+exports.computeRectCoord = computeRectCoord;
+function coordArrayToString(pointArray, xOffset, yOffset) {
+    var interim = [];
+    pointArray.forEach(function (item, index) {
+        pointArray[index][0] = item[0] - xOffset;
+        pointArray[index][1] = item[1] - yOffset;
+    });
+    pointArray.forEach(function (element) { return interim.push(element.join(',')); });
+    return interim.join(' ');
+}
+exports.coordArrayToString = coordArrayToString;
 
 
 /***/ }),
@@ -35523,8 +35659,10 @@ exports.StringToArray = StringToArray;
 Object.defineProperty(exports, "__esModule", { value: true });
 var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 var ReactDOM = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
-var elementparser_1 = __webpack_require__(/*! ./Elements/elementparser */ "./src/pars/Elements/elementparser.tsx");
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+var simpleshape_1 = __webpack_require__(/*! ./Elements/simpleshape */ "./src/pars/Elements/simpleshape.tsx");
+var placeholder_1 = __webpack_require__(/*! ./Elements/placeholder */ "./src/pars/Elements/placeholder.tsx");
+var polygon_1 = __webpack_require__(/*! ./Elements/polygon */ "./src/pars/Elements/polygon.tsx");
 var HTML5Visu = (function () {
     function HTML5Visu(rootDir) {
         this.rootDir = rootDir;
@@ -35547,24 +35685,29 @@ var HTML5Visu = (function () {
     HTML5Visu.prototype.ConvertVisuElements = function (XML) {
         console.log("Start parsing...");
         var visuXML = $(XML);
-        var VisuObjects = [];
+        var visuObjects = [];
         visuXML.children("visualisation").children("element").each(function () {
             var section = $(this);
             switch (section.attr("type")) {
                 case "simple":
-                    VisuObjects.push(elementparser_1.ParseSimpleShape(section));
+                    visuObjects.push(simpleshape_1.parseSimpleShape(section));
                     break;
                 case "bitmap":
+                    visuObjects.push(placeholder_1.Placeholder(section));
                     break;
                 case "button":
+                    visuObjects.push(placeholder_1.Placeholder(section));
                     break;
                 case "polygon":
+                    visuObjects.push(polygon_1.parsePolygon(section));
                     break;
                 case "piechart":
                     break;
                 case "group":
+                    visuObjects.push(placeholder_1.Placeholder(section));
                     break;
                 case "scrollbar":
+                    visuObjects.push(placeholder_1.Placeholder(section));
                     break;
                 default:
                     console.log("Type <" + section.attr("type") + "> is not supported yet!");
@@ -35572,10 +35715,10 @@ var HTML5Visu = (function () {
         });
         console.log("XMl-File parsed successfully!");
         function App() {
-            return (React.createElement(React.Fragment, null, VisuObjects.map(function (element, index) { return React.createElement("div", { key: index }, element); })));
+            return (React.createElement(React.Fragment, null, visuObjects.map(function (element, index) { return React.createElement("div", { key: index }, element); })));
         }
         ReactDOM.render(React.createElement(App, null), document.getElementById("visualisation"));
-        return VisuObjects;
+        return visuObjects;
     };
     return HTML5Visu;
 }());

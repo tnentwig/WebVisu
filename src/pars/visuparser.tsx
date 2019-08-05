@@ -1,7 +1,9 @@
 import * as $ from 'jquery';
 import * as ReactDOM from "react-dom";
-import {ParseSimpleShape} from './Elements/elementparser';
 import * as React from 'react';
+import {parseSimpleShape} from './Elements/simpleshape';
+import {Placeholder} from './Elements/placeholder';
+import { parsePolygon } from './Elements/polygon';
 
 export default class HTML5Visu {
     rootDir: string;
@@ -28,7 +30,7 @@ export default class HTML5Visu {
     ConvertVisuElements (XML : XMLDocument) : Array<(JSX.Element | undefined)> {
         console.log("Start parsing...");
         let visuXML=$(XML);
-        let VisuObjects: Array<(JSX.Element | undefined)> =[];
+        let visuObjects: Array<(JSX.Element | undefined)> =[];
         // Rip all <element> sections
         visuXML.children("visualisation").children("element").each(function(){
             let section = $(this);
@@ -36,25 +38,30 @@ export default class HTML5Visu {
             switch(section.attr("type")) {
                 // Is a simple shape like rectangle, round-rectangle, circle or line
                 case "simple":
-                    VisuObjects.push(ParseSimpleShape(section));
+                    visuObjects.push(parseSimpleShape(section));
                     break;
                 // Is a bitmap
                 case "bitmap":
+                    visuObjects.push(Placeholder(section));
                     break;
                 // Is a button
                 case "button":
+                    visuObjects.push(Placeholder(section));
                     break;
                 // Is a polygon - As polygon, polyline or bezier
                 case "polygon":
+                    visuObjects.push(parsePolygon(section))
                     break;
                 // Is a piechart
                 case "piechart":
                     break;
                 // Is a group (Dynamic elements like a graph)
                 case "group":
+                    visuObjects.push(Placeholder(section));
                     break;
                 // Is a Scrollbar
                 case "scrollbar":
+                    visuObjects.push(Placeholder(section));
                     break;
                 // Not a supported type, is logged
                 default:
@@ -62,20 +69,20 @@ export default class HTML5Visu {
             }
         });
         console.log("XMl-File parsed successfully!");
-
+        // The coverted sections are inserted in the virtual react DOM
         function App() {
             return (
                 <React.Fragment>
                     {
-                        VisuObjects.map((element, index)=><div key={index}>{element}</div>)
+                        visuObjects.map((element, index)=><div key={index}>{element}</div>)
                     }
                 </React.Fragment>
             )
         }
-
+        // The virtual DOM will be inserted in the DOM. React will update the DOM automatically.
         ReactDOM.render(<App />, document.getElementById("visualisation"));
 
-        return VisuObjects;
+        return visuObjects;
     }
 
 }
