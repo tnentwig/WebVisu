@@ -46,9 +46,12 @@ export function parsePolygon(section : JQuery<XMLDocument>){
                             )
                         case 'bezier':
                             return(
-                                <rect 
-                                width={relCornerCoord.x2}
-                                height={relCornerCoord.y2} />
+                                <path 
+                                d={util.coordArrayToBezierString(pointCoord, rect[0]-edge, rect[1]-edge)}
+                                fill={fill_color}
+                                strokeWidth={edge}
+                                stroke={frame_color}
+                                />
                             )
                         case 'polyline':
                             return(

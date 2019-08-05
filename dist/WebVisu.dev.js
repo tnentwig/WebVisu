@@ -35493,16 +35493,16 @@ function parsePolygon(section) {
             pointCoord_1.push(util.stringToArray($(this).text()));
         });
         var rect_1 = util.computeRectCoord(pointCoord_1);
-        var relCornerCoord_1 = { x1: 0, y1: 0, x2: rect_1[2] - rect_1[0], y2: rect_1[3] - rect_1[1] };
+        var relCornerCoord = { x1: 0, y1: 0, x2: rect_1[2] - rect_1[0], y2: rect_1[3] - rect_1[1] };
         var relCenterCoord = { x: center[0] - rect_1[0], y: center[1] - rect_1[1] };
         var edge_1 = 1;
-        return (React.createElement("div", { style: { position: "absolute", left: rect_1[0], top: rect_1[1], width: relCornerCoord_1.x2 + 2 * edge_1, height: relCornerCoord_1.y2 + 2 * edge_1 } },
-            React.createElement("svg", { width: relCornerCoord_1.x2 + 2 * edge_1, height: relCornerCoord_1.y2 + 2 * edge_1 }, (function () {
+        return (React.createElement("div", { style: { position: "absolute", left: rect_1[0], top: rect_1[1], width: relCornerCoord.x2 + 2 * edge_1, height: relCornerCoord.y2 + 2 * edge_1 } },
+            React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge_1, height: relCornerCoord.y2 + 2 * edge_1 }, (function () {
                 switch (shape) {
                     case 'polygon':
                         return (React.createElement("polygon", { points: util.coordArrayToString(pointCoord_1, rect_1[0] - edge_1, rect_1[1] - edge_1), fill: fill_color_1, strokeWidth: edge_1, stroke: frame_color_1 }));
                     case 'bezier':
-                        return (React.createElement("rect", { width: relCornerCoord_1.x2, height: relCornerCoord_1.y2 }));
+                        return (React.createElement("path", { d: util.coordArrayToBezierString(pointCoord_1, rect_1[0] - edge_1, rect_1[1] - edge_1), fill: fill_color_1, strokeWidth: edge_1, stroke: frame_color_1 }));
                     case 'polyline':
                         return (React.createElement("polyline", { points: util.coordArrayToString(pointCoord_1, rect_1[0] - edge_1, rect_1[1] - edge_1), fill: fill_color_1, strokeWidth: edge_1, stroke: frame_color_1 }));
                 }
@@ -35643,6 +35643,27 @@ function coordArrayToString(pointArray, xOffset, yOffset) {
     return interim.join(' ');
 }
 exports.coordArrayToString = coordArrayToString;
+function coordArrayToBezierString(pointArray, xOffset, yOffset) {
+    var bezier = '';
+    pointArray.forEach(function (item, index) {
+        pointArray[index][0] = item[0] - xOffset;
+        pointArray[index][1] = item[1] - yOffset;
+    });
+    pointArray.forEach(function (element, index) {
+        if (index == 0) {
+            bezier += 'M' + element.join(' ');
+        }
+        else if (index == 1) {
+            bezier += ' C' + element.join(' ');
+        }
+        else {
+            bezier += ', ' + element.join(' ');
+        }
+    });
+    console.log(bezier);
+    return bezier;
+}
+exports.coordArrayToBezierString = coordArrayToBezierString;
 
 
 /***/ }),

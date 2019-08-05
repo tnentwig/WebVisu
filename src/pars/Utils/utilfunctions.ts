@@ -1,4 +1,4 @@
-import { element } from "prop-types";
+import { element, string } from "prop-types";
 
 export function stringToBoolean(booleanExp : string) : boolean {
     return JSON.parse(booleanExp);
@@ -43,3 +43,24 @@ export function coordArrayToString(pointArray : number[][], xOffset : number, yO
     pointArray.forEach((element)=>interim.push(element.join(',')));
     return interim.join(' ');
   }
+
+export function coordArrayToBezierString(pointArray : number[][], xOffset : number, yOffset : number) : string {
+    let bezier : string = '';
+    pointArray.forEach(function(item, index){
+        pointArray[index][0] = item[0]-xOffset;
+        pointArray[index][1] = item[1]-yOffset;
+    })
+    pointArray.forEach((element,index)=>{
+        if (index == 0) {
+            bezier += 'M'+ element.join(' ');
+        }
+        else if (index == 1){
+            bezier += ' C' + element.join(' ');
+        }
+        else {
+            bezier += ', ' + element.join(' ');
+        }
+    })
+    console.log(bezier);
+    return bezier;
+}
