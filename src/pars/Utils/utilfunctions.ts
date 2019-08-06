@@ -21,7 +21,7 @@ export function stringToArray(stringExp : string) : Array<number> {
     return (stringExp.split(',')).map(Number);
 }
 
-export function computeRectCoord(pointArray : number[][]): number[] {
+export function computeMinMaxCoord(pointArray : number[][]): number[] {
     let rect = [pointArray[0][0], pointArray[0][1], pointArray[0][0], pointArray[0][1]];
     pointArray.forEach(function(element){
         // Find minimum and maximum of x
@@ -61,6 +61,5 @@ export function coordArrayToBezierString(pointArray : number[][], xOffset : numb
             bezier += ', ' + element.join(' ');
         }
     })
-    console.log(bezier);
     return bezier;
 }

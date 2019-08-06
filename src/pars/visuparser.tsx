@@ -4,6 +4,10 @@ import * as React from 'react';
 import {parseSimpleShape} from './Elements/simpleshape';
 import {Placeholder} from './Elements/placeholder';
 import { parsePolygon } from './Elements/polygon';
+import { parseButton } from './Elements/button';
+import { parseScrollbar } from './Elements/scrollbar';
+import { parseArrayTable } from './Elements/arraytable';
+import { parseBitmap } from './Elements/bitmap';
 
 export default class HTML5Visu {
     rootDir: string;
@@ -42,11 +46,11 @@ export default class HTML5Visu {
                     break;
                 // Is a bitmap
                 case "bitmap":
-                    visuObjects.push(Placeholder(section));
+                    visuObjects.push(parseBitmap(section));
                     break;
                 // Is a button
                 case "button":
-                    visuObjects.push(Placeholder(section));
+                    visuObjects.push(parseButton(section));
                     break;
                 // Is a polygon - As polygon, polyline or bezier
                 case "polygon":
@@ -61,9 +65,12 @@ export default class HTML5Visu {
                     break;
                 // Is a Scrollbar
                 case "scrollbar":
-                    visuObjects.push(Placeholder(section));
+                    visuObjects.push(parseScrollbar(section));
                     break;
                 // Not a supported type, is logged
+                case "array-table":
+                    visuObjects.push(parseArrayTable(section));
+                    break;
                 default:
                     console.log("Type <"+section.attr("type")+"> is not supported yet!");
             }

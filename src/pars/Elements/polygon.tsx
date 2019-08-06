@@ -23,9 +23,9 @@ export function parsePolygon(section : JQuery<XMLDocument>){
         let pointCoord: number[][] = [];
         section.children('point').each(function(){
             pointCoord.push(util.stringToArray($(this).text()));
-        })
+        });
         // Auxiliary values
-        let rect = util.computeRectCoord(pointCoord);
+        let rect = util.computeMinMaxCoord(pointCoord);
         let relCornerCoord = {x1:0, y1:0, x2:rect[2]-rect[0], y2:rect[3]-rect[1]};
         let relCenterCoord = {x:center[0]-rect[0], y:center[1]-rect[1]};
         let edge=1;

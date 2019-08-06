@@ -66,7 +66,15 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
                       />
                     )
                   case 'line':
-                    break;
+                      return(
+                        <line
+                        x1={relCornerCoord.x1}
+                        y1={relCornerCoord.y2}
+                        x2={relCornerCoord.x2}
+                        y2={relCornerCoord.y1}
+                        stroke={frame_color}
+                        />
+                      )
                   case 'rectangle':
                     return(
                       <rect 
