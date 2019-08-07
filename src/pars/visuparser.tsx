@@ -1,8 +1,8 @@
 import * as $ from 'jquery';
 import * as ReactDOM from "react-dom";
 import * as React from 'react';
-import {parseSimpleShape} from './Elements/Simpleshape/simpleshape';
-import {Placeholder} from './Elements/placeholder';
+import { parseSimpleShape } from './Elements/Simpleshape/simpleshape';
+import { Placeholder } from './Elements/placeholder';
 import { parsePolygon } from './Elements/polygon';
 import { parseButton } from './Elements/button';
 import { parseScrollbar } from './Elements/scrollbar';

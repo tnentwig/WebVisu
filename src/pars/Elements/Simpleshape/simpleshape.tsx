@@ -1,10 +1,10 @@
-import * as React from "react";
-import * as $ from 'jquery';
+import * as React from 'react';
 import * as util from '../../Utils/utilfunctions';
 import { RoundRect } from './Subunits/roundrect'
 import { Line } from './Subunits/line';
 import { Circle } from './Subunits/circle'
 import { Rectangle } from './Subunits/rectangle';
+import { parseTextfield } from './Features/text';
 
 export function parseSimpleShape(section : JQuery<XMLDocument>){
     // Check if its on of the allowed shapes like rectangle, round-rectangle, circle or line
@@ -25,15 +25,7 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
         let hidden_input = util.stringToBoolean(section.children("hidden-input").text());
         let enable_text_input = util.stringToBoolean(section.children("enable-text-input").text());
         
-        // Variable content like "toggle variable"
-        section.children("simple-shape").each(function() {
-            let simpleshape = $(this);
-            switch (simpleshape.text()) {
-                case "has-inside-color": 
-                ;
-                break;       
-            }
-        })
+        let textfield = parseTextfield(section);
 
         // Return of the React-Node
         switch (shape){
@@ -53,7 +45,7 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
             )
           case 'rectangle':
             return(
-              Rectangle(has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, hidden_input, enable_text_input, rect, center)
+              Rectangle(textfield, has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, hidden_input, enable_text_input, rect, center)
             )
         }
     }
