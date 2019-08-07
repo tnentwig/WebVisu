@@ -63,3 +63,4 @@ export function coordArrayToBezierString(pointArray : number[][], xOffset : numb
     })
     return bezier;
 }
+
