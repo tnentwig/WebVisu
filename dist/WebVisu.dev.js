@@ -45593,45 +45593,6 @@ objHTML5Visu.CreateVisu("/plc_visu.xml");
 
 /***/ }),
 
-/***/ "./src/pars/Elements/Simpleshape/Features/text.tsx":
-/*!*********************************************************!*\
-  !*** ./src/pars/Elements/Simpleshape/Features/text.tsx ***!
-  \*********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var util = __webpack_require__(/*! ../../../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
-var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-function parseTextfield(section) {
-    if (section.children('text-format').length > 0) {
-        var font_height = Number(section.children("font-height").text());
-        var font_height_point_size = Number(section.children("font-height-point-size").text());
-        var font_weight = Number(section.children("font-weight").text());
-        var font_italic = util.stringToBoolean(section.children("font-italic").text());
-        var font_strike_out = util.stringToBoolean(section.children("font-strike-out").text());
-        var font_underline = util.stringToBoolean(section.children("font-underline").text());
-        var font_char_set = Number(section.children("font-char-set").text());
-        var font_color = util.rgbToHexString(section.children("font-color").text());
-        var text_id = Number(section.children("text-id").text());
-        var text_align_horz = section.children("text-align-horz").text();
-        var text_align_vert = section.children("text-align-vert").text();
-        var text = section.children("text-format").text();
-        console.log(text);
-        return (React.createElement("text", { x: 0, y: 30, pointerEvents: 'none' }, text));
-    }
-    else {
-        console.log('nono');
-        return undefined;
-    }
-}
-exports.parseTextfield = parseTextfield;
-
-
-/***/ }),
-
 /***/ "./src/pars/Elements/Simpleshape/Subunits/circle.tsx":
 /*!***********************************************************!*\
   !*** ./src/pars/Elements/Simpleshape/Subunits/circle.tsx ***!
@@ -45643,13 +45604,17 @@ exports.parseTextfield = parseTextfield;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-function Circle(has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, hidden_input, enable_text_input, rect, center) {
+function Circle(textField, has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, hidden_input, enable_text_input, rect, center) {
     var relCornerCoord = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
     var relCenterCoord = { x: center[0] - rect[0], y: center[1] - rect[1] };
-    var edge = 1;
+    var edge = (line_width === 0) ? 1 : line_width;
+    var strokeWidth = (has_frame_color) ? edge : 0;
+    var fillColor = (has_inside_color) ? fill_color : 'none';
     return (React.createElement("div", { style: { position: "absolute", left: rect[0], top: rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
         React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge },
-            React.createElement("ellipse", { cx: relCenterCoord.x + edge, cy: relCenterCoord.y + edge, rx: relCornerCoord.x2 / 2, ry: relCornerCoord.y2 / 2, fill: fill_color, strokeWidth: edge, stroke: frame_color }))));
+            React.createElement("g", null,
+                React.createElement("ellipse", { cx: relCenterCoord.x + edge, cy: relCenterCoord.y + edge, rx: relCornerCoord.x2 / 2, ry: relCornerCoord.y2 / 2, fill: fillColor, strokeWidth: strokeWidth, stroke: frame_color }),
+                textField))));
 }
 exports.Circle = Circle;
 
@@ -45695,10 +45660,12 @@ function Rectangle(textField, has_inside_color, fill_color, fill_color_alarm, ha
     var relCornerCoord = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
     var relCenterCoord = { x: center[0] - rect[0], y: center[1] - rect[1] };
     var edge = (line_width === 0) ? 1 : line_width;
+    var strokeWidth = (has_frame_color) ? edge : 0;
+    var fillColor = (has_inside_color) ? fill_color : 'none';
     return (React.createElement("div", { style: { position: "absolute", left: rect[0], top: rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
         React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge, onClick: click },
             React.createElement("g", null,
-                React.createElement("rect", { width: relCornerCoord.x2, height: relCornerCoord.y2, x: edge, y: edge, fill: fill_color, strokeWidth: edge, stroke: frame_color }),
+                React.createElement("rect", { width: relCornerCoord.x2, height: relCornerCoord.y2, x: edge, y: edge, fill: fillColor, strokeWidth: strokeWidth, stroke: frame_color }),
                 textField))));
 }
 exports.Rectangle = Rectangle;
@@ -45748,7 +45715,7 @@ var roundrect_1 = __webpack_require__(/*! ./Subunits/roundrect */ "./src/pars/El
 var line_1 = __webpack_require__(/*! ./Subunits/line */ "./src/pars/Elements/Simpleshape/Subunits/line.tsx");
 var circle_1 = __webpack_require__(/*! ./Subunits/circle */ "./src/pars/Elements/Simpleshape/Subunits/circle.tsx");
 var rectangle_1 = __webpack_require__(/*! ./Subunits/rectangle */ "./src/pars/Elements/Simpleshape/Subunits/rectangle.tsx");
-var text_1 = __webpack_require__(/*! ./Features/text */ "./src/pars/Elements/Simpleshape/Features/text.tsx");
+var text_1 = __webpack_require__(/*! ../../Features/text */ "./src/pars/Features/text.tsx");
 function parseSimpleShape(section) {
     var shape = section.children("simple-shape").text();
     if (['round-rect', 'circle', 'line', 'rectangle'].includes(shape)) {
@@ -45770,7 +45737,7 @@ function parseSimpleShape(section) {
                 return (roundrect_1.RoundRect(has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, hidden_input, enable_text_input, rect, center));
                 break;
             case 'circle':
-                return (circle_1.Circle(has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, hidden_input, enable_text_input, rect, center));
+                return (circle_1.Circle(textfield, has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, hidden_input, enable_text_input, rect, center));
                 break;
             case 'line':
                 return (line_1.Line(has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, hidden_input, enable_text_input, rect, center));
@@ -45996,10 +45963,50 @@ function parseScrollbar(section) {
     var relCornerCoord = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
     var relCenterCoord = { x: center[0] - rect[0], y: center[1] - rect[1] };
     var edge = 1;
+    var orientation = ((relCornerCoord.x2 > relCornerCoord.y2) ? "horizontal" : "vertical");
     return (React.createElement("div", { style: { position: "absolute", left: rect[0], top: rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
-        React.createElement(Slider_1.default, { orientation: "vertical" })));
+        React.createElement(Slider_1.default, { orientation: orientation })));
 }
 exports.parseScrollbar = parseScrollbar;
+
+
+/***/ }),
+
+/***/ "./src/pars/Features/text.tsx":
+/*!************************************!*\
+  !*** ./src/pars/Features/text.tsx ***!
+  \************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var util = __webpack_require__(/*! ../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
+var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+function parseTextfield(section) {
+    if (section.children('text-format').length > 0) {
+        var font_height = Number(section.children("font-height").text());
+        var font_height_point_size = Number(section.children("font-height-point-size").text());
+        var font_weight = Number(section.children("font-weight").text());
+        var font_italic = util.stringToBoolean(section.children("font-italic").text());
+        var font_strike_out = util.stringToBoolean(section.children("font-strike-out").text());
+        var font_underline = util.stringToBoolean(section.children("font-underline").text());
+        var font_char_set = Number(section.children("font-char-set").text());
+        var font_color = util.rgbToHexString(section.children("font-color").text());
+        var text_id = Number(section.children("text-id").text());
+        var text_align_horz = section.children("text-align-horz").text();
+        var text_align_vert = section.children("text-align-vert").text();
+        var text = section.children("text-format").text();
+        var horizPosition = (text_align_horz === 'center') ? 'middle' : ((text_align_horz === 'left') ? 'end' : 'start');
+        return (React.createElement("text", { fill: font_color, fontWeight: font_weight, fontSize: -font_height, fontFamily: "Arial, Helvetica, sans-serif", textAnchor: horizPosition, pointerEvents: 'none' },
+            React.createElement("tspan", { alignmentBaseline: 'central', x: '50%', y: '50%' }, text)));
+    }
+    else {
+        return undefined;
+    }
+}
+exports.parseTextfield = parseTextfield;
 
 
 /***/ }),

@@ -8,6 +8,11 @@ frame_color_alarm : string, line_width : number, hidden_input : boolean, enable_
     let relCenterCoord = {x:center[0]-rect[0], y:center[1]-rect[1]};
     // The line_width is 0 in the xml if border width is 1 in the codesys dev env. Otherwise line_width is equal to the target border width. Very strange.
     let edge = (line_width === 0) ? 1 :line_width ;
+    // Compute the strokeWidth through has_frame_color
+    let strokeWidth = (has_frame_color) ? edge : 0;
+    // Compute the fill color through has_fill_color
+    let fillColor = (has_inside_color) ? fill_color : 'none';
+    // A 'circle' can be a circle or an ellipse.
     
     return(
     <div style={{position:"absolute", left:rect[0], top:rect[1], width:relCornerCoord.x2+2*edge, height:relCornerCoord.y2+2*edge}}>
@@ -18,8 +23,8 @@ frame_color_alarm : string, line_width : number, hidden_input : boolean, enable_
                     height={relCornerCoord.y2}
                     x={edge}
                     y={edge}
-                    fill={fill_color}
-                    strokeWidth={edge}
+                    fill={fillColor}
+                    strokeWidth={strokeWidth}
                     stroke={frame_color}
                 />
                 {textField}

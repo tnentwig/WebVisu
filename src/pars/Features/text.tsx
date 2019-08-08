@@ -1,4 +1,4 @@
-import * as util from '../../../Utils/utilfunctions'
+import * as util from '../Utils/utilfunctions'
 import * as React from "react";
 
 export function parseTextfield(section : JQuery<XMLDocument>) : JSX.Element | undefined {
@@ -19,12 +19,24 @@ export function parseTextfield(section : JQuery<XMLDocument>) : JSX.Element | un
         let text_align_vert = section.children("text-align-vert").text();
         let text = section.children("text-format").text();
 
+        // Calculate the horizontal position of the text
+        let horizPosition = (text_align_horz === 'center') ? 'middle' : ((text_align_horz === 'left') ? 'end' : 'start');
+
         return (
-            <text 
-            x={0} 
-            y={30} 
-            pointerEvents={'none'}
-            >{text}</text>
+            <text
+                fill={font_color}
+                fontWeight={font_weight}
+                fontSize={-font_height}
+                fontFamily={"Arial, Helvetica, sans-serif"}
+                textAnchor ={horizPosition}
+                pointerEvents={'none'}>
+                <tspan
+                alignmentBaseline = {'central'}
+                x={'50%'} 
+                y={'50%'} >
+                    {text}
+                </tspan>
+            </text>
         )
     }
     else {

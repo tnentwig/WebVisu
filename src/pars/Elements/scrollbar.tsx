@@ -21,11 +21,14 @@ export function parseScrollbar (section : JQuery<XMLDocument>) {
     let relCenterCoord = {x:center[0]-rect[0], y:center[1]-rect[1]};
     let edge = 1;
 
+    // Compute the orientation of the slider
+    let orientation : any = ((relCornerCoord.x2>relCornerCoord.y2) ? "horizontal" : "vertical");
+
     // Return of the react node
     return (
         <div style={{position:"absolute", left:rect[0], top:rect[1], width:relCornerCoord.x2+2*edge, height:relCornerCoord.y2+2*edge}}>
             <Slider
-                orientation={"vertical"}
+                orientation={orientation}
             />
         </div>
     )
