@@ -1,11 +1,36 @@
 
 class ComSocket {
-    serverURL: string;
+    serverURL : string;
+    varList : Object;
     constructor(serverURL : string) {
         this.serverURL = serverURL;
+        this.varList = [];
+    }
+
+    addObservableVar(varName : string, varAddr : string){
+        this.varList[varName] = 
+            {
+                addr : varAddr,
+                value : this.getValue(varAddr)
+            }
+    }
+
+    buildRequestFrame() {
+        let requestFrame : string;
+        let varNum;
+        for (let obj in this.varList) {
+            obj.varAddr = 
+        }
+
+    }
+
+    updateValueList() {
+        this.varList.forEach((element: any) => {
+            element.value = this.getValue(element.addr);
+        });
     }
     
-    getVar(varAdr : string) {
+    getValue(varAdr : string)  {
         $.ajax({
             type: 'POST',
             url: this.serverURL,
@@ -19,7 +44,7 @@ class ComSocket {
         });
     }
 
-    setVar(varAdr : string, varValue : number | string | boolean) {
+    setValue(varAdr : string, varValue : number | string | boolean) {
         $.ajax({
             type: 'POST',
             url: this.serverURL,
