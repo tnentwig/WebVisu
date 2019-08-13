@@ -45576,6 +45576,72 @@ module.exports = g;
 
 /***/ }),
 
+/***/ "./src/com/comsocket.ts":
+/*!******************************!*\
+  !*** ./src/com/comsocket.ts ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+var ComSocket = (function () {
+    function ComSocket(serverURL) {
+        this.serverURL = serverURL;
+        this.objList = {};
+        this.requestFrame = { preFrame: '', listings: 0 };
+        this.lutList = [];
+    }
+    ComSocket.prototype.addObservableVar = function (varName, varAddr) {
+        if (typeof (varName) === 'string') {
+            this.objList[varName] =
+                {
+                    addr: varAddr,
+                    value: undefined
+                };
+            this.requestFrame.preFrame += this.requestFrame.listings + '|' + varAddr.replace(/,/g, '|') + '|';
+            this.requestFrame.listings += 1;
+            this.lutList.push(varName);
+        }
+    };
+    ComSocket.prototype.updateVarList = function () {
+        var _this = this;
+        return $.ajax({
+            type: 'POST',
+            url: this.serverURL,
+            data: '|0|' + this.requestFrame.listings + '|' + this.requestFrame.preFrame,
+        })
+            .then(function (response) {
+            var transferarray = (response.slice(1, response.length - 1).split('|'));
+            for (var i = 0; i < transferarray.length; i++) {
+                var varName = _this.lutList[i];
+                _this.objList[varName].value = transferarray[i];
+            }
+            console.log(_this.objList);
+        });
+    };
+    ComSocket.prototype.setValue = function (varAdr, varValue) {
+        $.ajax({
+            type: 'POST',
+            url: this.serverURL,
+            data: '|1|1|0|' + varAdr.replace(/,/g, '|') + '|' + varValue + '|',
+            success: function (data, textStatus, jqXhr) {
+                console.log(data);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                console.log(errorThrown);
+            }
+        });
+    };
+    return ComSocket;
+}());
+exports.default = ComSocket;
+
+
+/***/ }),
+
 /***/ "./src/index.tsx":
 /*!***********************!*\
   !*** ./src/index.tsx ***!
@@ -45588,7 +45654,7 @@ module.exports = g;
 Object.defineProperty(exports, "__esModule", { value: true });
 var visuparser_1 = __webpack_require__(/*! ./pars/visuparser */ "./src/pars/visuparser.tsx");
 var objHTML5Visu = new visuparser_1.default("http://192.168.1.110");
-objHTML5Visu.CreateVisu("/plc_visu.xml");
+objHTML5Visu.createVisu("/plc_visu.xml");
 
 
 /***/ }),
@@ -45604,16 +45670,16 @@ objHTML5Visu.CreateVisu("/plc_visu.xml");
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-function Circle(textField, has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, hidden_input, enable_text_input, rect, center) {
-    var relCornerCoord = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
-    var relCenterCoord = { x: center[0] - rect[0], y: center[1] - rect[1] };
-    var edge = (line_width === 0) ? 1 : line_width;
-    var strokeWidth = (has_frame_color) ? edge : 0;
-    var fillColor = (has_inside_color) ? fill_color : 'none';
-    return (React.createElement("div", { style: { position: "absolute", left: rect[0], top: rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
+function Circle(textField, simpleShape) {
+    var relCornerCoord = { x1: 0, y1: 0, x2: simpleShape.rect[2] - simpleShape.rect[0], y2: simpleShape.rect[3] - simpleShape.rect[1] };
+    var relCenterCoord = { x: simpleShape.center[0] - simpleShape.rect[0], y: simpleShape.center[1] - simpleShape.rect[1] };
+    var edge = (simpleShape.line_width === 0) ? 1 : simpleShape.line_width;
+    var strokeWidth = (simpleShape.has_frame_color) ? edge : 0;
+    var fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
+    return (React.createElement("div", { style: { position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
         React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge },
             React.createElement("g", null,
-                React.createElement("ellipse", { cx: relCenterCoord.x + edge, cy: relCenterCoord.y + edge, rx: relCornerCoord.x2 / 2, ry: relCornerCoord.y2 / 2, fill: fillColor, strokeWidth: strokeWidth, stroke: frame_color }),
+                React.createElement("ellipse", { cx: relCenterCoord.x + edge, cy: relCenterCoord.y + edge, rx: relCornerCoord.x2 / 2, ry: relCornerCoord.y2 / 2, fill: fillColor, strokeWidth: strokeWidth, stroke: simpleShape.frame_color }),
                 textField))));
 }
 exports.Circle = Circle;
@@ -45632,13 +45698,13 @@ exports.Circle = Circle;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-function Line(has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, hidden_input, enable_text_input, rect, center) {
-    var relCornerCoord = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
-    var relCenterCoord = { x: center[0] - rect[0], y: center[1] - rect[1] };
+function Line(simpleShape) {
+    var relCornerCoord = { x1: 0, y1: 0, x2: simpleShape.rect[2] - simpleShape.rect[0], y2: simpleShape.rect[3] - simpleShape.rect[1] };
+    var relCenterCoord = { x: simpleShape.center[0] - simpleShape.rect[0], y: simpleShape.center[1] - simpleShape.rect[1] };
     var edge = 1;
-    return (React.createElement("div", { style: { position: "absolute", left: rect[0], top: rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
+    return (React.createElement("div", { style: { position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
         React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge },
-            React.createElement("line", { x1: relCornerCoord.x1, y1: relCornerCoord.y2, x2: relCornerCoord.x2, y2: relCornerCoord.y1, stroke: frame_color }))));
+            React.createElement("line", { x1: relCornerCoord.x1, y1: relCornerCoord.y2, x2: relCornerCoord.x2, y2: relCornerCoord.y1, stroke: simpleShape.frame_color }))));
 }
 exports.Line = Line;
 
@@ -45656,16 +45722,16 @@ exports.Line = Line;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-function Rectangle(textField, has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, hidden_input, enable_text_input, rect, center) {
-    var relCornerCoord = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
-    var relCenterCoord = { x: center[0] - rect[0], y: center[1] - rect[1] };
-    var edge = (line_width === 0) ? 1 : line_width;
-    var strokeWidth = (has_frame_color) ? edge : 0;
-    var fillColor = (has_inside_color) ? fill_color : 'none';
-    return (React.createElement("div", { style: { position: "absolute", left: rect[0], top: rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
+function Rectangle(textField, simpleShape) {
+    var relCornerCoord = { x1: 0, y1: 0, x2: simpleShape.rect[2] - simpleShape.rect[0], y2: simpleShape.rect[3] - simpleShape.rect[1] };
+    var relCenterCoord = { x: simpleShape.center[0] - simpleShape.rect[0], y: simpleShape.center[1] - simpleShape.rect[1] };
+    var edge = (simpleShape.line_width === 0) ? 1 : simpleShape.line_width;
+    var strokeWidth = (simpleShape.has_frame_color) ? edge : 0;
+    var fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
+    return (React.createElement("div", { style: { position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
         React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge, onClick: click },
             React.createElement("g", null,
-                React.createElement("rect", { width: relCornerCoord.x2, height: relCornerCoord.y2, x: edge, y: edge, fill: fillColor, strokeWidth: strokeWidth, stroke: frame_color }),
+                React.createElement("rect", { width: relCornerCoord.x2, height: relCornerCoord.y2, x: edge, y: edge, fill: fillColor, strokeWidth: strokeWidth, stroke: simpleShape.frame_color }),
                 textField))));
 }
 exports.Rectangle = Rectangle;
@@ -45687,13 +45753,13 @@ function click() {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-function RoundRect(has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, hidden_input, enable_text_input, rect, center) {
-    var relCornerCoord = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
-    var relCenterCoord = { x: center[0] - rect[0], y: center[1] - rect[1] };
+function RoundRect(simpleShape) {
+    var relCornerCoord = { x1: 0, y1: 0, x2: simpleShape.rect[2] - simpleShape.rect[0], y2: simpleShape.rect[3] - simpleShape.rect[1] };
+    var relCenterCoord = { x: simpleShape.center[0] - simpleShape.rect[0], y: simpleShape.center[1] - simpleShape.rect[1] };
     var edge = 1;
-    return (React.createElement("div", { style: { position: "absolute", left: rect[0], top: rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
+    return (React.createElement("div", { style: { position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
         React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge },
-            React.createElement("rect", { width: relCornerCoord.x2, height: relCornerCoord.y2, x: edge, y: edge, rx: 10, ry: 10, fill: fill_color, strokeWidth: edge, stroke: frame_color }))));
+            React.createElement("rect", { width: relCornerCoord.x2, height: relCornerCoord.y2, x: edge, y: edge, rx: 10, ry: 10, fill: simpleShape.fill_color, strokeWidth: edge, stroke: simpleShape.frame_color }))));
 }
 exports.RoundRect = RoundRect;
 
@@ -45719,30 +45785,32 @@ var text_1 = __webpack_require__(/*! ../../Features/text */ "./src/pars/Features
 function parseSimpleShape(section) {
     var shape = section.children("simple-shape").text();
     if (['round-rect', 'circle', 'line', 'rectangle'].includes(shape)) {
-        var has_inside_color = util.stringToBoolean(section.children("has-inside-color").text());
-        var fill_color = util.rgbToHexString(section.children("fill-color").text());
-        var fill_color_alarm = util.rgbToHexString(section.children("fill-color-alarm").text());
-        var has_frame_color = util.stringToBoolean(section.children("has-frame-color").text());
-        var frame_color = util.rgbToHexString(section.children("frame-color").text());
-        var frame_color_alarm = util.rgbToHexString(section.children("frame-color-alarm").text());
-        var line_width = Number(section.children("line-width").text());
-        var elem_id = Number(section.children("elem-id").text());
-        var rect = util.stringToArray(section.children("rect").text());
-        var center = util.stringToArray(section.children("center").text());
-        var hidden_input = util.stringToBoolean(section.children("hidden-input").text());
-        var enable_text_input = util.stringToBoolean(section.children("enable-text-input").text());
+        var simpleShape = {
+            has_inside_color: util.stringToBoolean(section.children("has-inside-color").text()),
+            fill_color: util.rgbToHexString(section.children("fill-color").text()),
+            fill_color_alarm: util.rgbToHexString(section.children("fill-color-alarm").text()),
+            has_frame_color: util.stringToBoolean(section.children("has-frame-color").text()),
+            frame_color: util.rgbToHexString(section.children("frame-color").text()),
+            frame_color_alarm: util.rgbToHexString(section.children("frame-color-alarm").text()),
+            line_width: Number(section.children("line-width").text()),
+            elem_id: Number(section.children("elem-id").text()),
+            rect: util.stringToArray(section.children("rect").text()),
+            center: util.stringToArray(section.children("center").text()),
+            hidden_input: util.stringToBoolean(section.children("hidden-input").text()),
+            enable_text_input: util.stringToBoolean(section.children("enable-text-input").text())
+        };
         var textfield = text_1.parseTextfield(section);
         switch (shape) {
             case 'round-rect':
-                return (roundrect_1.RoundRect(has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, hidden_input, enable_text_input, rect, center));
+                return (roundrect_1.RoundRect(simpleShape));
                 break;
             case 'circle':
-                return (circle_1.Circle(textfield, has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, hidden_input, enable_text_input, rect, center));
+                return (circle_1.Circle(textfield, simpleShape));
                 break;
             case 'line':
-                return (line_1.Line(has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, hidden_input, enable_text_input, rect, center));
+                return (line_1.Line(simpleShape));
             case 'rectangle':
-                return (rectangle_1.Rectangle(textfield, has_inside_color, fill_color, fill_color_alarm, has_frame_color, frame_color, frame_color_alarm, line_width, hidden_input, enable_text_input, rect, center));
+                return (rectangle_1.Rectangle(textfield, simpleShape));
         }
     }
     else {
@@ -46112,6 +46180,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 var ReactDOM = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+var comsocket_1 = __webpack_require__(/*! ../com/comsocket */ "./src/com/comsocket.ts");
 var simpleshape_1 = __webpack_require__(/*! ./Elements/Simpleshape/simpleshape */ "./src/pars/Elements/Simpleshape/simpleshape.tsx");
 var placeholder_1 = __webpack_require__(/*! ./Elements/placeholder */ "./src/pars/Elements/placeholder.tsx");
 var polygon_1 = __webpack_require__(/*! ./Elements/polygon */ "./src/pars/Elements/polygon.tsx");
@@ -46123,7 +46192,7 @@ var HTML5Visu = (function () {
     function HTML5Visu(rootDir) {
         this.rootDir = rootDir;
     }
-    HTML5Visu.prototype.CreateVisu = function (relPath) {
+    HTML5Visu.prototype.createVisu = function (relPath) {
         var _this = this;
         return $.ajax({
             url: this.rootDir + relPath,
@@ -46132,13 +46201,23 @@ var HTML5Visu = (function () {
             crossDomain: true
         })
             .then(function (data) {
-            return _this.ConvertVisuElements(data);
+            _this.initCommunication(data);
+            _this.convertVisuElements(data);
         })
             .fail(function (error) {
             return console.error(error);
         });
     };
-    HTML5Visu.prototype.ConvertVisuElements = function (XML) {
+    HTML5Visu.prototype.initCommunication = function (XML) {
+        var com = new comsocket_1.default(this.rootDir + '/webvisu/webvisu.htm');
+        var visuXML = $(XML);
+        visuXML.children("visualisation").children("variablelist").children("variable").each(function () {
+            var variable = $(this);
+            com.addObservableVar(variable.attr("name"), variable.text());
+        });
+        com.updateVarList();
+    };
+    HTML5Visu.prototype.convertVisuElements = function (XML) {
         console.log("Start parsing...");
         var visuXML = $(XML);
         var visuObjects = [];

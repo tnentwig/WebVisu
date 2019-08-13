@@ -1,47 +1,50 @@
+import * as $ from 'jquery';
 
-class ComSocket {
+export default class ComSocket {
     serverURL : string;
-    varList : Object;
+    // objList contains all variables as objects with the name as key and addr & value of the variable
+    objList: {[key: string] : {addr: string, value: string | undefined}};
+    // The objList has no clear sequence. To get the possibily of correct access with numbers as indices use the look up table
+    lutList: Array<string>;
+    private requestFrame: {preFrame: String, listings: number}
+
     constructor(serverURL : string) {
         this.serverURL = serverURL;
-        this.varList = [];
+        this.objList  = {};
+        this.requestFrame = {preFrame:'', listings:0};
+        this.lutList = []
     }
 
-    addObservableVar(varName : string, varAddr : string){
-        this.varList[varName] = 
+    addObservableVar(varName : string | undefined, varAddr : string){
+        // Add new variable as object to objList
+        if (typeof(varName)==='string') {
+            this.objList[varName] = 
             {
-                addr : varAddr,
-                value : this.getValue(varAddr)
+                addr    : varAddr,
+                value   : undefined       // value is undefined at first
             }
-    }
-
-    buildRequestFrame() {
-        let requestFrame : string;
-        let varNum;
-        for (let obj in this.varList) {
-            obj.varAddr = 
+        // Add new variable to the request frame
+        this.requestFrame.preFrame += this.requestFrame.listings + '|' + varAddr.replace(/,/g, '|') + '|';
+        this.requestFrame.listings += 1;
+        // Create reference of the key in the LUT
+        this.lutList.push(varName);
         }
-
     }
 
-    updateValueList() {
-        this.varList.forEach((element: any) => {
-            element.value = this.getValue(element.addr);
-        });
-    }
-    
-    getValue(varAdr : string)  {
-        $.ajax({
+    updateVarList() {
+        return $.ajax({
             type: 'POST',
             url: this.serverURL,
-            data: '|0|1|0|'+ varAdr.replace(/,/g, '|') + '|',
-            success: function(data, textStatus, jqXhr) {
-                        console.log(data);
-            },
-            error: function(jqXhr, textStatus, errorThrown) {
-                        console.log(errorThrown);
+            data: '|0|'+this.requestFrame.listings+'|'+this.requestFrame.preFrame,
+        })
+        .then((response : string) => {
+            let transferarray : Array<string>= (response.slice(1,response.length-1).split('|'));
+            for(let i=0; i<transferarray.length; i++) {
+                let varName = this.lutList[i];
+                this.objList[varName].value=transferarray[i];
             }
-        });
+            console.log(this.objList);
+        })
     }
 
     setValue(varAdr : string, varValue : number | string | boolean) {

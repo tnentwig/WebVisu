@@ -1,6 +1,7 @@
 import * as $ from 'jquery';
 import * as ReactDOM from "react-dom";
 import * as React from 'react';
+import ComSocket from '../com/comsocket';
 import { parseSimpleShape } from './Elements/Simpleshape/simpleshape';
 import { Placeholder } from './Elements/placeholder';
 import { parsePolygon } from './Elements/polygon';
@@ -14,16 +15,19 @@ export default class HTML5Visu {
     constructor(rootDir: string){
         this.rootDir= rootDir;
     }
-    CreateVisu (relPath: string) {
+    createVisu (relPath: string) {
         return $.ajax({
             url: this.rootDir+relPath,
             type: 'GET',
             dataType: 'XML', // if text => no pre-processing, if xml => parseXML preprocessing
             crossDomain: true
         })
+
         .then((data) => {
+            // Searching for variables and initialize the communication
+            this.initCommunication(data);
             // Searching for elements
-            return this.ConvertVisuElements(data);
+            this.convertVisuElements(data);
             }
         )
         .fail((error) => {
@@ -31,7 +35,18 @@ export default class HTML5Visu {
         })
     }
 
-    ConvertVisuElements (XML : XMLDocument) : Array<(JSX.Element | undefined)> {
+    initCommunication(XML : XMLDocument) {
+        let com = new ComSocket(this.rootDir + '/webvisu/webvisu.htm');
+        let visuXML=$(XML);
+        // Rip all of <variable> in <variablelist> section
+        visuXML.children("visualisation").children("variablelist").children("variable").each(function(){
+            let variable = $(this);
+            com.addObservableVar(variable.attr("name"), variable.text());
+        });
+        com.updateVarList();
+    }
+
+    convertVisuElements (XML : XMLDocument) : Array<(JSX.Element | undefined)> {
         console.log("Start parsing...");
         let visuXML=$(XML);
         let visuObjects: Array<(JSX.Element | undefined)> =[];
