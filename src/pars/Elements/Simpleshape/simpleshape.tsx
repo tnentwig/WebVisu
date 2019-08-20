@@ -4,8 +4,9 @@ import { RoundRect } from './Subunits/roundrect'
 import { Line } from './Subunits/line';
 import { Circle } from './Subunits/circle'
 import { Rectangle } from './Subunits/rectangle';
-import { parseTextfield } from '../../Features/text';
-import { ISimpleShape } from '../interfaces';
+import { parseTextfield } from './Features/text';
+import { ISimpleShape } from '../../Interfaces/interfaces';
+import { parseUserEvent } from './Features/userevent';
 
 export function parseSimpleShape(section : JQuery<XMLDocument>){
     // Check if its on of the allowed shapes like rectangle, round-rectangle, circle or line
@@ -29,10 +30,12 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
           enable_text_input : util.stringToBoolean(section.children("enable-text-input").text())
         }
         // Parsing of textfields
-        let textfield = parseTextfield(section);
+        let textField = parseTextfield(section);
 
-        // Parsing of click events
-        
+        // Parsing of observable events (like toggle color)
+  
+        // Parsing of user events
+        let userEvents = parseUserEvent(section);
         // Return of the React-Node
         switch (shape){
           case 'round-rect':
@@ -42,16 +45,16 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
             break;
           case 'circle':
             return(
-              Circle(textfield, simpleShape)
+              Circle(textField, simpleShape)
             )
-          break;
+            break;
           case 'line':
             return(
               Line(simpleShape)
             )
           case 'rectangle':
             return(
-              Rectangle(textfield, simpleShape)
+              <Rectangle simpleShape={simpleShape} textField={textField} userEvents={userEvents} />
             )
         }
     }

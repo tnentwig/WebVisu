@@ -1,5 +1,5 @@
-import * as util from '../Utils/utilfunctions'
-import * as React from "react";
+import * as util from '../../../Utils/utilfunctions'
+import * as React from 'react';
 
 export function parseTextfield(section : JQuery<XMLDocument>) : JSX.Element | undefined {
     // Check if a text tag is given

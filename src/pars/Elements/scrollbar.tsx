@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 import Slider from '@material-ui/core/Slider';
 
 import { stringToBoolean, rgbToHexString, stringToArray } from '../Utils/utilfunctions';
@@ -23,6 +23,7 @@ export function parseScrollbar (section : JQuery<XMLDocument>) {
 
     // Compute the orientation of the slider
     let orientation : any = ((relCornerCoord.x2>relCornerCoord.y2) ? "horizontal" : "vertical");
+
 
     // Return of the react node
     return (

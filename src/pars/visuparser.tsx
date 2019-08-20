@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import * as ReactDOM from "react-dom";
+import * as ReactDOM from 'react-dom';
 import * as React from 'react';
 import ComSocket from '../com/comsocket';
 import { parseSimpleShape } from './Elements/Simpleshape/simpleshape';
@@ -36,20 +36,21 @@ export default class HTML5Visu {
     }
 
     initCommunication(XML : XMLDocument) {
-        let com = new ComSocket(this.rootDir + '/webvisu/webvisu.htm');
+        let com = ComSocket.singleton();
+        com.setServerURL(this.rootDir + '/webvisu/webvisu.htm');
         let visuXML=$(XML);
         // Rip all of <variable> in <variablelist> section
         visuXML.children("visualisation").children("variablelist").children("variable").each(function(){
             let variable = $(this);
             com.addObservableVar(variable.attr("name"), variable.text());
         });
-        com.updateVarList();
+         com.startCyclicUpdate(1000);
     }
 
-    convertVisuElements (XML : XMLDocument) : Array<(JSX.Element | undefined)> {
+    convertVisuElements (XML : XMLDocument) : Array<(JSX.Element | undefined | null)> {
         console.log("Start parsing...");
         let visuXML=$(XML);
-        let visuObjects: Array<(JSX.Element | undefined)> =[];
+        let visuObjects: Array<(JSX.Element | undefined | null)> =[];
         // Rip all <element> sections
         visuXML.children("visualisation").children("element").each(function(){
             let section = $(this);

@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 import * as $ from 'jquery';
 
 import * as util from '../Utils/utilfunctions';

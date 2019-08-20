@@ -3,13 +3,13 @@ const path = require('path');
 module.exports = {
     mode: 'development',
     devtool: 'source-map',
-    entry:  './src/index.tsx',
+    entry:  './src/index.ts',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'WebVisu.dev.js'
     },
     resolve: {
-        extensions: ['.ts', '.tsx', '.js']
+        extensions: ['.ts', '.tsx', '.js'],
     },
     module: {
         rules: [
@@ -19,7 +19,7 @@ module.exports = {
             },
             {
                 enforce: 'pre',
-                loader: "source-map-loader"
+                loader: ["source-map-loader", "eslint-loader"]
             }
         ]
     }

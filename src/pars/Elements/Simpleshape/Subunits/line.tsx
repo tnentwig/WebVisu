@@ -1,5 +1,5 @@
-import * as React from "react";
-import { ISimpleShape } from '../../interfaces';
+import * as React from 'react';
+import { ISimpleShape } from '../../../Interfaces/interfaces';
 
 export function Line (simpleShape : ISimpleShape) 
 {

@@ -1,4 +1,3 @@
-import { element, string } from "prop-types";
 
 export function stringToBoolean(booleanExp : string) : boolean {
     return JSON.parse(booleanExp);
@@ -9,9 +8,9 @@ export function rgbToHexString(rgb : string) : string{
     let r = Number(rgbClr[0]);
     let g = Number(rgbClr[1]);
     let b = Number(rgbClr[2]);
-    let interim = (r << 16 | g << 8 | b).toString(16).toUpperCase()
+    let interim = ((r << 16) | (g << 8) | b).toString(16).toUpperCase()
     // Extends the string with zeros ahead to get a length of 6 characters (#xxxxxx)
-    while(interim.length != 6){
+    while(interim.length !== 6){
         interim = '0'+interim;
     };
     return ('#'+interim)
@@ -51,10 +50,10 @@ export function coordArrayToBezierString(pointArray : number[][], xOffset : numb
         pointArray[index][1] = item[1]-yOffset;
     })
     pointArray.forEach((element,index)=>{
-        if (index == 0) {
+        if (index === 0) {
             bezier += 'M'+ element.join(' ');
         }
-        else if (index == 1){
+        else if (index === 1){
             bezier += ' C' + element.join(' ');
         }
         else {

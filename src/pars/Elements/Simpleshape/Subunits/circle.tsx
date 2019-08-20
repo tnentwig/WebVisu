@@ -1,5 +1,5 @@
-import * as React from "react";
-import { ISimpleShape } from '../../interfaces';
+import * as React from 'react';
+import { ISimpleShape } from '../../../Interfaces/interfaces';
 
 export function Circle (textField : JSX.Element|undefined, simpleShape: ISimpleShape) 
 {
@@ -13,7 +13,6 @@ export function Circle (textField : JSX.Element|undefined, simpleShape: ISimpleS
     // Compute the fill color through has_fill_color
     let fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
     // A 'circle' can be a circle or an ellipse.
-
 
     
     return(
