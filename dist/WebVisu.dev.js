@@ -55221,9 +55221,6 @@ var ComSocket = (function () {
     __decorate([
         mobx_1.observable
     ], ComSocket.prototype, "oVisuVariables", void 0);
-    __decorate([
-        mobx_1.action
-    ], ComSocket.prototype, "updateVarList", null);
     return ComSocket;
 }());
 exports.default = ComSocket;

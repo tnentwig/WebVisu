@@ -42,7 +42,7 @@
     "mobx-react-lite": "^1.4.1",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
-    "ts-loader": "^6.0.4"
+    "ts-loader": "^6.0.4",
+    "update": "^0.7.4"
   }
-
 }
