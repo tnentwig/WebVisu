@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PLC Server</title>
+    <script type="text/javascript">
+      function do_ajax() {
+        // New xhr-Request object
+        let req = new XMLHttpRequest();
+        // Get the element with the result id
+        let result = document.getElementById('result');
+        // 
+        req.onreadystatechange = function()
+        {
+          if(this.readyState == 4 && this.status == 200) {
+            result.innerHTML = this.responseText;
+          } else {
+            result.innerHTML = "Hi";
+          }
+        }
+        req.open('POST', '/', true);
+        req.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+        req.send("name=" + document.getElementById('name').value);
+      }
+
+      function renderXML(xmlFile) {
+        let reader = new FileReader();
+        reader.onload = ()=>{
+          let DOMpars = new DOMParser();
+          let xmlDoc = DOMpars.parseFromString(reader.result, "text/xml");
+          if(xmlDoc.documentElement.nodeName == "parsererror"){
+            console.log("error while parsing");
+          } 
+          else {
+            let rootElement = xmlDoc.documentElement;
+            let variablelist = rootElement.getElementsByTagName("variablelist")[0];
+            let varlist = document.getElementById('variablelist');
+            for (let i = 0; i < variablelist.children.length; i++) {
+              // Create a table with name, address and a field for the initial value           
+              let row = document.createElement('tr');
+              // Create the name field
+              let field1 = document.createElement('td');
+              // Create the address field
+              let field2 = document.createElement('td');
+              // Create the select field
+              let field3 = document.createElement('td');
+              // Fill the name field
+              let name = document.createTextNode(variablelist.children[i].attributes[0].value);
+              // Fill the address field
+              let address = document.createTextNode(variablelist.children[i].textContent);
+              // Fill the initial field
+              let initial = document.createElement('input');
+              initial.setAttribute('class',"variable");
+              initial.setAttribute('name',variablelist.children[i].textContent);
+              field1.appendChild(name);
+              field2.appendChild(address);
+              field3.appendChild(initial);
+              row.appendChild(field1);
+              row.appendChild(field2);
+              row.appendChild(field3);
+              // Append the row
+              varlist.appendChild(row);
+            }
+          }
+        }
+        reader.readAsText(xmlFile);
+      }
+      function sendVariables(){
+        let vaw = document.getElementsByClassName("variable");
+        let varObjects = {};
+        for (let i = 0; i < vaw.length; i++){
+          varObjects[vaw[i].getAttribute("name")]=vaw[i].value;
+        }
+        let req = new XMLHttpRequest();
+        req.open('POST', '/hallo', true);
+        req.setRequestHeader('content-type', 'application/json;charset=UTF-8');
+        req.send(JSON.stringify(varObjects));
+      }
+    </script>
+  </head>
+  <body>
+    <form>
+      <div>
+        <Text>Choose the XML-File that should be taken for the webvisu server simulation:</Text>
+      </div>
+      <input type="file" id="xmlfile" onchange="renderXML(document.getElementById('xmlfile').files[0])"/>
+    </form>
+
+    <div>
+      <table id="variablelist">
+        <tr>
+          <th>Name</th>
+          <th>Adresse</th>
+        </tr>
+      </table>
+    </div>
+
+    <div>
+      <button onclick="sendVariables()">Submit the values to the local server</button>
+    </div>
+
+    <!--
+    <form action="index" method="post">
+      <label>Name:<input type="text" id="name" value="" /></label>
+      <button type="button" id="btn-post" onclick="do_ajax();">Click</button>
+      <div id="result"></div>
+    </form>
+    -->
+  </body>
+</html>
