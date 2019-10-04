@@ -3,25 +3,6 @@
   <head>
     <title>PLC Server</title>
     <script type="text/javascript">
-      function do_ajax() {
-        // New xhr-Request object
-        let req = new XMLHttpRequest();
-        // Get the element with the result id
-        let result = document.getElementById('result');
-        // 
-        req.onreadystatechange = function()
-        {
-          if(this.readyState == 4 && this.status == 200) {
-            result.innerHTML = this.responseText;
-          } else {
-            result.innerHTML = "Hi";
-          }
-        }
-        req.open('POST', '/', true);
-        req.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
-        req.send("name=" + document.getElementById('name').value);
-      }
-
       function renderXML(xmlFile) {
         let reader = new FileReader();
         reader.onload = ()=>{
@@ -71,7 +52,7 @@
           varObjects[vaw[i].getAttribute("name")]=vaw[i].value;
         }
         let req = new XMLHttpRequest();
-        req.open('POST', '/hallo', true);
+        req.open('POST', '/index', true);
         req.setRequestHeader('content-type', 'application/json;charset=UTF-8');
         req.send(JSON.stringify(varObjects));
       }
@@ -98,12 +79,5 @@
       <button onclick="sendVariables()">Submit the values to the local server</button>
     </div>
 
-    <!--
-    <form action="index" method="post">
-      <label>Name:<input type="text" id="name" value="" /></label>
-      <button type="button" id="btn-post" onclick="do_ajax();">Click</button>
-      <div id="result"></div>
-    </form>
-    -->
   </body>
 </html>
