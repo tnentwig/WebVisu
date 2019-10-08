@@ -44,7 +44,7 @@ export default class HTML5Visu {
             let variable = $(this);
             com.addObservableVar(variable.attr("name"), variable.text());
         });
-         com.startCyclicUpdate(1000);
+         com.startCyclicUpdate(5000);
     }
 
     convertVisuElements (XML : XMLDocument) : Array<(JSX.Element | undefined | null)> {
