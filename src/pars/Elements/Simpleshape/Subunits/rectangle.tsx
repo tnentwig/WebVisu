@@ -23,7 +23,7 @@ export const Rectangle :React.FunctionComponent<Props> = ({simpleShape, textFiel
 
     return useObserver(()=>
     <div style={{position:"absolute", left:simpleShape.rect[0], top:simpleShape.rect[1], width:relCornerCoord.x2+2*edge, height:relCornerCoord.y2+2*edge}}>
-        <svg width={relCornerCoord.x2+2*edge} height={relCornerCoord.y2+2*edge} onClick={()=>console.log(Number(ComSocket.singleton().oVisuVariables['.xTest2'].value))}>
+        <svg width={relCornerCoord.x2+2*edge} height={relCornerCoord.y2+2*edge} onClick={()=>ComSocket.singleton().toggleValue('.xTest2')}>
             <g>
                 <rect 
                     width={relCornerCoord.x2}
