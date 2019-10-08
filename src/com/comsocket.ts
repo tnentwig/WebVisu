@@ -27,7 +27,6 @@ export default class ComSocket implements IComSocket {
         this.serverURL = serverURL;
     }
 
-
     addObservableVar(varName : string | undefined, varAddr : string){
         // Add new variable as object to objList
         if (typeof(varName)==='string') {
@@ -47,6 +46,7 @@ export default class ComSocket implements IComSocket {
     updateVarList() {
         return $.ajax({
             type: 'POST',
+            contentType: "text/plain",
             url: this.serverURL,
             data: '|0|'+this.requestFrame.listings+'|'+this.requestFrame.preFrame,
         })
@@ -67,12 +67,13 @@ export default class ComSocket implements IComSocket {
         $.ajax({
             type: 'POST',
             url: this.serverURL,
+            contentType: "text/plain",
             data: '|1|1|0|'+ this.oVisuVariables[varName].addr.replace(/,/g, '|') + '|'+ varValue + '|',
             success: function(data, textStatus, jqXhr) {
                         //console.log(data);
             },
             error: function(jqXhr, textStatus, errorThrown) {
-                        console.log(errorThrown);
+                        console.log("Fehler");
             }
         });
     }  
