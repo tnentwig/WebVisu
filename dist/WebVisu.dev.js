@@ -55184,6 +55184,7 @@ var ComSocket = (function () {
         var _this = this;
         return $.ajax({
             type: 'POST',
+            contentType: "text/plain",
             url: this.serverURL,
             data: '|0|' + this.requestFrame.listings + '|' + this.requestFrame.preFrame,
         })
@@ -55204,11 +55205,12 @@ var ComSocket = (function () {
         $.ajax({
             type: 'POST',
             url: this.serverURL,
+            contentType: "text/plain",
             data: '|1|1|0|' + this.oVisuVariables[varName].addr.replace(/,/g, '|') + '|' + varValue + '|',
             success: function (data, textStatus, jqXhr) {
             },
             error: function (jqXhr, textStatus, errorThrown) {
-                console.log(errorThrown);
+                console.log("Fehler");
             }
         });
     };
@@ -55239,8 +55241,8 @@ exports.default = ComSocket;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var visuparser_1 = __webpack_require__(/*! ./pars/visuparser */ "./src/pars/visuparser.tsx");
-var objHTML5Visu = new visuparser_1.default("http://192.168.1.110");
-objHTML5Visu.createVisu("/plc_visu.xml");
+var objHTML5Visu = new visuparser_1.default("http://localhost:5000");
+objHTML5Visu.createVisu("/static/plc_visu.xml");
 
 
 /***/ }),
@@ -55381,7 +55383,7 @@ exports.Rectangle = function (_a) {
     var fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
     return mobx_react_lite_1.useObserver(function () {
         return React.createElement("div", { style: { position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
-            React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge, onClick: function () { return console.log(Number(comsocket_1.default.singleton().oVisuVariables['.xTest2'].value)); } },
+            React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge, onClick: function () { return comsocket_1.default.singleton().toggleValue('.xTest2'); } },
                 React.createElement("g", null,
                     React.createElement("rect", { width: relCornerCoord.x2, height: relCornerCoord.y2, x: edge, y: edge, fill: fillColor, strokeWidth: strokeWidth, stroke: simpleShape.frame_color }),
                     textField)));
@@ -55835,7 +55837,7 @@ var HTML5Visu = (function () {
             var variable = $(this);
             com.addObservableVar(variable.attr("name"), variable.text());
         });
-        com.startCyclicUpdate(1000);
+        com.startCyclicUpdate(5000);
     };
     HTML5Visu.prototype.convertVisuElements = function (XML) {
         console.log("Start parsing...");
