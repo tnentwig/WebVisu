@@ -15,6 +15,8 @@
             let rootElement = xmlDoc.documentElement;
             let variablelist = rootElement.getElementsByTagName("variablelist")[0];
             let varlist = document.getElementById('variablelist');
+            // remove old entries
+            varlist.innerHTML = "";
             for (let i = 0; i < variablelist.children.length; i++) {
               // Create a table with name, address and a field for the initial value           
               let row = document.createElement('tr');
