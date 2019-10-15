@@ -16,7 +16,7 @@ export interface ISimpleShape {
 
 export interface IComSocket {
     // Variables
-    oVisuVariables: {[key: string] : {addr: string, value: string | undefined}};
+    oVisuVariables: Map<string,{addr: string, value: string|undefined}>;
     // Functions
     addObservableVar(varName : string | undefined, varAddr : string) : void;
     updateVarList() : void;

@@ -5,7 +5,8 @@ import { observable } from "mobx"
 export default class ComSocket implements IComSocket {
     private static instance : IComSocket=new ComSocket();
     // objList contains all variables as objects with the name as key and addr & value of the variable
-    @observable oVisuVariables: {[key: string] : {addr: string, value: string | undefined}};
+    oVisuVariables: Map<string,{addr: string, value: string | undefined}>;
+    //@observable oVisuVariables: {[key: string] : {addr: string, value: string | undefined}};
     // The objList has no clear sequence. To get the possibily of correct access with numbers as indices use the look up table
     private lutKeyVariable: Array<string>;
     private requestFrame: {preFrame: String, listings: number}
@@ -14,7 +15,7 @@ export default class ComSocket implements IComSocket {
     // this class shall be a singleton
     private constructor() {
         this.serverURL = '';
-        this.oVisuVariables  = {};
+        this.oVisuVariables  = observable(new Map());
         this.requestFrame = {preFrame:'', listings:0};
         this.lutKeyVariable = []
     }
@@ -27,14 +28,13 @@ export default class ComSocket implements IComSocket {
         this.serverURL = serverURL;
     }
 
-    addObservableVar(varName : string | undefined, varAddr : string){
+    addObservableVar(varName : string , varAddr : string){
         // Add new variable as object to objList
         if (typeof(varName)==='string') {
-            this.oVisuVariables[varName] = 
-            {
+            this.oVisuVariables.set(varName,{
                 addr    : varAddr,
                 value   : undefined       // value is undefined at first 
-            }
+            })
         // Add new variable to the request frame
         this.requestFrame.preFrame += this.requestFrame.listings + '|' + varAddr.replace(/,/g, '|') + '|';
         this.requestFrame.listings += 1;
@@ -54,7 +54,7 @@ export default class ComSocket implements IComSocket {
             let transferarray : Array<string>= (response.slice(1,response.length-1).split('|'));
             for(let i=0; i<transferarray.length; i++) {
                 let varName = this.lutKeyVariable[i];
-                this.oVisuVariables[varName].value=transferarray[i];
+                this.oVisuVariables.get(varName)!.value=transferarray[i];
             };
         })
     }
@@ -68,7 +68,7 @@ export default class ComSocket implements IComSocket {
             type: 'POST',
             url: this.serverURL,
             contentType: "text/plain",
-            data: '|1|1|0|'+ this.oVisuVariables[varName].addr.replace(/,/g, '|') + '|'+ varValue + '|',
+            data: '|1|1|0|'+ this.oVisuVariables.get(varName)!.addr.replace(/,/g, '|') + '|'+ varValue + '|',
             success: function(data, textStatus, jqXhr) {
                         //console.log(data);
             },
@@ -80,7 +80,7 @@ export default class ComSocket implements IComSocket {
     // toggleValue : Wechselt den Wert einer boolschen Variablen 
     toggleValue(varName : string) {
         let value;
-        Number(this.oVisuVariables[varName].value) === 0 ? value=1 : value=0;
+        Number(this.oVisuVariables.get(varName)!.value) === 0 ? value=1 : value=0;
         this.setValue(varName, value);
     }
 }
