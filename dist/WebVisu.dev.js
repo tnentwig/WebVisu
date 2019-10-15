@@ -86,6 +86,22 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./node_modules/@babel/runtime/helpers/esm/arrayWithHoles.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/@babel/runtime/helpers/esm/arrayWithHoles.js ***!
+  \*******************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _arrayWithHoles; });
+function _arrayWithHoles(arr) {
+  if (Array.isArray(arr)) return arr;
+}
+
+/***/ }),
+
 /***/ "./node_modules/@babel/runtime/helpers/esm/arrayWithoutHoles.js":
 /*!**********************************************************************!*\
   !*** ./node_modules/@babel/runtime/helpers/esm/arrayWithoutHoles.js ***!
@@ -265,6 +281,60 @@ function _iterableToArray(iter) {
 
 /***/ }),
 
+/***/ "./node_modules/@babel/runtime/helpers/esm/iterableToArrayLimit.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/@babel/runtime/helpers/esm/iterableToArrayLimit.js ***!
+  \*************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _iterableToArrayLimit; });
+function _iterableToArrayLimit(arr, i) {
+  var _arr = [];
+  var _n = true;
+  var _d = false;
+  var _e = undefined;
+
+  try {
+    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+      _arr.push(_s.value);
+
+      if (i && _arr.length === i) break;
+    }
+  } catch (err) {
+    _d = true;
+    _e = err;
+  } finally {
+    try {
+      if (!_n && _i["return"] != null) _i["return"]();
+    } finally {
+      if (_d) throw _e;
+    }
+  }
+
+  return _arr;
+}
+
+/***/ }),
+
+/***/ "./node_modules/@babel/runtime/helpers/esm/nonIterableRest.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/@babel/runtime/helpers/esm/nonIterableRest.js ***!
+  \********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _nonIterableRest; });
+function _nonIterableRest() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance");
+}
+
+/***/ }),
+
 /***/ "./node_modules/@babel/runtime/helpers/esm/nonIterableSpread.js":
 /*!**********************************************************************!*\
   !*** ./node_modules/@babel/runtime/helpers/esm/nonIterableSpread.js ***!
@@ -341,6 +411,28 @@ function _objectWithoutPropertiesLoose(source, excluded) {
 
 /***/ }),
 
+/***/ "./node_modules/@babel/runtime/helpers/esm/slicedToArray.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/@babel/runtime/helpers/esm/slicedToArray.js ***!
+  \******************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _slicedToArray; });
+/* harmony import */ var _arrayWithHoles__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./arrayWithHoles */ "./node_modules/@babel/runtime/helpers/esm/arrayWithHoles.js");
+/* harmony import */ var _iterableToArrayLimit__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./iterableToArrayLimit */ "./node_modules/@babel/runtime/helpers/esm/iterableToArrayLimit.js");
+/* harmony import */ var _nonIterableRest__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./nonIterableRest */ "./node_modules/@babel/runtime/helpers/esm/nonIterableRest.js");
+
+
+
+function _slicedToArray(arr, i) {
+  return Object(_arrayWithHoles__WEBPACK_IMPORTED_MODULE_0__["default"])(arr) || Object(_iterableToArrayLimit__WEBPACK_IMPORTED_MODULE_1__["default"])(arr, i) || Object(_nonIterableRest__WEBPACK_IMPORTED_MODULE_2__["default"])();
+}
+
+/***/ }),
+
 /***/ "./node_modules/@babel/runtime/helpers/esm/toConsumableArray.js":
 /*!**********************************************************************!*\
   !*** ./node_modules/@babel/runtime/helpers/esm/toConsumableArray.js ***!
@@ -401,23 +493,25 @@ function _typeof(obj) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "styles", function() { return styles; });
-/* harmony import */ var _babel_runtime_helpers_esm_objectWithoutProperties__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/objectWithoutProperties */ "./node_modules/@babel/runtime/helpers/esm/objectWithoutProperties.js");
-/* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
-/* harmony import */ var _babel_runtime_helpers_esm_toConsumableArray__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/esm/toConsumableArray */ "./node_modules/@babel/runtime/helpers/esm/toConsumableArray.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
-/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var clsx__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! clsx */ "./node_modules/clsx/dist/clsx.m.js");
-/* harmony import */ var _material_ui_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @material-ui/utils */ "./node_modules/@material-ui/utils/esm/index.js");
-/* harmony import */ var _styles_withStyles__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../styles/withStyles */ "./node_modules/@material-ui/core/esm/styles/withStyles.js");
-/* harmony import */ var _styles_useTheme__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../styles/useTheme */ "./node_modules/@material-ui/core/esm/styles/useTheme.js");
-/* harmony import */ var _styles_colorManipulator__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../styles/colorManipulator */ "./node_modules/@material-ui/core/esm/styles/colorManipulator.js");
-/* harmony import */ var _utils_focusVisible__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../utils/focusVisible */ "./node_modules/@material-ui/core/esm/utils/focusVisible.js");
-/* harmony import */ var _utils_ownerWindow__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../utils/ownerWindow */ "./node_modules/@material-ui/core/esm/utils/ownerWindow.js");
-/* harmony import */ var _utils_useEventCallback__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../utils/useEventCallback */ "./node_modules/@material-ui/core/esm/utils/useEventCallback.js");
-/* harmony import */ var _utils_reactHelpers__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../utils/reactHelpers */ "./node_modules/@material-ui/core/esm/utils/reactHelpers.js");
-/* harmony import */ var _ValueLabel__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./ValueLabel */ "./node_modules/@material-ui/core/esm/Slider/ValueLabel.js");
+/* harmony import */ var _babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/slicedToArray */ "./node_modules/@babel/runtime/helpers/esm/slicedToArray.js");
+/* harmony import */ var _babel_runtime_helpers_esm_objectWithoutProperties__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/objectWithoutProperties */ "./node_modules/@babel/runtime/helpers/esm/objectWithoutProperties.js");
+/* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
+/* harmony import */ var _babel_runtime_helpers_esm_toConsumableArray__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/esm/toConsumableArray */ "./node_modules/@babel/runtime/helpers/esm/toConsumableArray.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var clsx__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! clsx */ "./node_modules/clsx/dist/clsx.m.js");
+/* harmony import */ var _material_ui_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @material-ui/utils */ "./node_modules/@material-ui/utils/esm/index.js");
+/* harmony import */ var _styles_withStyles__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../styles/withStyles */ "./node_modules/@material-ui/core/esm/styles/withStyles.js");
+/* harmony import */ var _styles_useTheme__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../styles/useTheme */ "./node_modules/@material-ui/core/esm/styles/useTheme.js");
+/* harmony import */ var _styles_colorManipulator__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../styles/colorManipulator */ "./node_modules/@material-ui/core/esm/styles/colorManipulator.js");
+/* harmony import */ var _utils_focusVisible__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../utils/focusVisible */ "./node_modules/@material-ui/core/esm/utils/focusVisible.js");
+/* harmony import */ var _utils_ownerWindow__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../utils/ownerWindow */ "./node_modules/@material-ui/core/esm/utils/ownerWindow.js");
+/* harmony import */ var _utils_useEventCallback__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../utils/useEventCallback */ "./node_modules/@material-ui/core/esm/utils/useEventCallback.js");
+/* harmony import */ var _utils_reactHelpers__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../utils/reactHelpers */ "./node_modules/@material-ui/core/esm/utils/reactHelpers.js");
+/* harmony import */ var _ValueLabel__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./ValueLabel */ "./node_modules/@material-ui/core/esm/Slider/ValueLabel.js");
+
 
 
 
@@ -527,7 +621,7 @@ function setValueIndex(_ref) {
     return source;
   }
 
-  var output = Object(_babel_runtime_helpers_esm_toConsumableArray__WEBPACK_IMPORTED_MODULE_2__["default"])(values);
+  var output = Object(_babel_runtime_helpers_esm_toConsumableArray__WEBPACK_IMPORTED_MODULE_3__["default"])(values);
 
   output[index] = newValue;
   return output;
@@ -677,13 +771,13 @@ var styles = function styles(theme) {
         duration: theme.transitions.duration.shortest
       }),
       '&$focusVisible,&:hover': {
-        boxShadow: "0px 0px 0px 8px ".concat(Object(_styles_colorManipulator__WEBPACK_IMPORTED_MODULE_9__["fade"])(theme.palette.primary.main, 0.16)),
+        boxShadow: "0px 0px 0px 8px ".concat(Object(_styles_colorManipulator__WEBPACK_IMPORTED_MODULE_10__["fade"])(theme.palette.primary.main, 0.16)),
         '@media (hover: none)': {
           boxShadow: 'none'
         }
       },
       '&$active': {
-        boxShadow: "0px 0px 0px 14px ".concat(Object(_styles_colorManipulator__WEBPACK_IMPORTED_MODULE_9__["fade"])(theme.palette.primary.main, 0.16))
+        boxShadow: "0px 0px 0px 14px ".concat(Object(_styles_colorManipulator__WEBPACK_IMPORTED_MODULE_10__["fade"])(theme.palette.primary.main, 0.16))
       },
       '$disabled &': {
         pointerEvents: 'none',
@@ -725,11 +819,11 @@ var styles = function styles(theme) {
 
     /* Styles applied to the mark element if active (depending on the value). */
     markActive: {
-      backgroundColor: Object(_styles_colorManipulator__WEBPACK_IMPORTED_MODULE_9__["lighten"])(theme.palette.primary.main, 0.76)
+      backgroundColor: Object(_styles_colorManipulator__WEBPACK_IMPORTED_MODULE_10__["lighten"])(theme.palette.primary.main, 0.76)
     },
 
     /* Styles applied to the mark label element. */
-    markLabel: Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__["default"])({}, theme.typography.body2, {
+    markLabel: Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_2__["default"])({}, theme.typography.body2, {
       color: theme.palette.text.secondary,
       position: 'absolute',
       top: 22,
@@ -748,7 +842,7 @@ var styles = function styles(theme) {
     }
   };
 };
-var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Slider(props, ref) {
+var Slider = react__WEBPACK_IMPORTED_MODULE_4___default.a.forwardRef(function Slider(props, ref) {
   var ariaLabel = props['aria-label'],
       ariaLabelledby = props['aria-labelledby'],
       ariaValuetext = props['aria-valuetext'],
@@ -778,42 +872,45 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
       ThumbComponent = _props$ThumbComponent === void 0 ? 'span' : _props$ThumbComponent,
       valueProp = props.value,
       _props$ValueLabelComp = props.ValueLabelComponent,
-      ValueLabelComponent = _props$ValueLabelComp === void 0 ? _ValueLabel__WEBPACK_IMPORTED_MODULE_14__["default"] : _props$ValueLabelComp,
+      ValueLabelComponent = _props$ValueLabelComp === void 0 ? _ValueLabel__WEBPACK_IMPORTED_MODULE_15__["default"] : _props$ValueLabelComp,
       _props$valueLabelDisp = props.valueLabelDisplay,
       valueLabelDisplay = _props$valueLabelDisp === void 0 ? 'off' : _props$valueLabelDisp,
       _props$valueLabelForm = props.valueLabelFormat,
       valueLabelFormat = _props$valueLabelForm === void 0 ? Identity : _props$valueLabelForm,
-      other = Object(_babel_runtime_helpers_esm_objectWithoutProperties__WEBPACK_IMPORTED_MODULE_0__["default"])(props, ["aria-label", "aria-labelledby", "aria-valuetext", "classes", "className", "component", "defaultValue", "disabled", "getAriaValueText", "marks", "max", "min", "name", "onChange", "onChangeCommitted", "onMouseDown", "orientation", "step", "ThumbComponent", "value", "ValueLabelComponent", "valueLabelDisplay", "valueLabelFormat"]);
+      other = Object(_babel_runtime_helpers_esm_objectWithoutProperties__WEBPACK_IMPORTED_MODULE_1__["default"])(props, ["aria-label", "aria-labelledby", "aria-valuetext", "classes", "className", "component", "defaultValue", "disabled", "getAriaValueText", "marks", "max", "min", "name", "onChange", "onChangeCommitted", "onMouseDown", "orientation", "step", "ThumbComponent", "value", "ValueLabelComponent", "valueLabelDisplay", "valueLabelFormat"]);
 
-  var theme = Object(_styles_useTheme__WEBPACK_IMPORTED_MODULE_8__["default"])();
+  var theme = Object(_styles_useTheme__WEBPACK_IMPORTED_MODULE_9__["default"])();
 
-  var _React$useRef = react__WEBPACK_IMPORTED_MODULE_3___default.a.useRef(valueProp != null),
+  var _React$useRef = react__WEBPACK_IMPORTED_MODULE_4___default.a.useRef(valueProp != null),
       isControlled = _React$useRef.current;
 
-  var touchId = react__WEBPACK_IMPORTED_MODULE_3___default.a.useRef(); // We can't use the :active browser pseudo-classes.
+  var touchId = react__WEBPACK_IMPORTED_MODULE_4___default.a.useRef(); // We can't use the :active browser pseudo-classes.
   // - The active state isn't triggered when clicking on the rail.
   // - The active state isn't transfered when inversing a range slider.
 
-  var _React$useState = react__WEBPACK_IMPORTED_MODULE_3___default.a.useState(-1),
-      active = _React$useState[0],
-      setActive = _React$useState[1];
+  var _React$useState = react__WEBPACK_IMPORTED_MODULE_4___default.a.useState(-1),
+      _React$useState2 = Object(_babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_0__["default"])(_React$useState, 2),
+      active = _React$useState2[0],
+      setActive = _React$useState2[1];
 
-  var _React$useState2 = react__WEBPACK_IMPORTED_MODULE_3___default.a.useState(-1),
-      open = _React$useState2[0],
-      setOpen = _React$useState2[1];
+  var _React$useState3 = react__WEBPACK_IMPORTED_MODULE_4___default.a.useState(-1),
+      _React$useState4 = Object(_babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_0__["default"])(_React$useState3, 2),
+      open = _React$useState4[0],
+      setOpen = _React$useState4[1];
 
-  var _React$useState3 = react__WEBPACK_IMPORTED_MODULE_3___default.a.useState(defaultValue),
-      valueState = _React$useState3[0],
-      setValueState = _React$useState3[1];
+  var _React$useState5 = react__WEBPACK_IMPORTED_MODULE_4___default.a.useState(defaultValue),
+      _React$useState6 = Object(_babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_0__["default"])(_React$useState5, 2),
+      valueState = _React$useState6[0],
+      setValueState = _React$useState6[1];
 
   var valueDerived = isControlled ? valueProp : valueState;
   var range = Array.isArray(valueDerived);
-  var instanceRef = react__WEBPACK_IMPORTED_MODULE_3___default.a.useRef();
+  var instanceRef = react__WEBPACK_IMPORTED_MODULE_4___default.a.useRef();
   var values = range ? valueDerived.sort(asc) : [valueDerived];
   values = values.map(function (value) {
     return clamp(value, min, max);
   });
-  var marks = marksProp === true && step !== null ? Object(_babel_runtime_helpers_esm_toConsumableArray__WEBPACK_IMPORTED_MODULE_2__["default"])(Array(Math.floor((max - min) / step) + 1)).map(function (_, index) {
+  var marks = marksProp === true && step !== null ? Object(_babel_runtime_helpers_esm_toConsumableArray__WEBPACK_IMPORTED_MODULE_3__["default"])(Array(Math.floor((max - min) / step) + 1)).map(function (_, index) {
     return {
       value: min + step * index
     };
@@ -823,19 +920,20 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
 
   };
 
-  var _useIsFocusVisible = Object(_utils_focusVisible__WEBPACK_IMPORTED_MODULE_10__["useIsFocusVisible"])(),
+  var _useIsFocusVisible = Object(_utils_focusVisible__WEBPACK_IMPORTED_MODULE_11__["useIsFocusVisible"])(),
       isFocusVisible = _useIsFocusVisible.isFocusVisible,
       onBlurVisible = _useIsFocusVisible.onBlurVisible,
       focusVisibleRef = _useIsFocusVisible.ref;
 
-  var _React$useState4 = react__WEBPACK_IMPORTED_MODULE_3___default.a.useState(-1),
-      focusVisible = _React$useState4[0],
-      setFocusVisible = _React$useState4[1];
+  var _React$useState7 = react__WEBPACK_IMPORTED_MODULE_4___default.a.useState(-1),
+      _React$useState8 = Object(_babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_0__["default"])(_React$useState7, 2),
+      focusVisible = _React$useState8[0],
+      setFocusVisible = _React$useState8[1];
 
-  var sliderRef = react__WEBPACK_IMPORTED_MODULE_3___default.a.useRef();
-  var handleFocusRef = Object(_utils_reactHelpers__WEBPACK_IMPORTED_MODULE_13__["useForkRef"])(focusVisibleRef, sliderRef);
-  var handleRef = Object(_utils_reactHelpers__WEBPACK_IMPORTED_MODULE_13__["useForkRef"])(ref, handleFocusRef);
-  var handleFocus = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_12__["default"])(function (event) {
+  var sliderRef = react__WEBPACK_IMPORTED_MODULE_4___default.a.useRef();
+  var handleFocusRef = Object(_utils_reactHelpers__WEBPACK_IMPORTED_MODULE_14__["useForkRef"])(focusVisibleRef, sliderRef);
+  var handleRef = Object(_utils_reactHelpers__WEBPACK_IMPORTED_MODULE_14__["useForkRef"])(ref, handleFocusRef);
+  var handleFocus = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_13__["default"])(function (event) {
     var index = Number(event.currentTarget.getAttribute('data-index'));
 
     if (isFocusVisible(event)) {
@@ -844,7 +942,7 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
 
     setOpen(index);
   });
-  var handleBlur = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_12__["default"])(function () {
+  var handleBlur = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_13__["default"])(function () {
     if (focusVisible !== -1) {
       setFocusVisible(-1);
       onBlurVisible();
@@ -852,14 +950,14 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
 
     setOpen(-1);
   });
-  var handleMouseOver = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_12__["default"])(function (event) {
+  var handleMouseOver = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_13__["default"])(function (event) {
     var index = Number(event.currentTarget.getAttribute('data-index'));
     setOpen(index);
   });
-  var handleMouseLeave = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_12__["default"])(function () {
+  var handleMouseLeave = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_13__["default"])(function () {
     setOpen(-1);
   });
-  var handleKeyDown = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_12__["default"])(function (event) {
+  var handleKeyDown = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_13__["default"])(function (event) {
     var index = Number(event.currentTarget.getAttribute('data-index'));
     var value = values[index];
     var tenPercents = (max - min) / 10;
@@ -952,14 +1050,14 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
       onChangeCommitted(event, newValue);
     }
   });
-  var previousIndex = react__WEBPACK_IMPORTED_MODULE_3___default.a.useRef();
+  var previousIndex = react__WEBPACK_IMPORTED_MODULE_4___default.a.useRef();
   var axis = orientation;
 
   if (theme.direction === 'rtl' && orientation !== "vertical") {
     axis += '-reverse';
   }
 
-  var getFingerNewValue = react__WEBPACK_IMPORTED_MODULE_3___default.a.useCallback(function (_ref3) {
+  var getFingerNewValue = react__WEBPACK_IMPORTED_MODULE_4___default.a.useCallback(function (_ref3) {
     var finger = _ref3.finger,
         _ref3$move = _ref3.move,
         move = _ref3$move === void 0 ? false : _ref3$move,
@@ -976,9 +1074,9 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
     var percent;
 
     if (axis.indexOf('vertical') === 0) {
-      percent = (bottom + Object(_utils_ownerWindow__WEBPACK_IMPORTED_MODULE_11__["default"])(slider).pageYOffset - finger.y) / height;
+      percent = (bottom + Object(_utils_ownerWindow__WEBPACK_IMPORTED_MODULE_12__["default"])(slider).pageYOffset - finger.y) / height;
     } else {
-      percent = (finger.x - left - Object(_utils_ownerWindow__WEBPACK_IMPORTED_MODULE_11__["default"])(slider).pageXOffset) / width;
+      percent = (finger.x - left - Object(_utils_ownerWindow__WEBPACK_IMPORTED_MODULE_12__["default"])(slider).pageXOffset) / width;
     }
 
     if (axis.indexOf('-reverse') !== -1) {
@@ -1024,7 +1122,7 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
       activeIndex: activeIndex
     };
   }, [max, min, axis, range, step, marks]);
-  var handleTouchMove = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_12__["default"])(function (event) {
+  var handleTouchMove = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_13__["default"])(function (event) {
     var finger = trackFinger(event, touchId);
 
     if (!finger) {
@@ -1054,7 +1152,7 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
       onChange(event, newValue);
     }
   });
-  var handleTouchEnd = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_12__["default"])(function (event) {
+  var handleTouchEnd = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_13__["default"])(function (event) {
     var finger = trackFinger(event, touchId);
 
     if (!finger) {
@@ -1086,18 +1184,14 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
     document.body.removeEventListener('touchmove', handleTouchMove);
     document.body.removeEventListener('touchend', handleTouchEnd);
   });
-  var handleMouseEnter = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_12__["default"])(function (event) {
+  var handleMouseEnter = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_13__["default"])(function (event) {
     // If the slider was being interacted with but the mouse went off the window
     // and then re-entered while unclicked then end the interaction.
-    //
-    // In Firefox, the event can be triggered when a new DOM node is inserted and hovered.
-    // We need to make sure that the relatedTarget (The EventTarget the pointing device exited from)
-    // is not null (it should be the html element)
-    if (event.buttons === 0 && event.relatedTarget !== null) {
+    if (event.buttons === 0) {
       handleTouchEnd(event);
     }
   });
-  var handleTouchStart = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_12__["default"])(function (event) {
+  var handleTouchStart = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_13__["default"])(function (event) {
     // Workaround as Safari has partial support for touchAction: 'none'.
     event.preventDefault();
     var touch = event.changedTouches[0];
@@ -1134,7 +1228,7 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
     document.body.addEventListener('touchmove', handleTouchMove);
     document.body.addEventListener('touchend', handleTouchEnd);
   });
-  react__WEBPACK_IMPORTED_MODULE_3___default.a.useEffect(function () {
+  react__WEBPACK_IMPORTED_MODULE_4___default.a.useEffect(function () {
     if (disabled) {
       return function () {};
     }
@@ -1150,7 +1244,7 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
       document.body.removeEventListener('touchend', handleTouchEnd);
     };
   }, [disabled, handleMouseEnter, handleTouchEnd, handleTouchMove, handleTouchStart]);
-  var handleMouseDown = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_12__["default"])(function (event) {
+  var handleMouseDown = Object(_utils_useEventCallback__WEBPACK_IMPORTED_MODULE_13__["default"])(function (event) {
     if (onMouseDown) {
       onMouseDown(event);
     }
@@ -1191,22 +1285,22 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
   var trackOffset = valueToPercent(range ? values[0] : min, min, max);
   var trackLeap = valueToPercent(values[values.length - 1], min, max) - trackOffset;
 
-  var trackStyle = Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__["default"])({}, axisProps[axis].offset(trackOffset), {}, axisProps[axis].leap(trackLeap));
+  var trackStyle = Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_2__["default"])({}, axisProps[axis].offset(trackOffset), {}, axisProps[axis].leap(trackLeap));
 
-  return react__WEBPACK_IMPORTED_MODULE_3___default.a.createElement(Component, Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__["default"])({
+  return react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement(Component, Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_2__["default"])({
     ref: handleRef,
-    className: Object(clsx__WEBPACK_IMPORTED_MODULE_5__["default"])(classes.root, className, disabled && classes.disabled, marks.length > 0 && marks.some(function (mark) {
+    className: Object(clsx__WEBPACK_IMPORTED_MODULE_6__["default"])(classes.root, className, disabled && classes.disabled, marks.length > 0 && marks.some(function (mark) {
       return mark.label;
     }) && classes.marked, {
       vertical: classes.vertical
     }[orientation]),
     onMouseDown: handleMouseDown
-  }, other), react__WEBPACK_IMPORTED_MODULE_3___default.a.createElement("span", {
+  }, other), react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement("span", {
     className: classes.rail
-  }), react__WEBPACK_IMPORTED_MODULE_3___default.a.createElement("span", {
+  }), react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement("span", {
     className: classes.track,
     style: trackStyle
-  }), react__WEBPACK_IMPORTED_MODULE_3___default.a.createElement("input", {
+  }), react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement("input", {
     value: values.join(','),
     name: name,
     type: "hidden"
@@ -1214,20 +1308,19 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
     var percent = valueToPercent(mark.value, min, max);
     var style = axisProps[axis].offset(percent);
     var markActive = range ? mark.value >= values[0] && mark.value <= values[values.length - 1] : mark.value <= values[0];
-    return react__WEBPACK_IMPORTED_MODULE_3___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_3___default.a.Fragment, {
+    return react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_4___default.a.Fragment, {
       key: mark.value
-    }, react__WEBPACK_IMPORTED_MODULE_3___default.a.createElement("span", {
+    }, react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement("span", {
       style: style,
-      className: Object(clsx__WEBPACK_IMPORTED_MODULE_5__["default"])(classes.mark, markActive && classes.markActive)
-    }), react__WEBPACK_IMPORTED_MODULE_3___default.a.createElement("span", {
-      "aria-hidden": true,
+      className: Object(clsx__WEBPACK_IMPORTED_MODULE_6__["default"])(classes.mark, markActive && classes.markActive)
+    }), react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement("span", {
       style: style,
-      className: Object(clsx__WEBPACK_IMPORTED_MODULE_5__["default"])(classes.markLabel, markActive && classes.markLabelActive)
+      className: Object(clsx__WEBPACK_IMPORTED_MODULE_6__["default"])(classes.markLabel, markActive && classes.markLabelActive)
     }, mark.label));
   }), values.map(function (value, index) {
     var percent = valueToPercent(value, min, max);
     var style = axisProps[axis].offset(percent);
-    return react__WEBPACK_IMPORTED_MODULE_3___default.a.createElement(ValueLabelComponent, {
+    return react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement(ValueLabelComponent, {
       key: index,
       valueLabelFormat: valueLabelFormat,
       valueLabelDisplay: valueLabelDisplay,
@@ -1236,8 +1329,8 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
       index: index,
       open: open === index || active === index,
       disabled: disabled
-    }, react__WEBPACK_IMPORTED_MODULE_3___default.a.createElement(ThumbComponent, {
-      className: Object(clsx__WEBPACK_IMPORTED_MODULE_5__["default"])(classes.thumb, active === index && classes.active, focusVisible === index && classes.focusVisible),
+    }, react__WEBPACK_IMPORTED_MODULE_4___default.a.createElement(ThumbComponent, {
+      className: Object(clsx__WEBPACK_IMPORTED_MODULE_6__["default"])(classes.thumb, active === index && classes.active, focusVisible === index && classes.focusVisible),
       tabIndex: disabled ? null : 0,
       role: "slider",
       style: style,
@@ -1261,17 +1354,17 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
   /**
    * The label of the slider.
    */
-  'aria-label': prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.string,
+  'aria-label': prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.string,
 
   /**
    * The id of the element containing a label for the slider.
    */
-  'aria-labelledby': prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.string,
+  'aria-labelledby': prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.string,
 
   /**
    * A string value that provides a user-friendly name for the current value of the slider.
    */
-  'aria-valuetext': Object(_material_ui_utils__WEBPACK_IMPORTED_MODULE_6__["chainPropTypes"])(prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.string, function (props) {
+  'aria-valuetext': Object(_material_ui_utils__WEBPACK_IMPORTED_MODULE_7__["chainPropTypes"])(prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.string, function (props) {
     var range = Array.isArray(props.value || props.defaultValue);
 
     if (range && props['aria-valuetext']) {
@@ -1285,28 +1378,28 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
    * Override or extend the styles applied to the component.
    * See [CSS API](#css) below for more details.
    */
-  classes: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.object.isRequired,
+  classes: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.object.isRequired,
 
   /**
    * @ignore
    */
-  className: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.string,
+  className: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.string,
 
   /**
    * The component used for the root node.
    * Either a string to use a DOM element or a component.
    */
-  component: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.elementType,
+  component: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.elementType,
 
   /**
    * The default element value. Use when the component is not controlled.
    */
-  defaultValue: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.number, prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.arrayOf(prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.number)]),
+  defaultValue: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.number, prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.arrayOf(prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.number)]),
 
   /**
    * If `true`, the slider will be disabled.
    */
-  disabled: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.bool,
+  disabled: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.bool,
 
   /**
    * Accepts a function which returns a string value that provides a user-friendly name for the current value of the slider.
@@ -1314,31 +1407,31 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
    * @param {number} value The thumb label's value to format
    * @param {number} index The thumb label's index to format
    */
-  getAriaValueText: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.func,
+  getAriaValueText: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.func,
 
   /**
    * Marks indicate predetermined values to which the user can move the slider.
    * If `true` the marks will be spaced according the value of the `step` prop.
    * If an array, it should contain objects with `value` and an optional `label` keys.
    */
-  marks: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.bool, prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.array]),
+  marks: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.bool, prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.array]),
 
   /**
    * The maximum allowed value of the slider.
    * Should not be equal to min.
    */
-  max: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.number,
+  max: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.number,
 
   /**
    * The minimum allowed value of the slider.
    * Should not be equal to max.
    */
-  min: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.number,
+  min: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.number,
 
   /**
    * Name attribute of the hidden `input` element.
    */
-  name: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.string,
+  name: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.string,
 
   /**
    * Callback function that is fired when the slider's value changed.
@@ -1346,7 +1439,7 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
    * @param {object} event The event source of the callback
    * @param {any} value The new value
    */
-  onChange: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.func,
+  onChange: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.func,
 
   /**
    * Callback function that is fired when the `mouseup` is triggered.
@@ -1354,39 +1447,39 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
    * @param {object} event The event source of the callback
    * @param {any} value The new value
    */
-  onChangeCommitted: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.func,
+  onChangeCommitted: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.func,
 
   /**
    * @ignore
    */
-  onMouseDown: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.func,
+  onMouseDown: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.func,
 
   /**
    * The slider orientation.
    */
-  orientation: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.oneOf(['horizontal', 'vertical']),
+  orientation: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.oneOf(['horizontal', 'vertical']),
 
   /**
    * The granularity with which the slider can step through values. (A "discrete" slider.)
    * When step is `null`, the thumb can only be slid onto marks provided with the `marks` prop.
    */
-  step: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.number,
+  step: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.number,
 
   /**
    * The component used to display the value label.
    */
-  ThumbComponent: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.elementType,
+  ThumbComponent: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.elementType,
 
   /**
    * The value of the slider.
    * For ranged sliders, provide an array with two values.
    */
-  value: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.number, prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.arrayOf(prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.number)]),
+  value: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.number, prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.arrayOf(prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.number)]),
 
   /**
    * The value label component.
    */
-  ValueLabelComponent: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.elementType,
+  ValueLabelComponent: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.elementType,
 
   /**
    * Controls when the value label is displayed:
@@ -1395,7 +1488,7 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
    * - `on` will display persistently.
    * - `off` will never display.
    */
-  valueLabelDisplay: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.oneOf(['on', 'auto', 'off']),
+  valueLabelDisplay: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.oneOf(['on', 'auto', 'off']),
 
   /**
    * The format function the value label's value.
@@ -1405,9 +1498,9 @@ var Slider = react__WEBPACK_IMPORTED_MODULE_3___default.a.forwardRef(function Sl
    * - {number} value The value label's value to format
    * - {number} index The value label's index to format
    */
-  valueLabelFormat: prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.string, prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.func])
+  valueLabelFormat: prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.string, prop_types__WEBPACK_IMPORTED_MODULE_5___default.a.func])
 } : undefined;
-/* harmony default export */ __webpack_exports__["default"] = (Object(_styles_withStyles__WEBPACK_IMPORTED_MODULE_7__["default"])(styles, {
+/* harmony default export */ __webpack_exports__["default"] = (Object(_styles_withStyles__WEBPACK_IMPORTED_MODULE_8__["default"])(styles, {
   name: 'MuiSlider'
 })(Slider));
 
@@ -3680,7 +3773,8 @@ function getStylesCreator(stylesOrCreator) {
       });
       return stylesWithOverrides;
     },
-    options: {}
+    options: {},
+    themingEnabled: themingEnabled
   };
 }
 
@@ -3823,7 +3917,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "withThemeCreator", function() { return _withTheme__WEBPACK_IMPORTED_MODULE_13__["withThemeCreator"]; });
 
-/** @license Material-UI v4.3.3
+/** @license Material-UI v4.3.0
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -4200,9 +4294,10 @@ function makeStyles(stylesOrCreator) {
     meta: classNamePrefix,
     classNamePrefix: classNamePrefix
   };
+  var listenToTheme = stylesCreator.themingEnabled || typeof name === 'string';
   return function () {
     var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var theme = Object(_useTheme__WEBPACK_IMPORTED_MODULE_7__["default"])() || defaultTheme;
+    var theme = (listenToTheme ? Object(_useTheme__WEBPACK_IMPORTED_MODULE_7__["default"])() : null) || defaultTheme;
 
     var stylesOptions = Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__["default"])({}, react__WEBPACK_IMPORTED_MODULE_2___default.a.useContext(_StylesProvider__WEBPACK_IMPORTED_MODULE_8__["StylesContext"]), {}, stylesOptions2);
 
@@ -4458,16 +4553,17 @@ function styled(Component) {
 
       var classes = useStyles(props);
       var className = Object(clsx__WEBPACK_IMPORTED_MODULE_3__["default"])(classes.root, classNameProp);
+
+      if (clone) {
+        return react__WEBPACK_IMPORTED_MODULE_2___default.a.cloneElement(children, {
+          className: Object(clsx__WEBPACK_IMPORTED_MODULE_3__["default"])(children.props.className, className)
+        });
+      }
+
       var spread = other;
 
       if (filterProps) {
         spread = omit(spread, filterProps);
-      }
-
-      if (clone) {
-        return react__WEBPACK_IMPORTED_MODULE_2___default.a.cloneElement(children, Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"])({
-          className: Object(clsx__WEBPACK_IMPORTED_MODULE_3__["default"])(children.props.className, className)
-        }, spread));
       }
 
       if (typeof children === 'function') {
@@ -4496,8 +4592,6 @@ function styled(Component) {
       /**
        * If `true`, the component will recycle it's children DOM element.
        * It's using `React.cloneElement` internally.
-       *
-       * This prop will be deprecated and removed in v5
        */
       clone: Object(_material_ui_utils__WEBPACK_IMPORTED_MODULE_5__["chainPropTypes"])(prop_types__WEBPACK_IMPORTED_MODULE_4___default.a.bool, function (props) {
         if (props.clone && props.component) {
@@ -16842,9 +16936,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jss */ "./node_modules/jss/dist/jss.esm.js");
 
 
-var px = jss__WEBPACK_IMPORTED_MODULE_0__["hasCSSTOMSupport"] && CSS ? CSS.px : 'px';
-var ms = jss__WEBPACK_IMPORTED_MODULE_0__["hasCSSTOMSupport"] && CSS ? CSS.ms : 'ms';
-var percent = jss__WEBPACK_IMPORTED_MODULE_0__["hasCSSTOMSupport"] && CSS ? CSS.percent : '%';
+var px = jss__WEBPACK_IMPORTED_MODULE_0__["hasCSSTOMSupport"] ? window.CSS.px : 'px';
+var ms = jss__WEBPACK_IMPORTED_MODULE_0__["hasCSSTOMSupport"] ? window.CSS.ms : 'ms';
+var percent = jss__WEBPACK_IMPORTED_MODULE_0__["hasCSSTOMSupport"] ? window.CSS.percent : '%';
 /**
  * Generated jss-plugin-default-unit CSS property units
  *
@@ -19499,7 +19593,7 @@ var Jss =
 function () {
   function Jss(options) {
     this.id = instanceCounter++;
-    this.version = "10.0.0-alpha.24";
+    this.version = "10.0.0-alpha.23";
     this.plugins = new PluginsRegistry();
     this.options = {
       id: {
@@ -55052,6 +55146,12 @@ module.exports = g;
 
 "use strict";
 
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 var mobx_1 = __webpack_require__(/*! mobx */ "./node_modules/mobx/lib/mobx.module.js");
@@ -55081,20 +55181,20 @@ var ComSocket = (function () {
     };
     ComSocket.prototype.updateVarList = function () {
         var _this = this;
-        return $.ajax({
+        $.ajax({
             type: 'POST',
             contentType: "text/plain",
             url: this.serverURL,
             data: '|0|' + this.requestFrame.listings + '|' + this.requestFrame.preFrame,
         })
-            .then(function (response) {
+            .then(mobx_1.action(function (response) {
             var transferarray = (response.slice(1, response.length - 1).split('|'));
             for (var i = 0; i < transferarray.length; i++) {
                 var varName = _this.lutKeyVariable[i];
                 _this.oVisuVariables.get(varName).value = transferarray[i];
             }
             ;
-        });
+        }));
     };
     ComSocket.prototype.startCyclicUpdate = function (periodms) {
         var _this = this;
@@ -55119,6 +55219,9 @@ var ComSocket = (function () {
         this.setValue(varName, value);
     };
     ComSocket.instance = new ComSocket();
+    __decorate([
+        mobx_1.action
+    ], ComSocket.prototype, "updateVarList", null);
     return ComSocket;
 }());
 exports.default = ComSocket;
@@ -55216,19 +55319,23 @@ exports.parseUserEvent = parseUserEvent;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-function Circle(textField, simpleShape) {
+var comsocket_1 = __webpack_require__(/*! ../../../../com/comsocket */ "./src/com/comsocket.ts");
+var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
+exports.Circle = function (_a) {
+    var simpleShape = _a.simpleShape, textField = _a.textField;
     var relCornerCoord = { x1: 0, y1: 0, x2: simpleShape.rect[2] - simpleShape.rect[0], y2: simpleShape.rect[3] - simpleShape.rect[1] };
     var relCenterCoord = { x: simpleShape.center[0] - simpleShape.rect[0], y: simpleShape.center[1] - simpleShape.rect[1] };
     var edge = (simpleShape.line_width === 0) ? 1 : simpleShape.line_width;
     var strokeWidth = (simpleShape.has_frame_color) ? edge : 0;
     var fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
-    return (React.createElement("div", { style: { position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
-        React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge },
-            React.createElement("g", null,
-                React.createElement("ellipse", { cx: relCenterCoord.x + edge, cy: relCenterCoord.y + edge, rx: relCornerCoord.x2 / 2, ry: relCornerCoord.y2 / 2, fill: fillColor, strokeWidth: strokeWidth, stroke: simpleShape.frame_color }),
-                textField))));
-}
-exports.Circle = Circle;
+    return mobx_react_lite_1.useObserver(function () {
+        return React.createElement("div", { style: { position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
+            React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge },
+                React.createElement("g", null,
+                    React.createElement("ellipse", { cx: relCenterCoord.x + edge, cy: relCenterCoord.y + edge, rx: relCornerCoord.x2 / 2, ry: relCornerCoord.y2 / 2, fill: comsocket_1.default.singleton().oVisuVariables.get(".xTest2").value ? fillColor : simpleShape.fill_color_alarm, strokeWidth: comsocket_1.default.singleton().oVisuVariables.get(".xTest2").value, stroke: simpleShape.frame_color }),
+                    textField)));
+    });
+};
 
 
 /***/ }),
@@ -55279,7 +55386,7 @@ exports.Rectangle = function (_a) {
     var fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
     return mobx_react_lite_1.useObserver(function () {
         return React.createElement("div", { style: { position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
-            React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge, onClick: function () { return comsocket_1.default.singleton().toggleValue('.xTest2'); } },
+            React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge, onClick: function () { return click(userEvents); } },
                 React.createElement("g", null,
                     React.createElement("rect", { width: relCornerCoord.x2, height: relCornerCoord.y2, x: edge, y: edge, fill: fillColor, strokeWidth: strokeWidth, stroke: simpleShape.frame_color }),
                     textField)));
@@ -55287,6 +55394,7 @@ exports.Rectangle = function (_a) {
 };
 function click(userEvents) {
     var com = comsocket_1.default.singleton();
+    console.log(userEvents);
     if (userEvents.length > 0) {
         userEvents.forEach(function (value, index) { return com.toggleValue(value); });
     }
@@ -55359,10 +55467,8 @@ function parseSimpleShape(section) {
         switch (shape) {
             case 'round-rect':
                 return (roundrect_1.RoundRect(simpleShape));
-                break;
             case 'circle':
-                return (circle_1.Circle(textField, simpleShape));
-                break;
+                return (React.createElement(circle_1.Circle, { simpleShape: simpleShape, textField: textField }));
             case 'line':
                 return (line_1.Line(simpleShape));
             case 'rectangle':
