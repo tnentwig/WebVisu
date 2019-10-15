@@ -42,12 +42,10 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
             return(
               RoundRect(simpleShape)
             )
-            break;
           case 'circle':
             return(
-              Circle(textField, simpleShape)
+              <Circle simpleShape={simpleShape} textField={textField}></Circle>
             )
-            break;
           case 'line':
             return(
               Line(simpleShape)

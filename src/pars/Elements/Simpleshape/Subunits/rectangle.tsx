@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ISimpleShape } from '../../../Interfaces/interfaces';
 import ComSocket from '../../../../com/comsocket';
-import {useObserver,useObservable} from 'mobx-react-lite'
+import {useObserver,} from 'mobx-react-lite'
 
 type Props = {
     simpleShape: ISimpleShape,
@@ -19,11 +19,10 @@ export const Rectangle :React.FunctionComponent<Props> = ({simpleShape, textFiel
     let strokeWidth = (simpleShape.has_frame_color) ? edge : 0;
     // Compute the fill color through has_fill_color
     let fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
-    // A 'circle' can be a circle or an ellipse.
 
     return useObserver(()=>
     <div style={{position:"absolute", left:simpleShape.rect[0], top:simpleShape.rect[1], width:relCornerCoord.x2+2*edge, height:relCornerCoord.y2+2*edge}}>
-        <svg width={relCornerCoord.x2+2*edge} height={relCornerCoord.y2+2*edge} onClick={()=>ComSocket.singleton().toggleValue('.xTest2')}>
+        <svg width={relCornerCoord.x2+2*edge} height={relCornerCoord.y2+2*edge} onClick={()=>click(userEvents)}>
             <g>
                 <rect 
                     width={relCornerCoord.x2}
@@ -43,6 +42,7 @@ export const Rectangle :React.FunctionComponent<Props> = ({simpleShape, textFiel
 
 function click (userEvents : string[]) {
     let com = ComSocket.singleton();
+    console.log(userEvents);
     if (userEvents.length>0) {
         userEvents.forEach((value, index)=>com.toggleValue(value));
     }

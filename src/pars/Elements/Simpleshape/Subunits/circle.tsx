@@ -1,7 +1,15 @@
 import * as React from 'react';
 import { ISimpleShape } from '../../../Interfaces/interfaces';
+import ComSocket from '../../../../com/comsocket';
+import {useObserver} from 'mobx-react-lite';
+import {autorun} from"mobx";
 
-export function Circle (textField : JSX.Element|undefined, simpleShape: ISimpleShape) 
+type Props = {
+    simpleShape: ISimpleShape,
+    textField : JSX.Element|undefined,
+}
+
+export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField})=> 
 {
     // Auxiliary values
     let relCornerCoord = {x1:0, y1:0, x2:simpleShape.rect[2]-simpleShape.rect[0], y2:simpleShape.rect[3]-simpleShape.rect[1]};
@@ -13,9 +21,8 @@ export function Circle (textField : JSX.Element|undefined, simpleShape: ISimpleS
     // Compute the fill color through has_fill_color
     let fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
     // A 'circle' can be a circle or an ellipse.
-
     
-    return(
+    return useObserver(()=>
     <div style={{position:"absolute", left:simpleShape.rect[0], top:simpleShape.rect[1], width:relCornerCoord.x2+2*edge, height:relCornerCoord.y2+2*edge}}>
         <svg width={relCornerCoord.x2+2*edge} height={relCornerCoord.y2+2*edge}>   
             <g>
@@ -24,8 +31,8 @@ export function Circle (textField : JSX.Element|undefined, simpleShape: ISimpleS
                 cy={relCenterCoord.y+edge}
                 rx={relCornerCoord.x2/2}
                 ry={relCornerCoord.y2/2}
-                fill={fillColor}
-                strokeWidth={strokeWidth}
+                fill={ComSocket.singleton().oVisuVariables.get(".xTest2")!.value ? fillColor : simpleShape.fill_color_alarm}
+                strokeWidth={ComSocket.singleton().oVisuVariables.get(".xTest2")!.value}
                 stroke={simpleShape.frame_color}
                 />
                 {textField}

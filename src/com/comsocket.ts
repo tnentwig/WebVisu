@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
 import { IComSocket } from '../pars/Interfaces/interfaces';
-import { observable } from "mobx"
+import { observable, action, autorun, toJS } from "mobx"
 
 export default class ComSocket implements IComSocket {
     private static instance : IComSocket=new ComSocket();
@@ -17,7 +17,7 @@ export default class ComSocket implements IComSocket {
         this.serverURL = '';
         this.oVisuVariables  = observable(new Map());
         this.requestFrame = {preFrame:'', listings:0};
-        this.lutKeyVariable = []
+        this.lutKeyVariable = [];
     }
 
     public static singleton(){
@@ -42,21 +42,21 @@ export default class ComSocket implements IComSocket {
         this.lutKeyVariable.push(varName);
         }
     }
-
+    @action
     updateVarList() {
-        return $.ajax({
+        $.ajax({
             type: 'POST',
             contentType: "text/plain",
             url: this.serverURL,
             data: '|0|'+this.requestFrame.listings+'|'+this.requestFrame.preFrame,
         })
-        .then((response : string) => {
+        .then(action((response : string) => {
             let transferarray : Array<string>= (response.slice(1,response.length-1).split('|'));
             for(let i=0; i<transferarray.length; i++) {
                 let varName = this.lutKeyVariable[i];
                 this.oVisuVariables.get(varName)!.value=transferarray[i];
             };
-        })
+        }))
     }
 
     startCyclicUpdate(periodms : number) {
