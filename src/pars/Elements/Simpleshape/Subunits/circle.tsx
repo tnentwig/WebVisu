@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { ISimpleShape } from '../../../Interfaces/interfaces';
 import ComSocket from '../../../../com/comsocket';
-import {useObserver} from 'mobx-react-lite';
-import {autorun} from"mobx";
+import {useObserver, useComputed} from 'mobx-react-lite';
 
 type Props = {
     simpleShape: ISimpleShape,
@@ -21,7 +20,9 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField})
     // Compute the fill color through has_fill_color
     let fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
     // A 'circle' can be a circle or an ellipse.
-    
+
+    // We have to decide if an alarm was toggled
+
     return useObserver(()=>
     <div style={{position:"absolute", left:simpleShape.rect[0], top:simpleShape.rect[1], width:relCornerCoord.x2+2*edge, height:relCornerCoord.y2+2*edge}}>
         <svg width={relCornerCoord.x2+2*edge} height={relCornerCoord.y2+2*edge}>   
@@ -31,8 +32,8 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField})
                 cy={relCenterCoord.y+edge}
                 rx={relCornerCoord.x2/2}
                 ry={relCornerCoord.y2/2}
-                fill={ComSocket.singleton().oVisuVariables.get(".xTest2")!.value ? fillColor : simpleShape.fill_color_alarm}
-                strokeWidth={ComSocket.singleton().oVisuVariables.get(".xTest2")!.value}
+                fill={ComSocket.singleton().oVisuVariables.get(".xTest2")!.value==="0" ? fillColor : simpleShape.fill_color_alarm}
+                strokeWidth={strokeWidth}
                 stroke={simpleShape.frame_color}
                 />
                 {textField}

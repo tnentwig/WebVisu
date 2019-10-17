@@ -42,7 +42,6 @@ export const Rectangle :React.FunctionComponent<Props> = ({simpleShape, textFiel
 
 function click (userEvents : string[]) {
     let com = ComSocket.singleton();
-    console.log(userEvents);
     if (userEvents.length>0) {
         userEvents.forEach((value, index)=>com.toggleValue(value));
     }

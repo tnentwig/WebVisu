@@ -6,7 +6,7 @@ import { Circle } from './Subunits/circle'
 import { Rectangle } from './Subunits/rectangle';
 import { parseTextfield } from './Features/text';
 import { ISimpleShape } from '../../Interfaces/interfaces';
-import { parseUserEvent } from './Features/userevent';
+import { parseUserEvent } from './Features/event';
 
 export function parseSimpleShape(section : JQuery<XMLDocument>){
     // Check if its on of the allowed shapes like rectangle, round-rectangle, circle or line
@@ -33,8 +33,8 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
         let textField = parseTextfield(section);
 
         // Parsing of observable events (like toggle color)
-  
-        // Parsing of user events
+        //let sysEvents = parseSysEvent(section);
+        // Parsing of user events that causes a reaction like toggle or pop up input
         let userEvents = parseUserEvent(section);
         // Return of the React-Node
         switch (shape){

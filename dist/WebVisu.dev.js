@@ -55246,6 +55246,29 @@ objHTML5Visu.createVisu("/static/plc_visu.xml");
 
 /***/ }),
 
+/***/ "./src/pars/Elements/Simpleshape/Features/event.ts":
+/*!*********************************************************!*\
+  !*** ./src/pars/Elements/Simpleshape/Features/event.ts ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+function parseUserEvent(section) {
+    var varList = [];
+    section.children("expr-toggle-var").children("expr").each(function () {
+        varList.push($(this).children("var").text());
+    });
+    return varList;
+}
+exports.parseUserEvent = parseUserEvent;
+
+
+/***/ }),
+
 /***/ "./src/pars/Elements/Simpleshape/Features/text.tsx":
 /*!*********************************************************!*\
   !*** ./src/pars/Elements/Simpleshape/Features/text.tsx ***!
@@ -55285,29 +55308,6 @@ exports.parseTextfield = parseTextfield;
 
 /***/ }),
 
-/***/ "./src/pars/Elements/Simpleshape/Features/userevent.ts":
-/*!*************************************************************!*\
-  !*** ./src/pars/Elements/Simpleshape/Features/userevent.ts ***!
-  \*************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
-function parseUserEvent(section) {
-    var varList = [];
-    section.children("expr-toggle-var").children("expr").each(function () {
-        varList.push($(this).children("var").text());
-    });
-    return varList;
-}
-exports.parseUserEvent = parseUserEvent;
-
-
-/***/ }),
-
 /***/ "./src/pars/Elements/Simpleshape/Subunits/circle.tsx":
 /*!***********************************************************!*\
   !*** ./src/pars/Elements/Simpleshape/Subunits/circle.tsx ***!
@@ -55332,7 +55332,7 @@ exports.Circle = function (_a) {
         return React.createElement("div", { style: { position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
             React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge },
                 React.createElement("g", null,
-                    React.createElement("ellipse", { cx: relCenterCoord.x + edge, cy: relCenterCoord.y + edge, rx: relCornerCoord.x2 / 2, ry: relCornerCoord.y2 / 2, fill: comsocket_1.default.singleton().oVisuVariables.get(".xTest2").value ? fillColor : simpleShape.fill_color_alarm, strokeWidth: comsocket_1.default.singleton().oVisuVariables.get(".xTest2").value, stroke: simpleShape.frame_color }),
+                    React.createElement("ellipse", { cx: relCenterCoord.x + edge, cy: relCenterCoord.y + edge, rx: relCornerCoord.x2 / 2, ry: relCornerCoord.y2 / 2, fill: comsocket_1.default.singleton().oVisuVariables.get(".xTest2").value === "1" ? fillColor : simpleShape.fill_color_alarm, strokeWidth: strokeWidth = strokeWidth + 1, stroke: simpleShape.frame_color }),
                     textField)));
     });
 };
@@ -55394,7 +55394,6 @@ exports.Rectangle = function (_a) {
 };
 function click(userEvents) {
     var com = comsocket_1.default.singleton();
-    console.log(userEvents);
     if (userEvents.length > 0) {
         userEvents.forEach(function (value, index) { return com.toggleValue(value); });
     }
@@ -55444,7 +55443,7 @@ var line_1 = __webpack_require__(/*! ./Subunits/line */ "./src/pars/Elements/Sim
 var circle_1 = __webpack_require__(/*! ./Subunits/circle */ "./src/pars/Elements/Simpleshape/Subunits/circle.tsx");
 var rectangle_1 = __webpack_require__(/*! ./Subunits/rectangle */ "./src/pars/Elements/Simpleshape/Subunits/rectangle.tsx");
 var text_1 = __webpack_require__(/*! ./Features/text */ "./src/pars/Elements/Simpleshape/Features/text.tsx");
-var userevent_1 = __webpack_require__(/*! ./Features/userevent */ "./src/pars/Elements/Simpleshape/Features/userevent.ts");
+var event_1 = __webpack_require__(/*! ./Features/event */ "./src/pars/Elements/Simpleshape/Features/event.ts");
 function parseSimpleShape(section) {
     var shape = section.children("simple-shape").text();
     if (['round-rect', 'circle', 'line', 'rectangle'].includes(shape)) {
@@ -55463,7 +55462,7 @@ function parseSimpleShape(section) {
             enable_text_input: util.stringToBoolean(section.children("enable-text-input").text())
         };
         var textField = text_1.parseTextfield(section);
-        var userEvents = userevent_1.parseUserEvent(section);
+        var userEvents = event_1.parseUserEvent(section);
         switch (shape) {
             case 'round-rect':
                 return (roundrect_1.RoundRect(simpleShape));
@@ -55839,7 +55838,7 @@ var HTML5Visu = (function () {
             var variable = $(this);
             com.addObservableVar(variable.attr("name"), variable.text());
         });
-        com.startCyclicUpdate(5000);
+        com.startCyclicUpdate(200);
     };
     HTML5Visu.prototype.convertVisuElements = function (XML) {
         console.log("Start parsing...");
