@@ -55269,6 +55269,38 @@ exports.parseUserEvent = parseUserEvent;
 
 /***/ }),
 
+/***/ "./src/pars/Elements/Simpleshape/Features/reactions.ts":
+/*!*************************************************************!*\
+  !*** ./src/pars/Elements/Simpleshape/Features/reactions.ts ***!
+  \*************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+function parseReactions(section) {
+    var exprMap = new Map();
+    var tags = [];
+    tags.push("expr-toggle-color");
+    tags.push("expr-fill-color");
+    tags.push("expr-fill-color-alarm");
+    tags.push("expr-frame-color");
+    tags.push("expr-frame-color-alarm");
+    tags.push("expr-invisible");
+    tags.forEach(function (entry) {
+        section.children(entry).children("expr").each(function () {
+            exprMap.set(entry, $(this).children("var").text());
+        });
+    });
+    return exprMap;
+}
+exports.parseReactions = parseReactions;
+
+
+/***/ }),
+
 /***/ "./src/pars/Elements/Simpleshape/Features/text.tsx":
 /*!*********************************************************!*\
   !*** ./src/pars/Elements/Simpleshape/Features/text.tsx ***!
@@ -55322,17 +55354,51 @@ var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 var comsocket_1 = __webpack_require__(/*! ../../../../com/comsocket */ "./src/com/comsocket.ts");
 var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
 exports.Circle = function (_a) {
-    var simpleShape = _a.simpleShape, textField = _a.textField;
+    var simpleShape = _a.simpleShape, textField = _a.textField, reactions = _a.reactions;
     var relCornerCoord = { x1: 0, y1: 0, x2: simpleShape.rect[2] - simpleShape.rect[0], y2: simpleShape.rect[3] - simpleShape.rect[1] };
     var relCenterCoord = { x: simpleShape.center[0] - simpleShape.rect[0], y: simpleShape.center[1] - simpleShape.rect[1] };
     var edge = (simpleShape.line_width === 0) ? 1 : simpleShape.line_width;
     var strokeWidth = (simpleShape.has_frame_color) ? edge : 0;
     var fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
+    var initial = {
+        absCornerCoord: { x1: simpleShape.rect[0], y1: simpleShape.rect[1], x2: simpleShape.rect[3], y2: simpleShape.rect[4] },
+        relCornerCoord: relCornerCoord,
+        relCenterCoord: relCenterCoord,
+        edge: (simpleShape.line_width === 0) ? 1 : simpleShape.line_width,
+        cx: relCenterCoord.x + edge,
+        cy: relCenterCoord.y + edge,
+        rx: relCornerCoord.x2 / 2,
+        ry: relCornerCoord.y2 / 2,
+        normalColor: simpleShape.fill_color,
+        alarmColor: simpleShape.fill_color_alarm,
+        fill: fillColor,
+        strokeWidth: (simpleShape.has_frame_color) ? edge : 0,
+        stroke: simpleShape.frame_color,
+        display: "true",
+        alarm: false
+    };
+    if (typeof (reactions.has("expr-toggle-color"))) {
+        var reaction_1 = reactions.get("expr-toggle-color");
+        Object.defineProperty(initial, "fill", {
+            get: function () {
+                return comsocket_1.default.singleton().oVisuVariables.get(reaction_1).value === "0" ? initial.normalColor : initial.alarmColor;
+            }
+        });
+    }
+    if (typeof (reactions.has("expr-invisible"))) {
+        var reaction_2 = reactions.get("expr-toggle-color");
+        Object.defineProperty(initial, "display", {
+            get: function () {
+                return comsocket_1.default.singleton().oVisuVariables.get(reaction_2).value === "0" ? "true" : false;
+            }
+        });
+    }
+    var state = mobx_react_lite_1.useObservable(initial);
     return mobx_react_lite_1.useObserver(function () {
-        return React.createElement("div", { style: { position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
+        return React.createElement("div", { "data-tip": "hi", style: { display: state.display, position: "absolute", left: state.absCornerCoord.x1, top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
             React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge },
                 React.createElement("g", null,
-                    React.createElement("ellipse", { cx: relCenterCoord.x + edge, cy: relCenterCoord.y + edge, rx: relCornerCoord.x2 / 2, ry: relCornerCoord.y2 / 2, fill: comsocket_1.default.singleton().oVisuVariables.get(".xTest2").value === "1" ? fillColor : simpleShape.fill_color_alarm, strokeWidth: strokeWidth = strokeWidth + 1, stroke: simpleShape.frame_color }),
+                    React.createElement("ellipse", { cx: state.relCenterCoord.x + edge, cy: state.relCenterCoord.y + edge, rx: state.relCornerCoord.x2 / 2, ry: state.relCornerCoord.y2 / 2, fill: state.fill, strokeWidth: state.strokeWidth, stroke: state.stroke }),
                     textField)));
     });
 };
@@ -55444,6 +55510,7 @@ var circle_1 = __webpack_require__(/*! ./Subunits/circle */ "./src/pars/Elements
 var rectangle_1 = __webpack_require__(/*! ./Subunits/rectangle */ "./src/pars/Elements/Simpleshape/Subunits/rectangle.tsx");
 var text_1 = __webpack_require__(/*! ./Features/text */ "./src/pars/Elements/Simpleshape/Features/text.tsx");
 var event_1 = __webpack_require__(/*! ./Features/event */ "./src/pars/Elements/Simpleshape/Features/event.ts");
+var reactions_1 = __webpack_require__(/*! ./Features/reactions */ "./src/pars/Elements/Simpleshape/Features/reactions.ts");
 function parseSimpleShape(section) {
     var shape = section.children("simple-shape").text();
     if (['round-rect', 'circle', 'line', 'rectangle'].includes(shape)) {
@@ -55462,12 +55529,13 @@ function parseSimpleShape(section) {
             enable_text_input: util.stringToBoolean(section.children("enable-text-input").text())
         };
         var textField = text_1.parseTextfield(section);
+        var reactions = reactions_1.parseReactions(section);
         var userEvents = event_1.parseUserEvent(section);
         switch (shape) {
             case 'round-rect':
                 return (roundrect_1.RoundRect(simpleShape));
             case 'circle':
-                return (React.createElement(circle_1.Circle, { simpleShape: simpleShape, textField: textField }));
+                return (React.createElement(circle_1.Circle, { simpleShape: simpleShape, textField: textField, reactions: reactions }));
             case 'line':
                 return (line_1.Line(simpleShape));
             case 'rectangle':
