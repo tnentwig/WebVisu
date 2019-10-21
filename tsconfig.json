@@ -10,6 +10,7 @@
         "allowSyntheticDefaultImports": true,
         "jsx": "react",
         "strict": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "strictNullChecks": false // for maps returning undefined | string
     }
 }
