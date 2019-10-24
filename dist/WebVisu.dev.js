@@ -55146,12 +55146,6 @@ module.exports = g;
 
 "use strict";
 
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 var mobx_1 = __webpack_require__(/*! mobx */ "./node_modules/mobx/lib/mobx.module.js");
@@ -55187,14 +55181,16 @@ var ComSocket = (function () {
             url: this.serverURL,
             data: '|0|' + this.requestFrame.listings + '|' + this.requestFrame.preFrame,
         })
-            .then(mobx_1.action(function (response) {
+            .then(function (response) {
             var transferarray = (response.slice(1, response.length - 1).split('|'));
             for (var i = 0; i < transferarray.length; i++) {
                 var varName = _this.lutKeyVariable[i];
-                _this.oVisuVariables.get(varName).value = transferarray[i];
+                if (_this.oVisuVariables.get(varName).value !== transferarray[i]) {
+                    mobx_1.action(_this.oVisuVariables.get(varName).value = transferarray[i]);
+                }
             }
             ;
-        }));
+        });
     };
     ComSocket.prototype.startCyclicUpdate = function (periodms) {
         var _this = this;
@@ -55219,9 +55215,6 @@ var ComSocket = (function () {
         this.setValue(varName, value);
     };
     ComSocket.instance = new ComSocket();
-    __decorate([
-        mobx_1.action
-    ], ComSocket.prototype, "updateVarList", null);
     return ComSocket;
 }());
 exports.default = ComSocket;
@@ -55240,16 +55233,16 @@ exports.default = ComSocket;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var visuparser_1 = __webpack_require__(/*! ./pars/visuparser */ "./src/pars/visuparser.tsx");
-var objHTML5Visu = new visuparser_1.default("http://localhost:5000");
-objHTML5Visu.createVisu("/static/plc_visu.xml");
+var objHTML5Visu = new visuparser_1.default("http://localhost:8080");
+objHTML5Visu.createVisu("/plc_visu.xml");
 
 
 /***/ }),
 
-/***/ "./src/pars/Elements/Simpleshape/Features/event.ts":
-/*!*********************************************************!*\
-  !*** ./src/pars/Elements/Simpleshape/Features/event.ts ***!
-  \*********************************************************/
+/***/ "./src/pars/Elements/Simpleshape/Features/eventParser.ts":
+/*!***************************************************************!*\
+  !*** ./src/pars/Elements/Simpleshape/Features/eventParser.ts ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -55257,6 +55250,33 @@ objHTML5Visu.createVisu("/static/plc_visu.xml");
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+function parseDynamicParameters(section) {
+    var exprMap = new Map();
+    var tags = [];
+    tags.push("expr-toggle-color");
+    tags.push("expr-fill-color");
+    tags.push("expr-fill-color-alarm");
+    tags.push("expr-frame-color");
+    tags.push("expr-frame-color-alarm");
+    tags.push("expr-invisible");
+    tags.push("expr-fill-flags");
+    tags.push("expr-frame-flags");
+    tags.push("expr-line-width");
+    tags.push("expr-left");
+    tags.push("expr-right");
+    tags.push("expr-top");
+    tags.push("expr-bottom");
+    tags.push("expr-xpos");
+    tags.push("expr-ypos");
+    tags.push("expr-scale");
+    tags.forEach(function (entry) {
+        section.children(entry).children("expr").each(function () {
+            exprMap.set(entry, $(this).children("var").text());
+        });
+    });
+    return exprMap;
+}
+exports.parseDynamicParameters = parseDynamicParameters;
 function parseUserEvent(section) {
     var varList = [];
     section.children("expr-toggle-var").children("expr").each(function () {
@@ -55269,34 +55289,118 @@ exports.parseUserEvent = parseUserEvent;
 
 /***/ }),
 
-/***/ "./src/pars/Elements/Simpleshape/Features/reactions.ts":
-/*!*************************************************************!*\
-  !*** ./src/pars/Elements/Simpleshape/Features/reactions.ts ***!
-  \*************************************************************/
+/***/ "./src/pars/Elements/Simpleshape/Features/objectManager.ts":
+/*!*****************************************************************!*\
+  !*** ./src/pars/Elements/Simpleshape/Features/objectManager.ts ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
-function parseReactions(section) {
-    var exprMap = new Map();
-    var tags = [];
-    tags.push("expr-toggle-color");
-    tags.push("expr-fill-color");
-    tags.push("expr-fill-color-alarm");
-    tags.push("expr-frame-color");
-    tags.push("expr-frame-color-alarm");
-    tags.push("expr-invisible");
-    tags.forEach(function (entry) {
-        section.children(entry).children("expr").each(function () {
-            exprMap.set(entry, $(this).children("var").text());
+var comsocket_1 = __webpack_require__(/*! ../../../../com/comsocket */ "./src/com/comsocket.ts");
+var utilfunctions_1 = __webpack_require__(/*! ../../../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
+function attachDynamicParameters(visuObject, dynamicElements) {
+    if (dynamicElements.has("expr-toggle-color")) {
+        var element_1 = dynamicElements.get("expr-toggle-color");
+        Object.defineProperty(visuObject, "alarm", {
+            get: function () {
+                var value = comsocket_1.default.singleton().oVisuVariables.get(element_1).value;
+                if (value === "0") {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
         });
-    });
-    return exprMap;
+    }
+    if (dynamicElements.has("expr-fill-color")) {
+        var element_2 = dynamicElements.get("expr-fill-color");
+        Object.defineProperty(visuObject, "normalFillColor", {
+            get: function () {
+                return utilfunctions_1.numberToHexColor(comsocket_1.default.singleton().oVisuVariables.get(element_2).value);
+            }
+        });
+    }
+    if (dynamicElements.has("expr-fill-color-alarm")) {
+        var element_3 = dynamicElements.get("expr-fill-color-alarm");
+        Object.defineProperty(visuObject, "alarmFillColor", {
+            get: function () {
+                return utilfunctions_1.numberToHexColor(comsocket_1.default.singleton().oVisuVariables.get(element_3).value);
+            }
+        });
+    }
+    if (dynamicElements.has("expr-frame-color")) {
+        var element_4 = dynamicElements.get("expr-frame-color");
+        Object.defineProperty(visuObject, "normalFrameColor", {
+            get: function () {
+                return utilfunctions_1.numberToHexColor(comsocket_1.default.singleton().oVisuVariables.get(element_4).value);
+            }
+        });
+    }
+    if (dynamicElements.has("expr-frame-color-alarm")) {
+        var element_5 = dynamicElements.get("expr-frame-color-alarm");
+        Object.defineProperty(visuObject, "alarmFrameColor", {
+            get: function () {
+                return utilfunctions_1.numberToHexColor(comsocket_1.default.singleton().oVisuVariables.get(element_5).value);
+            }
+        });
+    }
+    if (dynamicElements.has("expr-invisible")) {
+        var element_6 = dynamicElements.get("expr-invisible");
+        Object.defineProperty(visuObject, "display", {
+            get: function () {
+                var value = comsocket_1.default.singleton().oVisuVariables.get(element_6).value;
+                if (value === "0") {
+                    return "visible";
+                }
+                else {
+                    return "hidden";
+                }
+            }
+        });
+    }
+    if (dynamicElements.has("expr-fill-flags")) {
+        var element_7 = dynamicElements.get("expr-fill-flags");
+        Object.defineProperty(visuObject, "hasFillColor", {
+            get: function () {
+                var value = comsocket_1.default.singleton().oVisuVariables.get(element_7).value;
+                if (value === "0") {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+        });
+    }
+    if (dynamicElements.has("expr-frame-flags")) {
+        var element_8 = dynamicElements.get("expr-frame-flags");
+        Object.defineProperty(visuObject, "hasFrameColor", {
+            get: function () {
+                var value = comsocket_1.default.singleton().oVisuVariables.get(element_8).value;
+                if (value === "0") {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+        });
+    }
+    if (dynamicElements.has("expr-line-width")) {
+        var element_9 = dynamicElements.get("expr-line-width");
+        Object.defineProperty(visuObject, "strokeWidth", {
+            get: function () {
+                return Number(comsocket_1.default.singleton().oVisuVariables.get(element_9).value);
+            }
+        });
+    }
+    return visuObject;
 }
-exports.parseReactions = parseReactions;
+exports.attachDynamicParameters = attachDynamicParameters;
 
 
 /***/ }),
@@ -55351,54 +55455,84 @@ exports.parseTextfield = parseTextfield;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-var comsocket_1 = __webpack_require__(/*! ../../../../com/comsocket */ "./src/com/comsocket.ts");
+var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Simpleshape/Features/objectManager.ts");
 var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
 exports.Circle = function (_a) {
-    var simpleShape = _a.simpleShape, textField = _a.textField, reactions = _a.reactions;
+    var simpleShape = _a.simpleShape, textField = _a.textField, dynamicParameters = _a.dynamicParameters;
     var relCornerCoord = { x1: 0, y1: 0, x2: simpleShape.rect[2] - simpleShape.rect[0], y2: simpleShape.rect[3] - simpleShape.rect[1] };
     var relCenterCoord = { x: simpleShape.center[0] - simpleShape.rect[0], y: simpleShape.center[1] - simpleShape.rect[1] };
     var edge = (simpleShape.line_width === 0) ? 1 : simpleShape.line_width;
     var strokeWidth = (simpleShape.has_frame_color) ? edge : 0;
     var fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
     var initial = {
+        normalFillColor: simpleShape.fill_color,
+        alarmFillColor: simpleShape.fill_color_alarm,
+        normalFrameColor: simpleShape.frame_color,
+        alarmFrameColor: simpleShape.frame_color_alarm,
+        hasFillColor: simpleShape.has_inside_color,
+        hasFrameColor: simpleShape.has_frame_color,
+        strokeWidth: strokeWidth,
         absCornerCoord: { x1: simpleShape.rect[0], y1: simpleShape.rect[1], x2: simpleShape.rect[3], y2: simpleShape.rect[4] },
+        edge: edge,
+        display: "visible",
+        alarm: false,
         relCornerCoord: relCornerCoord,
         relCenterCoord: relCenterCoord,
-        edge: (simpleShape.line_width === 0) ? 1 : simpleShape.line_width,
-        cx: relCenterCoord.x + edge,
-        cy: relCenterCoord.y + edge,
-        rx: relCornerCoord.x2 / 2,
-        ry: relCornerCoord.y2 / 2,
-        normalColor: simpleShape.fill_color,
-        alarmColor: simpleShape.fill_color_alarm,
         fill: fillColor,
-        strokeWidth: (simpleShape.has_frame_color) ? edge : 0,
-        stroke: simpleShape.frame_color,
-        display: "true",
-        alarm: false
+        stroke: simpleShape.frame_color
     };
-    if (typeof (reactions.has("expr-toggle-color"))) {
-        var reaction_1 = reactions.get("expr-toggle-color");
-        Object.defineProperty(initial, "fill", {
-            get: function () {
-                return comsocket_1.default.singleton().oVisuVariables.get(reaction_1).value === "0" ? initial.normalColor : initial.alarmColor;
+    initial = objectManager_1.attachDynamicParameters(initial, dynamicParameters);
+    Object.defineProperty(initial, "fill", {
+        get: function () {
+            if (initial.alarm === false) {
+                if (initial.hasFillColor) {
+                    return "none";
+                }
+                else {
+                    return initial.normalFillColor;
+                }
             }
-        });
-    }
-    if (typeof (reactions.has("expr-invisible"))) {
-        var reaction_2 = reactions.get("expr-toggle-color");
-        Object.defineProperty(initial, "display", {
-            get: function () {
-                return comsocket_1.default.singleton().oVisuVariables.get(reaction_2).value === "0" ? "true" : false;
+            else {
+                return initial.alarmFillColor;
             }
-        });
-    }
-    var state = mobx_react_lite_1.useObservable(initial);
+        }
+    });
+    Object.defineProperty(initial, "stroke", {
+        get: function () {
+            if (initial.alarm === false) {
+                if (initial.hasFrameColor) {
+                    return initial.normalFrameColor;
+                }
+                else {
+                    return "none";
+                }
+            }
+            else {
+                return initial.alarmFrameColor;
+            }
+        }
+    });
+    Object.defineProperty(initial, "edge", {
+        get: function () {
+            if (initial.hasFrameColor || initial.alarm) {
+                if (initial.strokeWidth === 0) {
+                    return 1;
+                }
+                else {
+                    return initial.strokeWidth;
+                }
+            }
+            else {
+                return 0;
+            }
+        }
+    });
+    var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
     return mobx_react_lite_1.useObserver(function () {
-        return React.createElement("div", { "data-tip": "hi", style: { display: state.display, position: "absolute", left: state.absCornerCoord.x1, top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
-            React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge },
+        return React.createElement("div", { style: { visibility: state.display, position: "absolute", left: state.absCornerCoord.x1, top: state.absCornerCoord.y1, width: state.relCornerCoord.x2 + 2 * state.edge, height: state.relCornerCoord.y2 + 2 * state.edge } },
+            React.createElement("svg", { width: state.relCornerCoord.x2 + 2 * state.edge, height: state.relCornerCoord.y2 + 2 * state.edge },
                 React.createElement("g", null,
-                    React.createElement("ellipse", { cx: state.relCenterCoord.x + edge, cy: state.relCenterCoord.y + edge, rx: state.relCornerCoord.x2 / 2, ry: state.relCornerCoord.y2 / 2, fill: state.fill, strokeWidth: state.strokeWidth, stroke: state.stroke }),
+                    React.createElement("ellipse", { stroke: state.stroke, cx: state.relCenterCoord.x + state.edge, cy: state.relCenterCoord.y + state.edge, rx: state.relCornerCoord.x2 / 2, ry: state.relCornerCoord.y2 / 2, fill: state.fill, strokeWidth: state.strokeWidth }),
                     textField)));
     });
 };
@@ -55509,8 +55643,7 @@ var line_1 = __webpack_require__(/*! ./Subunits/line */ "./src/pars/Elements/Sim
 var circle_1 = __webpack_require__(/*! ./Subunits/circle */ "./src/pars/Elements/Simpleshape/Subunits/circle.tsx");
 var rectangle_1 = __webpack_require__(/*! ./Subunits/rectangle */ "./src/pars/Elements/Simpleshape/Subunits/rectangle.tsx");
 var text_1 = __webpack_require__(/*! ./Features/text */ "./src/pars/Elements/Simpleshape/Features/text.tsx");
-var event_1 = __webpack_require__(/*! ./Features/event */ "./src/pars/Elements/Simpleshape/Features/event.ts");
-var reactions_1 = __webpack_require__(/*! ./Features/reactions */ "./src/pars/Elements/Simpleshape/Features/reactions.ts");
+var eventParser_1 = __webpack_require__(/*! ./Features/eventParser */ "./src/pars/Elements/Simpleshape/Features/eventParser.ts");
 function parseSimpleShape(section) {
     var shape = section.children("simple-shape").text();
     if (['round-rect', 'circle', 'line', 'rectangle'].includes(shape)) {
@@ -55529,13 +55662,13 @@ function parseSimpleShape(section) {
             enable_text_input: util.stringToBoolean(section.children("enable-text-input").text())
         };
         var textField = text_1.parseTextfield(section);
-        var reactions = reactions_1.parseReactions(section);
-        var userEvents = event_1.parseUserEvent(section);
+        var dynamicParameters = eventParser_1.parseDynamicParameters(section);
+        var userEvents = eventParser_1.parseUserEvent(section);
         switch (shape) {
             case 'round-rect':
                 return (roundrect_1.RoundRect(simpleShape));
             case 'circle':
-                return (React.createElement(circle_1.Circle, { simpleShape: simpleShape, textField: textField, reactions: reactions }));
+                return (React.createElement(circle_1.Circle, { simpleShape: simpleShape, textField: textField, dynamicParameters: dynamicParameters }));
             case 'line':
                 return (line_1.Line(simpleShape));
             case 'rectangle':
@@ -55796,6 +55929,15 @@ function rgbToHexString(rgb) {
     return ('#' + interim);
 }
 exports.rgbToHexString = rgbToHexString;
+function numberToHexColor(number) {
+    var interim = Number(number).toString(16);
+    while (interim.length !== 6) {
+        interim = interim + '0';
+    }
+    ;
+    return ('#' + interim);
+}
+exports.numberToHexColor = numberToHexColor;
 function stringToArray(stringExp) {
     return (stringExp.split(',')).map(Number);
 }
@@ -55900,7 +56042,7 @@ var HTML5Visu = (function () {
     };
     HTML5Visu.prototype.initCommunication = function (XML) {
         var com = comsocket_1.default.singleton();
-        com.setServerURL(this.rootDir + '/webvisu/webvisu.htm');
+        com.setServerURL(this.rootDir + '/webvisu.htm');
         var visuXML = $(XML);
         visuXML.children("visualisation").children("variablelist").children("variable").each(function () {
             var variable = $(this);
