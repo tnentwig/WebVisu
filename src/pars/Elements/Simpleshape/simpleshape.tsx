@@ -6,8 +6,7 @@ import { Circle } from './Subunits/circle'
 import { Rectangle } from './Subunits/rectangle';
 import { parseTextfield } from './Features/text';
 import { ISimpleShape } from '../../Interfaces/interfaces';
-import { parseUserEvent } from './Features/event';
-import { parseReactions } from './Features/reactions';
+import { parseDynamicParameters, parseUserEvent } from './Features/eventParser';
 
 export function parseSimpleShape(section : JQuery<XMLDocument>){
     // Check if its on of the allowed shapes like rectangle, round-rectangle, circle or line
@@ -34,7 +33,7 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
         let textField = parseTextfield(section);
 
         // Parsing of observable events (like toggle color)
-        let reactions = parseReactions(section);
+        let dynamicParameters = parseDynamicParameters(section);
         // Parsing of user events that causes a reaction like toggle or pop up input
         let userEvents = parseUserEvent(section);
         // Return of the React-Node
@@ -45,7 +44,7 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
             )
           case 'circle':
             return(
-              <Circle simpleShape={simpleShape} textField={textField} reactions={reactions}></Circle>
+              <Circle simpleShape={simpleShape} textField={textField} dynamicParameters={dynamicParameters}></Circle>
             )
           case 'line':
             return(

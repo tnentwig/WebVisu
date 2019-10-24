@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { ISimpleShape } from '../../../Interfaces/interfaces';
-import ComSocket from '../../../../com/comsocket';
-import * as util from '../../../Utils/utilfunctions';
-import {useObserver, useObservable, } from 'mobx-react-lite';
+import {attachDynamicParameters} from '../Features/objectManager'
+import {useObserver, useLocalStore } from 'mobx-react-lite';
+import { IVisuObject } from '../Features/interfaces';
 
 type Props = {
     simpleShape: ISimpleShape,
     textField : JSX.Element|undefined,
-    reactions : Map<string, string>
+    dynamicParameters : Map<string, string>
 }
 
-export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, reactions})=> 
+export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, dynamicParameters})=> 
 {
     // Auxiliary values
     let relCornerCoord = {x1:0, y1:0, x2:simpleShape.rect[2]-simpleShape.rect[0], y2:simpleShape.rect[3]-simpleShape.rect[1]};
@@ -23,57 +23,87 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
     let fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
     
     // Create an object with the initial parameters
-    let initial  = {
+    let initial  : IVisuObject= {
+        // Variables will be initialised with the parameter values 
+        normalFillColor : simpleShape.fill_color,
+        alarmFillColor : simpleShape.fill_color_alarm,
+        normalFrameColor : simpleShape.frame_color,
+        alarmFrameColor : simpleShape.frame_color_alarm,
+        hasFillColor : simpleShape.has_inside_color,
+        hasFrameColor : simpleShape.has_frame_color,
+        strokeWidth : strokeWidth,
+
         absCornerCoord : {x1:simpleShape.rect[0],y1:simpleShape.rect[1],x2:simpleShape.rect[3],y2:simpleShape.rect[4]},
+        edge : edge,
+        display : "visible" as any,
+        alarm : false,
+        // Computed
         relCornerCoord : relCornerCoord,
         relCenterCoord : relCenterCoord,
-        edge : (simpleShape.line_width === 0) ? 1 :simpleShape.line_width,
-        cx : relCenterCoord.x+edge,
-        cy : relCenterCoord.y+edge,
-        rx : relCornerCoord.x2/2,
-        ry : relCornerCoord.y2/2,
-        normalColor : simpleShape.fill_color,
-        alarmColor : simpleShape.fill_color_alarm,
         fill : fillColor,
-        strokeWidth : (simpleShape.has_frame_color) ? edge : 0,
-        stroke : simpleShape.frame_color,
-        display : "true",
-        alarm : false
+        stroke : simpleShape.frame_color
     }
-    // Processing the variables for visual elements
-    // 1) Set alarm state
-    if (typeof(reactions.has("expr-toggle-color"))) {
-        let reaction = reactions!.get("expr-toggle-color");
-        Object.defineProperty(initial, "fill", {
-            get: function() {
-                return ComSocket.singleton().oVisuVariables.get(reaction)!.value==="0" ? initial.normalColor : initial.alarmColor;
+    // Attach the dynamic paramters like color variable
+    initial = attachDynamicParameters(initial, dynamicParameters)
+
+    Object.defineProperty(initial, "fill", {
+        get: function() {
+            if (initial.alarm === false){
+                if (initial.hasFillColor){
+                    return "none";
+                } else {
+                    return initial.normalFillColor;
+                }
+            } else {
+                return initial.alarmFillColor;
             }
-        });
-    }
-       // 2) Set invisible state
-       if (typeof(reactions.has("expr-invisible"))) {
-        let reaction = reactions!.get("expr-toggle-color");
-        Object.defineProperty(initial, "display", {
-            get: function() {
-                return ComSocket.singleton().oVisuVariables.get(reaction)!.value==="0" ? "true" : false;
+        }
+    });
+
+    Object.defineProperty(initial, "stroke", {
+        get: function() {
+            if (initial.alarm === false){
+                if (initial.hasFrameColor){
+                    return initial.normalFrameColor;
+                } else {
+                    return "none";
+                }
+            } else {
+                return initial.alarmFrameColor;
             }
-        });
-    }
+        }
+    });
+
+    Object.defineProperty(initial, "edge", {
+        get: function() {
+            if (initial.hasFrameColor || initial.alarm){
+                if (initial.strokeWidth === 0){
+                    return 1;
+                } else {
+                    return initial.strokeWidth;
+                }
+            } else {
+                return 0;
+            }
+        }
+    });
+
+    
     // Convert object to an observable one
-    const state = useObservable(initial);
+    const state  = useLocalStore(()=>initial);
 
     return useObserver(()=>
-    <div style={{display : state.display, position:"absolute", left:state.absCornerCoord.x1, top:simpleShape.rect[1], width:relCornerCoord.x2+2*edge, height:relCornerCoord.y2+2*edge}}>
-        <svg width={relCornerCoord.x2+2*edge} height={relCornerCoord.y2+2*edge}>   
+    <div style={{visibility : state.display, position:"absolute", left:state.absCornerCoord.x1, top:state.absCornerCoord.y1, width:state.relCornerCoord.x2+2*state.edge, height:state.relCornerCoord.y2+2*state.edge}}>
+        <svg width={state.relCornerCoord.x2+2*state.edge} height={state.relCornerCoord.y2+2*state.edge}>   
             <g>
                 <ellipse
-                cx={state.relCenterCoord.x+edge}
-                cy={state.relCenterCoord.y+edge}
+                stroke={state.stroke}
+                cx={state.relCenterCoord.x+state.edge}
+                cy={state.relCenterCoord.y+state.edge}
                 rx={state.relCornerCoord.x2/2}
                 ry={state.relCornerCoord.y2/2}
                 fill={state.fill}
                 strokeWidth={state.strokeWidth}
-                stroke={state.stroke}
                 />
                 {textField}
             </g>
