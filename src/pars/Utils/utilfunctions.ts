@@ -16,6 +16,14 @@ export function rgbToHexString(rgb : string) : string{
     return ('#'+interim)
 }
 
+export function numberToHexColor(number : string) : string {
+    let interim = Number(number).toString(16);
+    while(interim.length !== 6){
+        interim = interim +'0';
+    };
+    return ('#'+interim)
+}
+
 export function stringToArray(stringExp : string) : Array<number> {
     return (stringExp.split(',')).map(Number);
 }
