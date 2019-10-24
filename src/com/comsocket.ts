@@ -42,7 +42,6 @@ export default class ComSocket implements IComSocket {
         this.lutKeyVariable.push(varName);
         }
     }
-    @action
     updateVarList() {
         $.ajax({
             type: 'POST',
@@ -50,13 +49,15 @@ export default class ComSocket implements IComSocket {
             url: this.serverURL,
             data: '|0|'+this.requestFrame.listings+'|'+this.requestFrame.preFrame,
         })
-        .then(action((response : string) => {
+        .then((response : string) => {
             let transferarray : Array<string>= (response.slice(1,response.length-1).split('|'));
             for(let i=0; i<transferarray.length; i++) {
                 let varName = this.lutKeyVariable[i];
-                this.oVisuVariables.get(varName)!.value=transferarray[i];
+                if (this.oVisuVariables.get(varName)!.value!==transferarray[i]){
+                    action(this.oVisuVariables.get(varName)!.value=transferarray[i]);   
+                }
             };
-        }))
+        })
     }
 
     startCyclicUpdate(periodms : number) {
