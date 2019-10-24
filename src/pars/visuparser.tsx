@@ -37,7 +37,7 @@ export default class HTML5Visu {
 
     initCommunication(XML : XMLDocument) {
         let com = ComSocket.singleton();
-        com.setServerURL(this.rootDir + '/webvisu/webvisu.htm');
+        com.setServerURL(this.rootDir + '/webvisu.htm');
         let visuXML=$(XML);
         // Rip all of <variable> in <variablelist> section
         visuXML.children("visualisation").children("variablelist").children("variable").each(function(){
