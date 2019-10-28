@@ -55250,7 +55250,7 @@ objHTML5Visu.createVisu("/plc_visu.xml");
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
-function parseDynamicParameters(section) {
+function parseDynamicShapeParameters(section) {
     var exprMap = new Map();
     var tags = [];
     tags.push("expr-toggle-color");
@@ -55277,7 +55277,24 @@ function parseDynamicParameters(section) {
     });
     return exprMap;
 }
-exports.parseDynamicParameters = parseDynamicParameters;
+exports.parseDynamicShapeParameters = parseDynamicShapeParameters;
+function parseDynamicTextParameters(section) {
+    var exprMap = new Map();
+    var tags = [];
+    tags.push("expr-text-flags");
+    tags.push("expr-font-flags");
+    tags.push("expr-font-name");
+    tags.push("expr-text-display");
+    tags.push("expr-text-color");
+    tags.push("expr-font-height");
+    tags.forEach(function (entry) {
+        section.children(entry).children("expr").each(function () {
+            exprMap.set(entry, $(this).children("var").text());
+        });
+    });
+    return exprMap;
+}
+exports.parseDynamicTextParameters = parseDynamicTextParameters;
 function parseUserEvent(section) {
     var varList = [];
     section.children("expr-toggle-var").children("expr").each(function () {
@@ -55368,7 +55385,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
         Object.defineProperty(visuObject, "hasFillColor", {
             get: function () {
                 var value = comsocket_1.default.singleton().oVisuVariables.get(element_7).value;
-                if (value === "0") {
+                if (value === "1") {
                     return false;
                 }
                 else {
@@ -55470,10 +55487,10 @@ exports.attachDynamicParameters = attachDynamicParameters;
 
 /***/ }),
 
-/***/ "./src/pars/Elements/Simpleshape/Features/text.tsx":
-/*!*********************************************************!*\
-  !*** ./src/pars/Elements/Simpleshape/Features/text.tsx ***!
-  \*********************************************************/
+/***/ "./src/pars/Elements/Simpleshape/Features/textManager.tsx":
+/*!****************************************************************!*\
+  !*** ./src/pars/Elements/Simpleshape/Features/textManager.tsx ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -55482,29 +55499,127 @@ exports.attachDynamicParameters = attachDynamicParameters;
 Object.defineProperty(exports, "__esModule", { value: true });
 var util = __webpack_require__(/*! ../../../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-function parseTextfield(section) {
-    if (section.children('text-format').length > 0) {
-        var font_height = Number(section.children("font-height").text());
-        var font_height_point_size = Number(section.children("font-height-point-size").text());
-        var font_weight = Number(section.children("font-weight").text());
-        var font_italic = util.stringToBoolean(section.children("font-italic").text());
-        var font_strike_out = util.stringToBoolean(section.children("font-strike-out").text());
-        var font_underline = util.stringToBoolean(section.children("font-underline").text());
-        var font_char_set = Number(section.children("font-char-set").text());
-        var font_color = util.rgbToHexString(section.children("font-color").text());
-        var text_id = Number(section.children("text-id").text());
-        var text_align_horz = section.children("text-align-horz").text();
-        var text_align_vert = section.children("text-align-vert").text();
-        var text = section.children("text-format").text();
-        var horizPosition = (text_align_horz === 'center') ? 'middle' : ((text_align_horz === 'left') ? 'end' : 'start');
-        return (React.createElement("text", { fill: font_color, fontWeight: font_weight, fontSize: -font_height, fontFamily: "Arial, Helvetica, sans-serif", textAnchor: horizPosition, pointerEvents: 'none' },
-            React.createElement("tspan", { alignmentBaseline: 'central', x: '50%', y: '50%' }, text)));
+var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
+var comsocket_1 = __webpack_require__(/*! ../../../../com/comsocket */ "./src/com/comsocket.ts");
+var utilfunctions_1 = __webpack_require__(/*! ../../../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
+exports.Textfield = function (_a) {
+    var section = _a.section, dynamicParameters = _a.dynamicParameters;
+    var fontName = (section.children("font-name").text().length) ? section.children("font-name").text() : "Arial";
+    var fontHeight = Number(section.children("font-height").text());
+    var font_height_point_size = Number(section.children("font-height-point-size").text());
+    var fontWeight = Number(section.children("font-weight").text());
+    var isItalic = util.stringToBoolean(section.children("font-italic").text());
+    var hasStrikeOut = util.stringToBoolean(section.children("font-strike-out").text());
+    var hasUnderline = util.stringToBoolean(section.children("font-underline").text());
+    var charSet = Number(section.children("font-char-set").text());
+    var fontColor = util.rgbToHexString(section.children("font-color").text());
+    var textId = Number(section.children("text-id").text());
+    var textAlignHorz = section.children("text-align-horz").text();
+    var textAlignVert = section.children("text-align-vert").text();
+    var text = section.children("text-format").text();
+    var initial = {
+        fontHeight: fontHeight,
+        fontWeight: fontWeight,
+        fontColor: fontColor,
+        fontName: fontName,
+        hasUnderline: hasUnderline,
+        isItalic: isItalic,
+        hasStrikeOut: hasStrikeOut,
+        textAlignHorz: textAlignHorz,
+        textAlignVert: textAlignVert,
+        text: text,
+        horzPosition: "center",
+        vertPosition: "central",
+        output: text,
+        fontStyle: "normal",
+        textDecoration: "initial"
+    };
+    if (dynamicParameters.has("expr-font-flag")) {
+        var element_1 = dynamicParameters.get("expr-font-flag");
+        Object.defineProperty(initial, "hasUnderline", {
+            get: function () {
+                var value = (Number(comsocket_1.default.singleton().oVisuVariables.get(element_1).value) & 4) ? true : false;
+                return value;
+            }
+        });
+        Object.defineProperty(initial, "isItalic", {
+            get: function () {
+                var value = (Number(comsocket_1.default.singleton().oVisuVariables.get(element_1).value) & 1) ? true : false;
+                return value;
+            }
+        });
+        Object.defineProperty(initial, "hasStrikeOut", {
+            get: function () {
+                var value = (Number(comsocket_1.default.singleton().oVisuVariables.get(element_1).value) & 8) ? true : false;
+                return value;
+            }
+        });
+        Object.defineProperty(initial, "fontWeight", {
+            get: function () {
+                var value = (Number(comsocket_1.default.singleton().oVisuVariables.get(element_1).value) & 2) ? 700 : 400;
+                return value;
+            }
+        });
     }
-    else {
-        return undefined;
+    if (dynamicParameters.has("expr-font-name")) {
+        var element_2 = dynamicParameters.get("expr-font-name");
+        Object.defineProperty(initial, "fontName", {
+            get: function () {
+                var value = comsocket_1.default.singleton().oVisuVariables.get(element_2).value;
+                return value + ", Arial";
+            }
+        });
     }
-}
-exports.parseTextfield = parseTextfield;
+    if (dynamicParameters.has("expr-text-color")) {
+        var element_3 = dynamicParameters.get("expr-text-color");
+        Object.defineProperty(initial, "fontColor", {
+            get: function () {
+                var value = comsocket_1.default.singleton().oVisuVariables.get(element_3).value;
+                var hex = utilfunctions_1.numberToHexColor(value);
+                return hex;
+            }
+        });
+    }
+    if (dynamicParameters.has("expr-font-height")) {
+        var element_4 = dynamicParameters.get("expr-font-height");
+        Object.defineProperty(initial, "fontHeight", {
+            get: function () {
+                var value = (-1) * Number(comsocket_1.default.singleton().oVisuVariables.get(element_4).value);
+                value = value / 1.3;
+                return value;
+            }
+        });
+    }
+    Object.defineProperty(initial, "horzPosition", {
+        get: function () {
+            var position = (initial.textAlignHorz === 'center') ? 'middle' : ((initial.textAlignHorz === 'left') ? 'end' : 'start');
+            return position;
+        }
+    });
+    Object.defineProperty(initial, "fontStyle", {
+        get: function () {
+            var value = (initial.isItalic === true) ? 'italic' : 'normal';
+            return value;
+        }
+    });
+    Object.defineProperty(initial, "textDecoration", {
+        get: function () {
+            var string = "";
+            if (initial.hasStrikeOut) {
+                string += "line-through ";
+            }
+            if (initial.hasUnderline) {
+                string += "underline ";
+            }
+            return string;
+        }
+    });
+    var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
+    return mobx_react_lite_1.useObserver(function () {
+        return React.createElement("text", { textDecoration: state.textDecoration, fontStyle: state.fontStyle, fill: state.fontColor, fontWeight: state.fontWeight, fontSize: -state.fontHeight, fontFamily: state.fontName, textAnchor: "start", pointerEvents: 'none' },
+            React.createElement("tspan", { alignmentBaseline: state.vertPosition, x: '0%', y: '50%' }, text));
+    });
+};
 
 
 /***/ }),
@@ -55563,10 +55678,10 @@ exports.Circle = function (_a) {
         get: function () {
             if (initial.alarm === false) {
                 if (initial.hasFillColor) {
-                    return "none";
+                    return initial.normalFillColor;
                 }
                 else {
-                    return initial.normalFillColor;
+                    return "none";
                 }
             }
             else {
@@ -55765,7 +55880,7 @@ var roundrect_1 = __webpack_require__(/*! ./Subunits/roundrect */ "./src/pars/El
 var line_1 = __webpack_require__(/*! ./Subunits/line */ "./src/pars/Elements/Simpleshape/Subunits/line.tsx");
 var circle_1 = __webpack_require__(/*! ./Subunits/circle */ "./src/pars/Elements/Simpleshape/Subunits/circle.tsx");
 var rectangle_1 = __webpack_require__(/*! ./Subunits/rectangle */ "./src/pars/Elements/Simpleshape/Subunits/rectangle.tsx");
-var text_1 = __webpack_require__(/*! ./Features/text */ "./src/pars/Elements/Simpleshape/Features/text.tsx");
+var textManager_1 = __webpack_require__(/*! ./Features/textManager */ "./src/pars/Elements/Simpleshape/Features/textManager.tsx");
 var eventParser_1 = __webpack_require__(/*! ./Features/eventParser */ "./src/pars/Elements/Simpleshape/Features/eventParser.ts");
 function parseSimpleShape(section) {
     var shape = section.children("simple-shape").text();
@@ -55784,14 +55899,15 @@ function parseSimpleShape(section) {
             hidden_input: util.stringToBoolean(section.children("hidden-input").text()),
             enable_text_input: util.stringToBoolean(section.children("enable-text-input").text())
         };
-        var textField = text_1.parseTextfield(section);
-        var dynamicParameters = eventParser_1.parseDynamicParameters(section);
+        var dynamicTextParameters = eventParser_1.parseDynamicTextParameters(section);
+        var textField = React.createElement(textManager_1.Textfield, { section: section, dynamicParameters: dynamicTextParameters });
+        var dynamicShapeParameters = eventParser_1.parseDynamicShapeParameters(section);
         var userEvents = eventParser_1.parseUserEvent(section);
         switch (shape) {
             case 'round-rect':
                 return (roundrect_1.RoundRect(simpleShape));
             case 'circle':
-                return (React.createElement(circle_1.Circle, { simpleShape: simpleShape, textField: textField, dynamicParameters: dynamicParameters }));
+                return (React.createElement(circle_1.Circle, { simpleShape: simpleShape, textField: textField, dynamicParameters: dynamicShapeParameters }));
             case 'line':
                 return (line_1.Line(simpleShape));
             case 'rectangle':
@@ -56057,7 +56173,12 @@ function numberToHexColor(number) {
     var r = interim & 255;
     var g = (interim >> 8) & 255;
     var b = (interim >> 16) & 255;
-    return ('#' + ((((r << 8) + g) << 8) + b).toString(16));
+    var rgb = "" + ((((r << 8) + g) << 8) + b).toString(16);
+    while (rgb.length !== 6) {
+        rgb = '0' + rgb;
+    }
+    ;
+    return ('#' + rgb);
 }
 exports.numberToHexColor = numberToHexColor;
 function stringToArray(stringExp) {
