@@ -17,11 +17,11 @@ export function rgbToHexString(rgb : string) : string{
 }
 
 export function numberToHexColor(number : string) : string {
-    let interim = Number(number).toString(16);
-    while(interim.length !== 6){
-        interim = interim +'0';
-    };
-    return ('#'+interim)
+    let interim = Number(number);
+    let r = interim & 255;
+    let g = (interim >> 8) & 255;
+    let b = (interim >> 16) & 255;
+    return ('#'+((((r << 8) + g) << 8) + b).toString(16))
 }
 
 export function stringToArray(stringExp : string) : Array<number> {
