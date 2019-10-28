@@ -13,7 +13,7 @@ export function rgbToHexString(rgb : string) : string{
     while(interim.length !== 6){
         interim = '0'+interim;
     };
-    return ('#'+interim)
+    return ('#'+interim);
 }
 
 export function numberToHexColor(number : string) : string {
@@ -21,7 +21,11 @@ export function numberToHexColor(number : string) : string {
     let r = interim & 255;
     let g = (interim >> 8) & 255;
     let b = (interim >> 16) & 255;
-    return ('#'+((((r << 8) + g) << 8) + b).toString(16))
+    let rgb = ""+((((r << 8) + g) << 8) + b).toString(16);
+    while(rgb.length !== 6){
+        rgb = '0'+rgb;
+    };
+    return('#'+rgb);
 }
 
 export function stringToArray(stringExp : string) : Array<number> {
