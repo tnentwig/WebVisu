@@ -4,9 +4,9 @@ import { RoundRect } from './Subunits/roundrect'
 import { Line } from './Subunits/line';
 import { Circle } from './Subunits/circle'
 import { Rectangle } from './Subunits/rectangle';
-import { parseTextfield } from './Features/text';
+import { Textfield } from './Features/textManager';
 import { ISimpleShape } from '../../Interfaces/interfaces';
-import { parseDynamicParameters, parseUserEvent } from './Features/eventParser';
+import { parseDynamicShapeParameters, parseUserEvent, parseDynamicTextParameters } from './Features/eventParser';
 
 export function parseSimpleShape(section : JQuery<XMLDocument>){
     // Check if its on of the allowed shapes like rectangle, round-rectangle, circle or line
@@ -29,11 +29,12 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
           hidden_input : util.stringToBoolean(section.children("hidden-input").text()),
           enable_text_input : util.stringToBoolean(section.children("enable-text-input").text())
         }
-        // Parsing of textfields
-        let textField = parseTextfield(section);
-
+        // Parsing the textfield
+        let dynamicTextParameters = parseDynamicTextParameters(section);
+        // and returning a jsx object
+        let textField = <Textfield section={section} dynamicParameters={dynamicTextParameters}></Textfield>;
         // Parsing of observable events (like toggle color)
-        let dynamicParameters = parseDynamicParameters(section);
+        let dynamicShapeParameters = parseDynamicShapeParameters(section);
         // Parsing of user events that causes a reaction like toggle or pop up input
         let userEvents = parseUserEvent(section);
         // Return of the React-Node
@@ -44,7 +45,7 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
             )
           case 'circle':
             return(
-              <Circle simpleShape={simpleShape} textField={textField} dynamicParameters={dynamicParameters}></Circle>
+              <Circle simpleShape={simpleShape} textField={textField} dynamicParameters={dynamicShapeParameters}></Circle>
             )
           case 'line':
             return(

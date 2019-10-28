@@ -65,9 +65,9 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
         get: function() {
             if (initial.alarm === false){
                 if (initial.hasFillColor){
-                    return "none";
-                } else {
                     return initial.normalFillColor;
+                } else {
+                    return "none";
                 }
             } else {
                 return initial.alarmFillColor;

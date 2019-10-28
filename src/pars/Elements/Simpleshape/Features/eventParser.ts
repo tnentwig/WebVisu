@@ -2,7 +2,7 @@ import * as $ from 'jquery';
 
 // This function is parsing all <expr-...> tags like toggle color and returns a map with the expression as key and the variable as value
 
-export function parseDynamicParameters(section : JQuery<XMLDocument>) : Map<string, string> {
+export function parseDynamicShapeParameters(section : JQuery<XMLDocument>) : Map<string, string> {
     let exprMap : Map<string,string>= new Map();
     let tags : Array<string>= [];
     // Styling tags
@@ -33,6 +33,25 @@ export function parseDynamicParameters(section : JQuery<XMLDocument>) : Map<stri
         
     });
 
+    return exprMap;
+}
+
+export function parseDynamicTextParameters(section : JQuery<XMLDocument>) : Map<string, string> {
+    let exprMap : Map<string,string>= new Map();
+    let tags : Array<string>= [];
+    // Styling tags
+    tags.push("expr-text-flags");          // 1) The textflags sets the alignment of the text
+    tags.push("expr-font-flags");          // 2) The font flags sets the external appearance
+    tags.push("expr-font-name");           // 3) Sets the font name
+    tags.push("expr-text-display");        // 4) Sets the variable that has to be displayed
+    tags.push("expr-text-color");          // 5) Sets the text color
+    tags.push("expr-font-height");         // 6) Sets the font height
+
+    tags.forEach(function(entry){
+        section.children(entry).children("expr").each(function() {
+        exprMap.set(entry, $(this)!.children("var").text());
+        })
+    });
     return exprMap;
 }
 

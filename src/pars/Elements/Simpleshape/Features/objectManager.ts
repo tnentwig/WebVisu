@@ -75,7 +75,7 @@ export function attachDynamicParameters(visuObject: IVisuObject, dynamicElements
         Object.defineProperty(visuObject, "hasFillColor", {
             get: function() {
                 let value = ComSocket.singleton().oVisuVariables.get(element)!.value;
-                if (value === "0"){
+                if (value === "1"){
                     return false;
                 } else {
                     return true;
