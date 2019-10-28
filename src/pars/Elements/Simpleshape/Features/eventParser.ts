@@ -24,7 +24,7 @@ export function parseDynamicParameters(section : JQuery<XMLDocument>) : Map<stri
     tags.push("expr-xpos");                 // Absolute x-position
     tags.push("expr-ypos");                 // Absolute y-position
     tags.push("expr-scale");                // Scale with middle reference point
-
+    tags.push("expr-angle");                // Turn around center with angle
 
     tags.forEach(function(entry){
         section.children(entry).children("expr").each(function() {

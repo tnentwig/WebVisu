@@ -12,9 +12,14 @@ type Props = {
 
 export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, dynamicParameters})=> 
 {
-    // Auxiliary values
-    let relCornerCoord = {x1:0, y1:0, x2:simpleShape.rect[2]-simpleShape.rect[0], y2:simpleShape.rect[3]-simpleShape.rect[1]};
-    let relCenterCoord = {x:simpleShape.center[0]-simpleShape.rect[0], y:simpleShape.center[1]-simpleShape.rect[1]};
+    // absCornerCoord are the absolute coordinates of the <div> element in relation to the origin in the top left 
+    let absCornerCoord = {x1:simpleShape.rect[0],y1:simpleShape.rect[1],x2:simpleShape.rect[2],y2:simpleShape.rect[3]};
+    // absCenterCoord are the coordinates of the rotation and scale center
+    let absCenterCoord = {x:simpleShape.center[0], y:simpleShape.center[1]};
+    // relCoord are the width and the height in relation the div
+    let relCoord = {width:simpleShape.rect[2]-simpleShape.rect[0], height:simpleShape.rect[3]-simpleShape.rect[1]};
+    // the relCenterCoord are the coordinates of the midpoint of the div
+    let relMidpointCoord = {x:(simpleShape.rect[2]-simpleShape.rect[0])/2, y:(simpleShape.rect[3]-simpleShape.rect[1])/2};
     // The line_width is 0 in the xml if border width is 1 in the codesys dev env. Otherwise line_width is equal to the target border width. Very strange.
     let edge = (simpleShape.line_width === 0) ? 1 :simpleShape.line_width ;
     // Compute the strokeWidth through has_frame_color
@@ -32,16 +37,26 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
         hasFillColor : simpleShape.has_inside_color,
         hasFrameColor : simpleShape.has_frame_color,
         strokeWidth : strokeWidth,
-
-        absCornerCoord : {x1:simpleShape.rect[0],y1:simpleShape.rect[1],x2:simpleShape.rect[3],y2:simpleShape.rect[4]},
-        edge : edge,
-        display : "visible" as any,
-        alarm : false,
-        // Computed
-        relCornerCoord : relCornerCoord,
-        relCenterCoord : relCenterCoord,
+        // Positional arguments
+        absCornerCoord : absCornerCoord,
+        absCenterCoord : absCenterCoord,
+        left : 0,
+        right : 0,
+        top : 0,
+        bottom : 0,
+        xpos : 0,
+        ypos : 0,
+        scale : 1000,   // a scale of 1000 means a representation of 1:1
+        angle : 0,
+        // Computedd
+        transformedCoord : absCornerCoord,
+        relCoord : relCoord,
+        relMidpointCoord : relMidpointCoord,
         fill : fillColor,
-        stroke : simpleShape.frame_color
+        edge : edge,
+        stroke : simpleShape.frame_color,
+        display : "visible" as any,
+        alarm : false
     }
     // Attach the dynamic paramters like color variable
     initial = attachDynamicParameters(initial, dynamicParameters)
@@ -88,20 +103,73 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
         }
     });
 
+    Object.defineProperty(initial, "transformedCoord", {
+        get: function() {
+            let x1 = initial.absCornerCoord.x1;
+            let x2 = initial.absCornerCoord.x2;
+            let y1 = initial.absCornerCoord.y1;
+            let y2 = initial.absCornerCoord.y2;
+            let xc = initial.absCenterCoord.x;
+            let yc = initial.absCenterCoord.y;
+            // Scaling: the vector isnt normalized
+            x1 = (initial.scale/1000)*(x1-xc)+xc;
+            y1 = (initial.scale/1000)*(y1-yc)+yc;
+            x2 = (initial.scale/1000)*(x2-xc)+xc;
+            y2 = (initial.scale/1000)*(y2-yc)+yc;
+            // Rotating
+            let sinphi = Math.sin(initial.angle*(2*Math.PI)/360);
+            let cosphi = Math.cos(initial.angle*(2*Math.PI)/360);
+            let xoff = (x1-xc)*cosphi-(y1-yc)*sinphi-(x1-xc);
+            let yoff = (x1-xc)*sinphi+(y1-yc)*cosphi-(y1-yc);
+            // Add the offset
+            x1 += initial.xpos+ initial.left+xoff;
+            x2 += initial.xpos + initial.right+xoff;
+            y1 += initial.ypos + initial.top+yoff;
+            y2 += initial.ypos+ initial.bottom+yoff;
+            // Init the interim return object
+            let coord ={x1:x1,y1:y1,x2:x2,y2:y2};
+
+            if (x1>x2){
+                coord.x1 = x2;
+                coord.x2 = x1;
+            }
+            if (y1>y2){
+                coord.y1 = y2;
+                coord.y2 = y1;
+            }
+            return coord
+        }
+    });
     
+    Object.defineProperty(initial, "relCoord", {
+        get: function() {
+            let width = initial.transformedCoord.x2-initial.transformedCoord.x1;
+            let height = initial.transformedCoord.y2-initial.transformedCoord.y1;
+            return {width:width,height:height}
+        }
+    });
+
+    Object.defineProperty(initial, "relMidpointCoord", {
+        get: function() {
+            let x = initial.relCoord.width/2;
+            let y = initial.relCoord.height/2;
+            return {x:x,y:y}
+        }
+    });
+
     // Convert object to an observable one
     const state  = useLocalStore(()=>initial);
 
     return useObserver(()=>
-    <div style={{visibility : state.display, position:"absolute", left:state.absCornerCoord.x1, top:state.absCornerCoord.y1, width:state.relCornerCoord.x2+2*state.edge, height:state.relCornerCoord.y2+2*state.edge}}>
-        <svg width={state.relCornerCoord.x2+2*state.edge} height={state.relCornerCoord.y2+2*state.edge}>   
+    <div style={{visibility : state.display, position:"absolute", left:state.transformedCoord.x1, top:state.transformedCoord.y1, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
+        <svg width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge}>   
             <g>
                 <ellipse
                 stroke={state.stroke}
-                cx={state.relCenterCoord.x+state.edge}
-                cy={state.relCenterCoord.y+state.edge}
-                rx={state.relCornerCoord.x2/2}
-                ry={state.relCornerCoord.y2/2}
+                cx={state.relMidpointCoord.x+state.edge}
+                cy={state.relMidpointCoord.y+state.edge}
+                rx={state.relMidpointCoord.x}
+                ry={state.relMidpointCoord.y}
                 fill={state.fill}
                 strokeWidth={state.strokeWidth}
                 />

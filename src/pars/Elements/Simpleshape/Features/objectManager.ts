@@ -106,6 +106,78 @@ export function attachDynamicParameters(visuObject: IVisuObject, dynamicElements
                 }
         });
     }
-
+    
+    // 10) Left-Position
+    if (dynamicElements.has("expr-left")) {
+        let element = dynamicElements!.get("expr-left");
+        Object.defineProperty(visuObject, "left", {
+            get: function() {
+                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                }
+        });
+    }
+    // 11) Right-Position
+    if (dynamicElements.has("expr-right")) {
+        let element = dynamicElements!.get("expr-right");
+        Object.defineProperty(visuObject, "right", {
+            get: function() {
+                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                }
+        });
+    }
+    // 12) Top-Position 
+    if (dynamicElements.has("expr-top")) {
+        let element = dynamicElements!.get("expr-top");
+        Object.defineProperty(visuObject, "top", {
+            get: function() {
+                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                }
+        });
+    }
+    // 13) Bottom-Position 
+    if (dynamicElements.has("expr-bottom")) {
+        let element = dynamicElements!.get("expr-bottom");
+        Object.defineProperty(visuObject, "bottom", {
+            get: function() {
+                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                }
+        });
+    }
+    // 14) x-Position 
+    if (dynamicElements.has("expr-xpos")) {
+        let element = dynamicElements!.get("expr-xpos");
+        Object.defineProperty(visuObject, "xpos", {
+            get: function() {
+                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                }
+        });
+    }
+    // 15) y-Position 
+    if (dynamicElements.has("expr-ypos")) {
+        let element = dynamicElements!.get("expr-ypos");
+        Object.defineProperty(visuObject, "ypos", {
+            get: function() {
+                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                }
+        });
+    }
+    // 16) Scaling
+    if (dynamicElements.has("expr-scale")) {
+        let element = dynamicElements!.get("expr-scale");
+        Object.defineProperty(visuObject, "scale", {
+            get: function() {
+                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                }
+        });
+    }
+    // 17) Rotating
+    if (dynamicElements.has("expr-angle")) {
+        let element = dynamicElements!.get("expr-angle");
+        Object.defineProperty(visuObject, "angle", {
+            get: function() {
+                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                }
+        });
+    }
     return visuObject;
 }
