@@ -55269,6 +55269,7 @@ function parseDynamicParameters(section) {
     tags.push("expr-xpos");
     tags.push("expr-ypos");
     tags.push("expr-scale");
+    tags.push("expr-angle");
     tags.forEach(function (entry) {
         section.children(entry).children("expr").each(function () {
             exprMap.set(entry, $(this).children("var").text());
@@ -55398,6 +55399,70 @@ function attachDynamicParameters(visuObject, dynamicElements) {
             }
         });
     }
+    if (dynamicElements.has("expr-left")) {
+        var element_10 = dynamicElements.get("expr-left");
+        Object.defineProperty(visuObject, "left", {
+            get: function () {
+                return Number(comsocket_1.default.singleton().oVisuVariables.get(element_10).value);
+            }
+        });
+    }
+    if (dynamicElements.has("expr-right")) {
+        var element_11 = dynamicElements.get("expr-right");
+        Object.defineProperty(visuObject, "right", {
+            get: function () {
+                return Number(comsocket_1.default.singleton().oVisuVariables.get(element_11).value);
+            }
+        });
+    }
+    if (dynamicElements.has("expr-top")) {
+        var element_12 = dynamicElements.get("expr-top");
+        Object.defineProperty(visuObject, "top", {
+            get: function () {
+                return Number(comsocket_1.default.singleton().oVisuVariables.get(element_12).value);
+            }
+        });
+    }
+    if (dynamicElements.has("expr-bottom")) {
+        var element_13 = dynamicElements.get("expr-bottom");
+        Object.defineProperty(visuObject, "bottom", {
+            get: function () {
+                return Number(comsocket_1.default.singleton().oVisuVariables.get(element_13).value);
+            }
+        });
+    }
+    if (dynamicElements.has("expr-xpos")) {
+        var element_14 = dynamicElements.get("expr-xpos");
+        Object.defineProperty(visuObject, "xpos", {
+            get: function () {
+                return Number(comsocket_1.default.singleton().oVisuVariables.get(element_14).value);
+            }
+        });
+    }
+    if (dynamicElements.has("expr-ypos")) {
+        var element_15 = dynamicElements.get("expr-ypos");
+        Object.defineProperty(visuObject, "ypos", {
+            get: function () {
+                return Number(comsocket_1.default.singleton().oVisuVariables.get(element_15).value);
+            }
+        });
+    }
+    if (dynamicElements.has("expr-scale")) {
+        var element_16 = dynamicElements.get("expr-scale");
+        Object.defineProperty(visuObject, "scale", {
+            get: function () {
+                return Number(comsocket_1.default.singleton().oVisuVariables.get(element_16).value);
+            }
+        });
+    }
+    if (dynamicElements.has("expr-angle")) {
+        var element_17 = dynamicElements.get("expr-angle");
+        Object.defineProperty(visuObject, "angle", {
+            get: function () {
+                return Number(comsocket_1.default.singleton().oVisuVariables.get(element_17).value);
+            }
+        });
+    }
     return visuObject;
 }
 exports.attachDynamicParameters = attachDynamicParameters;
@@ -55459,8 +55524,10 @@ var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./sr
 var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
 exports.Circle = function (_a) {
     var simpleShape = _a.simpleShape, textField = _a.textField, dynamicParameters = _a.dynamicParameters;
-    var relCornerCoord = { x1: 0, y1: 0, x2: simpleShape.rect[2] - simpleShape.rect[0], y2: simpleShape.rect[3] - simpleShape.rect[1] };
-    var relCenterCoord = { x: simpleShape.center[0] - simpleShape.rect[0], y: simpleShape.center[1] - simpleShape.rect[1] };
+    var absCornerCoord = { x1: simpleShape.rect[0], y1: simpleShape.rect[1], x2: simpleShape.rect[2], y2: simpleShape.rect[3] };
+    var absCenterCoord = { x: simpleShape.center[0], y: simpleShape.center[1] };
+    var relCoord = { width: simpleShape.rect[2] - simpleShape.rect[0], height: simpleShape.rect[3] - simpleShape.rect[1] };
+    var relMidpointCoord = { x: (simpleShape.rect[2] - simpleShape.rect[0]) / 2, y: (simpleShape.rect[3] - simpleShape.rect[1]) / 2 };
     var edge = (simpleShape.line_width === 0) ? 1 : simpleShape.line_width;
     var strokeWidth = (simpleShape.has_frame_color) ? edge : 0;
     var fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
@@ -55472,14 +55539,24 @@ exports.Circle = function (_a) {
         hasFillColor: simpleShape.has_inside_color,
         hasFrameColor: simpleShape.has_frame_color,
         strokeWidth: strokeWidth,
-        absCornerCoord: { x1: simpleShape.rect[0], y1: simpleShape.rect[1], x2: simpleShape.rect[3], y2: simpleShape.rect[4] },
-        edge: edge,
-        display: "visible",
-        alarm: false,
-        relCornerCoord: relCornerCoord,
-        relCenterCoord: relCenterCoord,
+        absCornerCoord: absCornerCoord,
+        absCenterCoord: absCenterCoord,
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        xpos: 0,
+        ypos: 0,
+        scale: 1000,
+        angle: 0,
+        transformedCoord: absCornerCoord,
+        relCoord: relCoord,
+        relMidpointCoord: relMidpointCoord,
         fill: fillColor,
-        stroke: simpleShape.frame_color
+        edge: edge,
+        stroke: simpleShape.frame_color,
+        display: "visible",
+        alarm: false
     };
     initial = objectManager_1.attachDynamicParameters(initial, dynamicParameters);
     Object.defineProperty(initial, "fill", {
@@ -55527,12 +55604,58 @@ exports.Circle = function (_a) {
             }
         }
     });
+    Object.defineProperty(initial, "transformedCoord", {
+        get: function () {
+            var x1 = initial.absCornerCoord.x1;
+            var x2 = initial.absCornerCoord.x2;
+            var y1 = initial.absCornerCoord.y1;
+            var y2 = initial.absCornerCoord.y2;
+            var xc = initial.absCenterCoord.x;
+            var yc = initial.absCenterCoord.y;
+            x1 = (initial.scale / 1000) * (x1 - xc) + xc;
+            y1 = (initial.scale / 1000) * (y1 - yc) + yc;
+            x2 = (initial.scale / 1000) * (x2 - xc) + xc;
+            y2 = (initial.scale / 1000) * (y2 - yc) + yc;
+            var sinphi = Math.sin(initial.angle * (2 * Math.PI) / 360);
+            var cosphi = Math.cos(initial.angle * (2 * Math.PI) / 360);
+            var xoff = (x1 - xc) * cosphi - (y1 - yc) * sinphi - (x1 - xc);
+            var yoff = (x1 - xc) * sinphi + (y1 - yc) * cosphi - (y1 - yc);
+            x1 += initial.xpos + initial.left + xoff;
+            x2 += initial.xpos + initial.right + xoff;
+            y1 += initial.ypos + initial.top + yoff;
+            y2 += initial.ypos + initial.bottom + yoff;
+            var coord = { x1: x1, y1: y1, x2: x2, y2: y2 };
+            if (x1 > x2) {
+                coord.x1 = x2;
+                coord.x2 = x1;
+            }
+            if (y1 > y2) {
+                coord.y1 = y2;
+                coord.y2 = y1;
+            }
+            return coord;
+        }
+    });
+    Object.defineProperty(initial, "relCoord", {
+        get: function () {
+            var width = initial.transformedCoord.x2 - initial.transformedCoord.x1;
+            var height = initial.transformedCoord.y2 - initial.transformedCoord.y1;
+            return { width: width, height: height };
+        }
+    });
+    Object.defineProperty(initial, "relMidpointCoord", {
+        get: function () {
+            var x = initial.relCoord.width / 2;
+            var y = initial.relCoord.height / 2;
+            return { x: x, y: y };
+        }
+    });
     var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
     return mobx_react_lite_1.useObserver(function () {
-        return React.createElement("div", { style: { visibility: state.display, position: "absolute", left: state.absCornerCoord.x1, top: state.absCornerCoord.y1, width: state.relCornerCoord.x2 + 2 * state.edge, height: state.relCornerCoord.y2 + 2 * state.edge } },
-            React.createElement("svg", { width: state.relCornerCoord.x2 + 2 * state.edge, height: state.relCornerCoord.y2 + 2 * state.edge },
+        return React.createElement("div", { style: { visibility: state.display, position: "absolute", left: state.transformedCoord.x1, top: state.transformedCoord.y1, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge } },
+            React.createElement("svg", { width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge },
                 React.createElement("g", null,
-                    React.createElement("ellipse", { stroke: state.stroke, cx: state.relCenterCoord.x + state.edge, cy: state.relCenterCoord.y + state.edge, rx: state.relCornerCoord.x2 / 2, ry: state.relCornerCoord.y2 / 2, fill: state.fill, strokeWidth: state.strokeWidth }),
+                    React.createElement("ellipse", { stroke: state.stroke, cx: state.relMidpointCoord.x + state.edge, cy: state.relMidpointCoord.y + state.edge, rx: state.relMidpointCoord.x, ry: state.relMidpointCoord.y, fill: state.fill, strokeWidth: state.strokeWidth }),
                     textField)));
     });
 };
@@ -55930,12 +56053,11 @@ function rgbToHexString(rgb) {
 }
 exports.rgbToHexString = rgbToHexString;
 function numberToHexColor(number) {
-    var interim = Number(number).toString(16);
-    while (interim.length !== 6) {
-        interim = interim + '0';
-    }
-    ;
-    return ('#' + interim);
+    var interim = Number(number);
+    var r = interim & 255;
+    var g = (interim >> 8) & 255;
+    var b = (interim >> 16) & 255;
+    return ('#' + ((((r << 8) + g) << 8) + b).toString(16));
 }
 exports.numberToHexColor = numberToHexColor;
 function stringToArray(stringExp) {
