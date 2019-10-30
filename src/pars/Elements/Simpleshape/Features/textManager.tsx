@@ -41,53 +41,71 @@ export const Textfield :React.FunctionComponent<Props> = ({section, dynamicParam
             textAlignVert : textAlignVert,
             text : text,
             // Computed Elements
-            horzPosition : "center",
-            vertPosition : "central" as any,
-            output : text,
+            // Horizontal orientation has three arguments textAnchor and the relative x- and y-position
+            textAnchor : "middle" as any,
+            xpos : "50%",
+            ypos : "50%",
+            // Vertical orientation
+            vertAlign : "middle" as any,
             fontStyle : "normal",
-            textDecoration : "initial"
+            textDecoration : "initial",
+            output : text
 
         };
 
         // Create the variable parameters
         // 1) The text flags: 1: linksbündig, 2: rechtsbündig, 4: horizontal zentriert, 8: oben, 10: unten, 20: vertikal zentriert
-        /*if (dynamicParameters.has("expr-text-flags")) {
+        if (dynamicParameters.has("expr-text-flags")) {
             let element = dynamicParameters!.get("expr-text-flags");
             Object.defineProperty(initial, "textAlignHorz", {
                 get: function() {
-                    let value = Number(ComSocket.singleton().oVisuVariables.get(element)!.value) % 10;
-                    if (value & 4){
-                        return false;
-                    } else {
-                        return true;
+                    let mod = Number(ComSocket.singleton().oVisuVariables.get(element)!.value) % 10;
+                    if (mod & 4){
+                        return "center";
+                    } else if (mod & 2) {
+                        return "right";
+                    } else if (mod & 1) {
+                    return "left";
                     }
                 }
             });
-        }*/
+            Object.defineProperty(initial, "textAlignVert", {
+                get: function() {
+                    let mod = Number(ComSocket.singleton().oVisuVariables.get(element)!.value) % 10;
+                    if (mod & 8){
+                        return "center";
+                    } else if (mod & 2) {
+                        return "right";
+                    } else if (mod & 1) {
+                    return "left";
+                    }
+                }
+            });
+        }
         // 2) The font flags: 
-        if (dynamicParameters.has("expr-font-flag")) {
-            let element = dynamicParameters!.get("expr-font-flag");
+        if (dynamicParameters.has("expr-font-flags")) {
+            let element = dynamicParameters!.get("expr-font-flags");
             Object.defineProperty(initial, "hasUnderline", {
                 get: function() {
-                    let value = (Number(ComSocket.singleton().oVisuVariables.get(element)!.value) & 4) ? true : false ;
+                    let value = (Number(ComSocket.singleton().oVisuVariables.get(element)!.value) & 4)>0 ? true : false ;
                     return value;
                 }
             });
             Object.defineProperty(initial, "isItalic", {
                 get: function() {
-                    let value = (Number(ComSocket.singleton().oVisuVariables.get(element)!.value) & 1) ? true : false ;
+                    let value = (Number(ComSocket.singleton().oVisuVariables.get(element)!.value) & 1)===1 ? true : false ;
                     return value;
                 }
             });
             Object.defineProperty(initial, "hasStrikeOut", {
                 get: function() {
-                    let value = (Number(ComSocket.singleton().oVisuVariables.get(element)!.value) & 8) ? true : false ;
+                    let value = (Number(ComSocket.singleton().oVisuVariables.get(element)!.value) & 8)>0 ? true : false ;
                     return value;
                 }
             });
             Object.defineProperty(initial, "fontWeight", {
                 get: function() {
-                    let value = (Number(ComSocket.singleton().oVisuVariables.get(element)!.value) & 2) ? 700 : 400 ;
+                    let value = (Number(ComSocket.singleton().oVisuVariables.get(element)!.value) & 2)>0 ? 700 : 400 ;
                     return value;
                 }
             });
@@ -126,9 +144,15 @@ export const Textfield :React.FunctionComponent<Props> = ({section, dynamicParam
         }
 
 
-        Object.defineProperty(initial, "horzPosition", {
+        Object.defineProperty(initial, "textAnchor", {
             get: function() {
-                let position = (initial.textAlignHorz === 'center') ? 'middle' : ((initial.textAlignHorz === 'left') ? 'end' : 'start')
+                let position = (initial.textAlignHorz === 'center') ? 'middle' : ((initial.textAlignHorz === 'left') ? 'start' : 'end')
+            return position
+            }
+        });
+        Object.defineProperty(initial, "xpos", {
+            get: function() {
+                let position = (initial.textAlignHorz === 'center') ? '50%' : ((initial.textAlignHorz === 'left') ? "0%" : "100%");
             return position
             }
         });
@@ -142,16 +166,14 @@ export const Textfield :React.FunctionComponent<Props> = ({section, dynamicParam
             get: function() {
                 let string = "";
                 if (initial.hasStrikeOut){
-                    string += "line-through ";
+                    string = "line-through ";
                 }
                 if (initial.hasUnderline){
-                    string += "underline ";
+                    string = "underline ";
                 }
-            return string
+            return string;
             }
         });
-        // Compute the shown string
-
 
         const state  = useLocalStore(()=>initial);
 
@@ -163,12 +185,12 @@ export const Textfield :React.FunctionComponent<Props> = ({section, dynamicParam
                 fontWeight={state.fontWeight}
                 fontSize={-state.fontHeight}
                 fontFamily={state.fontName}
-                textAnchor ={"start"}
+                textAnchor ={state.textAnchor}
                 pointerEvents={'none'}>
                 <tspan
-                alignmentBaseline = {state.vertPosition}
-                x={'0%'} 
-                y={'50%'} >
+                alignmentBaseline = {state.vertAlign}
+                x={state.xpos} 
+                y={state.ypos} >
                     {text}
                 </tspan>
             </text>
