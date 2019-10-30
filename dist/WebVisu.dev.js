@@ -55982,7 +55982,10 @@ exports.Circle = function (_a) {
             React.createElement("svg", { width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge },
                 React.createElement("g", null,
                     React.createElement("ellipse", { stroke: state.stroke, cx: state.relMidpointCoord.x + state.edge, cy: state.relMidpointCoord.y + state.edge, rx: state.relMidpointCoord.x, ry: state.relMidpointCoord.y, fill: state.fill, strokeWidth: state.strokeWidth }),
-                    textField)));
+                    textField,
+                    React.createElement("foreignObject", null,
+                        React.createElement("div", null,
+                            React.createElement("input", null))))));
     });
 };
 
