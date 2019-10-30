@@ -202,7 +202,6 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
 
         return useObserver(()=>
                 <text
-            
                 textDecoration={state.textDecoration}
                 fontStyle={state.fontStyle}
                 fill={state.fontColor}

@@ -174,7 +174,13 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
                 strokeWidth={state.strokeWidth}
                 />
                 {textField}
+                <foreignObject>
+                <div >
+                    <input></input>
+                </div>
+            </foreignObject>
             </g>
+
         </svg>
     </div>
     )
