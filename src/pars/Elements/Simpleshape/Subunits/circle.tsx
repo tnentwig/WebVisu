@@ -161,7 +161,7 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
     const state  = useLocalStore(()=>initial);
 
     return useObserver(()=>
-    <div style={{visibility : state.display, position:"absolute", left:state.transformedCoord.x1, top:state.transformedCoord.y1, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
+    <div style={{pointerEvents: "visible", visibility : state.display, position:"absolute", left:state.transformedCoord.x1, top:state.transformedCoord.y1, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
         <svg width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge}>   
             <g>
                 <ellipse
