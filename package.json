@@ -37,11 +37,13 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.3.3",
+    "@types/sprintf-js": "^1.1.2",
     "jquery": "^3.4.1",
     "mobx": "^5.13.0",
     "mobx-react-lite": "^1.4.1",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
+    "sprintf-js": "^1.1.2",
     "ts-loader": "^6.0.4"
   }
 }
