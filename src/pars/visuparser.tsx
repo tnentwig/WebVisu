@@ -27,7 +27,7 @@ export default class HTML5Visu {
             // Searching for variables and initialize the communication
             this.initCommunication(data);
             // Searching for elements
-            this.convertVisuElements(data);
+            setTimeout(()=>this.convertVisuElements(data), 800);
             }
         )
         .fail((error) => {
@@ -48,6 +48,7 @@ export default class HTML5Visu {
     }
 
     convertVisuElements (XML : XMLDocument) : Array<(JSX.Element | undefined | null)> {
+        
         console.log("Start parsing...");
         let visuXML=$(XML);
         let visuObjects: Array<(JSX.Element | undefined | null)> =[];

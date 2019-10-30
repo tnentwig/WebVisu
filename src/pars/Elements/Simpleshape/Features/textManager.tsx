@@ -3,14 +3,16 @@ import * as React from 'react';
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 import ComSocket from '../../../../com/comsocket';
 import {numberToHexColor} from '../../../Utils/utilfunctions'
+import {sprintf} from 'sprintf-js';
 
 type Props = {
     section : JQuery<XMLDocument>,
     dynamicParameters : Map<string, string>
 }
 
-export const Textfield :React.FunctionComponent<Props> = ({section, dynamicParameters})=>
-{        // The static tags for the font
+export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicParameters})  =>
+{       
+        // The static tags for the font
         let fontName = (section.children("font-name").text().length) ? section.children("font-name").text() : "Arial";
         let fontHeight = Number(section.children("font-height").text());
         let font_height_point_size = Number(section.children("font-height-point-size").text());
@@ -26,7 +28,6 @@ export const Textfield :React.FunctionComponent<Props> = ({section, dynamicParam
         let textAlignVert = section.children("text-align-vert").text();
         let text = section.children("text-format").text();
 
-
         const initial = {
             // Font variables
             fontHeight : fontHeight,
@@ -39,7 +40,8 @@ export const Textfield :React.FunctionComponent<Props> = ({section, dynamicParam
             // Text variables
             textAlignHorz : textAlignHorz,
             textAlignVert : textAlignVert,
-            text : text,
+            textStatic : text,
+            textVariable : "",
             // Computed Elements
             // Horizontal orientation has three arguments textAnchor and the relative x- and y-position
             textAnchor : "middle" as any,
@@ -49,7 +51,7 @@ export const Textfield :React.FunctionComponent<Props> = ({section, dynamicParam
             vertAlign : "middle" as any,
             fontStyle : "normal",
             textDecoration : "initial",
-            output : text
+            textOutput : text
 
         };
 
@@ -120,6 +122,16 @@ export const Textfield :React.FunctionComponent<Props> = ({section, dynamicParam
                 }
             });
         }
+        // 4) The text variable: 
+        if (dynamicParameters.has("text-display")) {
+            let element = dynamicParameters!.get("text-display");
+            Object.defineProperty(initial, "textVariable", {
+                get: function() {
+                    let value = ComSocket.singleton().oVisuVariables.get(element)!.value;
+                    return value;
+                }
+            });
+        }
         // 5) The font color: 
         if (dynamicParameters.has("expr-text-color")) {
             let element = dynamicParameters!.get("expr-text-color");
@@ -137,13 +149,18 @@ export const Textfield :React.FunctionComponent<Props> = ({section, dynamicParam
             Object.defineProperty(initial, "fontHeight", {
                 get: function() {
                     let value = (-1)*Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
-                    value = value/1.3;
+                    value = value/1.4;
                     return value;
                 }
             });
         }
 
-
+        Object.defineProperty(initial, "textOutput", {
+            get: function() {
+                let output = sprintf(initial.textStatic, initial.textVariable);
+            return output
+            }
+        });
         Object.defineProperty(initial, "textAnchor", {
             get: function() {
                 let position = (initial.textAlignHorz === 'center') ? 'middle' : ((initial.textAlignHorz === 'left') ? 'start' : 'end')
@@ -171,14 +188,21 @@ export const Textfield :React.FunctionComponent<Props> = ({section, dynamicParam
                 if (initial.hasUnderline){
                     string = "underline ";
                 }
-            return string;
+                if (string.length) {
+                    return string;
+                }
+                else {
+                    return "initial";
+                }
             }
         });
-
+        let trued = true;
         const state  = useLocalStore(()=>initial);
 
+
         return useObserver(()=>
-            <text
+                <text
+            
                 textDecoration={state.textDecoration}
                 fontStyle={state.fontStyle}
                 fill={state.fontColor}
@@ -186,13 +210,17 @@ export const Textfield :React.FunctionComponent<Props> = ({section, dynamicParam
                 fontSize={-state.fontHeight}
                 fontFamily={state.fontName}
                 textAnchor ={state.textAnchor}
-                pointerEvents={'none'}>
+                pointerEvents={'none'}
+                >
                 <tspan
-                alignmentBaseline = {state.vertAlign}
+                alignmentBaseline = {"central"}
                 x={state.xpos} 
                 y={state.ypos} >
-                    {text}
+                    {state.textOutput}
                 </tspan>
             </text>
         )
-}
+        
+       
+    }
+

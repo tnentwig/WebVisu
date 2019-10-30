@@ -43,7 +43,7 @@ export function parseDynamicTextParameters(section : JQuery<XMLDocument>) : Map<
     tags.push("expr-text-flags");          // 1) The textflags sets the alignment of the text
     tags.push("expr-font-flags");          // 2) The font flags sets the external appearance
     tags.push("expr-font-name");           // 3) Sets the font name
-    tags.push("expr-text-display");        // 4) Sets the variable that has to be displayed
+    tags.push("text-display");             // 4) Sets the variable that has to be displayed
     tags.push("expr-text-color");          // 5) Sets the text color
     tags.push("expr-font-height");         // 6) Sets the font height
 
