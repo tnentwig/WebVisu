@@ -1,8 +1,8 @@
 import * as $ from 'jquery';
-
+import ComSocket from '../../../../com/comsocket';
 // This function is parsing all <expr-...> tags like toggle color and returns a map with the expression as key and the variable as value
 
-export function parseDynamicShapeParameters(section : JQuery<XMLDocument>) : Map<string, string> {
+export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape : string) : Map<string, string> {
     let exprMap : Map<string,string>= new Map();
     let tags : Array<string>= [];
     // Styling tags
@@ -28,15 +28,21 @@ export function parseDynamicShapeParameters(section : JQuery<XMLDocument>) : Map
 
     tags.forEach(function(entry){
         section.children(entry).children("expr").each(function() {
-        exprMap.set(entry, $(this)!.children("var").text());
+            let varName = $(this)!.children("var").text();
+            // Determine if the deposited variable exists in the process image. There could be a misspelling of a variable name in the Codesysproject.
+            if(ComSocket.singleton().oVisuVariables.has(varName)){
+                exprMap.set(entry, varName);
+            }
+            else{
+                console.log("A variable is not available at <"+shape+ "> object for <"+entry+">. There could be a misspelling of a variable name in the CoDeys project.");
+            }
         })
-        
     });
 
     return exprMap;
 }
 
-export function parseDynamicTextParameters(section : JQuery<XMLDocument>) : Map<string, string> {
+export function parseDynamicTextParameters(section : JQuery<XMLDocument>, shape: string) : Map<string, string> {
     let exprMap : Map<string,string>= new Map();
     let tags : Array<string>= [];
     // Styling tags
@@ -49,7 +55,14 @@ export function parseDynamicTextParameters(section : JQuery<XMLDocument>) : Map<
 
     tags.forEach(function(entry){
         section.children(entry).children("expr").each(function() {
-        exprMap.set(entry, $(this)!.children("var").text());
+            let varName = $(this)!.children("var").text();
+            // Determine if the deposited variable exists in the process image. There could be a misspelling of a variable name in the Codesysproject.
+            if(ComSocket.singleton().oVisuVariables.has(varName)){
+                exprMap.set(entry, varName);
+            }
+            else{
+                console.log("A variable is not available at <"+shape+ "> object for <"+entry+">. There could be a misspelling of a variable name in the CoDeys project.");
+            }
         })
     });
     return exprMap;
