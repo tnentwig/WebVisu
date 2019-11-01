@@ -53,9 +53,13 @@ export default class ComSocket implements IComSocket {
             let transferarray : Array<string>= (response.slice(1,response.length-1).split('|'));
             for(let i=0; i<transferarray.length; i++) {
                 let varName = this.lutKeyVariable[i];
-                if (this.oVisuVariables.get(varName)!.value!==transferarray[i]){
-                    action(this.oVisuVariables.get(varName)!.value=transferarray[i]);   
+                // The visu element could have assigned values that are not regular variables in the process image
+                if(this.oVisuVariables.has(varName)){
+                    if (this.oVisuVariables.get(varName).value!==transferarray[i]){
+                        action(this.oVisuVariables.get(varName)!.value=transferarray[i]);   
+                    }
                 }
+                else ()=>console.log("%s is not a defined variable.", varName);
             };
         })
     }
