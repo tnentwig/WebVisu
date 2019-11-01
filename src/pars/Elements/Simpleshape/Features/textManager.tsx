@@ -48,7 +48,8 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
             xpos : "50%",
             ypos : "50%",
             // Vertical orientation
-            vertAlign : "middle" as any,
+            dominantBaseline : "middle" as any,
+            // Text manipulation
             fontStyle : "normal",
             textDecoration : "initial",
             textOutput : text
@@ -57,6 +58,8 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
 
         // Create the variable parameters
         // 1) The text flags: 1: linksbündig, 2: rechtsbündig, 4: horizontal zentriert, 8: oben, 10: unten, 20: vertikal zentriert
+        // The sum of the attributes should determine the position of the element e.g. 4 + 20 = 24 => in the center of the svg
+        // Problem: 12 is ambiguous : 8+4 and 10+2
         if (dynamicParameters.has("expr-text-flags")) {
             let element = dynamicParameters!.get("expr-text-flags");
             Object.defineProperty(initial, "textAlignHorz", {
@@ -173,6 +176,18 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
             return position
             }
         });
+        Object.defineProperty(initial, "ypos", {
+            get: function() {
+                let position = (initial.textAlignVert === 'center') ? '50%' : ((initial.textAlignVert === 'bottom') ? "90%" : "0%");
+            return position
+            }
+        });
+        Object.defineProperty(initial, "dominantBaseline", {
+            get: function() {
+                let position = (initial.textAlignVert === 'center') ? 'middle' : ((initial.textAlignVert === 'bottom') ? "baseline" : "hanging");
+            return position
+            }
+        });
         Object.defineProperty(initial, "fontStyle", {
             get: function() {
                 let value = (initial.isItalic === true) ? 'italic' : 'normal';
@@ -196,7 +211,6 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
                 }
             }
         });
-        let trued = true;
         const state  = useLocalStore(()=>initial);
 
 
@@ -212,7 +226,7 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
                 pointerEvents={'none'}
                 >
                 <tspan
-                alignmentBaseline = {"central"}
+                dominantBaseline = {state.dominantBaseline}
                 x={state.xpos} 
                 y={state.ypos} >
                     {state.textOutput}
