@@ -30,7 +30,7 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
           enable_text_input : util.stringToBoolean(section.children("enable-text-input").text())
         }
         // Parsing the textfields and returning a jsx object if it exists
-        let dynamicTextParameters = parseDynamicTextParameters(section);
+        let dynamicTextParameters = parseDynamicTextParameters(section, shape);
         let textField : JSX.Element;
         if (section.find("text-id").text().length){
         textField = <Textfield section={section} dynamicParameters={dynamicTextParameters}></Textfield>;
@@ -40,7 +40,7 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
         }
 
         // Parsing of observable events (like toggle color)
-        let dynamicShapeParameters = parseDynamicShapeParameters(section);
+        let dynamicShapeParameters = parseDynamicShapeParameters(section, shape);
         // Parsing of user events that causes a reaction like toggle or pop up input
         let userEvents = parseUserEvent(section);
         // Return of the React-Node
