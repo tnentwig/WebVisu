@@ -56,12 +56,12 @@ export function parseDynamicTextParameters(section : JQuery<XMLDocument>, shape:
     tags.forEach(function(entry){
         section.children(entry).children("expr").each(function() {
             let varName = $(this)!.children("var").text();
-            // Determine if the deposited variable exists in the process image. There could be a misspelling of a variable name in the Codesysproject.
             if(ComSocket.singleton().oVisuVariables.has(varName)){
                 exprMap.set(entry, varName);
             }
             else{
-                console.log("A variable is not available at <"+shape+ "> object for <"+entry+">. There could be a misspelling of a variable name in the CoDeys project.");
+                let placeholderName = $(this)!.children("placeholder").text();
+                console.log("A placeholder variable: "+placeholderName+" at <"+shape+ "> object for <"+entry+"> was found.");
             }
         })
     });
