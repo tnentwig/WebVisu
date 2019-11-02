@@ -20,9 +20,11 @@ export interface IVisuObject{
     alarmFrameColor : string,
     hasFillColor : boolean,
     hasFrameColor : boolean,
+    lineWidth : number,
     strokeWidth : number,
     display : any,
     alarm : boolean,
     fill : string,
-    stroke : string
+    stroke : string,
+    strokeDashArray : string
 }
