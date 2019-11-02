@@ -15,7 +15,7 @@ export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape
     tags.push("expr-fill-flags");           // 7) Toggles the "has-inside-color"
     tags.push("expr-frame-flags");          // 8) Toggles the "has-frame-color"
     tags.push("expr-line-width");           // 9) line-width
-
+ 
     // Transition tags
     tags.push("expr-left");                 // Relative left
     tags.push("expr-right");                // Relative right
@@ -26,6 +26,11 @@ export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape
     tags.push("expr-scale");                // Scale with middle reference point
     tags.push("expr-angle");                // Turn around center with angle
 
+    // Tooltip
+    tags.push("expr-tooltip-display");      // tooltip variable
+    // Deactivate Input
+    tags.push("expr-input-disabled");
+
     tags.forEach(function(entry){
         section.children(entry).children("expr").each(function() {
             let varName = $(this)!.children("var").text();
@@ -34,7 +39,8 @@ export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape
                 exprMap.set(entry, varName);
             }
             else{
-                console.log("A variable is not available at <"+shape+ "> object for <"+entry+">. There could be a misspelling of a variable name in the CoDeys project.");
+                let placeholderName = $(this)!.children("placeholder").text();
+                console.log("A placeholder variable: "+placeholderName+" at <"+shape+ "> object for <"+entry+"> was found.");
             }
         })
     });

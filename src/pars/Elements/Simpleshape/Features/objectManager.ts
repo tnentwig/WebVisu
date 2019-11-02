@@ -1,6 +1,6 @@
 import ComSocket from '../../../../com/comsocket';
 import {IVisuObject} from './interfaces'
-import {numberToHexColor} from '../../../Utils/utilfunctions'
+import {numberToHexColor, stringToBoolean} from '../../../Utils/utilfunctions'
 
 export function attachDynamicParameters(visuObject: IVisuObject, dynamicElements : Map<string,string>) : IVisuObject{
     // Processing the variables for visual elements
@@ -193,5 +193,24 @@ export function attachDynamicParameters(visuObject: IVisuObject, dynamicElements
                 }
         });
     }
+    // 18) Tooltip
+    if (dynamicElements.has("expr-tooltip-display")){
+        let element = dynamicElements!.get("expr-tooltip-display");
+        Object.defineProperty(visuObject, "tooltip", {
+            get: function() {
+                return ComSocket.singleton().oVisuVariables.get(element)!.value;
+                }
+        });
+    }
+    // 19) Deactivate Input
+    if (dynamicElements.has("expr-input-disabled")){
+        let element = dynamicElements!.get("expr-input-disabled");
+        Object.defineProperty(visuObject, "deactivateInput", {
+            get: function() {
+                return (ComSocket.singleton().oVisuVariables.get(element)!.value=="1"?"none":"visible");
+                }
+        });
+    }
+
     return visuObject;
 }

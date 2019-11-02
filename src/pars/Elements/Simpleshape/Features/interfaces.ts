@@ -23,6 +23,8 @@ export interface IVisuObject{
     lineWidth : number,
     strokeWidth : number,
     display : any,
+    tooltip : string,
+    eventType : any,
     alarm : boolean,
     fill : string,
     stroke : string,

@@ -26,6 +26,8 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
     let lineWidth = (simpleShape.has_frame_color) ? edge : 0;
     // Compute the fill color through has_fill_color
     let fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
+    // Tooltip
+    let tooltip = simpleShape.tooltip
     
     // Create an object with the initial parameters
     let initial  : IVisuObject= {
@@ -48,6 +50,8 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
         ypos : 0,
         scale : 1000,   // a scale of 1000 means a representation of 1:1
         angle : 0,
+        // Activate / deactivate input
+        eventType : "visible",
         // Computed
         strokeWidth : lineWidth,
         transformedCoord : absCornerCoord,
@@ -58,7 +62,8 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
         stroke : simpleShape.frame_color,
         strokeDashArray : "0",
         display : "visible" as any,
-        alarm : false
+        alarm : false,
+        tooltip : tooltip
     }
     // Attach the dynamic paramters like color variable
     initial = attachDynamicParameters(initial, dynamicParameters)
@@ -169,11 +174,12 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
         }
     });
 
+
     // Convert object to an observable one
     const state  = useLocalStore(()=>initial);
 
     return useObserver(()=>
-    <div style={{cursor: "auto", pointerEvents: "visible", visibility : state.display, position:"absolute", left:state.transformedCoord.x1, top:state.transformedCoord.y1, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
+    <div style={{cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCoord.x1-state.edge, top:state.transformedCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
         <svg width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge} strokeDasharray={state.strokeDashArray}>   
             <g>
                 <ellipse
@@ -184,13 +190,10 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
                 ry={state.relMidpointCoord.y}
                 fill={state.fill}
                 strokeWidth={state.strokeWidth}
-                />
+                >
+                <title>{state.tooltip}</title>
+                </ellipse>
                 {textField}
-                <foreignObject>
-                <div >
-                    <input></input>
-                </div>
-            </foreignObject>
             </g>
 
         </svg>

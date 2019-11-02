@@ -11,7 +11,8 @@ export interface ISimpleShape {
     rect : number[];
     center : number[];
     hidden_input : boolean;
-    enable_text_input : boolean
+    enable_text_input : boolean;
+    tooltip : string
 }
 
 export interface IComSocket {
