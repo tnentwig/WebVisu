@@ -58192,6 +58192,8 @@ function parseDynamicShapeParameters(section, shape) {
     tags.push("expr-ypos");
     tags.push("expr-scale");
     tags.push("expr-angle");
+    tags.push("expr-tooltip-display");
+    tags.push("expr-input-disabled");
     tags.forEach(function (entry) {
         section.children(entry).children("expr").each(function () {
             var varName = $(this).children("var").text();
@@ -58199,7 +58201,8 @@ function parseDynamicShapeParameters(section, shape) {
                 exprMap.set(entry, varName);
             }
             else {
-                console.log("A variable is not available at <" + shape + "> object for <" + entry + ">. There could be a misspelling of a variable name in the CoDeys project.");
+                var placeholderName = $(this).children("placeholder").text();
+                console.log("A placeholder variable: " + placeholderName + " at <" + shape + "> object for <" + entry + "> was found.");
             }
         });
     });
@@ -58430,6 +58433,22 @@ function attachDynamicParameters(visuObject, dynamicElements) {
             }
         });
     }
+    if (dynamicElements.has("expr-tooltip-display")) {
+        var element_18 = dynamicElements.get("expr-tooltip-display");
+        Object.defineProperty(visuObject, "tooltip", {
+            get: function () {
+                return comsocket_1.default.singleton().oVisuVariables.get(element_18).value;
+            }
+        });
+    }
+    if (dynamicElements.has("expr-input-disabled")) {
+        var element_19 = dynamicElements.get("expr-input-disabled");
+        Object.defineProperty(visuObject, "deactivateInput", {
+            get: function () {
+                return (comsocket_1.default.singleton().oVisuVariables.get(element_19).value == "1" ? true : false);
+            }
+        });
+    }
     return visuObject;
 }
 exports.attachDynamicParameters = attachDynamicParameters;
@@ -58466,7 +58485,7 @@ exports.Textfield = function (_a) {
     var fontColor = util.rgbToHexString(section.children("font-color").text());
     var textAlignHorz = section.children("text-align-horz").text();
     var textAlignVert = section.children("text-align-vert").text();
-    var text = section.children("text-format").text();
+    var text = section.children("text-format").text().replace('| |', ' ');
     var textId = Number(section.children("text-id").text());
     var initial = {
         fontHeight: fontHeight,
@@ -58683,6 +58702,7 @@ exports.Circle = function (_a) {
     var edge = (simpleShape.line_width === 0) ? 1 : simpleShape.line_width;
     var lineWidth = (simpleShape.has_frame_color) ? edge : 0;
     var fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
+    var tooltip = simpleShape.tooltip;
     var initial = {
         normalFillColor: simpleShape.fill_color,
         alarmFillColor: simpleShape.fill_color_alarm,
@@ -58701,6 +58721,7 @@ exports.Circle = function (_a) {
         ypos: 0,
         scale: 1000,
         angle: 0,
+        inactiveInput: false,
         strokeWidth: lineWidth,
         transformedCoord: absCornerCoord,
         relCoord: relCoord,
@@ -58710,7 +58731,8 @@ exports.Circle = function (_a) {
         stroke: simpleShape.frame_color,
         strokeDashArray: "0",
         display: "visible",
-        alarm: false
+        alarm: false,
+        tooltip: tooltip
     };
     initial = objectManager_1.attachDynamicParameters(initial, dynamicParameters);
     Object.defineProperty(initial, "fill", {
@@ -58816,14 +58838,12 @@ exports.Circle = function (_a) {
     });
     var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
     return mobx_react_lite_1.useObserver(function () {
-        return React.createElement("div", { style: { cursor: "auto", pointerEvents: "visible", visibility: state.display, position: "absolute", left: state.transformedCoord.x1, top: state.transformedCoord.y1, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge } },
+        return React.createElement("div", { style: { cursor: "auto", pointerEvents: "visible", visibility: state.display, position: "absolute", left: state.transformedCoord.x1 - state.edge, top: state.transformedCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
             React.createElement("svg", { width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
                 React.createElement("g", null,
-                    React.createElement("ellipse", { stroke: state.stroke, cx: state.relMidpointCoord.x + state.edge, cy: state.relMidpointCoord.y + state.edge, rx: state.relMidpointCoord.x, ry: state.relMidpointCoord.y, fill: state.fill, strokeWidth: state.strokeWidth }),
-                    textField,
-                    React.createElement("foreignObject", null,
-                        React.createElement("div", null,
-                            React.createElement("input", null))))));
+                    React.createElement("ellipse", { stroke: state.stroke, cx: state.relMidpointCoord.x + state.edge, cy: state.relMidpointCoord.y + state.edge, rx: state.relMidpointCoord.x, ry: state.relMidpointCoord.y, fill: state.fill, strokeWidth: state.strokeWidth },
+                        React.createElement("title", null, state.tooltip)),
+                    textField)));
     });
 };
 
@@ -58876,7 +58896,7 @@ exports.Rectangle = function (_a) {
     var fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
     return mobx_react_lite_1.useObserver(function () {
         return React.createElement("div", { style: { position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
-            React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge, onClick: function () { return click(userEvents); } },
+            React.createElement("svg", { pointerEvents: "unset", width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge, onClick: function () { return click(userEvents); } },
                 React.createElement("g", null,
                     React.createElement("rect", { width: relCornerCoord.x2, height: relCornerCoord.y2, x: edge, y: edge, fill: fillColor, strokeWidth: strokeWidth, stroke: simpleShape.frame_color }),
                     textField)));
@@ -58949,7 +58969,8 @@ function parseSimpleShape(section) {
             rect: util.stringToArray(section.children("rect").text()),
             center: util.stringToArray(section.children("center").text()),
             hidden_input: util.stringToBoolean(section.children("hidden-input").text()),
-            enable_text_input: util.stringToBoolean(section.children("enable-text-input").text())
+            enable_text_input: util.stringToBoolean(section.children("enable-text-input").text()),
+            tooltip: (section.children("tooltip").text()).length > 0 ? section.children("tooltip").text() : ""
         };
         var dynamicTextParameters = eventParser_1.parseDynamicTextParameters(section, shape);
         var textField = void 0;
