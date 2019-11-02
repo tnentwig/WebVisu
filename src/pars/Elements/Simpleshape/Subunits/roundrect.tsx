@@ -8,7 +8,7 @@ export function RoundRect (simpleShape : ISimpleShape)
     let relCenterCoord = {x:simpleShape.center[0]-simpleShape.rect[0], y:simpleShape.center[1]-simpleShape.rect[1]};
     let edge = 1;
     return(
-    <div style={{position:"absolute", left:simpleShape.rect[0], top:simpleShape.rect[1], width:relCornerCoord.x2+2*edge, height:relCornerCoord.y2+2*edge}}>
+    <div style={{cursor:"auto", position:"absolute", left:simpleShape.rect[0], top:simpleShape.rect[1], width:relCornerCoord.x2+2*edge, height:relCornerCoord.y2+2*edge}}>
         <svg width={relCornerCoord.x2+2*edge} height={relCornerCoord.y2+2*edge}>   
             <rect 
                 width={relCornerCoord.x2}
