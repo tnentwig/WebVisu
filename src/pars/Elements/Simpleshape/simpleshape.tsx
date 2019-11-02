@@ -27,7 +27,8 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
           rect : util.stringToArray(section.children("rect").text()),
           center : util.stringToArray(section.children("center").text()),
           hidden_input : util.stringToBoolean(section.children("hidden-input").text()),
-          enable_text_input : util.stringToBoolean(section.children("enable-text-input").text())
+          enable_text_input : util.stringToBoolean(section.children("enable-text-input").text()),
+          tooltip : (section.children("tooltip").text()).length>0? section.children("tooltip").text() : ""
         }
         // Parsing the textfields and returning a jsx object if it exists
         let dynamicTextParameters = parseDynamicTextParameters(section, shape);
