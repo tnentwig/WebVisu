@@ -58104,18 +58104,11 @@ var ComSocket = (function () {
         })
             .then(function (response) {
             var transferarray = (response.slice(1, response.length - 1).split('|'));
-            var _loop_1 = function (i) {
-                var varName = _this.lutKeyVariable[i];
-                if (_this.oVisuVariables.has(varName)) {
-                    if (_this.oVisuVariables.get(varName).value !== transferarray[i]) {
-                        mobx_1.action(_this.oVisuVariables.get(varName).value = transferarray[i]);
-                    }
-                }
-                else
-                    (function () { return console.log("%s is not a defined variable.", varName); });
-            };
             for (var i = 0; i < transferarray.length; i++) {
-                _loop_1(i);
+                var varName = _this.lutKeyVariable[i];
+                if (_this.oVisuVariables.get(varName).value !== transferarray[i]) {
+                    mobx_1.action(_this.oVisuVariables.get(varName).value = transferarray[i]);
+                }
             }
             ;
         });
@@ -58229,7 +58222,8 @@ function parseDynamicTextParameters(section, shape) {
                 exprMap.set(entry, varName);
             }
             else {
-                console.log("A variable is not available at <" + shape + "> object for <" + entry + ">. There could be a misspelling of a variable name in the CoDeys project.");
+                var placeholderName = $(this).children("placeholder").text();
+                console.log("A placeholder variable: " + placeholderName + " at <" + shape + "> object for <" + entry + "> was found.");
             }
         });
     });
@@ -58339,19 +58333,34 @@ function attachDynamicParameters(visuObject, dynamicElements) {
         var element_8 = dynamicElements.get("expr-frame-flags");
         Object.defineProperty(visuObject, "hasFrameColor", {
             get: function () {
+                var value = comsocket_1.default.singleton().oVisuVariables.get(element_8).value == "8" ? false : true;
+                return value;
+            }
+        });
+        Object.defineProperty(visuObject, "strokeDashArray", {
+            get: function () {
                 var value = comsocket_1.default.singleton().oVisuVariables.get(element_8).value;
-                if (value === "0") {
-                    return false;
+                if (value == "4") {
+                    return "20,10,5,5,5,10";
+                }
+                else if (value == "3") {
+                    return "20,5,5,5";
+                }
+                else if (value == "2") {
+                    return "5,5";
+                }
+                else if (value == "1") {
+                    return "10,10";
                 }
                 else {
-                    return true;
+                    return "0";
                 }
             }
         });
     }
     if (dynamicElements.has("expr-line-width")) {
         var element_9 = dynamicElements.get("expr-line-width");
-        Object.defineProperty(visuObject, "strokeWidth", {
+        Object.defineProperty(visuObject, "lineWidth", {
             get: function () {
                 return Number(comsocket_1.default.singleton().oVisuVariables.get(element_9).value);
             }
@@ -58455,10 +58464,10 @@ exports.Textfield = function (_a) {
     var hasUnderline = util.stringToBoolean(section.children("font-underline").text());
     var charSet = Number(section.children("font-char-set").text());
     var fontColor = util.rgbToHexString(section.children("font-color").text());
-    var textId = Number(section.children("text-id").text());
     var textAlignHorz = section.children("text-align-horz").text();
     var textAlignVert = section.children("text-align-vert").text();
     var text = section.children("text-format").text();
+    var textId = Number(section.children("text-id").text());
     var initial = {
         fontHeight: fontHeight,
         fontWeight: fontWeight,
@@ -58483,29 +58492,37 @@ exports.Textfield = function (_a) {
         var element_1 = dynamicParameters.get("expr-text-flags");
         Object.defineProperty(initial, "textAlignHorz", {
             get: function () {
-                var mod = Number(comsocket_1.default.singleton().oVisuVariables.get(element_1).value) % 10;
-                if (mod & 4) {
-                    return "center";
-                }
-                else if (mod & 2) {
-                    return "right";
-                }
-                else if (mod & 1) {
-                    return "left";
+                var value = Number(comsocket_1.default.singleton().oVisuVariables.get(element_1).value);
+                if ((value / 8) > 0) {
+                    if (value == 4) {
+                        return "center";
+                    }
+                    else if (value == 2) {
+                        return "right";
+                    }
+                    else if (value == 1) {
+                        return "left";
+                    }
+                    else {
+                        return "left";
+                    }
                 }
             }
         });
         Object.defineProperty(initial, "textAlignVert", {
             get: function () {
-                var mod = Number(comsocket_1.default.singleton().oVisuVariables.get(element_1).value) % 10;
-                if (mod & 8) {
+                var value = Number(comsocket_1.default.singleton().oVisuVariables.get(element_1).value);
+                if (value == 20) {
                     return "center";
                 }
-                else if (mod & 2) {
-                    return "right";
+                else if (value == 8) {
+                    return "top";
                 }
-                else if (mod & 1) {
-                    return "left";
+                else if (value == 10) {
+                    return "bottom";
+                }
+                else {
+                    return "top";
                 }
             }
         });
@@ -58577,31 +58594,37 @@ exports.Textfield = function (_a) {
     }
     Object.defineProperty(initial, "textOutput", {
         get: function () {
-            var output = sprintf_js_1.sprintf(initial.textStatic, initial.textVariable);
+            var output;
+            if (initial.textStatic.includes("%t")) {
+                output = "%t not supported yet!";
+            }
+            else {
+                output = sprintf_js_1.sprintf(initial.textStatic, initial.textVariable);
+            }
             return output;
         }
     });
     Object.defineProperty(initial, "textAnchor", {
         get: function () {
-            var position = (initial.textAlignHorz === 'center') ? 'middle' : ((initial.textAlignHorz === 'left') ? 'start' : 'end');
+            var position = (initial.textAlignHorz == 'center') ? 'middle' : ((initial.textAlignHorz == 'left') ? 'start' : 'end');
             return position;
         }
     });
     Object.defineProperty(initial, "xpos", {
         get: function () {
-            var position = (initial.textAlignHorz === 'center') ? '50%' : ((initial.textAlignHorz === 'left') ? "0%" : "100%");
+            var position = (initial.textAlignHorz == 'center') ? '50%' : ((initial.textAlignHorz == 'left') ? "0%" : "100%");
             return position;
         }
     });
     Object.defineProperty(initial, "ypos", {
         get: function () {
-            var position = (initial.textAlignVert === 'center') ? '50%' : ((initial.textAlignVert === 'bottom') ? "90%" : "0%");
+            var position = (initial.textAlignVert == 'center') ? '50%' : ((initial.textAlignVert == 'bottom') ? "90%" : "10%");
             return position;
         }
     });
     Object.defineProperty(initial, "dominantBaseline", {
         get: function () {
-            var position = (initial.textAlignVert === 'center') ? 'middle' : ((initial.textAlignVert === 'bottom') ? "baseline" : "hanging");
+            var position = (initial.textAlignVert == 'center') ? 'middle' : ((initial.textAlignVert == 'bottom') ? "baseline" : "hanging");
             return position;
         }
     });
@@ -58658,7 +58681,7 @@ exports.Circle = function (_a) {
     var relCoord = { width: simpleShape.rect[2] - simpleShape.rect[0], height: simpleShape.rect[3] - simpleShape.rect[1] };
     var relMidpointCoord = { x: (simpleShape.rect[2] - simpleShape.rect[0]) / 2, y: (simpleShape.rect[3] - simpleShape.rect[1]) / 2 };
     var edge = (simpleShape.line_width === 0) ? 1 : simpleShape.line_width;
-    var strokeWidth = (simpleShape.has_frame_color) ? edge : 0;
+    var lineWidth = (simpleShape.has_frame_color) ? edge : 0;
     var fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
     var initial = {
         normalFillColor: simpleShape.fill_color,
@@ -58667,7 +58690,7 @@ exports.Circle = function (_a) {
         alarmFrameColor: simpleShape.frame_color_alarm,
         hasFillColor: simpleShape.has_inside_color,
         hasFrameColor: simpleShape.has_frame_color,
-        strokeWidth: strokeWidth,
+        lineWidth: lineWidth,
         absCornerCoord: absCornerCoord,
         absCenterCoord: absCenterCoord,
         left: 0,
@@ -58678,12 +58701,14 @@ exports.Circle = function (_a) {
         ypos: 0,
         scale: 1000,
         angle: 0,
+        strokeWidth: lineWidth,
         transformedCoord: absCornerCoord,
         relCoord: relCoord,
         relMidpointCoord: relMidpointCoord,
         fill: fillColor,
         edge: edge,
         stroke: simpleShape.frame_color,
+        strokeDashArray: "0",
         display: "visible",
         alarm: false
     };
@@ -58700,6 +58725,16 @@ exports.Circle = function (_a) {
             }
             else {
                 return initial.alarmFillColor;
+            }
+        }
+    });
+    Object.defineProperty(initial, "strokeWidth", {
+        get: function () {
+            if (initial.alarm === false) {
+                return initial.lineWidth;
+            }
+            else {
+                return "1";
             }
         }
     });
@@ -58721,11 +58756,11 @@ exports.Circle = function (_a) {
     Object.defineProperty(initial, "edge", {
         get: function () {
             if (initial.hasFrameColor || initial.alarm) {
-                if (initial.strokeWidth === 0) {
+                if (initial.lineWidth === 0) {
                     return 1;
                 }
                 else {
-                    return initial.strokeWidth;
+                    return initial.lineWidth;
                 }
             }
             else {
@@ -58781,8 +58816,8 @@ exports.Circle = function (_a) {
     });
     var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
     return mobx_react_lite_1.useObserver(function () {
-        return React.createElement("div", { style: { pointerEvents: "visible", visibility: state.display, position: "absolute", left: state.transformedCoord.x1, top: state.transformedCoord.y1, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge } },
-            React.createElement("svg", { width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge },
+        return React.createElement("div", { style: { cursor: "auto", pointerEvents: "visible", visibility: state.display, position: "absolute", left: state.transformedCoord.x1, top: state.transformedCoord.y1, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge } },
+            React.createElement("svg", { width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
                 React.createElement("g", null,
                     React.createElement("ellipse", { stroke: state.stroke, cx: state.relMidpointCoord.x + state.edge, cy: state.relMidpointCoord.y + state.edge, rx: state.relMidpointCoord.x, ry: state.relMidpointCoord.y, fill: state.fill, strokeWidth: state.strokeWidth }),
                     textField,
@@ -58872,7 +58907,7 @@ function RoundRect(simpleShape) {
     var relCornerCoord = { x1: 0, y1: 0, x2: simpleShape.rect[2] - simpleShape.rect[0], y2: simpleShape.rect[3] - simpleShape.rect[1] };
     var relCenterCoord = { x: simpleShape.center[0] - simpleShape.rect[0], y: simpleShape.center[1] - simpleShape.rect[1] };
     var edge = 1;
-    return (React.createElement("div", { style: { position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
+    return (React.createElement("div", { style: { cursor: "auto", position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
         React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge },
             React.createElement("rect", { width: relCornerCoord.x2, height: relCornerCoord.y2, x: edge, y: edge, rx: 10, ry: 10, fill: simpleShape.fill_color, strokeWidth: edge, stroke: simpleShape.frame_color }))));
 }
