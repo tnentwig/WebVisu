@@ -23,10 +23,13 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
         let charSet = Number(section.children("font-char-set").text());
         let fontColor = util.rgbToHexString(section.children("font-color").text());
         // The static text flags
-        let textId = Number(section.children("text-id").text());
+
         let textAlignHorz = section.children("text-align-horz").text();
         let textAlignVert = section.children("text-align-vert").text();
         let text = section.children("text-format").text();
+
+        // The id is used for static language change with a .vis file
+        let textId = Number(section.children("text-id").text());
 
         const initial = {
             // Font variables
@@ -64,25 +67,33 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
             let element = dynamicParameters!.get("expr-text-flags");
             Object.defineProperty(initial, "textAlignHorz", {
                 get: function() {
-                    let mod = Number(ComSocket.singleton().oVisuVariables.get(element)!.value) % 10;
-                    if (mod & 4){
+                let value = Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                if ((value/8)>0){
+                    if (value == 4){
                         return "center";
-                    } else if (mod & 2) {
+                    } else if (value == 2) {
                         return "right";
-                    } else if (mod & 1) {
-                    return "left";
+                    } else if (value == 1) {
+                        return "left";
                     }
+                    else {
+                        return "left"; // This is the standard if passed textflag isn't correct
+                    }
+                }
                 }
             });
             Object.defineProperty(initial, "textAlignVert", {
                 get: function() {
-                    let mod = Number(ComSocket.singleton().oVisuVariables.get(element)!.value) % 10;
-                    if (mod & 8){
+                    let value = Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                    if (value == 20){
                         return "center";
-                    } else if (mod & 2) {
-                        return "right";
-                    } else if (mod & 1) {
-                    return "left";
+                    } else if (value == 8) {
+                        return "top";
+                    } else if (value == 10) {
+                        return "bottom";
+                    }
+                    else {
+                        return "top"; // This is the standard if passed textflag isn't correct
                     }
                 }
             });
@@ -160,31 +171,38 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
 
         Object.defineProperty(initial, "textOutput", {
             get: function() {
-                let output = sprintf(initial.textStatic, initial.textVariable);
+                // CoDeSys has implemented a %t symbol to show date and time. The text is not computed with sprintf then
+                let output : string;
+                if (initial.textStatic.includes("%t")){
+                    output = "%t not supported yet!";
+                }
+                else{
+                    output = sprintf(initial.textStatic, initial.textVariable);
+                }
             return output
             }
         });
         Object.defineProperty(initial, "textAnchor", {
             get: function() {
-                let position = (initial.textAlignHorz === 'center') ? 'middle' : ((initial.textAlignHorz === 'left') ? 'start' : 'end')
+                let position = (initial.textAlignHorz == 'center') ? 'middle' : ((initial.textAlignHorz == 'left') ? 'start' : 'end')
             return position
             }
         });
         Object.defineProperty(initial, "xpos", {
             get: function() {
-                let position = (initial.textAlignHorz === 'center') ? '50%' : ((initial.textAlignHorz === 'left') ? "0%" : "100%");
+                let position = (initial.textAlignHorz == 'center') ? '50%' : ((initial.textAlignHorz == 'left') ? "0%" : "100%");
             return position
             }
         });
         Object.defineProperty(initial, "ypos", {
             get: function() {
-                let position = (initial.textAlignVert === 'center') ? '50%' : ((initial.textAlignVert === 'bottom') ? "90%" : "0%");
+                let position = (initial.textAlignVert == 'center') ? '50%' : ((initial.textAlignVert == 'bottom') ? "90%" : "10%");
             return position
             }
         });
         Object.defineProperty(initial, "dominantBaseline", {
             get: function() {
-                let position = (initial.textAlignVert === 'center') ? 'middle' : ((initial.textAlignVert === 'bottom') ? "baseline" : "hanging");
+                let position = (initial.textAlignVert == 'center') ? 'middle' : ((initial.textAlignVert == 'bottom') ? "baseline" : "hanging");
             return position
             }
         });
