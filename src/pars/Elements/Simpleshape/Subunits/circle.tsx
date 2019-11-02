@@ -23,7 +23,7 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
     // The line_width is 0 in the xml if border width is 1 in the codesys dev env. Otherwise line_width is equal to the target border width. Very strange.
     let edge = (simpleShape.line_width === 0) ? 1 :simpleShape.line_width ;
     // Compute the strokeWidth through has_frame_color
-    let strokeWidth = (simpleShape.has_frame_color) ? edge : 0;
+    let lineWidth = (simpleShape.has_frame_color) ? edge : 0;
     // Compute the fill color through has_fill_color
     let fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
     
@@ -36,7 +36,7 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
         alarmFrameColor : simpleShape.frame_color_alarm,
         hasFillColor : simpleShape.has_inside_color,
         hasFrameColor : simpleShape.has_frame_color,
-        strokeWidth : strokeWidth,
+        lineWidth : lineWidth,
         // Positional arguments
         absCornerCoord : absCornerCoord,
         absCenterCoord : absCenterCoord,
@@ -48,13 +48,15 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
         ypos : 0,
         scale : 1000,   // a scale of 1000 means a representation of 1:1
         angle : 0,
-        // Computedd
+        // Computed
+        strokeWidth : lineWidth,
         transformedCoord : absCornerCoord,
         relCoord : relCoord,
         relMidpointCoord : relMidpointCoord,
         fill : fillColor,
         edge : edge,
         stroke : simpleShape.frame_color,
+        strokeDashArray : "0",
         display : "visible" as any,
         alarm : false
     }
@@ -71,6 +73,16 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
                 }
             } else {
                 return initial.alarmFillColor;
+            }
+        }
+    });
+    Object.defineProperty(initial, "strokeWidth", {
+        get: function() {
+            if (initial.alarm === false){
+                return initial.lineWidth;
+                }
+            else {
+                return "1";
             }
         }
     });
@@ -92,10 +104,10 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
     Object.defineProperty(initial, "edge", {
         get: function() {
             if (initial.hasFrameColor || initial.alarm){
-                if (initial.strokeWidth === 0){
+                if (initial.lineWidth === 0){
                     return 1;
                 } else {
-                    return initial.strokeWidth;
+                    return initial.lineWidth;
                 }
             } else {
                 return 0;
@@ -161,8 +173,8 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
     const state  = useLocalStore(()=>initial);
 
     return useObserver(()=>
-    <div style={{pointerEvents: "visible", visibility : state.display, position:"absolute", left:state.transformedCoord.x1, top:state.transformedCoord.y1, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
-        <svg width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge}>   
+    <div style={{cursor: "auto", pointerEvents: "visible", visibility : state.display, position:"absolute", left:state.transformedCoord.x1, top:state.transformedCoord.y1, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
+        <svg width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge} strokeDasharray={state.strokeDashArray}>   
             <g>
                 <ellipse
                 stroke={state.stroke}
