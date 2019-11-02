@@ -26,7 +26,7 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
 
         let textAlignHorz = section.children("text-align-horz").text();
         let textAlignVert = section.children("text-align-vert").text();
-        let text = section.children("text-format").text();
+        let text = section.children("text-format").text().replace('| |', ' ');
 
         // The id is used for static language change with a .vis file
         let textId = Number(section.children("text-id").text());
