@@ -44,6 +44,7 @@ export function attachDynamicParameters(visuObject: IVisuObject, dynamicElements
                 return numberToHexColor(ComSocket.singleton().oVisuVariables.get(element)!.value);
             }
         });
+
     }
     // 5) Set alarm frame color
     if (dynamicElements.has("expr-frame-color-alarm")) {
@@ -88,11 +89,24 @@ export function attachDynamicParameters(visuObject: IVisuObject, dynamicElements
         let element = dynamicElements!.get("expr-frame-flags");
         Object.defineProperty(visuObject, "hasFrameColor", {
             get: function() {
+                let value = ComSocket.singleton().oVisuVariables.get(element)!.value == "8" ? false : true;
+                return value;
+            }
+        });
+        Object.defineProperty(visuObject, "strokeDashArray", {
+            get: function() {
                 let value = ComSocket.singleton().oVisuVariables.get(element)!.value;
-                if (value === "0"){
-                    return false;
-                } else {
-                    return true;
+                if (value == "4"){
+                    return "20,10,5,5,5,10";
+                } else if (value == "3"){
+                    return "20,5,5,5";
+                } else if (value == "2"){
+                    return "5,5";
+                } else if (value == "1"){
+                    return "10,10";
+                } 
+                else {
+                    return "0";
                 }
             }
         });
@@ -100,7 +114,7 @@ export function attachDynamicParameters(visuObject: IVisuObject, dynamicElements
     // 9) line-width
     if (dynamicElements.has("expr-line-width")) {
         let element = dynamicElements!.get("expr-line-width");
-        Object.defineProperty(visuObject, "strokeWidth", {
+        Object.defineProperty(visuObject, "lineWidth", {
             get: function() {
                 return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
                 }
