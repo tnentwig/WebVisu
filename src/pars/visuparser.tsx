@@ -6,7 +6,7 @@ import { parseSimpleShape } from './Elements/Simpleshape/simpleshape';
 import { Placeholder } from './Elements/placeholder';
 import { parsePolygon } from './Elements/polygon';
 import { parseButton } from './Elements/button';
-import { parseScrollbar } from './Elements/scrollbar';
+import { Scrollbar } from './Elements/Scrollbar/scrollbar';
 import { parseArrayTable } from './Elements/arraytable';
 import { parseBitmap } from './Elements/bitmap';
 
@@ -44,7 +44,7 @@ export default class HTML5Visu {
             let variable = $(this);
             com.addObservableVar(variable.attr("name"), variable.text());
         });
-         com.startCyclicUpdate(200);
+         com.startCyclicUpdate(100);
     }
 
     convertVisuElements (XML : XMLDocument) : Array<(JSX.Element | undefined | null)> {
@@ -82,7 +82,7 @@ export default class HTML5Visu {
                     break;
                 // Is a Scrollbar
                 case "scrollbar":
-                    visuObjects.push(parseScrollbar(section));
+                    visuObjects.push(<Scrollbar section={section}></Scrollbar>);
                     break;
                 // Not a supported type, is logged
                 case "array-table":
