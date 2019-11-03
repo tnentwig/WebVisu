@@ -58131,9 +58131,19 @@ var ComSocket = (function () {
         });
     };
     ComSocket.prototype.toggleValue = function (varName) {
-        var value;
-        Number(this.oVisuVariables.get(varName).value) === 0 ? value = 1 : value = 0;
-        this.setValue(varName, value);
+        if (this.oVisuVariables.has(varName)) {
+            var value = Number(this.oVisuVariables.get(varName).value);
+            if (value === 0 || 1) {
+                value === 0 ? value = 1 : value = 0;
+                this.setValue(varName, value);
+            }
+            else {
+                throw new Error("The variable to be toggled is not a boolean!");
+            }
+        }
+        else {
+            throw new Error("The variable is not defined!");
+        }
     };
     ComSocket.instance = new ComSocket();
     return ComSocket;
@@ -58156,6 +58166,188 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var visuparser_1 = __webpack_require__(/*! ./pars/visuparser */ "./src/pars/visuparser.tsx");
 var objHTML5Visu = new visuparser_1.default("http://localhost:8080");
 objHTML5Visu.createVisu("/plc_visu.xml");
+
+
+/***/ }),
+
+/***/ "./src/pars/Elements/Scrollbar/eventParser.ts":
+/*!****************************************************!*\
+  !*** ./src/pars/Elements/Scrollbar/eventParser.ts ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+var comsocket_1 = __webpack_require__(/*! ../../../com/comsocket */ "./src/com/comsocket.ts");
+function parseScrollbarParameters(section) {
+    var exprMap = new Map();
+    var tags = [];
+    tags.push("expr-lower-bound");
+    tags.push("expr-upper-bound");
+    tags.push("expr-invisible");
+    tags.push("expr-tooltip-display");
+    tags.push("expr-tap-var");
+    tags.forEach(function (entry) {
+        section.children(entry).children("expr").each(function () {
+            if ($(this).children("var").text().length) {
+                var varName = $(this).children("var").text();
+                if (comsocket_1.default.singleton().oVisuVariables.has(varName)) {
+                    exprMap.set(entry, { type: "var", value: varName });
+                }
+            }
+            else if ($(this).children("const").text().length) {
+                var constValue = $(this).children("const").text();
+                exprMap.set(entry, { type: "const", value: constValue });
+            }
+            else if ($(this).children("placeholder").text().length) {
+                var placeholderName = $(this).children("placeholder").text();
+                console.log("A placeholder variable: " + placeholderName + " for <" + entry + "> was found.");
+            }
+        });
+    });
+    return exprMap;
+}
+exports.parseScrollbarParameters = parseScrollbarParameters;
+function updateScrollvalue(section) {
+    var update;
+    section.children("expr-tap-var").children("expr").each(function () {
+        var varName = $(this).children("var").text();
+        var com = comsocket_1.default.singleton();
+        if (com.oVisuVariables.has(varName)) {
+            update = function (setValue) {
+                com.setValue(varName, setValue);
+            };
+        }
+        else {
+            var placeholderName = $(this).children("placeholder").text();
+        }
+    });
+    return update;
+}
+exports.updateScrollvalue = updateScrollvalue;
+
+
+/***/ }),
+
+/***/ "./src/pars/Elements/Scrollbar/scrollbar.tsx":
+/*!***************************************************!*\
+  !*** ./src/pars/Elements/Scrollbar/scrollbar.tsx ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
+var Slider_1 = __webpack_require__(/*! @material-ui/core/Slider */ "./node_modules/@material-ui/core/esm/Slider/index.js");
+var utilfunctions_1 = __webpack_require__(/*! ../../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
+var eventParser_1 = __webpack_require__(/*! ../Scrollbar/eventParser */ "./src/pars/Elements/Scrollbar/eventParser.ts");
+var comsocket_1 = __webpack_require__(/*! ../../../com/comsocket */ "./src/com/comsocket.ts");
+exports.Scrollbar = function (_a) {
+    var section = _a.section;
+    var rect = utilfunctions_1.stringToArray(section.children("rect").text());
+    var tooltip = (section.children("tooltip").text()).length > 0 ? section.children("tooltip").text() : "";
+    var relCornerCoord = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
+    var orientation = ((relCornerCoord.x2 > relCornerCoord.y2) ? "horizontal" : "vertical");
+    var initial = {
+        tooltip: tooltip,
+        lowerBound: 0,
+        upperBound: 0,
+        startValue: 20,
+        value: 0,
+        display: "visible"
+    };
+    var dynamicElements = eventParser_1.parseScrollbarParameters(section);
+    var updateFunction = eventParser_1.updateScrollvalue(section);
+    if (dynamicElements.has("expr-lower-bound")) {
+        var element_1 = dynamicElements.get("expr-lower-bound");
+        if (element_1.type === "var") {
+            Object.defineProperty(initial, "lowerBound", {
+                get: function () {
+                    return Number(comsocket_1.default.singleton().oVisuVariables.get(element_1.value).value);
+                }
+            });
+        }
+        else if (element_1.type === "const") {
+            initial.lowerBound = Number(element_1.value);
+        }
+    }
+    if (dynamicElements.has("expr-upper-bound")) {
+        var element_2 = dynamicElements.get("expr-upper-bound");
+        if (element_2.type === "var") {
+            Object.defineProperty(initial, "upperBound", {
+                get: function () {
+                    return Number(comsocket_1.default.singleton().oVisuVariables.get(element_2.value).value);
+                }
+            });
+        }
+        else if (element_2.type === "const") {
+            initial.upperBound = Number(element_2.value);
+        }
+    }
+    if (dynamicElements.has("expr-invisible")) {
+        var element_3 = dynamicElements.get("expr-invisible");
+        if (element_3.type === "var") {
+            Object.defineProperty(initial, "display", {
+                get: function () {
+                    var value = comsocket_1.default.singleton().oVisuVariables.get(element_3.value).value;
+                    if (value == "0") {
+                        return "visible";
+                    }
+                    else {
+                        return "none";
+                    }
+                }
+            });
+        }
+        else if (element_3.type === "const") {
+            var value = void 0;
+            if (element_3.value === "0") {
+                value = "visible";
+            }
+            else {
+                value = "none";
+            }
+            initial.display = value;
+        }
+    }
+    if (dynamicElements.has("expr-tooltip-display")) {
+        var element_4 = dynamicElements.get("expr-tooltip-display");
+        if (element_4.type === "var") {
+            Object.defineProperty(initial, "tooltip", {
+                get: function () {
+                    return comsocket_1.default.singleton().oVisuVariables.get(element_4.value).value;
+                }
+            });
+        }
+    }
+    if (dynamicElements.has("expr-tap-var")) {
+        var element_5 = dynamicElements.get("expr-tap-var");
+        if (element_5.type === "const") {
+            initial.value = Number(element_5.value);
+        }
+        else if (element_5.type === "var") {
+            Object.defineProperty(initial, "value", {
+                get: function () {
+                    return Number(comsocket_1.default.singleton().oVisuVariables.get(element_5.value).value);
+                }
+            });
+        }
+    }
+    var handleSliderChange = function (event, newValue) {
+        updateFunction(newValue);
+    };
+    var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
+    return mobx_react_lite_1.useObserver(function () {
+        return React.createElement("div", { title: state.tooltip, style: { position: "absolute", left: rect[0], top: rect[1], width: relCornerCoord.x2, height: relCornerCoord.y2 } },
+            React.createElement(Slider_1.default, { orientation: orientation, min: state.lowerBound, max: state.upperBound, step: 1, value: state.value, onChange: handleSliderChange }));
+    });
+};
 
 
 /***/ }),
@@ -58241,6 +58433,54 @@ function parseUserEvent(section) {
     return varList;
 }
 exports.parseUserEvent = parseUserEvent;
+function parseClickEvent(section) {
+    var clickFunction;
+    section.children("expr-toggle-var").children("expr").each(function () {
+        var varName = $(this).children("var").text();
+        var com = comsocket_1.default.singleton();
+        if (com.oVisuVariables.has(varName)) {
+            clickFunction = function () {
+                com.toggleValue(varName);
+            };
+        }
+        else {
+            var placeholderName = $(this).children("placeholder").text();
+            console.log("A placeholder variable: " + placeholderName + "> was found.");
+        }
+    });
+    return clickFunction;
+}
+exports.parseClickEvent = parseClickEvent;
+function parseTapEvent(section, direction) {
+    var tapFunction;
+    var tapFalse = section.children("tap-false").text();
+    if (tapFalse.length) {
+        var tapDown_1 = (tapFalse === "false" ? 1 : 0);
+        var tapUp_1 = (tapFalse === "false" ? 0 : 1);
+        section.children("expr-tap-var").children("expr").each(function () {
+            var varName = $(this).children("var").text();
+            var com = comsocket_1.default.singleton();
+            if (com.oVisuVariables.has(varName)) {
+                if (direction === "down") {
+                    tapFunction = function () {
+                        com.setValue(varName, tapDown_1);
+                    };
+                }
+                else if (direction === "up") {
+                    tapFunction = function () {
+                        com.setValue(varName, tapUp_1);
+                    };
+                }
+            }
+            else {
+                var placeholderName = $(this).children("placeholder").text();
+                console.log("A placeholder variable: " + placeholderName + "> was found.");
+            }
+        });
+    }
+    return tapFunction;
+}
+exports.parseTapEvent = parseTapEvent;
 
 
 /***/ }),
@@ -58445,7 +58685,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
         var element_19 = dynamicElements.get("expr-input-disabled");
         Object.defineProperty(visuObject, "deactivateInput", {
             get: function () {
-                return (comsocket_1.default.singleton().oVisuVariables.get(element_19).value == "1" ? true : false);
+                return (comsocket_1.default.singleton().oVisuVariables.get(element_19).value == "1" ? "none" : "visible");
             }
         });
     }
@@ -58694,7 +58934,7 @@ var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Simpleshape/Features/objectManager.ts");
 var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
 exports.Circle = function (_a) {
-    var simpleShape = _a.simpleShape, textField = _a.textField, dynamicParameters = _a.dynamicParameters;
+    var simpleShape = _a.simpleShape, textField = _a.textField, dynamicParameters = _a.dynamicParameters, onclick = _a.onclick, onmousedown = _a.onmousedown, onmouseup = _a.onmouseup;
     var absCornerCoord = { x1: simpleShape.rect[0], y1: simpleShape.rect[1], x2: simpleShape.rect[2], y2: simpleShape.rect[3] };
     var absCenterCoord = { x: simpleShape.center[0], y: simpleShape.center[1] };
     var relCoord = { width: simpleShape.rect[2] - simpleShape.rect[0], height: simpleShape.rect[3] - simpleShape.rect[1] };
@@ -58721,7 +58961,7 @@ exports.Circle = function (_a) {
         ypos: 0,
         scale: 1000,
         angle: 0,
-        inactiveInput: false,
+        eventType: "visible",
         strokeWidth: lineWidth,
         transformedCoord: absCornerCoord,
         relCoord: relCoord,
@@ -58838,8 +59078,8 @@ exports.Circle = function (_a) {
     });
     var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
     return mobx_react_lite_1.useObserver(function () {
-        return React.createElement("div", { style: { cursor: "auto", pointerEvents: "visible", visibility: state.display, position: "absolute", left: state.transformedCoord.x1 - state.edge, top: state.transformedCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
-            React.createElement("svg", { width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
+        return React.createElement("div", { style: { cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCoord.x1 - state.edge, top: state.transformedCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
+            React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
                 React.createElement("g", null,
                     React.createElement("ellipse", { stroke: state.stroke, cx: state.relMidpointCoord.x + state.edge, cy: state.relMidpointCoord.y + state.edge, rx: state.relMidpointCoord.x, ry: state.relMidpointCoord.y, fill: state.fill, strokeWidth: state.strokeWidth },
                         React.createElement("title", null, state.tooltip)),
@@ -58896,7 +59136,7 @@ exports.Rectangle = function (_a) {
     var fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
     return mobx_react_lite_1.useObserver(function () {
         return React.createElement("div", { style: { position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
-            React.createElement("svg", { pointerEvents: "unset", width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge, onClick: function () { return click(userEvents); } },
+            React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge, onClick: function () { return click(userEvents); } },
                 React.createElement("g", null,
                     React.createElement("rect", { width: relCornerCoord.x2, height: relCornerCoord.y2, x: edge, y: edge, fill: fillColor, strokeWidth: strokeWidth, stroke: simpleShape.frame_color }),
                     textField)));
@@ -58981,12 +59221,15 @@ function parseSimpleShape(section) {
             textField = null;
         }
         var dynamicShapeParameters = eventParser_1.parseDynamicShapeParameters(section, shape);
+        var onclick_1 = eventParser_1.parseClickEvent(section);
+        var onmousedown_1 = eventParser_1.parseTapEvent(section, "down");
+        var onmouseup_1 = eventParser_1.parseTapEvent(section, "up");
         var userEvents = eventParser_1.parseUserEvent(section);
         switch (shape) {
             case 'round-rect':
                 return (roundrect_1.RoundRect(simpleShape));
             case 'circle':
-                return (React.createElement(circle_1.Circle, { simpleShape: simpleShape, textField: textField, dynamicParameters: dynamicShapeParameters }));
+                return (React.createElement(circle_1.Circle, { simpleShape: simpleShape, textField: textField, dynamicParameters: dynamicShapeParameters, onclick: onclick_1, onmousedown: onmousedown_1, onmouseup: onmouseup_1 }));
             case 'line':
                 return (line_1.Line(simpleShape));
             case 'rectangle':
@@ -59184,42 +59427,6 @@ exports.parsePolygon = parsePolygon;
 
 /***/ }),
 
-/***/ "./src/pars/Elements/scrollbar.tsx":
-/*!*****************************************!*\
-  !*** ./src/pars/Elements/scrollbar.tsx ***!
-  \*****************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-var Slider_1 = __webpack_require__(/*! @material-ui/core/Slider */ "./node_modules/@material-ui/core/esm/Slider/index.js");
-var utilfunctions_1 = __webpack_require__(/*! ../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
-function parseScrollbar(section) {
-    var rect = utilfunctions_1.stringToArray(section.children("rect").text());
-    var center = utilfunctions_1.stringToArray(section.children("center").text());
-    var has_inside_color = utilfunctions_1.stringToBoolean(section.children("has-inside-color").text());
-    var fill_color = utilfunctions_1.rgbToHexString(section.children("fill-color").text());
-    var fill_color_alarm = utilfunctions_1.rgbToHexString(section.children("fill-color-alarm").text());
-    var has_frame_color = utilfunctions_1.stringToBoolean(section.children("has-frame-color").text());
-    var frame_color = utilfunctions_1.rgbToHexString(section.children("frame-color").text());
-    var frame_color_alarm = utilfunctions_1.rgbToHexString(section.children("frame-color-alarm").text());
-    var hidden_input = utilfunctions_1.stringToBoolean(section.children("hidden-input").text());
-    var enable_text_input = utilfunctions_1.stringToBoolean(section.children("enable-text-input").text());
-    var relCornerCoord = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
-    var relCenterCoord = { x: center[0] - rect[0], y: center[1] - rect[1] };
-    var edge = 1;
-    var orientation = ((relCornerCoord.x2 > relCornerCoord.y2) ? "horizontal" : "vertical");
-    return (React.createElement("div", { style: { position: "absolute", left: rect[0], top: rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
-        React.createElement(Slider_1.default, { orientation: orientation })));
-}
-exports.parseScrollbar = parseScrollbar;
-
-
-/***/ }),
-
 /***/ "./src/pars/Utils/utilfunctions.ts":
 /*!*****************************************!*\
   !*** ./src/pars/Utils/utilfunctions.ts ***!
@@ -59339,7 +59546,7 @@ var simpleshape_1 = __webpack_require__(/*! ./Elements/Simpleshape/simpleshape *
 var placeholder_1 = __webpack_require__(/*! ./Elements/placeholder */ "./src/pars/Elements/placeholder.tsx");
 var polygon_1 = __webpack_require__(/*! ./Elements/polygon */ "./src/pars/Elements/polygon.tsx");
 var button_1 = __webpack_require__(/*! ./Elements/button */ "./src/pars/Elements/button.tsx");
-var scrollbar_1 = __webpack_require__(/*! ./Elements/scrollbar */ "./src/pars/Elements/scrollbar.tsx");
+var scrollbar_1 = __webpack_require__(/*! ./Elements/Scrollbar/scrollbar */ "./src/pars/Elements/Scrollbar/scrollbar.tsx");
 var arraytable_1 = __webpack_require__(/*! ./Elements/arraytable */ "./src/pars/Elements/arraytable.tsx");
 var bitmap_1 = __webpack_require__(/*! ./Elements/bitmap */ "./src/pars/Elements/bitmap.tsx");
 var HTML5Visu = (function () {
@@ -59370,7 +59577,7 @@ var HTML5Visu = (function () {
             var variable = $(this);
             com.addObservableVar(variable.attr("name"), variable.text());
         });
-        com.startCyclicUpdate(200);
+        com.startCyclicUpdate(100);
     };
     HTML5Visu.prototype.convertVisuElements = function (XML) {
         console.log("Start parsing...");
@@ -59397,7 +59604,7 @@ var HTML5Visu = (function () {
                     visuObjects.push(placeholder_1.Placeholder(section));
                     break;
                 case "scrollbar":
-                    visuObjects.push(scrollbar_1.parseScrollbar(section));
+                    visuObjects.push(React.createElement(scrollbar_1.Scrollbar, { section: section }));
                     break;
                 case "array-table":
                     visuObjects.push(arraytable_1.parseArrayTable(section));
