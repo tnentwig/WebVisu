@@ -82,3 +82,56 @@ export function parseUserEvent(section : JQuery<XMLDocument>) : string[] {
     })
     return varList;
 }
+
+export function parseClickEvent(section : JQuery<XMLDocument>) : Function {
+    let clickFunction : Function;
+
+     // Parse the <expr-toggle-var><expr><var> ... elements => toggle color
+     section.children("expr-toggle-var").children("expr").each(function() {
+        let varName = $(this).children("var").text();
+        let com = ComSocket.singleton();
+        if(com.oVisuVariables.has(varName)){
+            clickFunction = function():void{
+                com.toggleValue(varName);
+            }
+        }
+        else{
+            let placeholderName = $(this)!.children("placeholder").text();
+            console.log("A placeholder variable: "+placeholderName+"> was found.");
+        }
+     })
+
+    return clickFunction;
+}
+
+export function parseTapEvent(section : JQuery<XMLDocument>, direction: string) : Function {
+    let tapFunction : Function;
+        let tapFalse = section.children("tap-false").text();
+        // If tap-false exists a tap variable is existent
+        if (tapFalse.length){
+            let tapDown = (tapFalse === "false"? 1 : 0);
+            let tapUp = (tapFalse === "false"? 0 : 1);
+            // Parse the <expr-toggle-var><expr><var> ... elements => toggle color
+            section.children("expr-tap-var").children("expr").each(function() {
+                let varName = $(this).children("var").text();
+                let com = ComSocket.singleton();
+                if(com.oVisuVariables.has(varName)){
+                    // On mouse down or mouse up?
+                    if (direction === "down"){
+                        tapFunction = function():void{
+                            com.setValue(varName, tapDown);
+                        }
+                    } else if (direction === "up"){
+                        tapFunction = function():void{
+                            com.setValue(varName, tapUp);
+                        }
+                    }
+                }
+                else{
+                    let placeholderName = $(this)!.children("placeholder").text();
+                    console.log("A placeholder variable: "+placeholderName+"> was found.");
+                }
+            })
+        }
+    return tapFunction;
+}
