@@ -77,12 +77,25 @@ export default class ComSocket implements IComSocket {
                         console.log("Fehler");
             }
         });
-    }  
+    } 
+
+
     // toggleValue : Wechselt den Wert einer boolschen Variablen 
     toggleValue(varName : string) {
-        let value;
-        Number(this.oVisuVariables.get(varName)!.value) === 0 ? value=1 : value=0;
-        this.setValue(varName, value);
+        if (this.oVisuVariables.has(varName)){
+                let value = Number(this.oVisuVariables.get(varName)!.value);
+                if (value === 0 || 1){
+                    value === 0 ? value=1 : value=0;
+                    this.setValue(varName, value);
+                }
+                else {
+                    throw new Error("The variable to be toggled is not a boolean!")
+                }
+            }
+        else{
+            throw new Error("The variable is not defined!")
+        }
     }
+
 }
 
