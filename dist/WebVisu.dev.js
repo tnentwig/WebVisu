@@ -58517,7 +58517,7 @@ var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 function useOutsideAlerter(ref) {
     function handleClickOutside(event) {
         if (ref.current && !ref.current.contains(event.target)) {
-            ;
+            console.log("huhu");
         }
     }
     React.useEffect(function () {
@@ -58526,13 +58526,12 @@ function useOutsideAlerter(ref) {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     });
-    return "hidden";
 }
 exports.Inputfield = function (_a) {
     var section = _a.section;
     var _b = React.useState("text"), type = _b[0], setType = _b[1];
     var wrapperRef = React.useRef(null);
-    setType(useOutsideAlerter(wrapperRef));
+    useOutsideAlerter(wrapperRef);
     return (React.createElement("input", { ref: wrapperRef, type: type, style: { position: "absolute", verticalAlign: "middle", width: "100%" } }));
 };
 
