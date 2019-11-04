@@ -85,21 +85,25 @@ export function parseUserEvent(section : JQuery<XMLDocument>) : string[] {
 
 export function parseClickEvent(section : JQuery<XMLDocument>) : Function {
     let clickFunction : Function;
-
      // Parse the <expr-toggle-var><expr><var> ... elements => toggle color
-     section.children("expr-toggle-var").children("expr").each(function() {
-        let varName = $(this).children("var").text();
-        let com = ComSocket.singleton();
-        if(com.oVisuVariables.has(varName)){
-            clickFunction = function():void{
-                com.toggleValue(varName);
-            }
-        }
-        else{
-            let placeholderName = $(this)!.children("placeholder").text();
-            console.log("A placeholder variable: "+placeholderName+"> was found.");
-        }
-     })
+     if (section.children("expr-toggle-var").text().length){
+            section.children("expr-toggle-var").children("expr").each(function() {
+                let varName = $(this).children("var").text();
+                let com = ComSocket.singleton();
+                if(com.oVisuVariables.has(varName)){
+                    clickFunction = function():void{
+                        com.toggleValue(varName);
+                    }
+                }
+                else{
+                    let placeholderName = $(this)!.children("placeholder").text();
+                    console.log("A placeholder variable: "+placeholderName+"> was found.");
+                    clickFunction = function():void{;}
+                }
+            })
+     } else {
+        clickFunction = function():void{;};
+     }
 
     return clickFunction;
 }
@@ -130,8 +134,13 @@ export function parseTapEvent(section : JQuery<XMLDocument>, direction: string) 
                 else{
                     let placeholderName = $(this)!.children("placeholder").text();
                     console.log("A placeholder variable: "+placeholderName+"> was found.");
+                    tapFunction = function():void{;}
                 }
             })
+        } else {
+            tapFunction = function():void{
+                ;
+            }
         }
     return tapFunction;
 }

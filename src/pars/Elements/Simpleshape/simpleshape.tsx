@@ -5,6 +5,7 @@ import { Line } from './Subunits/line';
 import { Circle } from './Subunits/circle'
 import { Rectangle } from './Subunits/rectangle';
 import { Textfield } from './Features/textManager';
+import {Inputfield} from './Features/inputManager'
 import { ISimpleShape } from '../../Interfaces/interfaces';
 import { parseDynamicShapeParameters, parseUserEvent, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from './Features/eventParser';
 
@@ -34,10 +35,16 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
         let dynamicTextParameters = parseDynamicTextParameters(section, shape);
         let textField : JSX.Element;
         if (section.find("text-id").text().length){
-        textField = <Textfield section={section} dynamicParameters={dynamicTextParameters}></Textfield>;
+          textField = <Textfield section={section} dynamicParameters={dynamicTextParameters}></Textfield>;
         }
         else {
           textField = null;
+        }
+
+        // Parsing the inputfield
+        let inputField : JSX.Element;
+        if (section.find("enable-text-input").text() === "true"){
+            inputField = <Inputfield section={section}></Inputfield>
         }
 
         // Parsing of observable events (like toggle color)
@@ -60,7 +67,8 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
             return(
               <Circle 
                 simpleShape={simpleShape} 
-                textField={textField} 
+                textField={textField}
+                input ={inputField}
                 dynamicParameters={dynamicShapeParameters} 
                 onclick={onclick} 
                 onmousedown={onmousedown} 

@@ -58532,7 +58532,7 @@ exports.Inputfield = function (_a) {
     var _b = React.useState("text"), type = _b[0], setType = _b[1];
     var wrapperRef = React.useRef(null);
     useOutsideAlerter(wrapperRef);
-    return (React.createElement("input", { ref: wrapperRef, type: type, style: { position: "absolute", verticalAlign: "middle", width: "100%" } }));
+    return (React.createElement("input", { ref: wrapperRef, type: "text", style: { position: "absolute", verticalAlign: "middle", width: "100%" } }));
 };
 
 

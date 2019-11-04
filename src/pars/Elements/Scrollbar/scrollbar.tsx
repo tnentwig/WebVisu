@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {runInAction } from 'mobx';
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 import Slider from '@material-ui/core/Slider';
 import {stringToArray } from '../../Utils/utilfunctions';
@@ -106,6 +107,8 @@ export const Scrollbar :React.FunctionComponent<Props> = ({section})=>
     const handleSliderChange = (event : any, newValue : any) => {
         updateFunction(newValue);
     };
+
+    
     const state  = useLocalStore(()=>initial);
 
 

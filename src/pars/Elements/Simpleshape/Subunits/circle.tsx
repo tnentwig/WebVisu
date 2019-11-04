@@ -7,13 +7,14 @@ import { IVisuObject } from '../Features/interfaces';
 type Props = {
     simpleShape: ISimpleShape,
     textField : JSX.Element|undefined,
+    input : JSX.Element,
     dynamicParameters : Map<string, string>
     onmousedown : Function
     onmouseup : Function
     onclick : Function
 }
 
-export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, dynamicParameters, onclick, onmousedown, onmouseup})=> 
+export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, input, dynamicParameters, onclick, onmousedown, onmouseup})=> 
 {
     // absCornerCoord are the absolute coordinates of the <div> element in relation to the origin in the top left 
     let absCornerCoord = {x1:simpleShape.rect[0],y1:simpleShape.rect[1],x2:simpleShape.rect[2],y2:simpleShape.rect[3]};
@@ -182,11 +183,12 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
 
     return useObserver(()=>
     <div style={{cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCoord.x1-state.edge, top:state.transformedCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
+        {input}
         <svg 
             onClick={()=>onclick()} 
             onMouseDown={()=>onmousedown()} 
             onMouseUp={()=>onmouseup()}
-            onMouseLeave={()=>{onmouseup()}}  // We have to reset if somebody leaves the object with pressed key
+            onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
             width={state.relCoord.width+2*state.edge} 
             height={state.relCoord.height+2*state.edge} 
             strokeDasharray={state.strokeDashArray}>   

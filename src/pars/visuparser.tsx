@@ -16,7 +16,7 @@ export default class HTML5Visu {
         this.rootDir= rootDir;
     }
     createVisu (relPath: string) {
-        return $.ajax({
+        $.ajax({
             url: this.rootDir+relPath,
             type: 'GET',
             dataType: 'XML', // if text => no pre-processing, if xml => parseXML preprocessing
@@ -31,20 +31,21 @@ export default class HTML5Visu {
             }
         )
         .fail((error) => {
-            return console.error(error);
+            console.error(error);
         })
     }
 
     initCommunication(XML : XMLDocument) {
         let com = ComSocket.singleton();
-        com.setServerURL(this.rootDir + '/webvisu.htm');
+        com.setServerURL(this.rootDir + '');
         let visuXML=$(XML);
         // Rip all of <variable> in <variablelist> section
         visuXML.children("visualisation").children("variablelist").children("variable").each(function(){
             let variable = $(this);
             com.addObservableVar(variable.attr("name"), variable.text());
         });
-         com.startCyclicUpdate(100);
+        com.updateVarList();
+        com.startCyclicUpdate(200);
     }
 
     convertVisuElements (XML : XMLDocument) : Array<(JSX.Element | undefined | null)> {

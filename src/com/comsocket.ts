@@ -1,6 +1,7 @@
 import * as $ from 'jquery';
 import { IComSocket } from '../pars/Interfaces/interfaces';
 import { observable, action} from "mobx"
+import { CaughtException } from 'mobx/lib/internal';
 
 export default class ComSocket implements IComSocket {
     private static instance : IComSocket=new ComSocket();
@@ -43,6 +44,7 @@ export default class ComSocket implements IComSocket {
         }
     }
     updateVarList() {
+        try{
         $.ajax({
             type: 'POST',
             contentType: "text/plain",
@@ -58,6 +60,10 @@ export default class ComSocket implements IComSocket {
                 }
             };
         })
+
+        .fail((error:Error)=>console.log("Connection lost"));
+    }
+    catch{()=>console.log("Connection lost")}
     }
 
     startCyclicUpdate(periodms : number) {
