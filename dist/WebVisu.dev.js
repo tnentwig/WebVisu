@@ -58096,22 +58096,28 @@ var ComSocket = (function () {
     };
     ComSocket.prototype.updateVarList = function () {
         var _this = this;
-        $.ajax({
-            type: 'POST',
-            contentType: "text/plain",
-            url: this.serverURL,
-            data: '|0|' + this.requestFrame.listings + '|' + this.requestFrame.preFrame,
-        })
-            .then(function (response) {
-            var transferarray = (response.slice(1, response.length - 1).split('|'));
-            for (var i = 0; i < transferarray.length; i++) {
-                var varName = _this.lutKeyVariable[i];
-                if (_this.oVisuVariables.get(varName).value !== transferarray[i]) {
-                    mobx_1.action(_this.oVisuVariables.get(varName).value = transferarray[i]);
+        try {
+            $.ajax({
+                type: 'POST',
+                contentType: "text/plain",
+                url: this.serverURL,
+                data: '|0|' + this.requestFrame.listings + '|' + this.requestFrame.preFrame,
+            })
+                .then(function (response) {
+                var transferarray = (response.slice(1, response.length - 1).split('|'));
+                for (var i = 0; i < transferarray.length; i++) {
+                    var varName = _this.lutKeyVariable[i];
+                    if (_this.oVisuVariables.get(varName).value !== transferarray[i]) {
+                        mobx_1.action(_this.oVisuVariables.get(varName).value = transferarray[i]);
+                    }
                 }
-            }
-            ;
-        });
+                ;
+            })
+                .fail(function (error) { return console.log("Connection lost"); });
+        }
+        catch (_a) {
+            (function () { return console.log("Connection lost"); });
+        }
     };
     ComSocket.prototype.startCyclicUpdate = function (periodms) {
         var _this = this;
@@ -58435,19 +58441,25 @@ function parseUserEvent(section) {
 exports.parseUserEvent = parseUserEvent;
 function parseClickEvent(section) {
     var clickFunction;
-    section.children("expr-toggle-var").children("expr").each(function () {
-        var varName = $(this).children("var").text();
-        var com = comsocket_1.default.singleton();
-        if (com.oVisuVariables.has(varName)) {
-            clickFunction = function () {
-                com.toggleValue(varName);
-            };
-        }
-        else {
-            var placeholderName = $(this).children("placeholder").text();
-            console.log("A placeholder variable: " + placeholderName + "> was found.");
-        }
-    });
+    if (section.children("expr-toggle-var").text().length) {
+        section.children("expr-toggle-var").children("expr").each(function () {
+            var varName = $(this).children("var").text();
+            var com = comsocket_1.default.singleton();
+            if (com.oVisuVariables.has(varName)) {
+                clickFunction = function () {
+                    com.toggleValue(varName);
+                };
+            }
+            else {
+                var placeholderName = $(this).children("placeholder").text();
+                console.log("A placeholder variable: " + placeholderName + "> was found.");
+                clickFunction = function () { ; };
+            }
+        });
+    }
+    else {
+        clickFunction = function () { ; };
+    }
     return clickFunction;
 }
 exports.parseClickEvent = parseClickEvent;
@@ -58475,12 +58487,54 @@ function parseTapEvent(section, direction) {
             else {
                 var placeholderName = $(this).children("placeholder").text();
                 console.log("A placeholder variable: " + placeholderName + "> was found.");
+                tapFunction = function () { ; };
             }
         });
+    }
+    else {
+        tapFunction = function () {
+            ;
+        };
     }
     return tapFunction;
 }
 exports.parseTapEvent = parseTapEvent;
+
+
+/***/ }),
+
+/***/ "./src/pars/Elements/Simpleshape/Features/inputManager.tsx":
+/*!*****************************************************************!*\
+  !*** ./src/pars/Elements/Simpleshape/Features/inputManager.tsx ***!
+  \*****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+function useOutsideAlerter(ref) {
+    function handleClickOutside(event) {
+        if (ref.current && !ref.current.contains(event.target)) {
+            ;
+        }
+    }
+    React.useEffect(function () {
+        document.addEventListener("mousedown", handleClickOutside);
+        return function () {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    });
+    return "hidden";
+}
+exports.Inputfield = function (_a) {
+    var section = _a.section;
+    var _b = React.useState("text"), type = _b[0], setType = _b[1];
+    var wrapperRef = React.useRef(null);
+    setType(useOutsideAlerter(wrapperRef));
+    return (React.createElement("input", { ref: wrapperRef, type: type, style: { position: "absolute", verticalAlign: "middle", width: "100%" } }));
+};
 
 
 /***/ }),
@@ -58934,7 +58988,7 @@ var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Simpleshape/Features/objectManager.ts");
 var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
 exports.Circle = function (_a) {
-    var simpleShape = _a.simpleShape, textField = _a.textField, dynamicParameters = _a.dynamicParameters, onclick = _a.onclick, onmousedown = _a.onmousedown, onmouseup = _a.onmouseup;
+    var simpleShape = _a.simpleShape, textField = _a.textField, input = _a.input, dynamicParameters = _a.dynamicParameters, onclick = _a.onclick, onmousedown = _a.onmousedown, onmouseup = _a.onmouseup;
     var absCornerCoord = { x1: simpleShape.rect[0], y1: simpleShape.rect[1], x2: simpleShape.rect[2], y2: simpleShape.rect[3] };
     var absCenterCoord = { x: simpleShape.center[0], y: simpleShape.center[1] };
     var relCoord = { width: simpleShape.rect[2] - simpleShape.rect[0], height: simpleShape.rect[3] - simpleShape.rect[1] };
@@ -59079,7 +59133,8 @@ exports.Circle = function (_a) {
     var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
     return mobx_react_lite_1.useObserver(function () {
         return React.createElement("div", { style: { cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCoord.x1 - state.edge, top: state.transformedCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
-            React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
+            input,
+            React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
                 React.createElement("g", null,
                     React.createElement("ellipse", { stroke: state.stroke, cx: state.relMidpointCoord.x + state.edge, cy: state.relMidpointCoord.y + state.edge, rx: state.relMidpointCoord.x, ry: state.relMidpointCoord.y, fill: state.fill, strokeWidth: state.strokeWidth },
                         React.createElement("title", null, state.tooltip)),
@@ -59193,6 +59248,7 @@ var line_1 = __webpack_require__(/*! ./Subunits/line */ "./src/pars/Elements/Sim
 var circle_1 = __webpack_require__(/*! ./Subunits/circle */ "./src/pars/Elements/Simpleshape/Subunits/circle.tsx");
 var rectangle_1 = __webpack_require__(/*! ./Subunits/rectangle */ "./src/pars/Elements/Simpleshape/Subunits/rectangle.tsx");
 var textManager_1 = __webpack_require__(/*! ./Features/textManager */ "./src/pars/Elements/Simpleshape/Features/textManager.tsx");
+var inputManager_1 = __webpack_require__(/*! ./Features/inputManager */ "./src/pars/Elements/Simpleshape/Features/inputManager.tsx");
 var eventParser_1 = __webpack_require__(/*! ./Features/eventParser */ "./src/pars/Elements/Simpleshape/Features/eventParser.ts");
 function parseSimpleShape(section) {
     var shape = section.children("simple-shape").text();
@@ -59220,6 +59276,10 @@ function parseSimpleShape(section) {
         else {
             textField = null;
         }
+        var inputField = void 0;
+        if (section.find("enable-text-input").text() === "true") {
+            inputField = React.createElement(inputManager_1.Inputfield, { section: section });
+        }
         var dynamicShapeParameters = eventParser_1.parseDynamicShapeParameters(section, shape);
         var onclick_1 = eventParser_1.parseClickEvent(section);
         var onmousedown_1 = eventParser_1.parseTapEvent(section, "down");
@@ -59229,7 +59289,7 @@ function parseSimpleShape(section) {
             case 'round-rect':
                 return (roundrect_1.RoundRect(simpleShape));
             case 'circle':
-                return (React.createElement(circle_1.Circle, { simpleShape: simpleShape, textField: textField, dynamicParameters: dynamicShapeParameters, onclick: onclick_1, onmousedown: onmousedown_1, onmouseup: onmouseup_1 }));
+                return (React.createElement(circle_1.Circle, { simpleShape: simpleShape, textField: textField, input: inputField, dynamicParameters: dynamicShapeParameters, onclick: onclick_1, onmousedown: onmousedown_1, onmouseup: onmouseup_1 }));
             case 'line':
                 return (line_1.Line(simpleShape));
             case 'rectangle':
@@ -59555,7 +59615,7 @@ var HTML5Visu = (function () {
     }
     HTML5Visu.prototype.createVisu = function (relPath) {
         var _this = this;
-        return $.ajax({
+        $.ajax({
             url: this.rootDir + relPath,
             type: 'GET',
             dataType: 'XML',
@@ -59566,18 +59626,19 @@ var HTML5Visu = (function () {
             setTimeout(function () { return _this.convertVisuElements(data); }, 800);
         })
             .fail(function (error) {
-            return console.error(error);
+            console.error(error);
         });
     };
     HTML5Visu.prototype.initCommunication = function (XML) {
         var com = comsocket_1.default.singleton();
-        com.setServerURL(this.rootDir + '/webvisu.htm');
+        com.setServerURL(this.rootDir + '');
         var visuXML = $(XML);
         visuXML.children("visualisation").children("variablelist").children("variable").each(function () {
             var variable = $(this);
             com.addObservableVar(variable.attr("name"), variable.text());
         });
-        com.startCyclicUpdate(100);
+        com.updateVarList();
+        com.startCyclicUpdate(200);
     };
     HTML5Visu.prototype.convertVisuElements = function (XML) {
         console.log("Start parsing...");
