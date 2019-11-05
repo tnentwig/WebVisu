@@ -95249,14 +95249,6 @@ function parseDynamicTextParameters(section, shape) {
     return exprMap;
 }
 exports.parseDynamicTextParameters = parseDynamicTextParameters;
-function parseUserEvent(section) {
-    var varList = [];
-    section.children("expr-toggle-var").children("expr").each(function () {
-        varList.push($(this).children("var").text());
-    });
-    return varList;
-}
-exports.parseUserEvent = parseUserEvent;
 function parseClickEvent(section) {
     var clickFunction;
     if (section.children("expr-toggle-var").text().length) {
@@ -95404,10 +95396,49 @@ exports.Inputfield = function (_a) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var comsocket_1 = __webpack_require__(/*! ../../../../com/comsocket */ "./src/com/comsocket.ts");
 var utilfunctions_1 = __webpack_require__(/*! ../../../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
-function attachDynamicParameters(visuObject, dynamicElements) {
+function createVisuObject(simpleShape, dynamicElements) {
+    var absCornerCoord = { x1: simpleShape.rect[0], y1: simpleShape.rect[1], x2: simpleShape.rect[2], y2: simpleShape.rect[3] };
+    var absCenterCoord = { x: simpleShape.center[0], y: simpleShape.center[1] };
+    var relCoord = { width: simpleShape.rect[2] - simpleShape.rect[0], height: simpleShape.rect[3] - simpleShape.rect[1] };
+    var relMidpointCoord = { x: (simpleShape.rect[2] - simpleShape.rect[0]) / 2, y: (simpleShape.rect[3] - simpleShape.rect[1]) / 2 };
+    var edge = (simpleShape.line_width === 0) ? 1 : simpleShape.line_width;
+    var lineWidth = (simpleShape.has_frame_color) ? edge : 0;
+    var fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
+    var tooltip = simpleShape.tooltip;
+    var initial = {
+        normalFillColor: simpleShape.fill_color,
+        alarmFillColor: simpleShape.fill_color_alarm,
+        normalFrameColor: simpleShape.frame_color,
+        alarmFrameColor: simpleShape.frame_color_alarm,
+        hasFillColor: simpleShape.has_inside_color,
+        hasFrameColor: simpleShape.has_frame_color,
+        lineWidth: lineWidth,
+        absCornerCoord: absCornerCoord,
+        absCenterCoord: absCenterCoord,
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        xpos: 0,
+        ypos: 0,
+        scale: 1000,
+        angle: 0,
+        eventType: "visible",
+        strokeWidth: lineWidth,
+        transformedCoord: absCornerCoord,
+        relCoord: relCoord,
+        relMidpointCoord: relMidpointCoord,
+        fill: fillColor,
+        edge: edge,
+        stroke: simpleShape.frame_color,
+        strokeDashArray: "0",
+        display: "visible",
+        alarm: false,
+        tooltip: tooltip
+    };
     if (dynamicElements.has("expr-toggle-color")) {
         var element_1 = dynamicElements.get("expr-toggle-color");
-        Object.defineProperty(visuObject, "alarm", {
+        Object.defineProperty(initial, "alarm", {
             get: function () {
                 var value = comsocket_1.default.singleton().oVisuVariables.get(element_1).value;
                 if (value === "0") {
@@ -95421,7 +95452,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-fill-color")) {
         var element_2 = dynamicElements.get("expr-fill-color");
-        Object.defineProperty(visuObject, "normalFillColor", {
+        Object.defineProperty(initial, "normalFillColor", {
             get: function () {
                 return utilfunctions_1.numberToHexColor(comsocket_1.default.singleton().oVisuVariables.get(element_2).value);
             }
@@ -95429,7 +95460,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-fill-color-alarm")) {
         var element_3 = dynamicElements.get("expr-fill-color-alarm");
-        Object.defineProperty(visuObject, "alarmFillColor", {
+        Object.defineProperty(initial, "alarmFillColor", {
             get: function () {
                 return utilfunctions_1.numberToHexColor(comsocket_1.default.singleton().oVisuVariables.get(element_3).value);
             }
@@ -95437,7 +95468,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-frame-color")) {
         var element_4 = dynamicElements.get("expr-frame-color");
-        Object.defineProperty(visuObject, "normalFrameColor", {
+        Object.defineProperty(initial, "normalFrameColor", {
             get: function () {
                 return utilfunctions_1.numberToHexColor(comsocket_1.default.singleton().oVisuVariables.get(element_4).value);
             }
@@ -95445,7 +95476,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-frame-color-alarm")) {
         var element_5 = dynamicElements.get("expr-frame-color-alarm");
-        Object.defineProperty(visuObject, "alarmFrameColor", {
+        Object.defineProperty(initial, "alarmFrameColor", {
             get: function () {
                 return utilfunctions_1.numberToHexColor(comsocket_1.default.singleton().oVisuVariables.get(element_5).value);
             }
@@ -95453,7 +95484,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-invisible")) {
         var element_6 = dynamicElements.get("expr-invisible");
-        Object.defineProperty(visuObject, "display", {
+        Object.defineProperty(initial, "display", {
             get: function () {
                 var value = comsocket_1.default.singleton().oVisuVariables.get(element_6).value;
                 if (value === "0") {
@@ -95467,7 +95498,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-fill-flags")) {
         var element_7 = dynamicElements.get("expr-fill-flags");
-        Object.defineProperty(visuObject, "hasFillColor", {
+        Object.defineProperty(initial, "hasFillColor", {
             get: function () {
                 var value = comsocket_1.default.singleton().oVisuVariables.get(element_7).value;
                 if (value === "1") {
@@ -95481,13 +95512,13 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-frame-flags")) {
         var element_8 = dynamicElements.get("expr-frame-flags");
-        Object.defineProperty(visuObject, "hasFrameColor", {
+        Object.defineProperty(initial, "hasFrameColor", {
             get: function () {
                 var value = comsocket_1.default.singleton().oVisuVariables.get(element_8).value == "8" ? false : true;
                 return value;
             }
         });
-        Object.defineProperty(visuObject, "strokeDashArray", {
+        Object.defineProperty(initial, "strokeDashArray", {
             get: function () {
                 var value = comsocket_1.default.singleton().oVisuVariables.get(element_8).value;
                 if (value == "4") {
@@ -95510,7 +95541,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-line-width")) {
         var element_9 = dynamicElements.get("expr-line-width");
-        Object.defineProperty(visuObject, "lineWidth", {
+        Object.defineProperty(initial, "lineWidth", {
             get: function () {
                 return Number(comsocket_1.default.singleton().oVisuVariables.get(element_9).value);
             }
@@ -95518,7 +95549,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-left")) {
         var element_10 = dynamicElements.get("expr-left");
-        Object.defineProperty(visuObject, "left", {
+        Object.defineProperty(initial, "left", {
             get: function () {
                 return Number(comsocket_1.default.singleton().oVisuVariables.get(element_10).value);
             }
@@ -95526,7 +95557,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-right")) {
         var element_11 = dynamicElements.get("expr-right");
-        Object.defineProperty(visuObject, "right", {
+        Object.defineProperty(initial, "right", {
             get: function () {
                 return Number(comsocket_1.default.singleton().oVisuVariables.get(element_11).value);
             }
@@ -95534,7 +95565,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-top")) {
         var element_12 = dynamicElements.get("expr-top");
-        Object.defineProperty(visuObject, "top", {
+        Object.defineProperty(initial, "top", {
             get: function () {
                 return Number(comsocket_1.default.singleton().oVisuVariables.get(element_12).value);
             }
@@ -95542,7 +95573,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-bottom")) {
         var element_13 = dynamicElements.get("expr-bottom");
-        Object.defineProperty(visuObject, "bottom", {
+        Object.defineProperty(initial, "bottom", {
             get: function () {
                 return Number(comsocket_1.default.singleton().oVisuVariables.get(element_13).value);
             }
@@ -95550,7 +95581,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-xpos")) {
         var element_14 = dynamicElements.get("expr-xpos");
-        Object.defineProperty(visuObject, "xpos", {
+        Object.defineProperty(initial, "xpos", {
             get: function () {
                 return Number(comsocket_1.default.singleton().oVisuVariables.get(element_14).value);
             }
@@ -95558,7 +95589,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-ypos")) {
         var element_15 = dynamicElements.get("expr-ypos");
-        Object.defineProperty(visuObject, "ypos", {
+        Object.defineProperty(initial, "ypos", {
             get: function () {
                 return Number(comsocket_1.default.singleton().oVisuVariables.get(element_15).value);
             }
@@ -95566,7 +95597,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-scale")) {
         var element_16 = dynamicElements.get("expr-scale");
-        Object.defineProperty(visuObject, "scale", {
+        Object.defineProperty(initial, "scale", {
             get: function () {
                 return Number(comsocket_1.default.singleton().oVisuVariables.get(element_16).value);
             }
@@ -95574,7 +95605,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-angle")) {
         var element_17 = dynamicElements.get("expr-angle");
-        Object.defineProperty(visuObject, "angle", {
+        Object.defineProperty(initial, "angle", {
             get: function () {
                 return Number(comsocket_1.default.singleton().oVisuVariables.get(element_17).value);
             }
@@ -95582,7 +95613,7 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-tooltip-display")) {
         var element_18 = dynamicElements.get("expr-tooltip-display");
-        Object.defineProperty(visuObject, "tooltip", {
+        Object.defineProperty(initial, "tooltip", {
             get: function () {
                 return comsocket_1.default.singleton().oVisuVariables.get(element_18).value;
             }
@@ -95590,15 +95621,116 @@ function attachDynamicParameters(visuObject, dynamicElements) {
     }
     if (dynamicElements.has("expr-input-disabled")) {
         var element_19 = dynamicElements.get("expr-input-disabled");
-        Object.defineProperty(visuObject, "deactivateInput", {
+        Object.defineProperty(initial, "deactivateInput", {
             get: function () {
                 return (comsocket_1.default.singleton().oVisuVariables.get(element_19).value == "1" ? "none" : "visible");
             }
         });
     }
-    return visuObject;
+    Object.defineProperty(initial, "fill", {
+        get: function () {
+            if (initial.alarm === false) {
+                if (initial.hasFillColor) {
+                    return initial.normalFillColor;
+                }
+                else {
+                    return "none";
+                }
+            }
+            else {
+                return initial.alarmFillColor;
+            }
+        }
+    });
+    Object.defineProperty(initial, "strokeWidth", {
+        get: function () {
+            if (initial.alarm === false) {
+                return initial.lineWidth;
+            }
+            else {
+                return "1";
+            }
+        }
+    });
+    Object.defineProperty(initial, "stroke", {
+        get: function () {
+            if (initial.alarm === false) {
+                if (initial.hasFrameColor) {
+                    return initial.normalFrameColor;
+                }
+                else {
+                    return "none";
+                }
+            }
+            else {
+                return initial.alarmFrameColor;
+            }
+        }
+    });
+    Object.defineProperty(initial, "edge", {
+        get: function () {
+            if (initial.hasFrameColor || initial.alarm) {
+                if (initial.lineWidth === 0) {
+                    return 1;
+                }
+                else {
+                    return initial.lineWidth;
+                }
+            }
+            else {
+                return 0;
+            }
+        }
+    });
+    Object.defineProperty(initial, "transformedCoord", {
+        get: function () {
+            var x1 = initial.absCornerCoord.x1;
+            var x2 = initial.absCornerCoord.x2;
+            var y1 = initial.absCornerCoord.y1;
+            var y2 = initial.absCornerCoord.y2;
+            var xc = initial.absCenterCoord.x;
+            var yc = initial.absCenterCoord.y;
+            x1 = (initial.scale / 1000) * (x1 - xc) + xc;
+            y1 = (initial.scale / 1000) * (y1 - yc) + yc;
+            x2 = (initial.scale / 1000) * (x2 - xc) + xc;
+            y2 = (initial.scale / 1000) * (y2 - yc) + yc;
+            var sinphi = Math.sin(initial.angle * (2 * Math.PI) / 360);
+            var cosphi = Math.cos(initial.angle * (2 * Math.PI) / 360);
+            var xoff = (x1 - xc) * cosphi - (y1 - yc) * sinphi - (x1 - xc);
+            var yoff = (x1 - xc) * sinphi + (y1 - yc) * cosphi - (y1 - yc);
+            x1 += initial.xpos + initial.left + xoff;
+            x2 += initial.xpos + initial.right + xoff;
+            y1 += initial.ypos + initial.top + yoff;
+            y2 += initial.ypos + initial.bottom + yoff;
+            var coord = { x1: x1, y1: y1, x2: x2, y2: y2 };
+            if (x1 > x2) {
+                coord.x1 = x2;
+                coord.x2 = x1;
+            }
+            if (y1 > y2) {
+                coord.y1 = y2;
+                coord.y2 = y1;
+            }
+            return coord;
+        }
+    });
+    Object.defineProperty(initial, "relCoord", {
+        get: function () {
+            var width = initial.transformedCoord.x2 - initial.transformedCoord.x1;
+            var height = initial.transformedCoord.y2 - initial.transformedCoord.y1;
+            return { width: width, height: height };
+        }
+    });
+    Object.defineProperty(initial, "relMidpointCoord", {
+        get: function () {
+            var x = initial.relCoord.width / 2;
+            var y = initial.relCoord.height / 2;
+            return { x: x, y: y };
+        }
+    });
+    return initial;
 }
-exports.attachDynamicParameters = attachDynamicParameters;
+exports.createVisuObject = createVisuObject;
 
 
 /***/ }),
@@ -95842,147 +95974,7 @@ var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./sr
 var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
 exports.Circle = function (_a) {
     var simpleShape = _a.simpleShape, textField = _a.textField, input = _a.input, dynamicParameters = _a.dynamicParameters, onclick = _a.onclick, onmousedown = _a.onmousedown, onmouseup = _a.onmouseup;
-    var absCornerCoord = { x1: simpleShape.rect[0], y1: simpleShape.rect[1], x2: simpleShape.rect[2], y2: simpleShape.rect[3] };
-    var absCenterCoord = { x: simpleShape.center[0], y: simpleShape.center[1] };
-    var relCoord = { width: simpleShape.rect[2] - simpleShape.rect[0], height: simpleShape.rect[3] - simpleShape.rect[1] };
-    var relMidpointCoord = { x: (simpleShape.rect[2] - simpleShape.rect[0]) / 2, y: (simpleShape.rect[3] - simpleShape.rect[1]) / 2 };
-    var edge = (simpleShape.line_width === 0) ? 1 : simpleShape.line_width;
-    var lineWidth = (simpleShape.has_frame_color) ? edge : 0;
-    var fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
-    var tooltip = simpleShape.tooltip;
-    var initial = {
-        normalFillColor: simpleShape.fill_color,
-        alarmFillColor: simpleShape.fill_color_alarm,
-        normalFrameColor: simpleShape.frame_color,
-        alarmFrameColor: simpleShape.frame_color_alarm,
-        hasFillColor: simpleShape.has_inside_color,
-        hasFrameColor: simpleShape.has_frame_color,
-        lineWidth: lineWidth,
-        absCornerCoord: absCornerCoord,
-        absCenterCoord: absCenterCoord,
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-        xpos: 0,
-        ypos: 0,
-        scale: 1000,
-        angle: 0,
-        eventType: "visible",
-        strokeWidth: lineWidth,
-        transformedCoord: absCornerCoord,
-        relCoord: relCoord,
-        relMidpointCoord: relMidpointCoord,
-        fill: fillColor,
-        edge: edge,
-        stroke: simpleShape.frame_color,
-        strokeDashArray: "0",
-        display: "visible",
-        alarm: false,
-        tooltip: tooltip
-    };
-    initial = objectManager_1.attachDynamicParameters(initial, dynamicParameters);
-    Object.defineProperty(initial, "fill", {
-        get: function () {
-            if (initial.alarm === false) {
-                if (initial.hasFillColor) {
-                    return initial.normalFillColor;
-                }
-                else {
-                    return "none";
-                }
-            }
-            else {
-                return initial.alarmFillColor;
-            }
-        }
-    });
-    Object.defineProperty(initial, "strokeWidth", {
-        get: function () {
-            if (initial.alarm === false) {
-                return initial.lineWidth;
-            }
-            else {
-                return "1";
-            }
-        }
-    });
-    Object.defineProperty(initial, "stroke", {
-        get: function () {
-            if (initial.alarm === false) {
-                if (initial.hasFrameColor) {
-                    return initial.normalFrameColor;
-                }
-                else {
-                    return "none";
-                }
-            }
-            else {
-                return initial.alarmFrameColor;
-            }
-        }
-    });
-    Object.defineProperty(initial, "edge", {
-        get: function () {
-            if (initial.hasFrameColor || initial.alarm) {
-                if (initial.lineWidth === 0) {
-                    return 1;
-                }
-                else {
-                    return initial.lineWidth;
-                }
-            }
-            else {
-                return 0;
-            }
-        }
-    });
-    Object.defineProperty(initial, "transformedCoord", {
-        get: function () {
-            var x1 = initial.absCornerCoord.x1;
-            var x2 = initial.absCornerCoord.x2;
-            var y1 = initial.absCornerCoord.y1;
-            var y2 = initial.absCornerCoord.y2;
-            var xc = initial.absCenterCoord.x;
-            var yc = initial.absCenterCoord.y;
-            x1 = (initial.scale / 1000) * (x1 - xc) + xc;
-            y1 = (initial.scale / 1000) * (y1 - yc) + yc;
-            x2 = (initial.scale / 1000) * (x2 - xc) + xc;
-            y2 = (initial.scale / 1000) * (y2 - yc) + yc;
-            var sinphi = Math.sin(initial.angle * (2 * Math.PI) / 360);
-            var cosphi = Math.cos(initial.angle * (2 * Math.PI) / 360);
-            var xoff = (x1 - xc) * cosphi - (y1 - yc) * sinphi - (x1 - xc);
-            var yoff = (x1 - xc) * sinphi + (y1 - yc) * cosphi - (y1 - yc);
-            x1 += initial.xpos + initial.left + xoff;
-            x2 += initial.xpos + initial.right + xoff;
-            y1 += initial.ypos + initial.top + yoff;
-            y2 += initial.ypos + initial.bottom + yoff;
-            var coord = { x1: x1, y1: y1, x2: x2, y2: y2 };
-            if (x1 > x2) {
-                coord.x1 = x2;
-                coord.x2 = x1;
-            }
-            if (y1 > y2) {
-                coord.y1 = y2;
-                coord.y2 = y1;
-            }
-            return coord;
-        }
-    });
-    Object.defineProperty(initial, "relCoord", {
-        get: function () {
-            var width = initial.transformedCoord.x2 - initial.transformedCoord.x1;
-            var height = initial.transformedCoord.y2 - initial.transformedCoord.y1;
-            return { width: width, height: height };
-        }
-    });
-    Object.defineProperty(initial, "relMidpointCoord", {
-        get: function () {
-            var x = initial.relCoord.width / 2;
-            var y = initial.relCoord.height / 2;
-            return { x: x, y: y };
-        }
-    });
+    var initial = objectManager_1.createVisuObject(simpleShape, dynamicParameters);
     var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
     return mobx_react_lite_1.useObserver(function () {
         return React.createElement("div", { style: { cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCoord.x1 - state.edge, top: state.transformedCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
@@ -96009,15 +96001,22 @@ exports.Circle = function (_a) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-function Line(simpleShape) {
-    var relCornerCoord = { x1: 0, y1: 0, x2: simpleShape.rect[2] - simpleShape.rect[0], y2: simpleShape.rect[3] - simpleShape.rect[1] };
-    var relCenterCoord = { x: simpleShape.center[0] - simpleShape.rect[0], y: simpleShape.center[1] - simpleShape.rect[1] };
-    var edge = 1;
-    return (React.createElement("div", { style: { position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
-        React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge },
-            React.createElement("line", { x1: relCornerCoord.x1, y1: relCornerCoord.y2, x2: relCornerCoord.x2, y2: relCornerCoord.y1, stroke: simpleShape.frame_color }))));
-}
-exports.Line = Line;
+var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Simpleshape/Features/objectManager.ts");
+var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
+exports.Line = function (_a) {
+    var simpleShape = _a.simpleShape, textField = _a.textField, input = _a.input, dynamicParameters = _a.dynamicParameters, onclick = _a.onclick, onmousedown = _a.onmousedown, onmouseup = _a.onmouseup;
+    var initial = objectManager_1.createVisuObject(simpleShape, dynamicParameters);
+    var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
+    return mobx_react_lite_1.useObserver(function () {
+        return React.createElement("div", { style: { cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCoord.x1 - state.edge, top: state.transformedCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
+            input,
+            React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width, height: state.relCoord.height },
+                React.createElement("g", null,
+                    React.createElement("line", { x2: 0, y1: 0, x1: state.relCoord.width, y2: state.relCoord.height, stroke: state.stroke, strokeWidth: state.strokeWidth, strokeDasharray: state.strokeDashArray },
+                        React.createElement("title", null, state.tooltip)),
+                    textField)));
+    });
+};
 
 
 /***/ }),
@@ -96033,29 +96032,22 @@ exports.Line = Line;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-var comsocket_1 = __webpack_require__(/*! ../../../../com/comsocket */ "./src/com/comsocket.ts");
+var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Simpleshape/Features/objectManager.ts");
 var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
 exports.Rectangle = function (_a) {
-    var simpleShape = _a.simpleShape, textField = _a.textField, userEvents = _a.userEvents;
-    var relCornerCoord = { x1: 0, y1: 0, x2: simpleShape.rect[2] - simpleShape.rect[0], y2: simpleShape.rect[3] - simpleShape.rect[1] };
-    var relCenterCoord = { x: simpleShape.center[0] - simpleShape.rect[0], y: simpleShape.center[1] - simpleShape.rect[1] };
-    var edge = (simpleShape.line_width === 0) ? 1 : simpleShape.line_width;
-    var strokeWidth = (simpleShape.has_frame_color) ? edge : 0;
-    var fillColor = (simpleShape.has_inside_color) ? simpleShape.fill_color : 'none';
+    var simpleShape = _a.simpleShape, textField = _a.textField, input = _a.input, dynamicParameters = _a.dynamicParameters, onclick = _a.onclick, onmousedown = _a.onmousedown, onmouseup = _a.onmouseup;
+    var initial = objectManager_1.createVisuObject(simpleShape, dynamicParameters);
+    var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
     return mobx_react_lite_1.useObserver(function () {
-        return React.createElement("div", { style: { position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
-            React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge, onClick: function () { return click(userEvents); } },
+        return React.createElement("div", { style: { cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCoord.x1 - state.edge, top: state.transformedCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
+            input,
+            React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
                 React.createElement("g", null,
-                    React.createElement("rect", { width: relCornerCoord.x2, height: relCornerCoord.y2, x: edge, y: edge, fill: fillColor, strokeWidth: strokeWidth, stroke: simpleShape.frame_color }),
+                    React.createElement("rect", { width: state.relCoord.width, height: state.relCoord.height, x: state.edge, y: state.edge, fill: state.fill, stroke: state.stroke, strokeWidth: state.strokeWidth },
+                        React.createElement("title", null, state.tooltip)),
                     textField)));
     });
 };
-function click(userEvents) {
-    var com = comsocket_1.default.singleton();
-    if (userEvents.length > 0) {
-        userEvents.forEach(function (value, index) { return com.toggleValue(value); });
-    }
-}
 
 
 /***/ }),
@@ -96071,15 +96063,22 @@ function click(userEvents) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-function RoundRect(simpleShape) {
-    var relCornerCoord = { x1: 0, y1: 0, x2: simpleShape.rect[2] - simpleShape.rect[0], y2: simpleShape.rect[3] - simpleShape.rect[1] };
-    var relCenterCoord = { x: simpleShape.center[0] - simpleShape.rect[0], y: simpleShape.center[1] - simpleShape.rect[1] };
-    var edge = 1;
-    return (React.createElement("div", { style: { cursor: "auto", position: "absolute", left: simpleShape.rect[0], top: simpleShape.rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
-        React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge },
-            React.createElement("rect", { width: relCornerCoord.x2, height: relCornerCoord.y2, x: edge, y: edge, rx: 10, ry: 10, fill: simpleShape.fill_color, strokeWidth: edge, stroke: simpleShape.frame_color }))));
-}
-exports.RoundRect = RoundRect;
+var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Simpleshape/Features/objectManager.ts");
+var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
+exports.Roundrect = function (_a) {
+    var simpleShape = _a.simpleShape, textField = _a.textField, input = _a.input, dynamicParameters = _a.dynamicParameters, onclick = _a.onclick, onmousedown = _a.onmousedown, onmouseup = _a.onmouseup;
+    var initial = objectManager_1.createVisuObject(simpleShape, dynamicParameters);
+    var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
+    return mobx_react_lite_1.useObserver(function () {
+        return React.createElement("div", { style: { cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCoord.x1 - state.edge, top: state.transformedCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
+            input,
+            React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
+                React.createElement("g", null,
+                    React.createElement("rect", { width: state.relCoord.width, height: state.relCoord.height, x: state.edge, y: state.edge, rx: 10, ry: 10, fill: state.fill, stroke: state.stroke, strokeWidth: state.strokeWidth },
+                        React.createElement("title", null, state.tooltip)),
+                    textField)));
+    });
+};
 
 
 /***/ }),
@@ -96137,16 +96136,15 @@ function parseSimpleShape(section) {
         var onclick_1 = eventParser_1.parseClickEvent(section);
         var onmousedown_1 = eventParser_1.parseTapEvent(section, "down");
         var onmouseup_1 = eventParser_1.parseTapEvent(section, "up");
-        var userEvents = eventParser_1.parseUserEvent(section);
         switch (shape) {
             case 'round-rect':
-                return (roundrect_1.RoundRect(simpleShape));
+                return (React.createElement(roundrect_1.Roundrect, { simpleShape: simpleShape, textField: textField, input: inputField, dynamicParameters: dynamicShapeParameters, onclick: onclick_1, onmousedown: onmousedown_1, onmouseup: onmouseup_1 }));
             case 'circle':
                 return (React.createElement(circle_1.Circle, { simpleShape: simpleShape, textField: textField, input: inputField, dynamicParameters: dynamicShapeParameters, onclick: onclick_1, onmousedown: onmousedown_1, onmouseup: onmouseup_1 }));
             case 'line':
-                return (line_1.Line(simpleShape));
+                return (React.createElement(line_1.Line, { simpleShape: simpleShape, textField: textField, input: inputField, dynamicParameters: dynamicShapeParameters, onclick: onclick_1, onmousedown: onmousedown_1, onmouseup: onmouseup_1 }));
             case 'rectangle':
-                return (React.createElement(rectangle_1.Rectangle, { simpleShape: simpleShape, textField: textField, userEvents: userEvents }));
+                return (React.createElement(rectangle_1.Rectangle, { simpleShape: simpleShape, textField: textField, input: inputField, dynamicParameters: dynamicShapeParameters, onclick: onclick_1, onmousedown: onmousedown_1, onmouseup: onmouseup_1 }));
         }
     }
     else {
