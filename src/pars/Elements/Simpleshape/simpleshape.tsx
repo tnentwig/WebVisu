@@ -1,13 +1,13 @@
 import * as React from 'react';
 import * as util from '../../Utils/utilfunctions';
-import { RoundRect } from './Subunits/roundrect'
+import { Roundrect } from './Subunits/roundrect'
 import { Line } from './Subunits/line';
 import { Circle } from './Subunits/circle'
 import { Rectangle } from './Subunits/rectangle';
 import { Textfield } from './Features/textManager';
 import {Inputfield} from './Features/inputManager'
 import { ISimpleShape } from '../../Interfaces/interfaces';
-import { parseDynamicShapeParameters, parseUserEvent, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from './Features/eventParser';
+import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from './Features/eventParser';
 
 export function parseSimpleShape(section : JQuery<XMLDocument>){
     // Check if its on of the allowed shapes like rectangle, round-rectangle, circle or line
@@ -54,14 +54,20 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
         let onmousedown = parseTapEvent(section, "down");
         let onmouseup = parseTapEvent(section, "up");
         
-        let userEvents = parseUserEvent(section);
-        
+     
         
         // Return of the React-Node
         switch (shape){
           case 'round-rect':
             return(
-              RoundRect(simpleShape)
+              <Roundrect
+              simpleShape={simpleShape} 
+              textField={textField}
+              input ={inputField}
+              dynamicParameters={dynamicShapeParameters} 
+              onclick={onclick} 
+              onmousedown={onmousedown} 
+              onmouseup={onmouseup}/>
             )
           case 'circle':
             return(
@@ -76,11 +82,26 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
             )
           case 'line':
             return(
-              Line(simpleShape)
+              <Line 
+                simpleShape={simpleShape} 
+                textField={textField}
+                input ={inputField}
+                dynamicParameters={dynamicShapeParameters} 
+                onclick={onclick} 
+                onmousedown={onmousedown} 
+                onmouseup={onmouseup}></Line>
             )
+            
           case 'rectangle':
             return(
-              <Rectangle simpleShape={simpleShape} textField={textField} userEvents={userEvents} />
+              <Rectangle 
+              simpleShape={simpleShape} 
+              textField={textField}
+              input ={inputField}
+              dynamicParameters={dynamicShapeParameters} 
+              onclick={onclick} 
+              onmousedown={onmousedown} 
+              onmouseup={onmouseup}/>
             )
         }
     }

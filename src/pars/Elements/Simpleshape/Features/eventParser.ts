@@ -74,15 +74,6 @@ export function parseDynamicTextParameters(section : JQuery<XMLDocument>, shape:
     return exprMap;
 }
 
-export function parseUserEvent(section : JQuery<XMLDocument>) : string[] {
-    let varList : string[] = [];
-    // Parse the <expr-toggle-var><expr><var> ... elements => toggle color
-    section.children("expr-toggle-var").children("expr").each(function() {
-       varList.push($(this).children("var").text());
-    })
-    return varList;
-}
-
 export function parseClickEvent(section : JQuery<XMLDocument>) : Function {
     let clickFunction : Function;
      // Parse the <expr-toggle-var><expr><var> ... elements => toggle color

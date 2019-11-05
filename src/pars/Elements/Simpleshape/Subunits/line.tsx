@@ -1,23 +1,49 @@
 import * as React from 'react';
 import { ISimpleShape } from '../../../Interfaces/interfaces';
+import {createVisuObject} from '../Features/objectManager'
+import {useObserver, useLocalStore } from 'mobx-react-lite';
 
-export function Line (simpleShape : ISimpleShape) 
-{
-    // Auxiliary values
-    let relCornerCoord = {x1:0, y1:0, x2:simpleShape.rect[2]-simpleShape.rect[0], y2:simpleShape.rect[3]-simpleShape.rect[1]};
-    let relCenterCoord = {x:simpleShape.center[0]-simpleShape.rect[0], y:simpleShape.center[1]-simpleShape.rect[1]};
-    let edge = 1;
-    
-    return(
-    <div style={{position:"absolute", left:simpleShape.rect[0], top:simpleShape.rect[1], width:relCornerCoord.x2+2*edge, height:relCornerCoord.y2+2*edge}}>
-        <svg width={relCornerCoord.x2+2*edge} height={relCornerCoord.y2+2*edge}>   
-            <line
-                x1={relCornerCoord.x1}
-                y1={relCornerCoord.y2}
-                x2={relCornerCoord.x2}
-                y2={relCornerCoord.y1}
-                stroke={simpleShape.frame_color}
-            />
+type Props = {
+    simpleShape: ISimpleShape,
+    textField : JSX.Element|undefined,
+    input : JSX.Element,
+    dynamicParameters : Map<string, string>,
+    onmousedown : Function,
+    onmouseup : Function,
+    onclick : Function 
+}
+
+export const Line :React.FunctionComponent<Props> = ({simpleShape, textField, input, dynamicParameters, onclick, onmousedown, onmouseup})=>
+{ 
+    // Attach the dynamic paramters like color variable
+    let initial = createVisuObject(simpleShape, dynamicParameters)
+        
+    // Convert object to an observable one
+    const state  = useLocalStore(()=>initial);
+
+    return useObserver(()=>
+    <div style={{cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCoord.x1-state.edge, top:state.transformedCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
+        {input}
+        <svg
+            onClick={()=>onclick()} 
+            onMouseDown={()=>onmousedown()} 
+            onMouseUp={()=>onmouseup()}
+            onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
+            width={state.relCoord.width} 
+            height={state.relCoord.height}>
+            <g>
+                <line
+                    x2={0}
+                    y1={0}
+                    x1={state.relCoord.width}
+                    y2={state.relCoord.height}
+                    stroke={state.stroke}
+                    strokeWidth={state.strokeWidth}
+                    strokeDasharray={state.strokeDashArray}>
+                    <title>{state.tooltip}</title>
+                    </line>
+                {textField}
+            </g>
         </svg>
     </div>
     )
