@@ -95333,20 +95333,60 @@ exports.parseTapEvent = parseTapEvent;
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 var core_1 = __webpack_require__(/*! @material-ui/core */ "./node_modules/@material-ui/core/esm/index.js");
+var comsocket_1 = __webpack_require__(/*! ../../../../com/comsocket */ "./src/com/comsocket.ts");
 exports.Inputfield = function (_a) {
     var section = _a.section;
     var _b = React.useState(false), open = _b[0], setOpen = _b[1];
-    var _c = React.useState("visible"), visible = _c[0], setVis = _c[1];
-    var handleClick = function () {
-        setOpen(function (prev) { return !prev; });
-        setVis("none");
-    };
-    var handleClickAway = function () {
-        setOpen(false);
-        setVis("visible");
-    };
-    return (React.createElement(core_1.ClickAwayListener, { onClickAway: function () { return handleClickAway(); } },
-        React.createElement("div", { style: { position: "absolute", width: "100%", height: "100%", pointerEvents: visible }, onClick: function () { return handleClick(); } }, open ? React.createElement("input", { type: "text", style: { position: "absolute", width: "100%" } }) : null)));
+    var _c = React.useState(""), value = _c[0], setValue = _c[1];
+    var handleClick;
+    var handleClickOutside;
+    var handleEnter;
+    var type = "text";
+    var minvalue = "none";
+    var maxvalue = "none";
+    if (section.children("text-input-type").text().length) {
+        if (section.children("text-input-type").text() === "1") {
+            type = "number";
+            if (section.children("text-input-min-expr").text().length) {
+                minvalue = section.children("text-input-min-expr").children("expr").children("const").text();
+            }
+            if (section.children("text-input-max-expr").text().length) {
+                minvalue = section.children("text-input-max-expr").children("expr").children("const").text();
+            }
+        }
+    }
+    if (section.children("text-display").text().length) {
+        var expr = section.children("text-display").children("expr");
+        if (expr.children("var").text().length) {
+            var varName_1 = expr.children("var").text();
+            handleClickOutside = function () {
+                setOpen(false);
+            };
+            handleClick = function () {
+                setOpen(true);
+            };
+            handleEnter = function (event) {
+                if (event.keyCode == 13) {
+                    setOpen(false);
+                    comsocket_1.default.singleton().setValue(varName_1, value);
+                }
+                ;
+            };
+        }
+        else if (expr.children("const").text().length) {
+            handleClickOutside = function () { ; };
+            handleClick = function () { ; };
+            handleEnter = function () { ; };
+        }
+        else {
+            console.log("Placeholder for input isn't supported yet!");
+            handleClickOutside = function () { ; };
+            handleClick = function () { ; };
+            handleEnter = function () { ; };
+        }
+    }
+    return (React.createElement(core_1.ClickAwayListener, { onClickAway: function () { return handleClickOutside(); } },
+        React.createElement("div", { style: { position: "absolute", width: "100%", height: "100%", pointerEvents: "auto" }, onClick: function () { return handleClick(); }, onKeyDown: function () { return handleEnter(event); } }, open ? React.createElement("input", { type: type, max: maxvalue, min: minvalue, value: value, onChange: function (event) { return setValue(event.currentTarget.value); }, style: { position: "absolute", width: "100%" } }) : null)));
 };
 
 
