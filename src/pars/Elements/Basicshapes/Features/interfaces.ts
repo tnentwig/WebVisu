@@ -28,5 +28,6 @@ export interface IVisuObject{
     alarm : boolean,
     fill : string,
     stroke : string,
-    strokeDashArray : string
+    strokeDashArray : string,
+    points : number[][]
 }

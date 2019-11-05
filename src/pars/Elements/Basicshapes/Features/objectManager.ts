@@ -1,9 +1,9 @@
 import ComSocket from '../../../../com/comsocket';
 import {IVisuObject} from './interfaces'
 import {numberToHexColor} from '../../../Utils/utilfunctions'
-import {ISimpleShape} from '../../../Interfaces/interfaces'
+import {IBasicShape} from '../../../Interfaces/interfaces'
 
-export function createVisuObject(simpleShape: ISimpleShape, dynamicElements : Map<string,string>) : IVisuObject{
+export function createVisuObject(simpleShape: IBasicShape, dynamicElements : Map<string,string>) : IVisuObject{
 
     // absCornerCoord are the absolute coordinates of the <div> element in relation to the origin in the top left 
     let absCornerCoord = {x1:simpleShape.rect[0],y1:simpleShape.rect[1],x2:simpleShape.rect[2],y2:simpleShape.rect[3]};
@@ -56,7 +56,8 @@ export function createVisuObject(simpleShape: ISimpleShape, dynamicElements : Ma
         strokeDashArray : "0",
         display : "visible" as any,
         alarm : false,
-        tooltip : tooltip
+        tooltip : tooltip,
+        points :simpleShape.points
     }
 
 

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { stringToBoolean, rgbToHexString, stringToArray } from '../Utils/utilfunctions';
+import { stringToBoolean, rgbToHexString, stringToArray } from '../../Utils/utilfunctions';
 
 export function parseButton (section : JQuery<XMLDocument>) {
     // Parsing of the fixed parameters

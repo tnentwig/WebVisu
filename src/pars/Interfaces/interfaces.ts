@@ -1,5 +1,5 @@
 
-export interface ISimpleShape {
+export interface IBasicShape {
     has_inside_color : boolean;
     fill_color : string;
     fill_color_alarm : string;
@@ -12,7 +12,8 @@ export interface ISimpleShape {
     center : number[];
     hidden_input : boolean;
     enable_text_input : boolean;
-    tooltip : string
+    tooltip : string;
+    points : number[][]
 }
 
 export interface IComSocket {

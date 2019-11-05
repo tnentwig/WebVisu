@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { ISimpleShape } from '../../../Interfaces/interfaces';
+import { IBasicShape } from '../../../Interfaces/interfaces';
 import {createVisuObject} from '../Features/objectManager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 
 type Props = {
-    simpleShape: ISimpleShape,
+    simpleShape: IBasicShape,
     textField : JSX.Element|undefined,
     input : JSX.Element,
     dynamicParameters : Map<string, string>,

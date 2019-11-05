@@ -94994,191 +94994,9 @@ objHTML5Visu.createVisu("/plc_visu.xml");
 
 /***/ }),
 
-/***/ "./src/pars/Elements/Scrollbar/eventParser.ts":
-/*!****************************************************!*\
-  !*** ./src/pars/Elements/Scrollbar/eventParser.ts ***!
-  \****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
-var comsocket_1 = __webpack_require__(/*! ../../../com/comsocket */ "./src/com/comsocket.ts");
-function parseScrollbarParameters(section) {
-    var exprMap = new Map();
-    var tags = [];
-    tags.push("expr-lower-bound");
-    tags.push("expr-upper-bound");
-    tags.push("expr-invisible");
-    tags.push("expr-tooltip-display");
-    tags.push("expr-tap-var");
-    tags.forEach(function (entry) {
-        section.children(entry).children("expr").each(function () {
-            if ($(this).children("var").text().length) {
-                var varName = $(this).children("var").text();
-                if (comsocket_1.default.singleton().oVisuVariables.has(varName)) {
-                    exprMap.set(entry, { type: "var", value: varName });
-                }
-            }
-            else if ($(this).children("const").text().length) {
-                var constValue = $(this).children("const").text();
-                exprMap.set(entry, { type: "const", value: constValue });
-            }
-            else if ($(this).children("placeholder").text().length) {
-                var placeholderName = $(this).children("placeholder").text();
-                console.log("A placeholder variable: " + placeholderName + " for <" + entry + "> was found.");
-            }
-        });
-    });
-    return exprMap;
-}
-exports.parseScrollbarParameters = parseScrollbarParameters;
-function updateScrollvalue(section) {
-    var update;
-    section.children("expr-tap-var").children("expr").each(function () {
-        var varName = $(this).children("var").text();
-        var com = comsocket_1.default.singleton();
-        if (com.oVisuVariables.has(varName)) {
-            update = function (setValue) {
-                com.setValue(varName, setValue);
-            };
-        }
-        else {
-            var placeholderName = $(this).children("placeholder").text();
-        }
-    });
-    return update;
-}
-exports.updateScrollvalue = updateScrollvalue;
-
-
-/***/ }),
-
-/***/ "./src/pars/Elements/Scrollbar/scrollbar.tsx":
-/*!***************************************************!*\
-  !*** ./src/pars/Elements/Scrollbar/scrollbar.tsx ***!
-  \***************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
-var Slider_1 = __webpack_require__(/*! @material-ui/core/Slider */ "./node_modules/@material-ui/core/esm/Slider/index.js");
-var utilfunctions_1 = __webpack_require__(/*! ../../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
-var eventParser_1 = __webpack_require__(/*! ../Scrollbar/eventParser */ "./src/pars/Elements/Scrollbar/eventParser.ts");
-var comsocket_1 = __webpack_require__(/*! ../../../com/comsocket */ "./src/com/comsocket.ts");
-exports.Scrollbar = function (_a) {
-    var section = _a.section;
-    var rect = utilfunctions_1.stringToArray(section.children("rect").text());
-    var tooltip = (section.children("tooltip").text()).length > 0 ? section.children("tooltip").text() : "";
-    var relCornerCoord = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
-    var orientation = ((relCornerCoord.x2 > relCornerCoord.y2) ? "horizontal" : "vertical");
-    var initial = {
-        tooltip: tooltip,
-        lowerBound: 0,
-        upperBound: 0,
-        startValue: 20,
-        value: 0,
-        display: "visible"
-    };
-    var dynamicElements = eventParser_1.parseScrollbarParameters(section);
-    var updateFunction = eventParser_1.updateScrollvalue(section);
-    if (dynamicElements.has("expr-lower-bound")) {
-        var element_1 = dynamicElements.get("expr-lower-bound");
-        if (element_1.type === "var") {
-            Object.defineProperty(initial, "lowerBound", {
-                get: function () {
-                    return Number(comsocket_1.default.singleton().oVisuVariables.get(element_1.value).value);
-                }
-            });
-        }
-        else if (element_1.type === "const") {
-            initial.lowerBound = Number(element_1.value);
-        }
-    }
-    if (dynamicElements.has("expr-upper-bound")) {
-        var element_2 = dynamicElements.get("expr-upper-bound");
-        if (element_2.type === "var") {
-            Object.defineProperty(initial, "upperBound", {
-                get: function () {
-                    return Number(comsocket_1.default.singleton().oVisuVariables.get(element_2.value).value);
-                }
-            });
-        }
-        else if (element_2.type === "const") {
-            initial.upperBound = Number(element_2.value);
-        }
-    }
-    if (dynamicElements.has("expr-invisible")) {
-        var element_3 = dynamicElements.get("expr-invisible");
-        if (element_3.type === "var") {
-            Object.defineProperty(initial, "display", {
-                get: function () {
-                    var value = comsocket_1.default.singleton().oVisuVariables.get(element_3.value).value;
-                    if (value == "0") {
-                        return "visible";
-                    }
-                    else {
-                        return "none";
-                    }
-                }
-            });
-        }
-        else if (element_3.type === "const") {
-            var value = void 0;
-            if (element_3.value === "0") {
-                value = "visible";
-            }
-            else {
-                value = "none";
-            }
-            initial.display = value;
-        }
-    }
-    if (dynamicElements.has("expr-tooltip-display")) {
-        var element_4 = dynamicElements.get("expr-tooltip-display");
-        if (element_4.type === "var") {
-            Object.defineProperty(initial, "tooltip", {
-                get: function () {
-                    return comsocket_1.default.singleton().oVisuVariables.get(element_4.value).value;
-                }
-            });
-        }
-    }
-    if (dynamicElements.has("expr-tap-var")) {
-        var element_5 = dynamicElements.get("expr-tap-var");
-        if (element_5.type === "const") {
-            initial.value = Number(element_5.value);
-        }
-        else if (element_5.type === "var") {
-            Object.defineProperty(initial, "value", {
-                get: function () {
-                    return Number(comsocket_1.default.singleton().oVisuVariables.get(element_5.value).value);
-                }
-            });
-        }
-    }
-    var handleSliderChange = function (event, newValue) {
-        updateFunction(newValue);
-    };
-    var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
-    return mobx_react_lite_1.useObserver(function () {
-        return React.createElement("div", { title: state.tooltip, style: { position: "absolute", left: rect[0], top: rect[1], width: relCornerCoord.x2, height: relCornerCoord.y2 } },
-            React.createElement(Slider_1.default, { orientation: orientation, min: state.lowerBound, max: state.upperBound, step: 1, value: state.value, onChange: handleSliderChange }));
-    });
-};
-
-
-/***/ }),
-
-/***/ "./src/pars/Elements/Simpleshape/Features/eventParser.ts":
+/***/ "./src/pars/Elements/Basicshapes/Features/eventParser.ts":
 /*!***************************************************************!*\
-  !*** ./src/pars/Elements/Simpleshape/Features/eventParser.ts ***!
+  !*** ./src/pars/Elements/Basicshapes/Features/eventParser.ts ***!
   \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -95313,9 +95131,9 @@ exports.parseTapEvent = parseTapEvent;
 
 /***/ }),
 
-/***/ "./src/pars/Elements/Simpleshape/Features/inputManager.tsx":
+/***/ "./src/pars/Elements/Basicshapes/Features/inputManager.tsx":
 /*!*****************************************************************!*\
-  !*** ./src/pars/Elements/Simpleshape/Features/inputManager.tsx ***!
+  !*** ./src/pars/Elements/Basicshapes/Features/inputManager.tsx ***!
   \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -95384,9 +95202,9 @@ exports.Inputfield = function (_a) {
 
 /***/ }),
 
-/***/ "./src/pars/Elements/Simpleshape/Features/objectManager.ts":
+/***/ "./src/pars/Elements/Basicshapes/Features/objectManager.ts":
 /*!*****************************************************************!*\
-  !*** ./src/pars/Elements/Simpleshape/Features/objectManager.ts ***!
+  !*** ./src/pars/Elements/Basicshapes/Features/objectManager.ts ***!
   \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -95434,7 +95252,8 @@ function createVisuObject(simpleShape, dynamicElements) {
         strokeDashArray: "0",
         display: "visible",
         alarm: false,
-        tooltip: tooltip
+        tooltip: tooltip,
+        points: simpleShape.points
     };
     if (dynamicElements.has("expr-toggle-color")) {
         var element_1 = dynamicElements.get("expr-toggle-color");
@@ -95735,9 +95554,9 @@ exports.createVisuObject = createVisuObject;
 
 /***/ }),
 
-/***/ "./src/pars/Elements/Simpleshape/Features/textManager.tsx":
+/***/ "./src/pars/Elements/Basicshapes/Features/textManager.tsx":
 /*!****************************************************************!*\
-  !*** ./src/pars/Elements/Simpleshape/Features/textManager.tsx ***!
+  !*** ./src/pars/Elements/Basicshapes/Features/textManager.tsx ***!
   \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -95959,10 +95778,10 @@ exports.Textfield = function (_a) {
 
 /***/ }),
 
-/***/ "./src/pars/Elements/Simpleshape/Subunits/circle.tsx":
-/*!***********************************************************!*\
-  !*** ./src/pars/Elements/Simpleshape/Subunits/circle.tsx ***!
-  \***********************************************************/
+/***/ "./src/pars/Elements/Basicshapes/PolySubunits/bezier.tsx":
+/*!***************************************************************!*\
+  !*** ./src/pars/Elements/Basicshapes/PolySubunits/bezier.tsx ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -95970,7 +95789,103 @@ exports.Textfield = function (_a) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Simpleshape/Features/objectManager.ts");
+var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Basicshapes/Features/objectManager.ts");
+var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
+var utilfunctions_1 = __webpack_require__(/*! ../../../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
+exports.Bezier = function (_a) {
+    var polyShape = _a.polyShape, textField = _a.textField, input = _a.input, dynamicParameters = _a.dynamicParameters, onclick = _a.onclick, onmousedown = _a.onmousedown, onmouseup = _a.onmouseup;
+    var initial = objectManager_1.createVisuObject(polyShape, dynamicParameters);
+    var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
+    return mobx_react_lite_1.useObserver(function () {
+        return React.createElement("div", { style: { cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.absCornerCoord.x1 - state.edge, top: state.absCornerCoord.y1 - state.edge, width: state.absCornerCoord.x2 - state.absCornerCoord.x1 + state.edge, height: state.absCornerCoord.y1 - state.absCornerCoord.y2 + state.edge } },
+            input,
+            React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.absCornerCoord.x2 - state.absCornerCoord.x1 + 2 * state.edge, height: state.absCornerCoord.y2 - state.absCornerCoord.y1 + 2 * state.edge, strokeDasharray: state.strokeDashArray },
+                React.createElement("g", null,
+                    React.createElement("path", { d: utilfunctions_1.coordArrayToBezierString(state.points, state.absCornerCoord.x1, state.absCornerCoord.y1), fill: state.fill, strokeWidth: state.strokeWidth, stroke: state.stroke }),
+                    React.createElement("title", null, state.tooltip),
+                    textField)));
+    });
+};
+
+
+/***/ }),
+
+/***/ "./src/pars/Elements/Basicshapes/PolySubunits/polygon.tsx":
+/*!****************************************************************!*\
+  !*** ./src/pars/Elements/Basicshapes/PolySubunits/polygon.tsx ***!
+  \****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Basicshapes/Features/objectManager.ts");
+var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
+var utilfunctions_1 = __webpack_require__(/*! ../../../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
+exports.Polygon = function (_a) {
+    var polyShape = _a.polyShape, textField = _a.textField, input = _a.input, dynamicParameters = _a.dynamicParameters, onclick = _a.onclick, onmousedown = _a.onmousedown, onmouseup = _a.onmouseup;
+    var initial = objectManager_1.createVisuObject(polyShape, dynamicParameters);
+    var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
+    return mobx_react_lite_1.useObserver(function () {
+        return React.createElement("div", { style: { cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCoord.x1 - state.edge, top: state.transformedCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
+            input,
+            React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
+                React.createElement("g", null,
+                    React.createElement("polygon", { points: utilfunctions_1.coordArrayToString(state.points, state.relCoord.width - state.edge, state.relCoord.height - state.edge), fill: state.fill, strokeWidth: state.strokeWidth, stroke: state.stroke }),
+                    React.createElement("title", null, state.tooltip),
+                    textField)));
+    });
+};
+
+
+/***/ }),
+
+/***/ "./src/pars/Elements/Basicshapes/PolySubunits/polyline.tsx":
+/*!*****************************************************************!*\
+  !*** ./src/pars/Elements/Basicshapes/PolySubunits/polyline.tsx ***!
+  \*****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Basicshapes/Features/objectManager.ts");
+var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
+var utilfunctions_1 = __webpack_require__(/*! ../../../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
+exports.Polyline = function (_a) {
+    var polyShape = _a.polyShape, textField = _a.textField, input = _a.input, dynamicParameters = _a.dynamicParameters, onclick = _a.onclick, onmousedown = _a.onmousedown, onmouseup = _a.onmouseup;
+    var initial = objectManager_1.createVisuObject(polyShape, dynamicParameters);
+    var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
+    return mobx_react_lite_1.useObserver(function () {
+        return React.createElement("div", { style: { cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.absCornerCoord.x1 - state.edge, top: state.absCornerCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
+            input,
+            React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
+                React.createElement("g", null,
+                    React.createElement("polyline", { points: utilfunctions_1.coordArrayToString(state.points, state.transformedCoord.x2 - state.edge, state.transformedCoord.y2 - state.edge), fill: state.fill, strokeWidth: state.strokeWidth, stroke: state.stroke }),
+                    React.createElement("title", null, state.tooltip),
+                    textField)));
+    });
+};
+
+
+/***/ }),
+
+/***/ "./src/pars/Elements/Basicshapes/SimpleSubunits/circle.tsx":
+/*!*****************************************************************!*\
+  !*** ./src/pars/Elements/Basicshapes/SimpleSubunits/circle.tsx ***!
+  \*****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Basicshapes/Features/objectManager.ts");
 var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
 exports.Circle = function (_a) {
     var simpleShape = _a.simpleShape, textField = _a.textField, input = _a.input, dynamicParameters = _a.dynamicParameters, onclick = _a.onclick, onmousedown = _a.onmousedown, onmouseup = _a.onmouseup;
@@ -95990,10 +95905,10 @@ exports.Circle = function (_a) {
 
 /***/ }),
 
-/***/ "./src/pars/Elements/Simpleshape/Subunits/line.tsx":
-/*!*********************************************************!*\
-  !*** ./src/pars/Elements/Simpleshape/Subunits/line.tsx ***!
-  \*********************************************************/
+/***/ "./src/pars/Elements/Basicshapes/SimpleSubunits/line.tsx":
+/*!***************************************************************!*\
+  !*** ./src/pars/Elements/Basicshapes/SimpleSubunits/line.tsx ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -96001,7 +95916,7 @@ exports.Circle = function (_a) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Simpleshape/Features/objectManager.ts");
+var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Basicshapes/Features/objectManager.ts");
 var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
 exports.Line = function (_a) {
     var simpleShape = _a.simpleShape, textField = _a.textField, input = _a.input, dynamicParameters = _a.dynamicParameters, onclick = _a.onclick, onmousedown = _a.onmousedown, onmouseup = _a.onmouseup;
@@ -96021,10 +95936,10 @@ exports.Line = function (_a) {
 
 /***/ }),
 
-/***/ "./src/pars/Elements/Simpleshape/Subunits/rectangle.tsx":
-/*!**************************************************************!*\
-  !*** ./src/pars/Elements/Simpleshape/Subunits/rectangle.tsx ***!
-  \**************************************************************/
+/***/ "./src/pars/Elements/Basicshapes/SimpleSubunits/rectangle.tsx":
+/*!********************************************************************!*\
+  !*** ./src/pars/Elements/Basicshapes/SimpleSubunits/rectangle.tsx ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -96032,7 +95947,7 @@ exports.Line = function (_a) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Simpleshape/Features/objectManager.ts");
+var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Basicshapes/Features/objectManager.ts");
 var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
 exports.Rectangle = function (_a) {
     var simpleShape = _a.simpleShape, textField = _a.textField, input = _a.input, dynamicParameters = _a.dynamicParameters, onclick = _a.onclick, onmousedown = _a.onmousedown, onmouseup = _a.onmouseup;
@@ -96052,10 +95967,10 @@ exports.Rectangle = function (_a) {
 
 /***/ }),
 
-/***/ "./src/pars/Elements/Simpleshape/Subunits/roundrect.tsx":
-/*!**************************************************************!*\
-  !*** ./src/pars/Elements/Simpleshape/Subunits/roundrect.tsx ***!
-  \**************************************************************/
+/***/ "./src/pars/Elements/Basicshapes/SimpleSubunits/roundrect.tsx":
+/*!********************************************************************!*\
+  !*** ./src/pars/Elements/Basicshapes/SimpleSubunits/roundrect.tsx ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -96063,7 +95978,7 @@ exports.Rectangle = function (_a) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Simpleshape/Features/objectManager.ts");
+var objectManager_1 = __webpack_require__(/*! ../Features/objectManager */ "./src/pars/Elements/Basicshapes/Features/objectManager.ts");
 var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
 exports.Roundrect = function (_a) {
     var simpleShape = _a.simpleShape, textField = _a.textField, input = _a.input, dynamicParameters = _a.dynamicParameters, onclick = _a.onclick, onmousedown = _a.onmousedown, onmouseup = _a.onmouseup;
@@ -96083,9 +95998,86 @@ exports.Roundrect = function (_a) {
 
 /***/ }),
 
-/***/ "./src/pars/Elements/Simpleshape/simpleshape.tsx":
+/***/ "./src/pars/Elements/Basicshapes/polyshape.tsx":
+/*!*****************************************************!*\
+  !*** ./src/pars/Elements/Basicshapes/polyshape.tsx ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+var util = __webpack_require__(/*! ../../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
+var bezier_1 = __webpack_require__(/*! ./PolySubunits/bezier */ "./src/pars/Elements/Basicshapes/PolySubunits/bezier.tsx");
+var polygon_1 = __webpack_require__(/*! ./PolySubunits/polygon */ "./src/pars/Elements/Basicshapes/PolySubunits/polygon.tsx");
+var polyline_1 = __webpack_require__(/*! ./PolySubunits/polyline */ "./src/pars/Elements/Basicshapes/PolySubunits/polyline.tsx");
+var textManager_1 = __webpack_require__(/*! ./Features/textManager */ "./src/pars/Elements/Basicshapes/Features/textManager.tsx");
+var inputManager_1 = __webpack_require__(/*! ./Features/inputManager */ "./src/pars/Elements/Basicshapes/Features/inputManager.tsx");
+var eventParser_1 = __webpack_require__(/*! ./Features/eventParser */ "./src/pars/Elements/Basicshapes/Features/eventParser.ts");
+function parsePolygon(section) {
+    var shape = section.children('poly-shape').text();
+    if (['polygon', 'bezier', 'polyline'].includes(shape)) {
+        var polyShape_1 = {
+            has_inside_color: util.stringToBoolean(section.children("has-inside-color").text()),
+            fill_color: util.rgbToHexString(section.children("fill-color").text()),
+            fill_color_alarm: util.rgbToHexString(section.children("fill-color-alarm").text()),
+            has_frame_color: util.stringToBoolean(section.children("has-frame-color").text()),
+            frame_color: util.rgbToHexString(section.children("frame-color").text()),
+            frame_color_alarm: util.rgbToHexString(section.children("frame-color-alarm").text()),
+            line_width: Number(section.children("line-width").text()),
+            elem_id: Number(section.children("elem-id").text()),
+            rect: [],
+            center: util.stringToArray(section.children("center").text()),
+            hidden_input: util.stringToBoolean(section.children("hidden-input").text()),
+            enable_text_input: util.stringToBoolean(section.children("enable-text-input").text()),
+            tooltip: (section.children("tooltip").text()).length > 0 ? section.children("tooltip").text() : "",
+            points: []
+        };
+        section.children('point').each(function () {
+            polyShape_1.points.push(util.stringToArray($(this).text()));
+        });
+        polyShape_1.rect = util.computeMinMaxCoord(polyShape_1.points);
+        console.log(polyShape_1.rect);
+        var dynamicTextParameters = eventParser_1.parseDynamicTextParameters(section, shape);
+        var textField = void 0;
+        if (section.find("text-id").text().length) {
+            textField = React.createElement(textManager_1.Textfield, { section: section, dynamicParameters: dynamicTextParameters });
+        }
+        else {
+            textField = null;
+        }
+        var inputField = void 0;
+        if (section.find("enable-text-input").text() === "true") {
+            inputField = React.createElement(inputManager_1.Inputfield, { section: section });
+        }
+        var dynamicShapeParameters = eventParser_1.parseDynamicShapeParameters(section, shape);
+        var onclick_1 = eventParser_1.parseClickEvent(section);
+        var onmousedown_1 = eventParser_1.parseTapEvent(section, "down");
+        var onmouseup_1 = eventParser_1.parseTapEvent(section, "up");
+        switch (shape) {
+            case 'polygon':
+                return (React.createElement(polygon_1.Polygon, { polyShape: polyShape_1, textField: textField, input: inputField, dynamicParameters: dynamicShapeParameters, onclick: onclick_1, onmousedown: onmousedown_1, onmouseup: onmouseup_1 }));
+            case 'bezier':
+                return (React.createElement(bezier_1.Bezier, { polyShape: polyShape_1, textField: textField, input: inputField, dynamicParameters: dynamicShapeParameters, onclick: onclick_1, onmousedown: onmousedown_1, onmouseup: onmouseup_1 }));
+            case 'polyline':
+                return (React.createElement(polyline_1.Polyline, { polyShape: polyShape_1, textField: textField, input: inputField, dynamicParameters: dynamicShapeParameters, onclick: onclick_1, onmousedown: onmousedown_1, onmouseup: onmouseup_1 }));
+        }
+    }
+    else {
+        (function () { return console.error("Poly-Shape: <" + shape + "> is not supported!"); });
+    }
+}
+exports.parsePolygon = parsePolygon;
+
+
+/***/ }),
+
+/***/ "./src/pars/Elements/Basicshapes/simpleshape.tsx":
 /*!*******************************************************!*\
-  !*** ./src/pars/Elements/Simpleshape/simpleshape.tsx ***!
+  !*** ./src/pars/Elements/Basicshapes/simpleshape.tsx ***!
   \*******************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -96095,13 +96087,13 @@ exports.Roundrect = function (_a) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 var util = __webpack_require__(/*! ../../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
-var roundrect_1 = __webpack_require__(/*! ./Subunits/roundrect */ "./src/pars/Elements/Simpleshape/Subunits/roundrect.tsx");
-var line_1 = __webpack_require__(/*! ./Subunits/line */ "./src/pars/Elements/Simpleshape/Subunits/line.tsx");
-var circle_1 = __webpack_require__(/*! ./Subunits/circle */ "./src/pars/Elements/Simpleshape/Subunits/circle.tsx");
-var rectangle_1 = __webpack_require__(/*! ./Subunits/rectangle */ "./src/pars/Elements/Simpleshape/Subunits/rectangle.tsx");
-var textManager_1 = __webpack_require__(/*! ./Features/textManager */ "./src/pars/Elements/Simpleshape/Features/textManager.tsx");
-var inputManager_1 = __webpack_require__(/*! ./Features/inputManager */ "./src/pars/Elements/Simpleshape/Features/inputManager.tsx");
-var eventParser_1 = __webpack_require__(/*! ./Features/eventParser */ "./src/pars/Elements/Simpleshape/Features/eventParser.ts");
+var roundrect_1 = __webpack_require__(/*! ./SimpleSubunits/roundrect */ "./src/pars/Elements/Basicshapes/SimpleSubunits/roundrect.tsx");
+var line_1 = __webpack_require__(/*! ./SimpleSubunits/line */ "./src/pars/Elements/Basicshapes/SimpleSubunits/line.tsx");
+var circle_1 = __webpack_require__(/*! ./SimpleSubunits/circle */ "./src/pars/Elements/Basicshapes/SimpleSubunits/circle.tsx");
+var rectangle_1 = __webpack_require__(/*! ./SimpleSubunits/rectangle */ "./src/pars/Elements/Basicshapes/SimpleSubunits/rectangle.tsx");
+var textManager_1 = __webpack_require__(/*! ./Features/textManager */ "./src/pars/Elements/Basicshapes/Features/textManager.tsx");
+var inputManager_1 = __webpack_require__(/*! ./Features/inputManager */ "./src/pars/Elements/Basicshapes/Features/inputManager.tsx");
+var eventParser_1 = __webpack_require__(/*! ./Features/eventParser */ "./src/pars/Elements/Basicshapes/Features/eventParser.ts");
 function parseSimpleShape(section) {
     var shape = section.children("simple-shape").text();
     if (['round-rect', 'circle', 'line', 'rectangle'].includes(shape)) {
@@ -96118,7 +96110,8 @@ function parseSimpleShape(section) {
             center: util.stringToArray(section.children("center").text()),
             hidden_input: util.stringToBoolean(section.children("hidden-input").text()),
             enable_text_input: util.stringToBoolean(section.children("enable-text-input").text()),
-            tooltip: (section.children("tooltip").text()).length > 0 ? section.children("tooltip").text() : ""
+            tooltip: (section.children("tooltip").text()).length > 0 ? section.children("tooltip").text() : "",
+            points: []
         };
         var dynamicTextParameters = eventParser_1.parseDynamicTextParameters(section, shape);
         var textField = void 0;
@@ -96152,6 +96145,222 @@ function parseSimpleShape(section) {
     }
 }
 exports.parseSimpleShape = parseSimpleShape;
+
+
+/***/ }),
+
+/***/ "./src/pars/Elements/Button/button.tsx":
+/*!*********************************************!*\
+  !*** ./src/pars/Elements/Button/button.tsx ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+var utilfunctions_1 = __webpack_require__(/*! ../../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
+function parseButton(section) {
+    var has_inside_color = utilfunctions_1.stringToBoolean(section.children("has-inside-color").text());
+    var fill_color = utilfunctions_1.rgbToHexString(section.children("fill-color").text());
+    var fill_color_alarm = utilfunctions_1.rgbToHexString(section.children("fill-color-alarm").text());
+    var has_frame_color = utilfunctions_1.stringToBoolean(section.children("has-frame-color").text());
+    var frame_color = utilfunctions_1.rgbToHexString(section.children("frame-color").text());
+    var frame_color_alarm = utilfunctions_1.rgbToHexString(section.children("frame-color-alarm").text());
+    var rect = utilfunctions_1.stringToArray(section.children("rect").text());
+    var center = utilfunctions_1.stringToArray(section.children("center").text());
+    var hidden_input = utilfunctions_1.stringToBoolean(section.children("hidden-input").text());
+    var enable_text_input = utilfunctions_1.stringToBoolean(section.children("enable-text-input").text());
+    var relCornerCoord = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
+    var relCenterCoord = { x: center[0] - rect[0], y: center[1] - rect[1] };
+    var edge = 1;
+    return (React.createElement("div", { style: { position: "absolute", left: rect[0], top: rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
+        React.createElement("button", { style: { backgroundColor: fill_color, width: relCornerCoord.x2, height: relCornerCoord.y2 } })));
+}
+exports.parseButton = parseButton;
+
+
+/***/ }),
+
+/***/ "./src/pars/Elements/Scrollbar/eventParser.ts":
+/*!****************************************************!*\
+  !*** ./src/pars/Elements/Scrollbar/eventParser.ts ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+var comsocket_1 = __webpack_require__(/*! ../../../com/comsocket */ "./src/com/comsocket.ts");
+function parseScrollbarParameters(section) {
+    var exprMap = new Map();
+    var tags = [];
+    tags.push("expr-lower-bound");
+    tags.push("expr-upper-bound");
+    tags.push("expr-invisible");
+    tags.push("expr-tooltip-display");
+    tags.push("expr-tap-var");
+    tags.forEach(function (entry) {
+        section.children(entry).children("expr").each(function () {
+            if ($(this).children("var").text().length) {
+                var varName = $(this).children("var").text();
+                if (comsocket_1.default.singleton().oVisuVariables.has(varName)) {
+                    exprMap.set(entry, { type: "var", value: varName });
+                }
+            }
+            else if ($(this).children("const").text().length) {
+                var constValue = $(this).children("const").text();
+                exprMap.set(entry, { type: "const", value: constValue });
+            }
+            else if ($(this).children("placeholder").text().length) {
+                var placeholderName = $(this).children("placeholder").text();
+                console.log("A placeholder variable: " + placeholderName + " for <" + entry + "> was found.");
+            }
+        });
+    });
+    return exprMap;
+}
+exports.parseScrollbarParameters = parseScrollbarParameters;
+function updateScrollvalue(section) {
+    var update;
+    section.children("expr-tap-var").children("expr").each(function () {
+        var varName = $(this).children("var").text();
+        var com = comsocket_1.default.singleton();
+        if (com.oVisuVariables.has(varName)) {
+            update = function (setValue) {
+                com.setValue(varName, setValue);
+            };
+        }
+        else {
+            var placeholderName = $(this).children("placeholder").text();
+        }
+    });
+    return update;
+}
+exports.updateScrollvalue = updateScrollvalue;
+
+
+/***/ }),
+
+/***/ "./src/pars/Elements/Scrollbar/scrollbar.tsx":
+/*!***************************************************!*\
+  !*** ./src/pars/Elements/Scrollbar/scrollbar.tsx ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+var mobx_react_lite_1 = __webpack_require__(/*! mobx-react-lite */ "./node_modules/mobx-react-lite/dist/index.module.js");
+var Slider_1 = __webpack_require__(/*! @material-ui/core/Slider */ "./node_modules/@material-ui/core/esm/Slider/index.js");
+var utilfunctions_1 = __webpack_require__(/*! ../../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
+var eventParser_1 = __webpack_require__(/*! ../Scrollbar/eventParser */ "./src/pars/Elements/Scrollbar/eventParser.ts");
+var comsocket_1 = __webpack_require__(/*! ../../../com/comsocket */ "./src/com/comsocket.ts");
+exports.Scrollbar = function (_a) {
+    var section = _a.section;
+    var rect = utilfunctions_1.stringToArray(section.children("rect").text());
+    var tooltip = (section.children("tooltip").text()).length > 0 ? section.children("tooltip").text() : "";
+    var relCornerCoord = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
+    var orientation = ((relCornerCoord.x2 > relCornerCoord.y2) ? "horizontal" : "vertical");
+    var initial = {
+        tooltip: tooltip,
+        lowerBound: 0,
+        upperBound: 0,
+        startValue: 20,
+        value: 0,
+        display: "visible"
+    };
+    var dynamicElements = eventParser_1.parseScrollbarParameters(section);
+    var updateFunction = eventParser_1.updateScrollvalue(section);
+    if (dynamicElements.has("expr-lower-bound")) {
+        var element_1 = dynamicElements.get("expr-lower-bound");
+        if (element_1.type === "var") {
+            Object.defineProperty(initial, "lowerBound", {
+                get: function () {
+                    return Number(comsocket_1.default.singleton().oVisuVariables.get(element_1.value).value);
+                }
+            });
+        }
+        else if (element_1.type === "const") {
+            initial.lowerBound = Number(element_1.value);
+        }
+    }
+    if (dynamicElements.has("expr-upper-bound")) {
+        var element_2 = dynamicElements.get("expr-upper-bound");
+        if (element_2.type === "var") {
+            Object.defineProperty(initial, "upperBound", {
+                get: function () {
+                    return Number(comsocket_1.default.singleton().oVisuVariables.get(element_2.value).value);
+                }
+            });
+        }
+        else if (element_2.type === "const") {
+            initial.upperBound = Number(element_2.value);
+        }
+    }
+    if (dynamicElements.has("expr-invisible")) {
+        var element_3 = dynamicElements.get("expr-invisible");
+        if (element_3.type === "var") {
+            Object.defineProperty(initial, "display", {
+                get: function () {
+                    var value = comsocket_1.default.singleton().oVisuVariables.get(element_3.value).value;
+                    if (value == "0") {
+                        return "visible";
+                    }
+                    else {
+                        return "none";
+                    }
+                }
+            });
+        }
+        else if (element_3.type === "const") {
+            var value = void 0;
+            if (element_3.value === "0") {
+                value = "visible";
+            }
+            else {
+                value = "none";
+            }
+            initial.display = value;
+        }
+    }
+    if (dynamicElements.has("expr-tooltip-display")) {
+        var element_4 = dynamicElements.get("expr-tooltip-display");
+        if (element_4.type === "var") {
+            Object.defineProperty(initial, "tooltip", {
+                get: function () {
+                    return comsocket_1.default.singleton().oVisuVariables.get(element_4.value).value;
+                }
+            });
+        }
+    }
+    if (dynamicElements.has("expr-tap-var")) {
+        var element_5 = dynamicElements.get("expr-tap-var");
+        if (element_5.type === "const") {
+            initial.value = Number(element_5.value);
+        }
+        else if (element_5.type === "var") {
+            Object.defineProperty(initial, "value", {
+                get: function () {
+                    return Number(comsocket_1.default.singleton().oVisuVariables.get(element_5.value).value);
+                }
+            });
+        }
+    }
+    var handleSliderChange = function (event, newValue) {
+        updateFunction(newValue);
+    };
+    var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
+    return mobx_react_lite_1.useObserver(function () {
+        return React.createElement("div", { title: state.tooltip, style: { position: "absolute", left: rect[0], top: rect[1], width: relCornerCoord.x2, height: relCornerCoord.y2 } },
+            React.createElement(Slider_1.default, { orientation: orientation, min: state.lowerBound, max: state.upperBound, step: 1, value: state.value, onChange: handleSliderChange }));
+    });
+};
 
 
 /***/ }),
@@ -96217,40 +96426,6 @@ exports.parseBitmap = parseBitmap;
 
 /***/ }),
 
-/***/ "./src/pars/Elements/button.tsx":
-/*!**************************************!*\
-  !*** ./src/pars/Elements/button.tsx ***!
-  \**************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-var utilfunctions_1 = __webpack_require__(/*! ../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
-function parseButton(section) {
-    var has_inside_color = utilfunctions_1.stringToBoolean(section.children("has-inside-color").text());
-    var fill_color = utilfunctions_1.rgbToHexString(section.children("fill-color").text());
-    var fill_color_alarm = utilfunctions_1.rgbToHexString(section.children("fill-color-alarm").text());
-    var has_frame_color = utilfunctions_1.stringToBoolean(section.children("has-frame-color").text());
-    var frame_color = utilfunctions_1.rgbToHexString(section.children("frame-color").text());
-    var frame_color_alarm = utilfunctions_1.rgbToHexString(section.children("frame-color-alarm").text());
-    var rect = utilfunctions_1.stringToArray(section.children("rect").text());
-    var center = utilfunctions_1.stringToArray(section.children("center").text());
-    var hidden_input = utilfunctions_1.stringToBoolean(section.children("hidden-input").text());
-    var enable_text_input = utilfunctions_1.stringToBoolean(section.children("enable-text-input").text());
-    var relCornerCoord = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
-    var relCenterCoord = { x: center[0] - rect[0], y: center[1] - rect[1] };
-    var edge = 1;
-    return (React.createElement("div", { style: { position: "absolute", left: rect[0], top: rect[1], width: relCornerCoord.x2 + 2 * edge, height: relCornerCoord.y2 + 2 * edge } },
-        React.createElement("button", { style: { backgroundColor: fill_color, width: relCornerCoord.x2, height: relCornerCoord.y2 } })));
-}
-exports.parseButton = parseButton;
-
-
-/***/ }),
-
 /***/ "./src/pars/Elements/placeholder.tsx":
 /*!*******************************************!*\
   !*** ./src/pars/Elements/placeholder.tsx ***!
@@ -96278,62 +96453,6 @@ function Placeholder(section) {
     }
 }
 exports.Placeholder = Placeholder;
-
-
-/***/ }),
-
-/***/ "./src/pars/Elements/polygon.tsx":
-/*!***************************************!*\
-  !*** ./src/pars/Elements/polygon.tsx ***!
-  \***************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
-var util = __webpack_require__(/*! ../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
-function parsePolygon(section) {
-    var shape = section.children('poly-shape').text();
-    if (['polygon', 'bezier', 'polyline'].includes(shape)) {
-        var has_inside_color = util.stringToBoolean(section.children("has-inside-color").text());
-        var fill_color_1 = util.rgbToHexString(section.children("fill-color").text());
-        var fill_color_alarm = util.rgbToHexString(section.children("fill-color-alarm").text());
-        var has_frame_color = util.stringToBoolean(section.children("has-frame-color").text());
-        var frame_color_1 = util.rgbToHexString(section.children("frame-color").text());
-        var frame_color_alarm = util.rgbToHexString(section.children("frame-color-alarm").text());
-        var line_width = Number(section.children("line-width").text());
-        var elem_id = Number(section.children("elem-id").text());
-        var center = util.stringToArray(section.children("center").text());
-        var hidden_input = util.stringToBoolean(section.children("hidden-input").text());
-        var enable_text_input = util.stringToBoolean(section.children("enable-text-input").text());
-        var pointCoord_1 = [];
-        section.children('point').each(function () {
-            pointCoord_1.push(util.stringToArray($(this).text()));
-        });
-        var rect_1 = util.computeMinMaxCoord(pointCoord_1);
-        var relCornerCoord = { x1: 0, y1: 0, x2: rect_1[2] - rect_1[0], y2: rect_1[3] - rect_1[1] };
-        var relCenterCoord = { x: center[0] - rect_1[0], y: center[1] - rect_1[1] };
-        var edge_1 = 1;
-        return (React.createElement("div", { style: { position: "absolute", left: rect_1[0], top: rect_1[1], width: relCornerCoord.x2 + 2 * edge_1, height: relCornerCoord.y2 + 2 * edge_1 } },
-            React.createElement("svg", { width: relCornerCoord.x2 + 2 * edge_1, height: relCornerCoord.y2 + 2 * edge_1 }, (function () {
-                switch (shape) {
-                    case 'polygon':
-                        return (React.createElement("polygon", { points: util.coordArrayToString(pointCoord_1, rect_1[0] - edge_1, rect_1[1] - edge_1), fill: fill_color_1, strokeWidth: edge_1, stroke: frame_color_1 }));
-                    case 'bezier':
-                        return (React.createElement("path", { d: util.coordArrayToBezierString(pointCoord_1, rect_1[0] - edge_1, rect_1[1] - edge_1), fill: fill_color_1, strokeWidth: edge_1, stroke: frame_color_1 }));
-                    case 'polyline':
-                        return (React.createElement("polyline", { points: util.coordArrayToString(pointCoord_1, rect_1[0] - edge_1, rect_1[1] - edge_1), fill: fill_color_1, strokeWidth: edge_1, stroke: frame_color_1 }));
-                }
-            })())));
-    }
-    else {
-        (function () { return console.error("Poly-Shape: <" + shape + "> is not supported!"); });
-    }
-}
-exports.parsePolygon = parsePolygon;
 
 
 /***/ }),
@@ -96453,10 +96572,10 @@ var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js"
 var ReactDOM = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 var comsocket_1 = __webpack_require__(/*! ../com/comsocket */ "./src/com/comsocket.ts");
-var simpleshape_1 = __webpack_require__(/*! ./Elements/Simpleshape/simpleshape */ "./src/pars/Elements/Simpleshape/simpleshape.tsx");
+var simpleshape_1 = __webpack_require__(/*! ./Elements/Basicshapes/simpleshape */ "./src/pars/Elements/Basicshapes/simpleshape.tsx");
 var placeholder_1 = __webpack_require__(/*! ./Elements/placeholder */ "./src/pars/Elements/placeholder.tsx");
-var polygon_1 = __webpack_require__(/*! ./Elements/polygon */ "./src/pars/Elements/polygon.tsx");
-var button_1 = __webpack_require__(/*! ./Elements/button */ "./src/pars/Elements/button.tsx");
+var polyshape_1 = __webpack_require__(/*! ./Elements/Basicshapes/polyshape */ "./src/pars/Elements/Basicshapes/polyshape.tsx");
+var button_1 = __webpack_require__(/*! ./Elements/Button/button */ "./src/pars/Elements/Button/button.tsx");
 var scrollbar_1 = __webpack_require__(/*! ./Elements/Scrollbar/scrollbar */ "./src/pars/Elements/Scrollbar/scrollbar.tsx");
 var arraytable_1 = __webpack_require__(/*! ./Elements/arraytable */ "./src/pars/Elements/arraytable.tsx");
 var bitmap_1 = __webpack_require__(/*! ./Elements/bitmap */ "./src/pars/Elements/bitmap.tsx");
@@ -96508,7 +96627,7 @@ var HTML5Visu = (function () {
                     visuObjects.push(button_1.parseButton(section));
                     break;
                 case "polygon":
-                    visuObjects.push(polygon_1.parsePolygon(section));
+                    visuObjects.push(polyshape_1.parsePolygon(section));
                     break;
                 case "piechart":
                     break;

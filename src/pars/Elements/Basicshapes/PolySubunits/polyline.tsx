@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { ISimpleShape } from '../../../Interfaces/interfaces';
+import { IBasicShape } from '../../../Interfaces/interfaces';
 import {createVisuObject} from '../Features/objectManager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
-import { IVisuObject } from '../Features/interfaces';
+import { coordArrayToString } from '../../../Utils/utilfunctions'
 
 type Props = {
-    simpleShape: ISimpleShape,
+    polyShape: IBasicShape,
     textField : JSX.Element|undefined,
     input : JSX.Element,
     dynamicParameters : Map<string, string>,
@@ -14,16 +14,16 @@ type Props = {
     onclick : Function
 }
 
-export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, input, dynamicParameters, onclick, onmousedown, onmouseup})=> 
+export const Polyline :React.FunctionComponent<Props> = ({polyShape, textField, input, dynamicParameters, onclick, onmousedown, onmouseup})=> 
 {
     // Attach the dynamic paramters like color variable
-    let initial = createVisuObject(simpleShape, dynamicParameters)
+    let initial = createVisuObject(polyShape, dynamicParameters)
     
     // Convert object to an observable one
     const state  = useLocalStore(()=>initial);
 
     return useObserver(()=>
-    <div style={{cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCoord.x1-state.edge, top:state.transformedCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
+    <div style={{cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.absCornerCoord.x1-state.edge, top:state.absCornerCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
         {input}
         <svg 
             onClick={()=>onclick()} 
@@ -34,17 +34,13 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
             height={state.relCoord.height+2*state.edge} 
             strokeDasharray={state.strokeDashArray}>   
             <g>
-                <ellipse
-                stroke={state.stroke}
-                cx={state.relMidpointCoord.x+state.edge}
-                cy={state.relMidpointCoord.y+state.edge}
-                rx={state.relMidpointCoord.x}
-                ry={state.relMidpointCoord.y}
+            <polyline
+                points={coordArrayToString(state.points, state.transformedCoord.x2-state.edge, state.transformedCoord.y2-state.edge)}
                 fill={state.fill}
                 strokeWidth={state.strokeWidth}
-                >
+                stroke={state.stroke}
+                />
                 <title>{state.tooltip}</title>
-                </ellipse>
                 {textField}
             </g>
 
@@ -52,4 +48,3 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
     </div>
     )
 }
-
