@@ -1,38 +1,31 @@
 import * as React from 'react';
+import { Input } from '@material-ui/core';
+import { ClickAwayListener } from '@material-ui/core';
 import ComSocket from '../../../../com/comsocket';
-
 
 type Props = {
     section : JQuery<XMLDocument>,
 }
 
-function useOutsideAlerter(ref : any) {
-    /**
-     * Alert if clicked on outside of element
-     */
-    function handleClickOutside(event: any) {
-      if (ref.current && !ref.current.contains(event.target)) {
-        console.log("huhu");
-      }
-    }
-  
-    React.useEffect(() => {
-      // Bind the event listener
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        // Unbind the event listener on clean up
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    });
-  }
 
+export const Inputfield : React.FunctionComponent<Props>  = ({section})  => {
+  const [open, setOpen] = React.useState(false);
+  const [visible, setVis] = React.useState("visible" as any);
+  const handleClick = () => {
+    setOpen(prev => !prev);
+    setVis("none");
+  };
 
-export const Inputfield :React.FunctionComponent<Props>  = ({section})  => {
-    const [type, setType] = React.useState("text");
-    const wrapperRef = React.useRef(null);
-    useOutsideAlerter(wrapperRef);
-  
+  const handleClickAway = () => {
+    setOpen(false);
+    setVis("visible");
+  };
+
     return (
-        <input ref={wrapperRef} type="text" style={{position:"absolute", verticalAlign:"middle", width:"100%"}}/>
+      <ClickAwayListener onClickAway={()=>handleClickAway()}>
+        <div style={{position:"absolute", width:"100%", height:"100%", pointerEvents:visible}} onClick={()=>handleClick()}>
+          {open ? <input type="text" style={{position:"absolute", width:"100%"}}/> : null}
+         </div>
+      </ClickAwayListener>
     )
 };
