@@ -17,6 +17,7 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
 
         // Parsing of the fixed parameters
         let simpleShape : IBasicShape = {
+          shape : shape,
           has_inside_color : util.stringToBoolean(section.children("has-inside-color").text()),
           fill_color : util.rgbToHexString(section.children("fill-color").text()),
           fill_color_alarm : util.rgbToHexString(section.children("fill-color-alarm").text()),
