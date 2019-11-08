@@ -4,7 +4,7 @@ import * as React from 'react';
 import ComSocket from '../com/comsocket';
 import { parseSimpleShape } from './Elements/Basicshapes/simpleshape';
 import { Placeholder } from './Elements/placeholder';
-import { parsePolygon } from './Elements/Basicshapes/polyshape';
+import { parsePolyshape } from './Elements/Basicshapes/polyshape';
 import { parseButton } from './Elements/Button/button';
 import { Scrollbar } from './Elements/Scrollbar/scrollbar';
 import { parseArrayTable } from './Elements/arraytable';
@@ -72,7 +72,7 @@ export default class HTML5Visu {
                     break;
                 // Is a polygon - As polygon, polyline or bezier
                 case "polygon":
-                    visuObjects.push(parsePolygon(section))
+                    visuObjects.push(parsePolyshape(section))
                     break;
                 // Is a piechart
                 case "piechart":
