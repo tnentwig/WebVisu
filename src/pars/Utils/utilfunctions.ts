@@ -45,22 +45,14 @@ export function computeMinMaxCoord(pointArray : number[][]): number[] {
     return rect;
 }
 
-export function coordArrayToString(pointArray : number[][], xOffset : number, yOffset : number) :string {
+export function coordArrayToString(pointArray : number[][]) :string {
     let interim : string[] = [];
-    pointArray.forEach(function(item, index){
-        pointArray[index][0] = item[0]-xOffset;
-        pointArray[index][1] = item[1]-yOffset;
-    })
     pointArray.forEach((element)=>interim.push(element.join(',')));
     return interim.join(' ');
   }
 
-export function coordArrayToBezierString(pointArray : number[][], xOffset : number, yOffset : number) : string {
+export function coordArrayToBezierString(pointArray : number[][]) : string {
     let bezier : string = '';
-    pointArray.forEach(function(item, index){
-        pointArray[index][0] = item[0]-xOffset;
-        pointArray[index][1] = item[1]-yOffset;
-    })
     pointArray.forEach((element,index)=>{
         if (index === 0) {
             bezier += 'M'+ element.join(' ');
