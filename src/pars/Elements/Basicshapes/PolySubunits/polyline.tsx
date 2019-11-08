@@ -23,7 +23,7 @@ export const Polyline :React.FunctionComponent<Props> = ({polyShape, textField, 
     const state  = useLocalStore(()=>initial);
 
     return useObserver(()=>
-    <div style={{cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.absCornerCoord.x1-state.edge, top:state.absCornerCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
+    <div style={{transform: state.cssTransform, transformOrigin: state.cssTransformOrigin, cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.absCornerCoord.x1-state.edge, top:state.absCornerCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
         {input}
         <svg 
             onClick={()=>onclick()} 
@@ -35,13 +35,13 @@ export const Polyline :React.FunctionComponent<Props> = ({polyShape, textField, 
             strokeDasharray={state.strokeDashArray}>   
             <g>
             <polyline
-                points={coordArrayToString(state.points, state.transformedCoord.x2-state.edge, state.transformedCoord.y2-state.edge)}
+                points={coordArrayToString(state.relPoints)}
                 fill={state.fill}
                 strokeWidth={state.strokeWidth}
                 stroke={state.stroke}
                 />
                 <title>{state.tooltip}</title>
-                {textField}
+            {textField}
             </g>
 
         </svg>

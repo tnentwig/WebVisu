@@ -23,7 +23,7 @@ export const Polygon :React.FunctionComponent<Props> = ({polyShape, textField, i
     const state  = useLocalStore(()=>initial);
 
     return useObserver(()=>
-    <div style={{cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCoord.x1-state.edge, top:state.transformedCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
+    <div style={{cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
         {input}
         <svg 
             onClick={()=>onclick()} 
@@ -35,7 +35,7 @@ export const Polygon :React.FunctionComponent<Props> = ({polyShape, textField, i
             strokeDasharray={state.strokeDashArray}>   
             <g>
             <polygon
-                points={coordArrayToString(state.points, state.relCoord.width-state.edge, state.relCoord.height-state.edge)}
+                points={coordArrayToString(state.relPoints)}
                 fill={state.fill}
                 strokeWidth={state.strokeWidth}
                 stroke={state.stroke}

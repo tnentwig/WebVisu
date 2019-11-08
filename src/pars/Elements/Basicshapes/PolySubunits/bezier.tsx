@@ -23,19 +23,19 @@ export const Bezier :React.FunctionComponent<Props> = ({polyShape, textField, in
     const state  = useLocalStore(()=>initial);
 
     return useObserver(()=>
-    <div style={{cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.absCornerCoord.x1-state.edge, top:state.absCornerCoord.y1-state.edge, width:state.absCornerCoord.x2-state.absCornerCoord.x1+state.edge, height:state.absCornerCoord.y1-state.absCornerCoord.y2+state.edge}}>
+    <div style={{cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
         {input}
         <svg 
             onClick={()=>onclick()} 
             onMouseDown={()=>onmousedown()} 
             onMouseUp={()=>onmouseup()}
             onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
-            width={state.absCornerCoord.x2-state.absCornerCoord.x1+2*state.edge} 
-            height={state.absCornerCoord.y2-state.absCornerCoord.y1+2*state.edge} 
+            width={state.relCoord.width+2*state.edge} 
+            height={state.relCoord.height+2*state.edge} 
             strokeDasharray={state.strokeDashArray}>   
             <g>
-            <path 
-                d={coordArrayToBezierString(state.points, state.absCornerCoord.x1, state.absCornerCoord.y1)}
+            <path
+                d={coordArrayToBezierString(state.relPoints)}
                 fill={state.fill}
                 strokeWidth={state.strokeWidth}
                 stroke={state.stroke}
