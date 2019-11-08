@@ -2,7 +2,7 @@
 export interface IVisuObject{
     absCornerCoord : {x1:number,y1:number,x2:number,y2:number},
     absCenterCoord : {x:number, y:number},
-    transformedCoord : {x1:number,y1:number,x2:number,y2:number},
+    transformedCornerCoord : {x1:number,y1:number,x2:number,y2:number},
     relCoord : {width:number,height:number}
     relMidpointCoord : {x:number,y:number}
     left : number,
@@ -29,5 +29,10 @@ export interface IVisuObject{
     fill : string,
     stroke : string,
     strokeDashArray : string,
-    points : number[][]
+    // The following variables are for polyshapes only
+    absPoints : number[][],
+    relPoints : number[][],
+    cssTransform : string,
+    cssTransformOrigin : string
+
 }
