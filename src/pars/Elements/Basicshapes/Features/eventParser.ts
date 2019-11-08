@@ -44,7 +44,6 @@ export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape
             }
         })
     });
-
     return exprMap;
 }
 
