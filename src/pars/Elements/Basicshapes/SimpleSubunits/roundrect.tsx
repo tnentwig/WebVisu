@@ -22,7 +22,7 @@ export const Roundrect :React.FunctionComponent<Props> = ({simpleShape, textFiel
     const state  = useLocalStore(()=>initial);
     
     return useObserver(()=>
-    <div style={{cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCoord.x1-state.edge, top:state.transformedCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
+    <div style={{cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
         {input}
         <svg 
             onClick={()=>onclick()} 
