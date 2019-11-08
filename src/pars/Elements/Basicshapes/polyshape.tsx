@@ -9,13 +9,14 @@ import { Textfield } from './Features/textManager';
 import { Inputfield } from './Features/inputManager'
 import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from './Features/eventParser';
 
-export function parsePolygon(section : JQuery<XMLDocument>){
+export function parsePolyshape(section : JQuery<XMLDocument>){
     // Check if its on of the allowed shapes like polygon, bezier or polyline
     let shape = section.children('poly-shape').text();
     // Parse the common informations
     if (['polygon', 'bezier', 'polyline'].includes(shape)) {
     // Parsing of the fixed parameters
     let polyShape : IBasicShape = {
+        shape : shape,
         has_inside_color : util.stringToBoolean(section.children("has-inside-color").text()),
         fill_color : util.rgbToHexString(section.children("fill-color").text()),
         fill_color_alarm : util.rgbToHexString(section.children("fill-color-alarm").text()),
@@ -29,22 +30,22 @@ export function parsePolygon(section : JQuery<XMLDocument>){
         hidden_input : util.stringToBoolean(section.children("hidden-input").text()),
         enable_text_input : util.stringToBoolean(section.children("enable-text-input").text()),
         tooltip : (section.children("tooltip").text()).length>0? section.children("tooltip").text() : "",
-        points : []
+        points : [] as number[][],
     }
     // Parsing the point coordinates
     section.children('point').each(function(){
-        polyShape.points.push(util.stringToArray($(this).text()));
+        let points = util.stringToArray($(this).text());
+        polyShape.points.push(points);
     });
     // Auxiliary values
     polyShape.rect = util.computeMinMaxCoord(polyShape.points);
-    console.log(polyShape.rect);
+
     // Parsing the textfields and returning a jsx object if it exists
     let dynamicTextParameters = parseDynamicTextParameters(section, shape);
     let textField : JSX.Element;
     if (section.find("text-id").text().length){
         textField = <Textfield section={section} dynamicParameters={dynamicTextParameters}></Textfield>;
-    }
-    else {
+    }else {
         textField = null;
     }
 
@@ -52,10 +53,13 @@ export function parsePolygon(section : JQuery<XMLDocument>){
     let inputField : JSX.Element;
     if (section.find("enable-text-input").text() === "true"){
         inputField = <Inputfield section={section}></Inputfield>
+    }else {
+        inputField = null;
     }
 
     // Parsing of observable events (like toggle color)
     let dynamicShapeParameters = parseDynamicShapeParameters(section, shape);
+
     // Parsing of user events that causes a reaction like toggle or pop up input
     let onclick =parseClickEvent(section);
     let onmousedown = parseTapEvent(section, "down");
