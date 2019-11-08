@@ -1,5 +1,6 @@
 
 export interface IBasicShape {
+    shape : string;
     has_inside_color : boolean;
     fill_color : string;
     fill_color_alarm : string;
