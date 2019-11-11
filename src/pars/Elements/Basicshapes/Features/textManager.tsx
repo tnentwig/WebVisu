@@ -246,8 +246,9 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
                 <tspan
                 dominantBaseline = {state.dominantBaseline}
                 x={state.xpos} 
-                y={state.ypos} >
-                    {state.textOutput}
+                y={state.ypos}
+                >
+                {state.textOutput}
                 </tspan>
             </text>
         )
