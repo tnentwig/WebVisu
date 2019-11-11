@@ -25,7 +25,7 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
           frame_color : util.rgbToHexString(section.children("frame-color").text()),
           frame_color_alarm : util.rgbToHexString(section.children("frame-color-alarm").text()),
           line_width : Number(section.children("line-width").text()),
-          elem_id : Number(section.children("elem-id").text()),
+          elem_id : section.children("elem-id").text(),
           rect : util.stringToArray(section.children("rect").text()),
           center : util.stringToArray(section.children("center").text()),
           hidden_input : util.stringToBoolean(section.children("hidden-input").text()),
@@ -48,7 +48,9 @@ export function parseSimpleShape(section : JQuery<XMLDocument>){
         let inputField : JSX.Element;
         if (section.find("enable-text-input").text() === "true"){
             inputField = <Inputfield section={section}></Inputfield>
-        }
+        }else {
+          inputField = null;
+      }
 
         // Parsing of observable events (like toggle color)
         let dynamicShapeParameters = parseDynamicShapeParameters(section, shape);
