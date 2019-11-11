@@ -1,4 +1,4 @@
-import HTML5Visu from './pars/visuparser';
+import HTML5Visu from './visuparser';
 import * as React from 'react';
 
 if (process.env.NODE_ENV !== 'production') {
