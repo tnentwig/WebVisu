@@ -1,7 +1,6 @@
 import * as $ from 'jquery';
 import { IComSocket } from '../pars/Interfaces/interfaces';
 import { observable, action} from "mobx"
-import { CaughtException } from 'mobx/lib/internal';
 
 export default class ComSocket implements IComSocket {
     private static instance : IComSocket=new ComSocket();
