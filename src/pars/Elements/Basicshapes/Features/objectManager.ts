@@ -420,8 +420,8 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
             get: function() {
                 let points =  initial.absPoints;
                 let interim = [];
-                let xoff = initial.transformedCornerCoord.x1;
-                let yoff = initial.transformedCornerCoord.y1;
+                let xoff = initial.transformedCornerCoord.x1-initial.edge;
+                let yoff = initial.transformedCornerCoord.y1-initial.edge;
                 for(let i = 0; i < points.length; i++) {
                     let x = points[i][0]-xoff;
                     let y = points[i][1]-yoff;
@@ -434,7 +434,6 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         Object.defineProperty(initial, "cssTransformOrigin", {
             get: function(){
                 let interim = ""+(absCenterCoord.x-absCornerCoord.x1) +"px "+(absCenterCoord.y-absCornerCoord.y1)+"px " as string;
-                console.log(interim);
                 return interim;
             }
         });
