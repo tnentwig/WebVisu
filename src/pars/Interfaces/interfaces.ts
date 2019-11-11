@@ -8,7 +8,7 @@ export interface IBasicShape {
     frame_color : string;
     frame_color_alarm : string;
     line_width : number;
-    elem_id : number;
+    elem_id : string;
     rect : number[];
     center : number[];
     hidden_input : boolean;

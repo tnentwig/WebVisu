@@ -24,7 +24,7 @@ export function parsePolyshape(section : JQuery<XMLDocument>){
         frame_color : util.rgbToHexString(section.children("frame-color").text()),
         frame_color_alarm : util.rgbToHexString(section.children("frame-color-alarm").text()),
         line_width : Number(section.children("line-width").text()),
-        elem_id : Number(section.children("elem-id").text()),
+        elem_id : section.children("elem-id").text(),
         rect : [],
         center : util.stringToArray(section.children("center").text()),
         hidden_input : util.stringToBoolean(section.children("hidden-input").text()),
