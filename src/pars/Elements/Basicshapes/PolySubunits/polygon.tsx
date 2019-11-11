@@ -23,28 +23,30 @@ export const Polygon :React.FunctionComponent<Props> = ({polyShape, textField, i
     const state  = useLocalStore(()=>initial);
 
     return useObserver(()=>
-    <div style={{cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
+    <div id={polyShape.elem_id} style={{transform: state.cssTransform, transformOrigin: state.cssTransformOrigin, cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
         {input}
-        <svg 
-            onClick={()=>onclick()} 
-            onMouseDown={()=>onmousedown()} 
-            onMouseUp={()=>onmouseup()}
-            onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
-            width={state.relCoord.width+2*state.edge} 
-            height={state.relCoord.height+2*state.edge} 
-            strokeDasharray={state.strokeDashArray}>   
-            <g>
-            <polygon
-                points={coordArrayToString(state.relPoints)}
-                fill={state.fill}
-                strokeWidth={state.strokeWidth}
-                stroke={state.stroke}
-                />
-                <title>{state.tooltip}</title>
-                {textField}
-            </g>
-
-        </svg>
+        <svg>
+            <svg
+                onClick={()=>onclick()} 
+                onMouseDown={()=>onmousedown()} 
+                onMouseUp={()=>onmouseup()}
+                onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
+                strokeDasharray={state.strokeDashArray}
+                >   
+                <polygon
+                    points={coordArrayToString(state.relPoints)}
+                    fill={state.fill}
+                    strokeWidth={state.strokeWidth}
+                    stroke={state.stroke}
+                    />
+                    <title>{state.tooltip}</title>
+                </svg>
+                <svg
+                    width={state.relCoord.width+2*state.edge} 
+                    height={state.relCoord.height+2*state.edge} >
+                    {textField}
+                </svg>
+            </svg>
     </div>
     )
 }

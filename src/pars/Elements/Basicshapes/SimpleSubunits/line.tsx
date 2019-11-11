@@ -22,16 +22,16 @@ export const Line :React.FunctionComponent<Props> = ({simpleShape, textField, in
     const state  = useLocalStore(()=>initial);
 
     return useObserver(()=>
-    <div style={{cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
+    <div id={simpleShape.elem_id} style={{cursor: "auto",overflow:"hidden", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
         {input}
-        <svg
-            onClick={()=>onclick()} 
-            onMouseDown={()=>onmousedown()} 
-            onMouseUp={()=>onmouseup()}
-            onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
-            width={state.relCoord.width} 
-            height={state.relCoord.height}>
-            <g>
+        <svg>
+            <svg
+                onClick={()=>onclick()} 
+                onMouseDown={()=>onmousedown()} 
+                onMouseUp={()=>onmouseup()}
+                onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
+                width={state.relCoord.width} 
+                height={state.relCoord.height}>
                 <line
                     x2={0}
                     y1={0}
@@ -41,9 +41,11 @@ export const Line :React.FunctionComponent<Props> = ({simpleShape, textField, in
                     strokeWidth={state.strokeWidth}
                     strokeDasharray={state.strokeDashArray}>
                     <title>{state.tooltip}</title>
-                    </line>
-                {textField}
-            </g>
+                </line>
+                <svg>
+                    {textField}
+                </svg>
+            </svg>
         </svg>
     </div>
     )

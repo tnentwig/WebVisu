@@ -22,31 +22,32 @@ export const Rectangle :React.FunctionComponent<Props> = ({simpleShape, textFiel
  const state  = useLocalStore(()=>initial);
     
 return useObserver(()=>
-    <div style={{cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
+    <div id={simpleShape.elem_id} style={{cursor: "auto", overflow:"hidden", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
         {input}
-        <svg 
-            onClick={()=>onclick()} 
-            onMouseDown={()=>onmousedown()} 
-            onMouseUp={()=>onmouseup()}
-            onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
-            width={state.relCoord.width+2*state.edge} 
-            height={state.relCoord.height+2*state.edge} 
-            strokeDasharray={state.strokeDashArray}>   
-            <g>
+        <svg>
+            <svg 
+                onClick={()=>onclick()} 
+                onMouseDown={()=>onmousedown()} 
+                onMouseUp={()=>onmouseup()}
+                onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
+                width={state.relCoord.width+2*state.edge} 
+                height={state.relCoord.height+2*state.edge} 
+                strokeDasharray={state.strokeDashArray}>   
                 <rect
-                width={state.relCoord.width}
-                height={state.relCoord.height}
-                x={state.edge}
-                y={state.edge}
-                fill={state.fill}
-                stroke={state.stroke}
-                strokeWidth={state.strokeWidth}
-                >
-                <title>{state.tooltip}</title>
+                    width={state.relCoord.width}
+                    height={state.relCoord.height}
+                    x={state.edge}
+                    y={state.edge}
+                    fill={state.fill}
+                    stroke={state.stroke}
+                    strokeWidth={state.strokeWidth}
+                    >
+                    <title>{state.tooltip}</title>
                 </rect>
-                {textField}
-            </g>
-
+                <svg>
+                    {textField}
+                </svg>
+            </svg>
         </svg>
     </div>
     )

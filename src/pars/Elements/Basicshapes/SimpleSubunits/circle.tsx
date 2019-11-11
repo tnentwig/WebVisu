@@ -23,8 +23,9 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
     const state  = useLocalStore(()=>initial);
 
     return useObserver(()=>
-    <div style={{cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
+    <div id={simpleShape.elem_id} style={{cursor: "auto", overflow:"hidden", pointerEvents: state.eventType, visibility:state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
         {input}
+        <svg>
         <svg 
             onClick={()=>onclick()} 
             onMouseDown={()=>onmousedown()} 
@@ -33,7 +34,6 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
             width={state.relCoord.width+2*state.edge} 
             height={state.relCoord.height+2*state.edge} 
             strokeDasharray={state.strokeDashArray}>   
-            <g>
                 <ellipse
                 stroke={state.stroke}
                 cx={state.relMidpointCoord.x+state.edge}
@@ -45,9 +45,10 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
                 >
                 <title>{state.tooltip}</title>
                 </ellipse>
+                <svg>
                 {textField}
-            </g>
-
+                </svg>
+            </svg>
         </svg>
     </div>
     )
