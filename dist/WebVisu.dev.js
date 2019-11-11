@@ -101529,7 +101529,7 @@ exports.default = ComSocket;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var visuparser_1 = __webpack_require__(/*! ./pars/visuparser */ "./src/pars/visuparser.tsx");
+var visuparser_1 = __webpack_require__(/*! ./visuparser */ "./src/visuparser.tsx");
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 if (true) {
     var whyDidYouUpdate = __webpack_require__(/*! why-did-you-update */ "./node_modules/why-did-you-update/lib/index.js").whyDidYouUpdate;
@@ -102130,8 +102130,8 @@ function createVisuObject(basicShape, dynamicElements) {
             get: function () {
                 var points = initial.absPoints;
                 var interim = [];
-                var xoff = initial.transformedCornerCoord.x1;
-                var yoff = initial.transformedCornerCoord.y1;
+                var xoff = initial.transformedCornerCoord.x1 - initial.edge;
+                var yoff = initial.transformedCornerCoord.y1 - initial.edge;
                 for (var i = 0; i < points.length; i++) {
                     var x = points[i][0] - xoff;
                     var y = points[i][1] - yoff;
@@ -102143,7 +102143,6 @@ function createVisuObject(basicShape, dynamicElements) {
         Object.defineProperty(initial, "cssTransformOrigin", {
             get: function () {
                 var interim = "" + (absCenterCoord.x - absCornerCoord.x1) + "px " + (absCenterCoord.y - absCornerCoord.y1) + "px ";
-                console.log(interim);
                 return interim;
             }
         });
@@ -102405,13 +102404,13 @@ exports.Bezier = function (_a) {
     var initial = objectManager_1.createVisuObject(polyShape, dynamicParameters);
     var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
     return mobx_react_lite_1.useObserver(function () {
-        return React.createElement("div", { style: { cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
+        return React.createElement("div", { id: polyShape.elem_id, style: { transform: state.cssTransform, transformOrigin: state.cssTransformOrigin, cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge } },
             input,
-            React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
-                React.createElement("g", null,
+            React.createElement("svg", null,
+                React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, strokeDasharray: state.strokeDashArray },
                     React.createElement("path", { d: utilfunctions_1.coordArrayToBezierString(state.relPoints), fill: state.fill, strokeWidth: state.strokeWidth, stroke: state.stroke }),
-                    React.createElement("title", null, state.tooltip),
-                    textField)));
+                    React.createElement("title", null, state.tooltip)),
+                React.createElement("svg", { width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge }, textField)));
     });
 };
 
@@ -102437,13 +102436,13 @@ exports.Polygon = function (_a) {
     var initial = objectManager_1.createVisuObject(polyShape, dynamicParameters);
     var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
     return mobx_react_lite_1.useObserver(function () {
-        return React.createElement("div", { style: { cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
+        return React.createElement("div", { id: polyShape.elem_id, style: { transform: state.cssTransform, transformOrigin: state.cssTransformOrigin, cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge } },
             input,
-            React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
-                React.createElement("g", null,
+            React.createElement("svg", null,
+                React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, strokeDasharray: state.strokeDashArray },
                     React.createElement("polygon", { points: utilfunctions_1.coordArrayToString(state.relPoints), fill: state.fill, strokeWidth: state.strokeWidth, stroke: state.stroke }),
-                    React.createElement("title", null, state.tooltip),
-                    textField)));
+                    React.createElement("title", null, state.tooltip)),
+                React.createElement("svg", { width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge }, textField)));
     });
 };
 
@@ -102469,13 +102468,13 @@ exports.Polyline = function (_a) {
     var initial = objectManager_1.createVisuObject(polyShape, dynamicParameters);
     var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
     return mobx_react_lite_1.useObserver(function () {
-        return React.createElement("div", { style: { transform: state.cssTransform, transformOrigin: state.cssTransformOrigin, cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.absCornerCoord.x1 - state.edge, top: state.absCornerCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
+        return React.createElement("div", { id: polyShape.elem_id, style: { overflow: "hidden", transform: state.cssTransform, transformOrigin: state.cssTransformOrigin, cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.absCornerCoord.x1 - state.edge, top: state.absCornerCoord.y1 - state.edge, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge } },
             input,
-            React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
-                React.createElement("g", null,
+            React.createElement("svg", null,
+                React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, strokeDasharray: state.strokeDashArray },
                     React.createElement("polyline", { points: utilfunctions_1.coordArrayToString(state.relPoints), fill: state.fill, strokeWidth: state.strokeWidth, stroke: state.stroke }),
-                    React.createElement("title", null, state.tooltip),
-                    textField)));
+                    React.createElement("title", null, state.tooltip)),
+                React.createElement("svg", { width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge }, textField)));
     });
 };
 
@@ -102500,13 +102499,13 @@ exports.Circle = function (_a) {
     var initial = objectManager_1.createVisuObject(simpleShape, dynamicParameters);
     var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
     return mobx_react_lite_1.useObserver(function () {
-        return React.createElement("div", { style: { cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
+        return React.createElement("div", { id: simpleShape.elem_id, style: { cursor: "auto", overflow: "hidden", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge } },
             input,
-            React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
-                React.createElement("g", null,
+            React.createElement("svg", null,
+                React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
                     React.createElement("ellipse", { stroke: state.stroke, cx: state.relMidpointCoord.x + state.edge, cy: state.relMidpointCoord.y + state.edge, rx: state.relMidpointCoord.x, ry: state.relMidpointCoord.y, fill: state.fill, strokeWidth: state.strokeWidth },
                         React.createElement("title", null, state.tooltip)),
-                    textField)));
+                    React.createElement("svg", null, textField))));
     });
 };
 
@@ -102531,13 +102530,13 @@ exports.Line = function (_a) {
     var initial = objectManager_1.createVisuObject(simpleShape, dynamicParameters);
     var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
     return mobx_react_lite_1.useObserver(function () {
-        return React.createElement("div", { style: { cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
+        return React.createElement("div", { id: simpleShape.elem_id, style: { cursor: "auto", overflow: "hidden", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
             input,
-            React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width, height: state.relCoord.height },
-                React.createElement("g", null,
+            React.createElement("svg", null,
+                React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width, height: state.relCoord.height },
                     React.createElement("line", { x2: 0, y1: 0, x1: state.relCoord.width, y2: state.relCoord.height, stroke: state.stroke, strokeWidth: state.strokeWidth, strokeDasharray: state.strokeDashArray },
                         React.createElement("title", null, state.tooltip)),
-                    textField)));
+                    React.createElement("svg", null, textField))));
     });
 };
 
@@ -102562,13 +102561,13 @@ exports.Rectangle = function (_a) {
     var initial = objectManager_1.createVisuObject(simpleShape, dynamicParameters);
     var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
     return mobx_react_lite_1.useObserver(function () {
-        return React.createElement("div", { style: { cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
+        return React.createElement("div", { id: simpleShape.elem_id, style: { cursor: "auto", overflow: "hidden", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge } },
             input,
-            React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
-                React.createElement("g", null,
+            React.createElement("svg", null,
+                React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
                     React.createElement("rect", { width: state.relCoord.width, height: state.relCoord.height, x: state.edge, y: state.edge, fill: state.fill, stroke: state.stroke, strokeWidth: state.strokeWidth },
                         React.createElement("title", null, state.tooltip)),
-                    textField)));
+                    React.createElement("svg", null, textField))));
     });
 };
 
@@ -102593,13 +102592,13 @@ exports.Roundrect = function (_a) {
     var initial = objectManager_1.createVisuObject(simpleShape, dynamicParameters);
     var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
     return mobx_react_lite_1.useObserver(function () {
-        return React.createElement("div", { style: { cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
+        return React.createElement("div", { id: simpleShape.elem_id, style: { cursor: "auto", overflow: "hidden", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + state.edge, height: state.relCoord.height + state.edge } },
             input,
-            React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
-                React.createElement("g", null,
+            React.createElement("svg", null,
+                React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
                     React.createElement("rect", { width: state.relCoord.width, height: state.relCoord.height, x: state.edge, y: state.edge, rx: 10, ry: 10, fill: state.fill, stroke: state.stroke, strokeWidth: state.strokeWidth },
                         React.createElement("title", null, state.tooltip)),
-                    textField)));
+                    React.createElement("svg", null, textField))));
     });
 };
 
@@ -102637,7 +102636,7 @@ function parsePolyshape(section) {
             frame_color: util.rgbToHexString(section.children("frame-color").text()),
             frame_color_alarm: util.rgbToHexString(section.children("frame-color-alarm").text()),
             line_width: Number(section.children("line-width").text()),
-            elem_id: Number(section.children("elem-id").text()),
+            elem_id: section.children("elem-id").text(),
             rect: [],
             center: util.stringToArray(section.children("center").text()),
             hidden_input: util.stringToBoolean(section.children("hidden-input").text()),
@@ -102718,7 +102717,7 @@ function parseSimpleShape(section) {
             frame_color: util.rgbToHexString(section.children("frame-color").text()),
             frame_color_alarm: util.rgbToHexString(section.children("frame-color-alarm").text()),
             line_width: Number(section.children("line-width").text()),
-            elem_id: Number(section.children("elem-id").text()),
+            elem_id: section.children("elem-id").text(),
             rect: util.stringToArray(section.children("rect").text()),
             center: util.stringToArray(section.children("center").text()),
             hidden_input: util.stringToBoolean(section.children("hidden-input").text()),
@@ -102737,6 +102736,9 @@ function parseSimpleShape(section) {
         var inputField = void 0;
         if (section.find("enable-text-input").text() === "true") {
             inputField = React.createElement(inputManager_1.Inputfield, { section: section });
+        }
+        else {
+            inputField = null;
         }
         var dynamicShapeParameters = eventParser_1.parseDynamicShapeParameters(section, shape);
         var onclick_1 = eventParser_1.parseClickEvent(section);
@@ -102792,6 +102794,78 @@ function parseButton(section) {
         React.createElement("button", { style: { backgroundColor: fill_color, width: relCornerCoord.x2, height: relCornerCoord.y2 } })));
 }
 exports.parseButton = parseButton;
+
+
+/***/ }),
+
+/***/ "./src/pars/Elements/Group/parseGroup.tsx":
+/*!************************************************!*\
+  !*** ./src/pars/Elements/Group/parseGroup.tsx ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+var simpleshape_1 = __webpack_require__(/*! ../Basicshapes/simpleshape */ "./src/pars/Elements/Basicshapes/simpleshape.tsx");
+var polyshape_1 = __webpack_require__(/*! ../Basicshapes/polyshape */ "./src/pars/Elements/Basicshapes/polyshape.tsx");
+var utilfunctions_1 = __webpack_require__(/*! ../../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
+exports.Group = function (_a) {
+    var section = _a.section;
+    var rectParent = utilfunctions_1.stringToArray(section.children("rect").text());
+    var elemId = section.children("elem-id").text();
+    var elemIdTransform = elemId + "trans;";
+    var rightdownCorner = [0, 0];
+    function getDimension(actualDimension, newRect) {
+        var len = newRect.length;
+        if (len === 4) {
+            (actualDimension[0] < newRect[2]) ? (actualDimension[0] = newRect[2]) : (newRect[0] = newRect[0]);
+            (actualDimension[1] < newRect[3]) ? (actualDimension[1] = newRect[3]) : (newRect[1] = newRect[1]);
+        }
+        else if (len === 2) {
+            for (var i = 0; i < 2; i++) {
+                (actualDimension[i] < newRect[i]) ? (actualDimension[i] = newRect[0]) : (newRect[0] = newRect[0]);
+            }
+        }
+    }
+    var visuObjects = [];
+    section.children("element").each(function () {
+        var section = $(this);
+        switch (section.attr("type")) {
+            case "simple":
+                visuObjects.push(simpleshape_1.parseSimpleShape(section));
+                getDimension(rightdownCorner, utilfunctions_1.stringToArray(section.children("rect").text()));
+                break;
+            case "polygon":
+                visuObjects.push(polyshape_1.parsePolyshape(section));
+                section.children('point').each(function () {
+                    getDimension(rightdownCorner, utilfunctions_1.stringToArray($(this).text()));
+                });
+                break;
+        }
+    });
+    var _b = React.useState("scale(1)"), scale = _b[0], setScale = _b[1];
+    React.useEffect(function () {
+        var setY = rectParent[3] - rectParent[1];
+        var setX = rectParent[2] - rectParent[0];
+        var scaleOrientation = setX / setY;
+        if (scaleOrientation < (rightdownCorner[0] / rightdownCorner[1])) {
+            var factor = setX / rightdownCorner[0];
+            var interim = "scale(" + factor + ")";
+            setScale(interim);
+        }
+        else {
+            var factor = setY / rightdownCorner[1];
+            var interim = "scale(" + factor + ")";
+            setScale(interim);
+        }
+    }, [rectParent, rightdownCorner]);
+    return (React.createElement("div", { id: elemId, style: { overflow: "hidden", position: "absolute", left: rectParent[0], top: rectParent[1], width: rectParent[2] - rectParent[0], height: rectParent[3] - rectParent[1] } },
+        React.createElement("div", { id: elemIdTransform, style: { transformOrigin: "left top", transform: scale } }, visuObjects.map(function (element, index) { return React.createElement(React.Fragment, null, element); }))));
+};
 
 
 /***/ }),
@@ -103039,37 +103113,6 @@ exports.parseBitmap = parseBitmap;
 
 /***/ }),
 
-/***/ "./src/pars/Elements/placeholder.tsx":
-/*!*******************************************!*\
-  !*** ./src/pars/Elements/placeholder.tsx ***!
-  \*******************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-var utilfunctions_1 = __webpack_require__(/*! ../Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
-function Placeholder(section) {
-    try {
-        var rect = utilfunctions_1.stringToArray(section.children("rect").text());
-        var relCoord = { x1: 0, y1: 0, x2: rect[2] - rect[0], y2: rect[3] - rect[1] };
-        return (React.createElement("div", { style: { position: "absolute", left: rect[0], top: rect[1] } },
-            React.createElement("svg", { width: relCoord.x2, height: relCoord.y2 },
-                React.createElement("rect", { width: relCoord.x2, height: relCoord.y2, fill: "white", strokeWidth: 2, stroke: "black" }),
-                React.createElement("line", { x1: relCoord.x1, y1: relCoord.y1, x2: relCoord.x2, y2: relCoord.y2, stroke: "black" }),
-                React.createElement("line", { x1: relCoord.x1, y1: relCoord.y2, x2: relCoord.x2, y2: relCoord.y1, stroke: "black" }))));
-    }
-    catch (_a) {
-        (function () { return console.error("Object is not supported! No dimensions detected!"); });
-    }
-}
-exports.Placeholder = Placeholder;
-
-
-/***/ }),
-
 /***/ "./src/pars/Utils/utilfunctions.ts":
 /*!*****************************************!*\
   !*** ./src/pars/Utils/utilfunctions.ts ***!
@@ -103163,10 +103206,69 @@ exports.coordArrayToBezierString = coordArrayToBezierString;
 
 /***/ }),
 
-/***/ "./src/pars/visuparser.tsx":
-/*!*********************************!*\
-  !*** ./src/pars/visuparser.tsx ***!
-  \*********************************/
+/***/ "./src/pars/elementparser.tsx":
+/*!************************************!*\
+  !*** ./src/pars/elementparser.tsx ***!
+  \************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+var simpleshape_1 = __webpack_require__(/*! ../pars/Elements/Basicshapes/simpleshape */ "./src/pars/Elements/Basicshapes/simpleshape.tsx");
+var polyshape_1 = __webpack_require__(/*! ../pars/Elements/Basicshapes/polyshape */ "./src/pars/Elements/Basicshapes/polyshape.tsx");
+var button_1 = __webpack_require__(/*! ../pars/Elements/Button/button */ "./src/pars/Elements/Button/button.tsx");
+var scrollbar_1 = __webpack_require__(/*! ../pars/Elements/Scrollbar/scrollbar */ "./src/pars/Elements/Scrollbar/scrollbar.tsx");
+var arraytable_1 = __webpack_require__(/*! ../pars/Elements/arraytable */ "./src/pars/Elements/arraytable.tsx");
+var bitmap_1 = __webpack_require__(/*! ../pars/Elements/bitmap */ "./src/pars/Elements/bitmap.tsx");
+var parseGroup_1 = __webpack_require__(/*! ../pars/Elements/Group/parseGroup */ "./src/pars/Elements/Group/parseGroup.tsx");
+exports.VisuElements = function (_a) {
+    var visualisation = _a.visualisation;
+    console.log("Start parsing...");
+    var visuObjects = [];
+    visualisation.children("visualisation").children("element").each(function () {
+        var section = $(this);
+        switch (section.attr("type")) {
+            case "simple":
+                visuObjects.push(simpleshape_1.parseSimpleShape(section));
+                break;
+            case "bitmap":
+                visuObjects.push(bitmap_1.parseBitmap(section));
+                break;
+            case "button":
+                visuObjects.push(button_1.parseButton(section));
+                break;
+            case "polygon":
+                visuObjects.push(polyshape_1.parsePolyshape(section));
+                break;
+            case "piechart":
+                break;
+            case "group":
+                visuObjects.push(React.createElement(parseGroup_1.Group, { section: section }));
+                break;
+            case "scrollbar":
+                visuObjects.push(React.createElement(scrollbar_1.Scrollbar, { section: section }));
+                break;
+            case "array-table":
+                visuObjects.push(arraytable_1.parseArrayTable(section));
+                break;
+            default:
+                console.log("Type <" + section.attr("type") + "> is not supported yet!");
+        }
+    });
+    return (React.createElement(React.Fragment, null, visuObjects.map(function (element, index) { return React.createElement(React.Fragment, null, element); })));
+};
+
+
+/***/ }),
+
+/***/ "./src/visuparser.tsx":
+/*!****************************!*\
+  !*** ./src/visuparser.tsx ***!
+  \****************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -103176,14 +103278,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 var ReactDOM = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-var comsocket_1 = __webpack_require__(/*! ../com/comsocket */ "./src/com/comsocket.ts");
-var simpleshape_1 = __webpack_require__(/*! ./Elements/Basicshapes/simpleshape */ "./src/pars/Elements/Basicshapes/simpleshape.tsx");
-var placeholder_1 = __webpack_require__(/*! ./Elements/placeholder */ "./src/pars/Elements/placeholder.tsx");
-var polyshape_1 = __webpack_require__(/*! ./Elements/Basicshapes/polyshape */ "./src/pars/Elements/Basicshapes/polyshape.tsx");
-var button_1 = __webpack_require__(/*! ./Elements/Button/button */ "./src/pars/Elements/Button/button.tsx");
-var scrollbar_1 = __webpack_require__(/*! ./Elements/Scrollbar/scrollbar */ "./src/pars/Elements/Scrollbar/scrollbar.tsx");
-var arraytable_1 = __webpack_require__(/*! ./Elements/arraytable */ "./src/pars/Elements/arraytable.tsx");
-var bitmap_1 = __webpack_require__(/*! ./Elements/bitmap */ "./src/pars/Elements/bitmap.tsx");
+var comsocket_1 = __webpack_require__(/*! ./com/comsocket */ "./src/com/comsocket.ts");
+var elementparser_1 = __webpack_require__(/*! ./pars/elementparser */ "./src/pars/elementparser.tsx");
+var utilfunctions_1 = __webpack_require__(/*! ./pars/Utils/utilfunctions */ "./src/pars/Utils/utilfunctions.ts");
 var HTML5Visu = (function () {
     function HTML5Visu(rootDir) {
         this.rootDir = rootDir;
@@ -103198,7 +103295,7 @@ var HTML5Visu = (function () {
         })
             .then(function (data) {
             _this.initCommunication(data);
-            setTimeout(function () { return _this.convertVisuElements(data); }, 800);
+            setTimeout(function () { return _this.displayVisu(data); }, 800);
         })
             .fail(function (error) {
             console.error(error);
@@ -103215,46 +103312,14 @@ var HTML5Visu = (function () {
         com.updateVarList();
         com.startCyclicUpdate(200);
     };
-    HTML5Visu.prototype.convertVisuElements = function (XML) {
-        console.log("Start parsing...");
-        var visuXML = $(XML);
-        var visuObjects = [];
-        visuXML.children("visualisation").children("element").each(function () {
-            var section = $(this);
-            switch (section.attr("type")) {
-                case "simple":
-                    visuObjects.push(simpleshape_1.parseSimpleShape(section));
-                    break;
-                case "bitmap":
-                    visuObjects.push(bitmap_1.parseBitmap(section));
-                    break;
-                case "button":
-                    visuObjects.push(button_1.parseButton(section));
-                    break;
-                case "polygon":
-                    visuObjects.push(polyshape_1.parsePolyshape(section));
-                    break;
-                case "piechart":
-                    break;
-                case "group":
-                    visuObjects.push(placeholder_1.Placeholder(section));
-                    break;
-                case "scrollbar":
-                    visuObjects.push(React.createElement(scrollbar_1.Scrollbar, { section: section }));
-                    break;
-                case "array-table":
-                    visuObjects.push(arraytable_1.parseArrayTable(section));
-                    break;
-                default:
-                    console.log("Type <" + section.attr("type") + "> is not supported yet!");
-            }
-        });
-        console.log("XMl-File parsed successfully!");
+    HTML5Visu.prototype.displayVisu = function (XML) {
+        var thisXML = $(XML);
+        var rect = utilfunctions_1.stringToArray(thisXML.children("visualisation").children("size").text());
         function App() {
-            return (React.createElement(React.Fragment, null, visuObjects.map(function (element, index) { return React.createElement("div", { key: index }, element); })));
+            return (React.createElement("div", { id: "current", style: { position: "absolute", overflow: "hidden", left: 0, top: 0, width: rect[0] * 1.1, height: rect[1] * 1.1 } }, React.createElement(elementparser_1.VisuElements, { visualisation: thisXML })));
         }
-        ReactDOM.render(React.createElement(App, null), document.getElementById("visualisation"));
-        return visuObjects;
+        ReactDOM.render(React.createElement(React.StrictMode, null,
+            React.createElement(App, null)), document.getElementById("visualisation"));
     };
     return HTML5Visu;
 }());
