@@ -101561,6 +101561,7 @@ var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js"
 var comsocket_1 = __webpack_require__(/*! ../../../../com/comsocket */ "./src/com/comsocket.ts");
 function parseDynamicShapeParameters(section, shape) {
     var exprMap = new Map();
+    var exprMap2 = new Map();
     var tags = [];
     tags.push("expr-toggle-color");
     tags.push("expr-fill-color");
@@ -101584,6 +101585,21 @@ function parseDynamicShapeParameters(section, shape) {
     tags.forEach(function (entry) {
         section.children(entry).children("expr").each(function () {
             var varName = $(this).children("var").text();
+            var interimObj = { type: null, value: null, arithmetic: "" };
+            $(this).children().each(function (index, element) {
+                if (index == 0) {
+                    interimObj.type = $(element).prop("tagName");
+                    interimObj.value = $(element).text();
+                }
+                else {
+                    switch ($(element).prop("tagName")) {
+                        case "const":
+                            interimObj.arithmetic += $(element).text() + " ";
+                        case "op":
+                            interimObj.arithmetic += $(element).text().split('(')[0] + " ";
+                    }
+                }
+            });
             if (comsocket_1.default.singleton().oVisuVariables.has(varName)) {
                 exprMap.set(entry, varName);
             }
@@ -102468,7 +102484,7 @@ exports.Polyline = function (_a) {
     var initial = objectManager_1.createVisuObject(polyShape, dynamicParameters);
     var state = mobx_react_lite_1.useLocalStore(function () { return initial; });
     return mobx_react_lite_1.useObserver(function () {
-        return React.createElement("div", { id: polyShape.elem_id, style: { overflow: "hidden", transform: state.cssTransform, transformOrigin: state.cssTransformOrigin, cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.absCornerCoord.x1 - state.edge, top: state.absCornerCoord.y1 - state.edge, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge } },
+        return React.createElement("div", { id: polyShape.elem_id, style: { transform: state.cssTransform, transformOrigin: state.cssTransformOrigin, cursor: "auto", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.absCornerCoord.x1 - state.edge, top: state.absCornerCoord.y1 - state.edge, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge } },
             input,
             React.createElement("svg", null,
                 React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, strokeDasharray: state.strokeDashArray },
@@ -102563,7 +102579,7 @@ exports.Rectangle = function (_a) {
     return mobx_react_lite_1.useObserver(function () {
         return React.createElement("div", { id: simpleShape.elem_id, style: { cursor: "auto", overflow: "hidden", pointerEvents: state.eventType, visibility: state.display, position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge } },
             input,
-            React.createElement("svg", null,
+            React.createElement("svg", { width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge },
                 React.createElement("svg", { onClick: function () { return onclick(); }, onMouseDown: function () { return onmousedown(); }, onMouseUp: function () { return onmouseup(); }, onMouseLeave: function () { return onmouseup(); }, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, strokeDasharray: state.strokeDashArray },
                     React.createElement("rect", { width: state.relCoord.width, height: state.relCoord.height, x: state.edge, y: state.edge, fill: state.fill, stroke: state.stroke, strokeWidth: state.strokeWidth },
                         React.createElement("title", null, state.tooltip)),
@@ -102848,7 +102864,7 @@ exports.Group = function (_a) {
         }
     });
     var _b = React.useState("scale(1)"), scale = _b[0], setScale = _b[1];
-    React.useEffect(function () {
+    React.useEffect(React.useCallback(function () {
         var setY = rectParent[3] - rectParent[1];
         var setX = rectParent[2] - rectParent[0];
         var scaleOrientation = setX / setY;
@@ -102862,7 +102878,8 @@ exports.Group = function (_a) {
             var interim = "scale(" + factor + ")";
             setScale(interim);
         }
-    }, [rectParent, rightdownCorner]);
+    }, [rectParent, rightdownCorner]));
+    console.log(section.children("elem-id").text());
     return (React.createElement("div", { id: elemId, style: { overflow: "hidden", position: "absolute", left: rectParent[0], top: rectParent[1], width: rectParent[2] - rectParent[0], height: rectParent[3] - rectParent[1] } },
         React.createElement("div", { id: elemIdTransform, style: { transformOrigin: "left top", transform: scale } }, visuObjects.map(function (element, index) { return React.createElement(React.Fragment, null, element); }))));
 };
