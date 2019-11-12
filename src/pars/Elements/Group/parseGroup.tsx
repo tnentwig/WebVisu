@@ -3,8 +3,7 @@ import * as $ from 'jquery';
 import { parseSimpleShape } from '../Basicshapes/simpleshape';
 import { parsePolyshape } from '../Basicshapes/polyshape';
 import { stringToArray } from '../../Utils/utilfunctions';
-import {useObserver } from 'mobx-react-lite';
-import { NONAME } from 'dns';
+
 
 type Props = {
     section : JQuery<XMLDocument>
@@ -30,8 +29,9 @@ export const Group :React.FunctionComponent<Props> = ({section})=>
             }
         }
     }
-
+    
     let visuObjects: Array<(JSX.Element | undefined | null)> =[];
+    
         // Rip all <element> sections
         section.children("element").each(function(){
             let section = $(this);
@@ -44,7 +44,7 @@ export const Group :React.FunctionComponent<Props> = ({section})=>
                 case "polygon":
                     visuObjects.push(parsePolyshape(section));
                     section.children('point').each(function(){
-                        getDimension(rightdownCorner, stringToArray($(this).text()));
+                    getDimension(rightdownCorner, stringToArray($(this).text()));
                     });
                     break;
             }
@@ -65,7 +65,7 @@ export const Group :React.FunctionComponent<Props> = ({section})=>
                 let interim ="scale("+factor+")";
                 setScale(interim);
             }
-        }, [rectParent, rightdownCorner])
+        }, [rectParent, rightdownCorner]);
         
         return (
             <div id={elemId} style={{overflow:"hidden", position:"absolute", left:rectParent[0], top:rectParent[1], width:rectParent[2]-rectParent[0], height:rectParent[3]-rectParent[1]}}>

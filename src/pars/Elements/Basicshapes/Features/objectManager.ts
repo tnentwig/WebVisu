@@ -261,6 +261,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         let element = dynamicElements!.get("expr-angle");
         Object.defineProperty(initial, "angle", {
             get: function() {
+
                 return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
                 }
         });
