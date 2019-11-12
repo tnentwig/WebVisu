@@ -34,27 +34,30 @@ export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape
 
     tags.forEach(function(entry){
         section.children(entry).children("expr").each(function() {
+            let type ="";
+            let value ="";
+            let arithmetic ="";
             // Determine the type of the expression. It could be a variable ("var"), placeholder or a constant ("const").
             // There may additionally be an arithmetic operation in postfix nomenclatur.
-            let varName = $(this)!.children("var").text();
-            
-            // Init a interim object
-            let interimObj = {type:null as string, value:null as string, arithmetic:"" as string}
+            let varName = $(this)!.children("var").text();          
             $(this).children().each((index, element)=>{
                 // The first item is the type of the expression
-                if (index == 0){
-                    interimObj.type=$(element).prop("tagName");
-                    interimObj.value=$(element).text();
+                console.log($(element).prop("tagName"));
+                if (index === 0){
+                    type=$(element).prop("tagName");
+                    value=$(element).text();
                 } else {
                     switch($(element).prop("tagName")){
                         case "const":
-                            interimObj.arithmetic += $(element).text()+" ";
+                            arithmetic += $(element).text()+" ";
+                            break;
                         case "op":
-                            interimObj.arithmetic += $(element).text().split('(')[0]+" ";
+                            arithmetic += $(element).text().split("(")[0]+" ";
+                            break;
                     }
                 }
-
             });
+            
             if(ComSocket.singleton().oVisuVariables.has(varName)){
                 exprMap.set(entry, varName);
             }
@@ -62,9 +65,11 @@ export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape
                 let placeholderName = $(this)!.children("placeholder").text();
                 console.log("A placeholder variable: "+placeholderName+" at <"+shape+ "> object for <"+entry+"> was found.");
             }
+            console.log(arithmetic);
         })
+        
     });
-    
+
     return exprMap;
 }
 
