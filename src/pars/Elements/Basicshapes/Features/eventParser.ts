@@ -4,6 +4,7 @@ import ComSocket from '../../../../com/comsocket';
 
 export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape : string) : Map<string, string> {
     let exprMap : Map<string,string>= new Map();
+    let exprMap2 : Map<string,{type:string, value:string, arithmetic:String}>= new Map();
     let tags : Array<string>= [];
     // Styling tags
     tags.push("expr-toggle-color");         // 1) Set alarm
@@ -33,8 +34,27 @@ export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape
 
     tags.forEach(function(entry){
         section.children(entry).children("expr").each(function() {
+            // Determine the type of the expression. It could be a variable ("var"), placeholder or a constant ("const").
+            // There may additionally be an arithmetic operation in postfix nomenclatur.
             let varName = $(this)!.children("var").text();
-            // Determine if the deposited variable exists in the process image. There could be a misspelling of a variable name in the Codesysproject.
+            
+            // Init a interim object
+            let interimObj = {type:null as string, value:null as string, arithmetic:"" as string}
+            $(this).children().each((index, element)=>{
+                // The first item is the type of the expression
+                if (index == 0){
+                    interimObj.type=$(element).prop("tagName");
+                    interimObj.value=$(element).text();
+                } else {
+                    switch($(element).prop("tagName")){
+                        case "const":
+                            interimObj.arithmetic += $(element).text()+" ";
+                        case "op":
+                            interimObj.arithmetic += $(element).text().split('(')[0]+" ";
+                    }
+                }
+
+            });
             if(ComSocket.singleton().oVisuVariables.has(varName)){
                 exprMap.set(entry, varName);
             }
@@ -44,6 +64,7 @@ export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape
             }
         })
     });
+    
     return exprMap;
 }
 
