@@ -101584,19 +101584,24 @@ function parseDynamicShapeParameters(section, shape) {
     tags.push("expr-input-disabled");
     tags.forEach(function (entry) {
         section.children(entry).children("expr").each(function () {
+            var type = "";
+            var value = "";
+            var arithmetic = "";
             var varName = $(this).children("var").text();
-            var interimObj = { type: null, value: null, arithmetic: "" };
             $(this).children().each(function (index, element) {
-                if (index == 0) {
-                    interimObj.type = $(element).prop("tagName");
-                    interimObj.value = $(element).text();
+                console.log($(element).prop("tagName"));
+                if (index === 0) {
+                    type = $(element).prop("tagName");
+                    value = $(element).text();
                 }
                 else {
                     switch ($(element).prop("tagName")) {
                         case "const":
-                            interimObj.arithmetic += $(element).text() + " ";
+                            arithmetic += $(element).text() + " ";
+                            break;
                         case "op":
-                            interimObj.arithmetic += $(element).text().split('(')[0] + " ";
+                            arithmetic += $(element).text().split("(")[0] + " ";
+                            break;
                     }
                 }
             });
@@ -101607,6 +101612,7 @@ function parseDynamicShapeParameters(section, shape) {
                 var placeholderName = $(this).children("placeholder").text();
                 console.log("A placeholder variable: " + placeholderName + " at <" + shape + "> object for <" + entry + "> was found.");
             }
+            console.log(arithmetic);
         });
     });
     return exprMap;
@@ -102864,7 +102870,7 @@ exports.Group = function (_a) {
         }
     });
     var _b = React.useState("scale(1)"), scale = _b[0], setScale = _b[1];
-    React.useEffect(React.useCallback(function () {
+    React.useEffect(function () {
         var setY = rectParent[3] - rectParent[1];
         var setX = rectParent[2] - rectParent[0];
         var scaleOrientation = setX / setY;
@@ -102878,8 +102884,7 @@ exports.Group = function (_a) {
             var interim = "scale(" + factor + ")";
             setScale(interim);
         }
-    }, [rectParent, rightdownCorner]));
-    console.log(section.children("elem-id").text());
+    }, [rectParent, rightdownCorner]);
     return (React.createElement("div", { id: elemId, style: { overflow: "hidden", position: "absolute", left: rectParent[0], top: rectParent[1], width: rectParent[2] - rectParent[0], height: rectParent[3] - rectParent[1] } },
         React.createElement("div", { id: elemIdTransform, style: { transformOrigin: "left top", transform: scale } }, visuObjects.map(function (element, index) { return React.createElement(React.Fragment, null, element); }))));
 };
