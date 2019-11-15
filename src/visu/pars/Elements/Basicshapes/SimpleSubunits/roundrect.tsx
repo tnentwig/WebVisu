@@ -7,26 +7,24 @@ type Props = {
     simpleShape: IBasicShape,
     textField : JSX.Element|undefined,
     input : JSX.Element,
-    dynamicParameters : Map<string, string>,
+    dynamicParameters : Map<string,{type:string, value:string, arithmetic:string}>,
     onmousedown : Function,
     onmouseup : Function,
-    onclick : Function 
+    onclick : Function
 }
 
-export const Rectangle :React.FunctionComponent<Props> = ({simpleShape, textField, input, dynamicParameters, onclick, onmousedown, onmouseup})=>
-{ 
- // Attach the dynamic paramters like color variable
- let initial = createVisuObject(simpleShape, dynamicParameters)
+export const Roundrect :React.FunctionComponent<Props> = ({simpleShape, textField, input, dynamicParameters, onclick, onmousedown, onmouseup})=>
+{
+    // Attach the dynamic paramters like color variable
+    let initial = createVisuObject(simpleShape, dynamicParameters)
+        
+    // Convert object to an observable one
+    const state  = useLocalStore(()=>initial);
     
- // Convert object to an observable one
- const state  = useLocalStore(()=>initial);
-    
-return useObserver(()=>
-    <div id={simpleShape.elem_id} style={{cursor: "auto", overflow:"hidden", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
+    return useObserver(()=>
+    <div id={simpleShape.elem_id} style={{cursor: "auto",overflow:"hidden", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
         {input}
-        <svg
-          width={state.relCoord.width+2*state.edge} 
-          height={state.relCoord.height+2*state.edge} >
+        <svg>
             <svg 
                 onClick={()=>onclick()} 
                 onMouseDown={()=>onmousedown()} 
@@ -40,6 +38,8 @@ return useObserver(()=>
                     height={state.relCoord.height}
                     x={state.edge}
                     y={state.edge}
+                    rx={10}
+                    ry={10}
                     fill={state.fill}
                     stroke={state.stroke}
                     strokeWidth={state.strokeWidth}
@@ -54,4 +54,3 @@ return useObserver(()=>
     </div>
     )
 }
-

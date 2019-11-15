@@ -1,9 +1,8 @@
 import * as $ from 'jquery';
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
-import ComSocket from './com/comsocket';
-import { VisuElements } from './pars/elementparser'
-import { stringToArray } from './pars/Utils/utilfunctions'
+import ComSocket from './visu/com/comsocket';
+import {Visualisation} from './visu/visuparser'
 
 export default class HTML5Visu {
     rootDir: string;
@@ -44,18 +43,17 @@ export default class HTML5Visu {
     }
 
     displayVisu (XML : XMLDocument)  {
-        let thisXML=$(XML);
-        let rect = stringToArray(thisXML.children("visualisation").children("size").text());
         // The coverted sections are inserted in the virtual react DOM
         function App() {
             return (
-                <div id="current" style={{position:"absolute", overflow:"hidden", left:0, top:0, width:rect[0]*1.1, height:rect[1]*1.1}}>
+                <React.Fragment>
                     {
-                        <VisuElements visualisation={thisXML}></VisuElements>
+                        <Visualisation visualisation={XML}></Visualisation>
                     }
-                </div>
+                </React.Fragment>
             )
         }
+        
         // The virtual DOM will be inserted in the DOM. React will update the DOM automatically.
         ReactDOM.render(
             <React.StrictMode><App /></React.StrictMode>, document.getElementById("visualisation"));

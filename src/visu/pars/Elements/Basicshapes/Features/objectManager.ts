@@ -1,9 +1,50 @@
 import ComSocket from '../../../../com/comsocket';
 import {IVisuObject} from './interfaces'
-import {numberToHexColor, computeMinMaxCoord} from '../../../Utils/utilfunctions'
+import {numberToHexColor, computeMinMaxCoord, evalRPN} from '../../../Utils/utilfunctions'
 import {IBasicShape} from '../../../Interfaces/interfaces'
 
-export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<string,string>) : IVisuObject{
+function evalFunction(value : string, type:string, arithmetic:string, isBooleanExpr: boolean) : Function {
+    var returnFunc = function () { ; };
+    switch (type) {
+        case "var":
+            returnFunc = function () {
+                var varContent = ComSocket.singleton().oVisuVariables.get(value).value;
+                var interim = varContent + " " + arithmetic;
+                var expr = evalRPN(interim);
+                if (isBooleanExpr){
+                    if ((expr === 0) || (expr === false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                } else {
+                    return expr;
+                }
+            };
+            break;
+        case "const":
+            returnFunc = function () {
+            var interim = value + " " + arithmetic;
+            var expr = evalRPN(interim);
+            if (isBooleanExpr){
+                if ((expr === 0) || (expr === false)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return expr;
+            }
+        };
+            break;
+        case "placeholder":
+            console.log("Placeholder not supported yet!");
+            break;
+    }
+    return returnFunc;
+}
+
+export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<string,{type:string, value:string, arithmetic:string}>) : IVisuObject{
 
     // absCornerCoord are the absolute coordinates of the <div> element in relation to the origin in the top left 
     let absCornerCoord = {x1:basicShape.rect[0],y1:basicShape.rect[1],x2:basicShape.rect[2],y2:basicShape.rect[3]};
@@ -25,7 +66,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // The polyshape specific values will be generated if necessary
     if (['polygon', 'bezier', 'polyline'].includes(basicShape.shape)){
         basicShape.points.forEach(function(item, index){
-            relPoints.push([item[0]-absCornerCoord.x1, item[1]-absCornerCoord.y1])
+            relPoints.push([item[0]-absCornerCoord.x1, item[1]-absCornerCoord.y1]);
         })
     }
 
@@ -76,18 +117,13 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // A <expr-..-> tag initiate a variable, const or a placeholder
     // We have to implement the const value, the variable or the placeholdervalue if available for the static value
     // Polyshapes and Simpleshapes have the same <expr-...> possibilities
-    // 1) Set alarm state
+
+
     if (dynamicElements.has("expr-toggle-color")) {
-        let element = dynamicElements!.get("expr-toggle-color");
+        let element = dynamicElements.get("expr-toggle-color");
+        let returnFunc = (evalFunction(element.value, element.type, element.arithmetic, true));
         Object.defineProperty(initial, "alarm", {
-            get: function() {
-                let value = ComSocket.singleton().oVisuVariables.get(element)!.value;
-                if (value === "0"){
-                    return false;
-                } else {
-                    return true;
-                }
-            }
+            get: ()=>returnFunc()
         });
     }
     // 2) Set fill color
@@ -95,16 +131,16 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         let element = dynamicElements!.get("expr-fill-color");
         Object.defineProperty(initial, "normalFillColor", {
             get: function() {
-                return numberToHexColor(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                return numberToHexColor(ComSocket.singleton().oVisuVariables.get(element.value)!.value);
             }
-        });
+        }); 
     }
     // 3) Set alarm color
     if (dynamicElements.has("expr-fill-color-alarm")) {
         let element = dynamicElements!.get("expr-fill-color-alarm");
         Object.defineProperty(initial, "alarmFillColor", {
             get: function() {
-                return numberToHexColor(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                return numberToHexColor(ComSocket.singleton().oVisuVariables.get(element.value)!.value);
             }
         });
     }
@@ -113,7 +149,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         let element = dynamicElements!.get("expr-frame-color");
         Object.defineProperty(initial, "normalFrameColor", {
             get: function() {
-                return numberToHexColor(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                return numberToHexColor(ComSocket.singleton().oVisuVariables.get(element.value)!.value);
             }
         });
 
@@ -123,7 +159,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         let element = dynamicElements!.get("expr-frame-color-alarm");
         Object.defineProperty(initial, "alarmFrameColor", {
             get: function() {
-                return numberToHexColor(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                return numberToHexColor(ComSocket.singleton().oVisuVariables.get(element.value)!.value);
             }
         });
     }
@@ -133,7 +169,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         let element = dynamicElements!.get("expr-invisible");
         Object.defineProperty(initial, "display", {
             get: function() {
-                let value = ComSocket.singleton().oVisuVariables.get(element)!.value;
+                let value = ComSocket.singleton().oVisuVariables.get(element.value)!.value;
                 if (value === "0"){
                     return "visible";
                 } else {
@@ -147,7 +183,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         let element = dynamicElements!.get("expr-fill-flags");
         Object.defineProperty(initial, "hasFillColor", {
             get: function() {
-                let value = ComSocket.singleton().oVisuVariables.get(element)!.value;
+                let value = ComSocket.singleton().oVisuVariables.get(element.value)!.value;
                 if (value === "1"){
                     return false;
                 } else {
@@ -161,13 +197,13 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         let element = dynamicElements!.get("expr-frame-flags");
         Object.defineProperty(initial, "hasFrameColor", {
             get: function() {
-                let value = ComSocket.singleton().oVisuVariables.get(element)!.value == "8" ? false : true;
+                let value = ComSocket.singleton().oVisuVariables.get(element.value)!.value == "8" ? false : true;
                 return value;
             }
         });
         Object.defineProperty(initial, "strokeDashArray", {
             get: function() {
-                let value = ComSocket.singleton().oVisuVariables.get(element)!.value;
+                let value = ComSocket.singleton().oVisuVariables.get(element.value)!.value;
                 if (value == "4"){
                     return "20,10,5,5,5,10";
                 } else if (value == "3"){
@@ -188,7 +224,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         let element = dynamicElements!.get("expr-line-width");
         Object.defineProperty(initial, "lineWidth", {
             get: function() {
-                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                return Number(ComSocket.singleton().oVisuVariables.get(element.value)!.value);
                 }
         });
     }
@@ -198,26 +234,25 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         let element = dynamicElements!.get("expr-left");
         Object.defineProperty(initial, "left", {
             get: function() {
-                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                return Number(ComSocket.singleton().oVisuVariables.get(element.value)!.value);
                 }
         });
     }
     // 11) Right-Position
     if (dynamicElements.has("expr-right")) {
         let element = dynamicElements!.get("expr-right");
+       let returnFunc = (evalFunction(element.value, element.type, element.arithmetic, false));
         Object.defineProperty(initial, "right", {
-            get: function() {
-                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
-                }
+            get: ()=>returnFunc()
+       
         });
     }
     // 12) Top-Position 
     if (dynamicElements.has("expr-top")) {
         let element = dynamicElements!.get("expr-top");
+        var returnFunc = (evalFunction(element.value, element.type, element.arithmetic, false));
         Object.defineProperty(initial, "top", {
-            get: function() {
-                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
-                }
+            get: ()=>returnFunc()
         });
     }
     // 13) Bottom-Position 
@@ -225,7 +260,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         let element = dynamicElements!.get("expr-bottom");
         Object.defineProperty(initial, "bottom", {
             get: function() {
-                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                return Number(ComSocket.singleton().oVisuVariables.get(element.value)!.value);
                 }
         });
     }
@@ -234,7 +269,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         let element = dynamicElements!.get("expr-xpos");
         Object.defineProperty(initial, "xpos", {
             get: function() {
-                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                return Number(ComSocket.singleton().oVisuVariables.get(element.value)!.value);
                 }
         });
     }
@@ -243,7 +278,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         let element = dynamicElements!.get("expr-ypos");
         Object.defineProperty(initial, "ypos", {
             get: function() {
-                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                return Number(ComSocket.singleton().oVisuVariables.get(element.value)!.value);
                 }
         });
     }
@@ -252,18 +287,16 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         let element = dynamicElements!.get("expr-scale");
         Object.defineProperty(initial, "scale", {
             get: function() {
-                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                return Number(ComSocket.singleton().oVisuVariables.get(element.value)!.value);
                 }
         });
     }
     // 17) Rotating
     if (dynamicElements.has("expr-angle")) {
         let element = dynamicElements!.get("expr-angle");
+        var returnFunc = (evalFunction(element.value, element.type, element.arithmetic, false));
         Object.defineProperty(initial, "angle", {
-            get: function() {
-
-                return Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
-                }
+            get: ()=>returnFunc()
         });
     }
     // 18) Tooltip
@@ -271,7 +304,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         let element = dynamicElements!.get("expr-tooltip-display");
         Object.defineProperty(initial, "tooltip", {
             get: function() {
-                return ComSocket.singleton().oVisuVariables.get(element)!.value;
+                return ComSocket.singleton().oVisuVariables.get(element.value)!.value;
                 }
         });
     }
@@ -280,7 +313,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         let element = dynamicElements!.get("expr-input-disabled");
         Object.defineProperty(initial, "deactivateInput", {
             get: function() {
-                return (ComSocket.singleton().oVisuVariables.get(element)!.value=="1"?"none":"visible");
+                return (ComSocket.singleton().oVisuVariables.get(element.value)!.value=="1"?"none":"visible");
                 }
         });
     }

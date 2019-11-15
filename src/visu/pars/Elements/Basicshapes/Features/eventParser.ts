@@ -2,9 +2,8 @@ import * as $ from 'jquery';
 import ComSocket from '../../../../com/comsocket';
 // This function is parsing all <expr-...> tags like toggle color and returns a map with the expression as key and the variable as value
 
-export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape : string) : Map<string, string> {
-    let exprMap : Map<string,string>= new Map();
-    let exprMap2 : Map<string,{type:string, value:string, arithmetic:String}>= new Map();
+export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape : string) : Map<string,{type:string, value:string, arithmetic:string}>{
+    let exprMap : Map<string,{type:string, value:string, arithmetic:string}>= new Map();
     let tags : Array<string>= [];
     // Styling tags
     tags.push("expr-toggle-color");         // 1) Set alarm
@@ -42,7 +41,6 @@ export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape
             let varName = $(this)!.children("var").text();          
             $(this).children().each((index, element)=>{
                 // The first item is the type of the expression
-                console.log($(element).prop("tagName"));
                 if (index === 0){
                     type=$(element).prop("tagName");
                     value=$(element).text();
@@ -57,19 +55,13 @@ export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape
                     }
                 }
             });
-            
-            if(ComSocket.singleton().oVisuVariables.has(varName)){
-                exprMap.set(entry, varName);
+
+            if (type.length){
+                exprMap.set(entry, {type:type, value:value, arithmetic:arithmetic});
             }
-            else{
-                let placeholderName = $(this)!.children("placeholder").text();
-                console.log("A placeholder variable: "+placeholderName+" at <"+shape+ "> object for <"+entry+"> was found.");
-            }
-            console.log(arithmetic);
         })
         
     });
-
     return exprMap;
 }
 

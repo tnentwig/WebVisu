@@ -2,19 +2,19 @@ import * as React from 'react';
 import { IBasicShape } from '../../../Interfaces/interfaces';
 import {createVisuObject} from '../Features/objectManager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
-import { coordArrayToString } from '../../../Utils/utilfunctions'
+import { coordArrayToBezierString } from '../../../Utils/utilfunctions'
 
 type Props = {
     polyShape: IBasicShape,
     textField : JSX.Element|undefined,
     input : JSX.Element,
-    dynamicParameters : Map<string, string>,
+    dynamicParameters :  Map<string,{type:string, value:string, arithmetic:string}>,
     onmousedown : Function,
     onmouseup : Function,
     onclick : Function
 }
 
-export const Polygon :React.FunctionComponent<Props> = ({polyShape, textField, input, dynamicParameters, onclick, onmousedown, onmouseup})=> 
+export const Bezier :React.FunctionComponent<Props> = ({polyShape, textField, input, dynamicParameters, onclick, onmousedown, onmouseup})=> 
 {
     // Attach the dynamic paramters like color variable
     let initial = createVisuObject(polyShape, dynamicParameters)
@@ -33,20 +33,21 @@ export const Polygon :React.FunctionComponent<Props> = ({polyShape, textField, i
                 onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
                 strokeDasharray={state.strokeDashArray}
                 >   
-                <polygon
-                    points={coordArrayToString(state.relPoints)}
+                <path
+                    d={coordArrayToBezierString(state.relPoints)}
                     fill={state.fill}
                     strokeWidth={state.strokeWidth}
                     stroke={state.stroke}
                     />
                     <title>{state.tooltip}</title>
-                </svg>
-                <svg
-                    width={state.relCoord.width+2*state.edge} 
-                    height={state.relCoord.height+2*state.edge} >
-                    {textField}
-                </svg>
             </svg>
+            <svg
+                width={state.relCoord.width+2*state.edge} 
+                height={state.relCoord.height+2*state.edge} >
+                {textField}
+            </svg>
+        </svg>
     </div>
     )
 }
+

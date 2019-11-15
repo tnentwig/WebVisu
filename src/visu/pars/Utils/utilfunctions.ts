@@ -1,3 +1,4 @@
+import { type } from "os";
 
 export function stringToBoolean(booleanExp : string) : boolean {
     return JSON.parse(booleanExp);
@@ -66,4 +67,51 @@ export function coordArrayToBezierString(pointArray : number[][]) : string {
     })
     return bezier;
 }
+/* Copyright 2014–2015 Kenan Yildirim <http://kenany.me/>*/
 
+export function evalRPN(postfix : string) : boolean|number|null {
+    //
+    let interim = "";
+    if (postfix.length === 0) {
+      return null;
+    } else if (postfix.charAt(postfix.length-1)){
+        interim = postfix.slice(0, -1);
+    } else {
+        interim = postfix;
+    }
+  
+    // Split into array of tokens
+    let postfixSplitted : Array<string> = interim.split(/\s+/);
+  
+    let stack : Array<number> = [] ;
+  
+    for (var i = 0; i < postfixSplitted.length; i++) {
+      var token = postfixSplitted[i];
+  
+      // Token is a value, push it onto the stack
+      if (!isNaN(Number(token))) {
+        stack.push(parseFloat(token));
+      }
+  
+      // Token is operator
+      else {
+        // Every operation requires two arguments
+        if (stack.length < 2) {
+          throw new Error('Insufficient values in expression.');
+        }
+  
+        // Pop two items from the top of the stack and push the result of the
+        // operation onto the stack.
+        var y = stack.pop();
+        var x = stack.pop();
+
+        stack.push(eval(x + token + ' ' + y));      // eval could be harmful, so remove all harmful characters before evaluating
+      }
+    }
+  
+    if (stack.length > 1) {
+      throw new Error('Inputted expression has too many values.');
+    }
+  
+    return stack.pop();
+  }

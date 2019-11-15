@@ -48,7 +48,10 @@ export const VisuElements :React.FunctionComponent<Props> =({visualisation})=>{
             case "scrollbar":
                 visuObjects.push(<Scrollbar section={section}></Scrollbar>);
                 break;
-            // Not a supported type, is logged
+            // Is a array table
+            case "array-table":
+                visuObjects.push(parseArrayTable(section));
+                break;
             case "array-table":
                 visuObjects.push(parseArrayTable(section));
                 break;
