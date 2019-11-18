@@ -1,13 +1,13 @@
 import * as $ from 'jquery';
 import * as React from 'react';
 import { parseSimpleShape } from '../pars/Elements/Basicshapes/simpleshape';
-import { Placeholder } from '../pars/Elements/placeholder';
 import { parsePolyshape } from '../pars/Elements/Basicshapes/polyshape';
 import { parseButton } from '../pars/Elements/Button/button';
 import { Scrollbar } from '../pars/Elements/Scrollbar/scrollbar';
 import { parseArrayTable } from '../pars/Elements/arraytable';
 import { parseBitmap } from '../pars/Elements/bitmap';
-import { Group } from '../pars/Elements/Group/parseGroup'
+import { Group } from '../pars/Elements/Group/parseGroup';
+import { Subvisu } from '../pars/Elements/Subvisu/subvisu'
 
 type Props = {
     visualisation: JQuery<XMLDocument>
@@ -52,8 +52,8 @@ export const VisuElements :React.FunctionComponent<Props> =({visualisation})=>{
             case "array-table":
                 visuObjects.push(parseArrayTable(section));
                 break;
-            case "array-table":
-                visuObjects.push(parseArrayTable(section));
+            case "reference":
+                visuObjects.push(<Subvisu section={section}></Subvisu>);
                 break;
             default:
                 console.log("Type <"+section.attr("type")+"> is not supported yet!");
