@@ -1,4 +1,3 @@
-import { type } from "os";
 
 export function stringToBoolean(booleanExp : string) : boolean {
     return JSON.parse(booleanExp);
