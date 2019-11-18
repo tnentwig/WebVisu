@@ -8,9 +8,15 @@ function evalFunction(value : string, type:string, arithmetic:string, isBooleanE
     switch (type) {
         case "var":
             returnFunc = function () {
-                var varContent = ComSocket.singleton().oVisuVariables.get(value).value;
-                var interim = varContent + " " + arithmetic;
-                var expr = evalRPN(interim);
+                let varContent = ComSocket.singleton().oVisuVariables.get(value).value;
+                let interim = varContent + " " + arithmetic;
+                let expr : number | boolean;
+                try{
+                    expr  = evalRPN(interim);
+                }catch {
+                    expr = Number(varContent);
+                }
+
                 if (isBooleanExpr){
                     if ((expr === 0) || (expr === false)) {
                         return false;
@@ -24,8 +30,8 @@ function evalFunction(value : string, type:string, arithmetic:string, isBooleanE
             break;
         case "const":
             returnFunc = function () {
-            var interim = value + " " + arithmetic;
-            var expr = evalRPN(interim);
+            let interim = value + " " + arithmetic;
+            let expr = evalRPN(interim);
             if (isBooleanExpr){
                 if ((expr === 0) || (expr === false)) {
                     return false;
