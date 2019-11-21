@@ -3,6 +3,7 @@ import * as ReactDOM from 'react-dom';
 import * as React from 'react';
 import ComSocket from './visu/com/comsocket';
 import {Visualisation} from './visu/visuparser'
+import { useObserver } from 'mobx-react-lite'
 
 export default class HTML5Visu {
     rootDir: string;
@@ -26,6 +27,8 @@ export default class HTML5Visu {
         await this.initCommunication(visuIni, 200);
         // Get the current visu
         let currentVisu = visuProp.get("STARTVISU");
+        let useCurrentVisuVariable = visuProp.get("USECURRENTVISU");
+        
         this.displayVisu(currentVisu);
     }
 
@@ -33,7 +36,7 @@ export default class HTML5Visu {
         return new Promise(resolve =>{
             let com = ComSocket.singleton();
             com.setServerURL(this.rootDir + '');
-            com.startCyclicUpdate(200);
+            com.startCyclicUpdate(cycletime);
             this.appendVariables(XML);
             resolve(true);
         })
@@ -66,22 +69,24 @@ export default class HTML5Visu {
             let parser = new DOMParser();
             let htmlDoc = parser.parseFromString(data, 'text/html');
             let htmlElement = htmlDoc.getElementsByTagName("param");
-            let visuName = "";
-            let updateTime = "";
             for (let i=0; i<htmlElement.length; i++){
                 let name = htmlElement[i].getAttribute("name").toString();
                 switch(name){
                     case "STARTVISU":
-                        visuName = htmlElement[i].getAttribute("value");
+                        let visuName = htmlElement[i].getAttribute("value");
                         console.log(visuName);
                         map.set(name, visuName)
                         break;
                     case "UPDATETIME":
-                        updateTime = htmlElement[i].getAttribute("value");
+                        let updateTime = htmlElement[i].getAttribute("value");
                         map.set(name, updateTime)
+                        break;
+                    case "UPDATETIME":
+                        let useCurrentVisu= htmlElement[i].getAttribute("value");
+                        map.set(name, useCurrentVisu)
                 }
             }
-            resolve(map)
+            resolve(map);
         })       
         .fail((error) => {
             console.error(error);
@@ -107,7 +112,7 @@ export default class HTML5Visu {
     displayVisu (name : string)  {
         // The coverted sections are inserted in the virtual react DOM
         function App() {
-            return (
+            return useObserver(()=>
                 <React.Fragment>
                     {
                         <Visualisation visuname={name}></Visualisation>
