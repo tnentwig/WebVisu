@@ -1,6 +1,12 @@
 
 export function stringToBoolean(booleanExp : string) : boolean {
-    return JSON.parse(booleanExp);
+    let interim = false;
+    try{
+        interim =JSON.parse(booleanExp)
+    }catch{
+        throw new Error("Not a boolean expression!");
+    }
+    return interim;
 }
 
 export function rgbToHexString(rgb : string) : string{
