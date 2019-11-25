@@ -1,22 +1,24 @@
 import * as $ from 'jquery';
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
-import ComSocket from './visu/com/comsocket';
-import {Visualisation} from './visu/visuparser'
-import { useObserver } from 'mobx-react-lite'
+import ComSocket from './visu/datamanger/comsocket';
+import StateManager from './visu/datamanger/statemanager'
+import { Visualisation } from './visu/visuparser';
+import { observer } from 'mobx-react';
 
 export default class HTML5Visu {
     rootDir: string;
+    
     constructor(){
         let path = location.protocol + '//' + window.location.host;
         this.rootDir= path;
     }
     async showMainVisu () {
          // Get the webvisu.htm file. There are the startvisu and updatetime listed
-        let visuProp : Map<string,string>;
         try{
            // Get the webvisu.htm file. There are the startvisu and updatetime listed
-           visuProp = await this.getWebvisuhtm('/webvisu.htm');
+           await this.getWebvisuhtm('/webvisu.htm');
+           console.log("Get the webvisu.htm");
         } catch {
            throw new Error("The URI is malformed!");
         }
@@ -25,11 +27,26 @@ export default class HTML5Visu {
         let visuIni = await this.getVisuini('/visu_ini.xml');
         // The Comsocket has to be initilized
         await this.initCommunication(visuIni, 200);
-        // Get the current visu
-        let currentVisu = visuProp.get("STARTVISU");
-        let useCurrentVisuVariable = visuProp.get("USECURRENTVISU");
+        // Get a reference to the global state manager
+        let stateManager = StateManager.singleton().oState;
         
-        this.displayVisu(currentVisu);
+        // The coverted sections are inserted in the virtual react DOM
+        
+        const App = observer(()=> {
+
+            return (
+                <React.Fragment>
+                    {
+                        <Visualisation visuname={stateManager.get("CURRENTVISU")}></Visualisation>
+                    }
+                </React.Fragment>
+            )
+        })
+        
+        // The virtual DOM will be inserted in the DOM. React will update the DOM automatically.
+        ReactDOM.render(
+            <React.StrictMode><App /></React.StrictMode>, document.getElementById("visualisation"));
+    
     }
 
     async initCommunication(XML : XMLDocument, cycletime : number) : Promise<boolean> {
@@ -53,9 +70,8 @@ export default class HTML5Visu {
         })
     }
 
-    getWebvisuhtm(relPath : string) : Promise<Map<string,string>>{
+    getWebvisuhtm(relPath : string) : Promise<boolean>{
     return new Promise((resolve)=>{
-        let map :Map<string,string> = new Map();    
     // Get the webvisu.htm file. There are the startvisu and updatetime listed
         let webvisuhtm =$.ajax({
             url: this.rootDir+relPath,
@@ -63,7 +79,8 @@ export default class HTML5Visu {
             dataType: 'html', 
             crossDomain: true
         })
-
+        // Get a reference to the global state manager
+        let stateManager = StateManager.singleton().oState;
         webvisuhtm.then((data) => {
             // Searching for cycletime and startvisuname
             let parser = new DOMParser();
@@ -74,19 +91,18 @@ export default class HTML5Visu {
                 switch(name){
                     case "STARTVISU":
                         let visuName = htmlElement[i].getAttribute("value");
-                        console.log(visuName);
-                        map.set(name, visuName)
+                        stateManager.set(name, visuName)
                         break;
                     case "UPDATETIME":
                         let updateTime = htmlElement[i].getAttribute("value");
-                        map.set(name, updateTime)
+                        stateManager.set(name, updateTime)
                         break;
-                    case "UPDATETIME":
+                    case "USECURRENTVISU":
                         let useCurrentVisu= htmlElement[i].getAttribute("value");
-                        map.set(name, useCurrentVisu)
+                        stateManager.set(name, useCurrentVisu)
                 }
             }
-            resolve(map);
+            resolve(true);
         })       
         .fail((error) => {
             console.error(error);
@@ -108,22 +124,4 @@ export default class HTML5Visu {
             })
         })
     }
-
-    displayVisu (name : string)  {
-        // The coverted sections are inserted in the virtual react DOM
-        function App() {
-            return useObserver(()=>
-                <React.Fragment>
-                    {
-                        <Visualisation visuname={name}></Visualisation>
-                    }
-                </React.Fragment>
-            )
-        }
-        
-        // The virtual DOM will be inserted in the DOM. React will update the DOM automatically.
-        ReactDOM.render(
-            <React.StrictMode><App /></React.StrictMode>, document.getElementById("visualisation"));
-    }
-
 }
