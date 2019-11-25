@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { IBasicShape } from '../../../Interfaces/interfaces';
-import {createVisuObject} from '../Features/objectManager'
+import {createVisuObject} from '../../Features/objectManager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
-import { IVisuObject } from '../Features/interfaces';
+import { IVisuObject } from '../../../Interfaces/interfaces';
 
 type Props = {
     simpleShape: IBasicShape,
