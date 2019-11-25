@@ -1,4 +1,5 @@
 const path = require('path');
+const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
     mode: 'production',
@@ -22,5 +23,12 @@ module.exports = {
                 loader: ["source-map-loader", "eslint-loader"]
             }
         ]
-    }
+    },
+    plugins: [new CompressionPlugin({
+      filename: "[path].gz[query]",
+      algorithm: "gzip",
+      test: /\.js$|\.css$|\.html$/,
+      threshold: 10240,
+      minRatio: 0.8
+    })],
 }
