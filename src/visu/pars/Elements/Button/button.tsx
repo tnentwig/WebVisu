@@ -1,31 +1,77 @@
 import * as React from 'react';
+import * as util from '../../Utils/utilfunctions';
+import { IBasicShape } from '../../Interfaces/interfaces';
+import { Textfield } from '../Features/textManager';
+import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from '../Features/eventManager';
+import {createVisuObject} from '../Features/objectManager'
+import {useObserver, useLocalStore } from 'mobx-react-lite';
+import { Image } from '../Features/image'
 
-import { stringToBoolean, rgbToHexString, stringToArray } from '../../Utils/utilfunctions';
+type Props = {
+    section : JQuery<XMLDocument>
+}
 
-export function parseButton (section : JQuery<XMLDocument>) {
+export const Button :React.FunctionComponent<Props> = ({section})=>
+{
     // Parsing of the fixed parameters
-    let has_inside_color = stringToBoolean(section.children("has-inside-color").text());
-    let fill_color = rgbToHexString(section.children("fill-color").text());
-    let fill_color_alarm = rgbToHexString(section.children("fill-color-alarm").text());
-    let has_frame_color = stringToBoolean(section.children("has-frame-color").text());
-    let frame_color = rgbToHexString(section.children("frame-color").text());
-    let frame_color_alarm = rgbToHexString(section.children("frame-color-alarm").text());
-    let rect = stringToArray(section.children("rect").text());
-    let center = stringToArray(section.children("center").text());
-    let hidden_input = stringToBoolean(section.children("hidden-input").text());
-    let enable_text_input = stringToBoolean(section.children("enable-text-input").text());
 
-    // Auxiliary values
-    let relCornerCoord = {x1:0, y1:0, x2:rect[2]-rect[0], y2:rect[3]-rect[1]};
-    let relCenterCoord = {x:center[0]-rect[0], y:center[1]-rect[1]};
-    let edge = 1;
+    let button : IBasicShape = {
+        shape : "button",
+        has_inside_color : util.stringToBoolean(section.children("has-inside-color").text()),
+        fill_color : util.rgbToHexString(section.children("fill-color").text()),
+        fill_color_alarm : util.rgbToHexString(section.children("fill-color-alarm").text()),
+        has_frame_color : util.stringToBoolean(section.children("has-frame-color").text()),
+        frame_color : util.rgbToHexString(section.children("frame-color").text()),
+        frame_color_alarm : util.rgbToHexString(section.children("frame-color-alarm").text()),
+        line_width : Number(section.children("line-width").text()),
+        elem_id : section.children("elem-id").text(),
+        rect : util.stringToArray(section.children("rect").text()),
+        center : util.stringToArray(section.children("center").text()),
+        hidden_input : util.stringToBoolean(section.children("hidden-input").text()),
+        enable_text_input : util.stringToBoolean(section.children("enable-text-input").text()),
+        tooltip : (section.children("tooltip").text()).length>0? section.children("tooltip").text() : "",
+        // Points only exists on polyforms
+        points : []
+      }
+
+    // Parsing the textfields and returning a jsx object if it exists
+    let dynamicTextParameters = parseDynamicTextParameters(section, button.shape);
+    let textField : JSX.Element;
+    if (section.find("text-id").text().length){
+      textField = <Textfield section={section} dynamicParameters={dynamicTextParameters}></Textfield>;
+    }
+    else {
+      textField = null;
+    }
+    // Parsing of observable events (like toggle color)
+    let dynamicShapeParameters = parseDynamicShapeParameters(section, button.shape);
+    // Parsing of user events that causes a reaction like toggle or pop up input
+    let onclick =parseClickEvent(section);
+    let onmousedown = parseTapEvent(section, "down");
+    let onmouseup = parseTapEvent(section, "up");
+
+    let initial = createVisuObject(button, dynamicShapeParameters)
+
+     // Convert object to an observable one
+    const state  = useLocalStore(()=>initial);
 
     // Return of the react node
-    return (
-        <div style={{position:"absolute", left:rect[0], top:rect[1], width:relCornerCoord.x2+2*edge, height:relCornerCoord.y2+2*edge}}>
-            <button style={{backgroundColor: fill_color, width:relCornerCoord.x2, height:relCornerCoord.y2}}>
-
+    return useObserver(()=>
+        <div id={button.elem_id} style={{position:"absolute", left:state.transformedCornerCoord.x1, top:state.transformedCornerCoord.y1, width:state.relCoord.width, height:state.relCoord.height}}>
+            <button
+            title={state.tooltip} 
+            onClick={()=>onclick()} 
+            onMouseDown={()=>onmousedown()} 
+            onMouseUp={()=>onmouseup()}
+            onMouseLeave={()=>onmouseup()} 
+            style={{backgroundColor: state.fill, width:state.relCoord.width, height:state.relCoord.height, position:"absolute"}}>               
             </button>
+            <Image section={section} inlineElement={true}></Image>
+            <div style={{width:"100%", height:"100%", position:"absolute", textAlign:"center",margin: "auto", top: 0, left: 0, bottom: 0, right: 0, pointerEvents:"none"}}>
+              <svg width="100%" height="100%">
+                {textField}
+              </svg>
+            </div>
         </div>
     )
 
