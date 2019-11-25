@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IBasicShape } from '../../../Interfaces/interfaces';
-import {createVisuObject} from '../Features/objectManager'
+import {createVisuObject} from '../../Features/objectManager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 
 type Props = {
@@ -17,7 +17,7 @@ export const Rectangle :React.FunctionComponent<Props> = ({simpleShape, textFiel
 { 
  // Attach the dynamic paramters like color variable
  let initial = createVisuObject(simpleShape, dynamicParameters)
-    
+
  // Convert object to an observable one
  const state  = useLocalStore(()=>initial);
     
