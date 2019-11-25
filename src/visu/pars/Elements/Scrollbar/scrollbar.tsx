@@ -3,7 +3,7 @@ import {useObserver, useLocalStore } from 'mobx-react-lite';
 import Slider from '@material-ui/core/Slider';
 import {stringToArray } from '../../Utils/utilfunctions';
 import {parseScrollbarParameters, updateScrollvalue} from '../Scrollbar/eventParser'
-import ComSocket from '../../../com/comsocket';
+import ComSocket from '../../../datamanger/comsocket';
 
 type Props = {
     section : JQuery<XMLDocument>
@@ -12,6 +12,7 @@ type Props = {
 export const Scrollbar :React.FunctionComponent<Props> = ({section})=>
 {
     // Parsing of the fixed parameters
+    let elem_id = section.children("elem-id").text();
     let rect = stringToArray(section.children("rect").text());
     let tooltip = (section.children("tooltip").text()).length>0? section.children("tooltip").text() : ""
     // Auxiliary values
@@ -103,25 +104,37 @@ export const Scrollbar :React.FunctionComponent<Props> = ({section})=>
             });
         }
     }
-    const handleSliderChange = (event : any, newValue : any) => {
+    let handleSliderChange = (event : MouseEvent, newValue : Number) => {
         updateFunction(newValue);
     };
 
-    
+    function throttled(delay : number, fn : Function) {
+        let lastCall = 0;
+        return function (...args : any[]) {
+            const now = (new Date).getTime();
+            if (now - lastCall < delay) {
+            return;
+            }
+            lastCall = now;
+            return fn(...args);
+        }
+    }
+    const tHandleSliderChange = throttled(150, handleSliderChange);
+
     const state  = useLocalStore(()=>initial);
 
 
 
     // Return of the react node
     return useObserver(()=>
-        <div title={state.tooltip} style={{position:"absolute", left:rect[0], top:rect[1], width:relCornerCoord.x2, height:relCornerCoord.y2}}>
+        <div id={elem_id} title={state.tooltip} style={{position:"absolute", left:rect[0], top:rect[1], width:relCornerCoord.x2, height:relCornerCoord.y2}}>
             <Slider
                 orientation={orientation}
                 min={state.lowerBound}
                 max={state.upperBound}
                 step={1}
                 value={state.value}
-                onChange={handleSliderChange}
+                onChange={tHandleSliderChange}
             />
         </div>
     )

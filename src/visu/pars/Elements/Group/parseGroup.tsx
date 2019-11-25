@@ -32,21 +32,21 @@ export const Group :React.FunctionComponent<Props> = ({section})=>
     
     let visuObjects: Array<(JSX.Element | undefined | null)> =[];
     
-        // Rip all <element> sections
-        section.children("element").each(function(){
-            let section = $(this);
-            // Determine the type of the element
-            switch(section.attr("type")) {
-                case "simple":
-                    visuObjects.push(parseSimpleShape(section));
-                    getDimension(rightdownCorner, stringToArray(section.children("rect").text()));
-                    break;
-                case "polygon":
-                    visuObjects.push(parsePolyshape(section));
-                    section.children('point').each(function(){
-                    getDimension(rightdownCorner, stringToArray($(this).text()));
-                    });
-                    break;
+    // Rip all <element> sections
+    section.children("element").each(function(){
+        let section = $(this);
+        // Determine the type of the element
+        switch(section.attr("type")) {
+            case "simple":
+                visuObjects.push(parseSimpleShape(section));
+                getDimension(rightdownCorner, stringToArray(section.children("rect").text()));
+                break;
+            case "polygon":
+                visuObjects.push(parsePolyshape(section));
+                section.children('point').each(function(){
+                getDimension(rightdownCorner, stringToArray($(this).text()));
+                });
+                break;
             }
         });
 

@@ -2,10 +2,10 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import { parseSimpleShape } from '../pars/Elements/Basicshapes/simpleshape';
 import { parsePolyshape } from '../pars/Elements/Basicshapes/polyshape';
-import { parseButton } from '../pars/Elements/Button/button';
+import { Button } from '../pars/Elements/Button/button';
 import { Scrollbar } from '../pars/Elements/Scrollbar/scrollbar';
 import { parseArrayTable } from '../pars/Elements/arraytable';
-import { parseBitmap } from '../pars/Elements/bitmap';
+import { Bitmap } from './Elements/Bitmap/bitmap';
 import { Group } from '../pars/Elements/Group/parseGroup';
 import { Subvisu } from '../pars/Elements/Subvisu/subvisu'
 
@@ -27,11 +27,11 @@ export const VisuElements :React.FunctionComponent<Props> =({visualisation})=>{
                 break;
             // Is a bitmap
             case "bitmap":
-                visuObjects.push(parseBitmap(section));
+                visuObjects.push(<Bitmap section={section}></Bitmap>);
                 break;
             // Is a button
             case "button":
-                visuObjects.push(parseButton(section));
+                visuObjects.push(<Button section={section}></Button>);
                 break;
             // Is a polygon - As polygon, polyline or bezier
             case "polygon":

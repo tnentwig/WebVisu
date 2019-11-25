@@ -4,10 +4,10 @@ import { Roundrect } from './SimpleSubunits/roundrect'
 import { Line } from './SimpleSubunits/line';
 import { Circle } from './SimpleSubunits/circle'
 import { Rectangle } from './SimpleSubunits/rectangle';
-import { Textfield } from './Features/textManager';
-import { Inputfield } from './Features/inputManager'
+import { Textfield } from '../Features/textManager';
+import { Inputfield } from '../Features/inputManager';
 import { IBasicShape } from '../../Interfaces/interfaces';
-import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from './Features/eventParser';
+import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from '../Features/eventManager';
 
 export function parseSimpleShape(section : JQuery<XMLDocument>){
     // Check if its on of the allowed shapes like rectangle, round-rectangle, circle or line

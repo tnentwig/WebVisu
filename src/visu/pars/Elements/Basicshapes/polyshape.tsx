@@ -5,9 +5,9 @@ import { IBasicShape } from '../../Interfaces/interfaces';
 import { Bezier } from './PolySubunits/bezier'
 import { Polygon } from './PolySubunits/polygon'
 import { Polyline } from './PolySubunits/polyline'
-import { Textfield } from './Features/textManager';
-import { Inputfield } from './Features/inputManager'
-import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from './Features/eventParser';
+import { Textfield } from '../Features/textManager';
+import { Inputfield } from '../Features/inputManager'
+import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from '../Features/eventManager';
 
 export function parsePolyshape(section : JQuery<XMLDocument>){
     // Check if its on of the allowed shapes like polygon, bezier or polyline

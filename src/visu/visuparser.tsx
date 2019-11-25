@@ -2,7 +2,7 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import { VisuElements } from '../visu/pars/elementparser'
 import { stringToArray } from './pars/Utils/utilfunctions'
-import ComSocket from '../visu/com/comsocket'
+import ComSocket from './datamanger/comsocket'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 
 type Props = {
@@ -58,7 +58,7 @@ export const Visualisation :React.FunctionComponent<Props> = ({visuname})=> {
         }, [store, url]);
 
     return useObserver(()=>
-        <div id={store.name} style={{position:"absolute", overflow:"hidden", left:0, top:0, width:store.rect[0], height:store.rect[1]}}>
+        <div id={store.name} style={{position:"absolute", overflow:"hidden", left:0, top:0, width:store.rect[0]+1, height:store.rect[1]+1}}>
             {store.isLoading ? null :
                 <VisuElements visualisation={store.xml}></VisuElements>
             }
