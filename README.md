@@ -36,4 +36,4 @@ The WebVisu-SPA is still in progress but already contains numerous functionaliti
 | Gauge                | :heavy_check_mark:    |
 | Bar display          | :heavy_check_mark:    |
 | Histogram            | :heavy_minus_sign:    |
-| CurrentVisu-Variable | :heavy_check_sign:    |
+| CurrentVisu-Variable | :heavy_check_mark:    |
