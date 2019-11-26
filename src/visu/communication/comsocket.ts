@@ -1,6 +1,7 @@
 import * as $ from 'jquery';
 import { IComSocket } from '../pars/Interfaces/interfaces';
 import { observable, action} from "mobx"
+import StateManager from "../statemanagement/statemanager"
 
 export default class ComSocket implements IComSocket {
     private static instance : IComSocket=new ComSocket();
@@ -57,9 +58,13 @@ export default class ComSocket implements IComSocket {
                     action(this.oVisuVariables.get(varName)!.value=transferarray[i]);   
                 }
             };
+            StateManager.singleton().oState.set("ISONLINE", "TRUE");
         })
 
-        .fail((error:Error)=>console.log("Connection lost"));
+        .fail(()=>{
+            console.log("Connection lost");
+            StateManager.singleton().oState.set("ISONLINE", "FALSE");
+        });
     }
     catch{()=>console.log("Connection lost")}
     }
