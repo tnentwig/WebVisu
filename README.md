@@ -15,6 +15,25 @@ The SPA parse the current visualisation XML file and insert a React component dy
 ## Currently supported elements
 The WebVisu-SPA is still in progress but already contains numerous functionalities and elements.
 
-| Element       | Integrated |
-| ------------- | ---------- | 
-| Rectangle     | :ok_hand:  | 
+| Element/ Function    | Integrated            | 
+| -------------------- | :-------------------: | 
+| Rectangle            | :heavy_check_mark:    |
+| Roundrect            | :heavy_check_mark:    |
+| Ellipse              | :heavy_check_mark:    |
+| Polygon              | :heavy_check_mark:    |
+| Bezier               | :heavy_check_mark:    |
+| Polyline             | :heavy_check_mark:    |
+| Sector               | :heavy_minus_sign:    |
+| Bitmap               | :heavy_check_mark:    |
+| Subvisualisation     | :heavy_check_mark:    |
+| Button               | :heavy_check_mark:    |
+| WMF-File             | :heavy_minus_sign:    |
+| Table                | :heavy_minus_sign:    |
+| Alarm table          | :heavy_minus_sign:    |
+| ActiveX-Element      | :heavy_minus_sign:    |
+| Slider               | :heavy_check_mark:    |
+| Button               | :heavy_check_mark:    |
+| Gauge                | :heavy_check_mark:    |
+| Bar display          | :heavy_check_mark:    |
+| Histogram            | :heavy_minus_sign:    |
+| CurrentVisu-Variable | :heavy_check_sign:    |
