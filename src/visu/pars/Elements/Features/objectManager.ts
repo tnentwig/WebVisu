@@ -1,4 +1,4 @@
-import ComSocket from '../../../datamanger/comsocket';
+import ComSocket from '../../../communication/comsocket';
 import {IVisuObject} from '../../Interfaces/interfaces'
 import {numberToHexColor, computeMinMaxCoord, evalRPN} from '../../Utils/utilfunctions'
 import {IBasicShape} from '../../Interfaces/interfaces'

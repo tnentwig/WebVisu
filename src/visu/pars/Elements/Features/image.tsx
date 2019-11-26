@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as $ from 'jquery';
-import ComSocket from '../../../datamanger/comsocket';
+import ComSocket from '../../../communication/comsocket';
 import * as util from '../../Utils/utilfunctions';
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 import { autorun } from 'mobx';

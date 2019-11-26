@@ -1,7 +1,7 @@
 import * as util from '../../Utils/utilfunctions'
 import * as React from 'react';
 import {useObserver, useLocalStore } from 'mobx-react-lite';
-import ComSocket from '../../../datamanger/comsocket';
+import ComSocket from '../../../communication/comsocket';
 import {numberToHexColor} from '../../Utils/utilfunctions'
 import {sprintf} from 'sprintf-js';
 

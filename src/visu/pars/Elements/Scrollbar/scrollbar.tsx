@@ -3,7 +3,7 @@ import {useObserver, useLocalStore } from 'mobx-react-lite';
 import Slider from '@material-ui/core/Slider';
 import {stringToArray } from '../../Utils/utilfunctions';
 import {parseScrollbarParameters, updateScrollvalue} from '../Scrollbar/eventParser'
-import ComSocket from '../../../datamanger/comsocket';
+import ComSocket from '../../../communication/comsocket';
 
 type Props = {
     section : JQuery<XMLDocument>

@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
-import ComSocket from '../../../datamanger/comsocket';
-import StateManager from '../../../datamanger/statemanager';
+import ComSocket from '../../../communication/comsocket';
+import StateManager from '../../../statemanagement/statemanager';
 // This function is parsing all <expr-...> tags like toggle color and returns a map with the expression as key and the variable as value
 
 export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape : string) : Map<string,{type:string, value:string, arithmetic:string}>{

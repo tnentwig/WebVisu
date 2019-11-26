@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import ComSocket from '../../../datamanger/comsocket';
+import ComSocket from '../../../communication/comsocket';
 // This function is parsing all <expr-...> tags like toggle color and returns a map with the expression as key and the variable as value
 
 export function parseScrollbarParameters(section : JQuery<XMLDocument>) : Map<string, {type:string, value:string}> {

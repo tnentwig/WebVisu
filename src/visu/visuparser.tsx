@@ -2,7 +2,7 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import { VisuElements } from '../visu/pars/elementparser'
 import { stringToArray } from './pars/Utils/utilfunctions'
-import ComSocket from './datamanger/comsocket'
+import ComSocket from './communication/comsocket'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 
 type Props = {
