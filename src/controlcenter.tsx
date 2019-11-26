@@ -1,8 +1,8 @@
 import * as $ from 'jquery';
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
-import ComSocket from './visu/datamanger/comsocket';
-import StateManager from './visu/datamanger/statemanager'
+import ComSocket from './visu/communication/comsocket';
+import StateManager from './visu/statemanagement/statemanager'
 import { Visualisation } from './visu/visuparser';
 import { observer } from 'mobx-react';
 
@@ -36,8 +36,9 @@ export default class HTML5Visu {
 
             return (
                 <React.Fragment>
-                    {
-                        <Visualisation visuname={stateManager.get("CURRENTVISU")}></Visualisation>
+                    {stateManager.get("ISONLINE") === "TRUE"
+                        ? <Visualisation visuname={stateManager.get("CURRENTVISU")}></Visualisation>
+                        : <div>The PLC webserver is offline!</div>
                     }
                 </React.Fragment>
             )
