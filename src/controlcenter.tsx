@@ -14,31 +14,25 @@ export default class HTML5Visu {
         this.rootDir= path;
     }
     async showMainVisu () {
-         // Get the webvisu.htm file. There are the startvisu and updatetime listed
-        try{
-           // Get the webvisu.htm file. There are the startvisu and updatetime listed
-           await this.getWebvisuhtm('/webvisu.htm');
-           console.log("Get the webvisu.htm");
-        } catch {
-           throw new Error("The URI is malformed!");
-        }
-       
+        // Get a reference to the global state manager
+        let stateManager = StateManager.singleton().oState;
+        // Get the path to the files
+        await this.getPath();
+        stateManager.set("ROOTDIR", this.rootDir);
+        // Get the webvisu.htm file. There are the startvisu and updatetime listed
+        await this.getWebvisuhtm('/webvisu.htm');
         // Get the visu-ini file. There are informations like the current user level, the current visu or the user passwords
         let visuIni = await this.getVisuini('/visu_ini.xml');
         // The Comsocket has to be initilized
         await this.initCommunication(visuIni, 200);
-        // Get a reference to the global state manager
-        let stateManager = StateManager.singleton().oState;
-        
         // The coverted sections are inserted in the virtual react DOM
         
         const App = observer(()=> {
-
             return (
-                <React.Fragment>
+                <React.Fragment>    
                     {stateManager.get("ISONLINE") === "TRUE"
                         ? <Visualisation visuname={stateManager.get("CURRENTVISU")}></Visualisation>
-                        : <div>The PLC webserver is offline!</div>
+                        : <div>The PLC webserver is not reachable!</div>
                     }
                 </React.Fragment>
             )
@@ -68,6 +62,39 @@ export default class HTML5Visu {
                 let variable = $(this);
                 ComSocket.singleton().addObservableVar(variable.attr("name"), variable.text());
             });
+        })
+    }
+
+    getPath() : Promise<boolean>{
+        return new Promise((resolve)=>{
+        // The request will automatically forwarded to the CoDeSys folder on a PFC. On older controllers we have to forward to /PLC manually
+        // A first try for get a manually forwarding
+            let getPath =$.ajax({
+                url: this.rootDir+'/visu_ini.xml',
+                type: 'GET',
+                dataType: 'xml', 
+                crossDomain: true
+            })
+            getPath.then((data) => {
+                // Path is correct 
+                resolve(true);
+            })
+            getPath.fail(()=>{
+                let getPath =$.ajax({
+                    url: this.rootDir+'/PLC/visu_ini.xml',
+                    type: 'GET',
+                    dataType: 'xml', 
+                    crossDomain: true
+                })
+                getPath.then((data) => {
+                    // Path must be adapted
+                    this.rootDir = this.rootDir + '/PLC';
+                    resolve(true);
+                })
+                getPath.fail(()=>{
+                    resolve(false);
+                })
+            })
         })
     }
 
