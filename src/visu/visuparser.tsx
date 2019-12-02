@@ -3,6 +3,7 @@ import * as React from 'react';
 import { VisuElements } from '../visu/pars/elementparser'
 import { stringToArray } from './pars/Utils/utilfunctions'
 import ComSocket from './communication/comsocket'
+import StateManager from '../visu/statemanagement/statemanager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 
 type Props = {
@@ -33,7 +34,7 @@ function getVisuxml(url : string) :Promise<XMLDocument> {
 
 export const Visualisation :React.FunctionComponent<Props> = ({visuname})=> {
     
-    let url= location.protocol + '//' + window.location.host +"/"+ visuname +".xml";
+    let url= StateManager.singleton().oState.get("ROOTDIR") + "/"+ visuname +".xml";
     let store = useLocalStore(()=>({
         isLoading : true,
         name : "",
@@ -58,7 +59,7 @@ export const Visualisation :React.FunctionComponent<Props> = ({visuname})=> {
         }, [store, url]);
 
     return useObserver(()=>
-        <div id={store.name} style={{position:"absolute", overflow:"hidden", left:0, top:0, width:store.rect[0]+1, height:store.rect[1]+1}}>
+        <div key={store.name} id={store.name} style={{position:"absolute", overflow:"hidden", left:0, top:0, width:store.rect[0]+1, height:store.rect[1]+1}}>
             {store.isLoading ? null :
                 <VisuElements visualisation={store.xml}></VisuElements>
             }
