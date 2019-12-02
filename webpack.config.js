@@ -3,7 +3,7 @@ const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
     mode: 'production',
-    //devtool: 'source-map',
+    devtool: 'source-map',
     entry:  './src/index.ts',
     output: {
         path: path.resolve(__dirname, 'dist'),
