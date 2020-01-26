@@ -63,7 +63,7 @@ export const VisuElements :React.FunctionComponent<Props> =({visualisation})=>{
     return (
         <React.Fragment>
             {
-                visuObjects.map((element, index)=><React.Fragment key={Math.random()}>{element}</React.Fragment>)
+                visuObjects.map((element, index)=><React.Fragment>{element}</React.Fragment>)
             }
         </React.Fragment>
     )
