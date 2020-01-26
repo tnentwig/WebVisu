@@ -23,7 +23,7 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
     const state  = useLocalStore(()=>initial);
 
     return useObserver(()=>
-    <div id={simpleShape.elem_id} style={{cursor: "auto", overflow:"hidden", pointerEvents: state.eventType, visibility:state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
+    <div style={{cursor: "auto", overflow:"hidden", pointerEvents: state.eventType, visibility:state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
         {input}
         <svg>
         <svg 

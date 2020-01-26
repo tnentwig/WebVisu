@@ -127,7 +127,7 @@ export const Scrollbar :React.FunctionComponent<Props> = ({section})=>
 
     // Return of the react node
     return useObserver(()=>
-        <div id={elem_id} title={state.tooltip} style={{position:"absolute", left:rect[0], top:rect[1], width:relCornerCoord.x2, height:relCornerCoord.y2}}>
+        <div title={state.tooltip} style={{position:"absolute", left:rect[0], top:rect[1], width:relCornerCoord.x2, height:relCornerCoord.y2}}>
             <Slider
                 orientation={orientation}
                 min={state.lowerBound}

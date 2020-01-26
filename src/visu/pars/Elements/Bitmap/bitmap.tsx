@@ -68,7 +68,6 @@ export const Bitmap :React.FunctionComponent<Props> = ({section})=>
     // Return of the react node
     return useObserver(()=>
         <div 
-        id={bitmap.elem_id} 
         style={{position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}
         onClick={()=>onclick()} 
         onMouseDown={()=>onmousedown()} 

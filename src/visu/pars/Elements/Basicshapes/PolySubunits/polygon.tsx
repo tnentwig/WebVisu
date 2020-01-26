@@ -23,7 +23,7 @@ export const Polygon :React.FunctionComponent<Props> = ({polyShape, textField, i
     const state  = useLocalStore(()=>initial);
 
     return useObserver(()=>
-    <div id={polyShape.elem_id} style={{transform: state.cssTransform, transformOrigin: state.cssTransformOrigin, cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
+    <div style={{transform: state.cssTransform, transformOrigin: state.cssTransformOrigin, cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
         {input}
         <svg>
             <svg
