@@ -7,7 +7,7 @@ type Props = {
     simpleShape: IBasicShape,
     textField : JSX.Element|undefined,
     input : JSX.Element,
-    dynamicParameters :  Map<string,{type:string, value:string, arithmetic:string}>,
+    dynamicParameters :  Map<string,string[][]>,
     onmousedown : Function,
     onmouseup : Function,
     onclick : Function 
