@@ -3,7 +3,7 @@ import * as $ from 'jquery';
 import { parseSimpleShape } from '../Basicshapes/simpleshape';
 import { parsePolyshape } from '../Basicshapes/polyshape';
 import { stringToArray } from '../../Utils/utilfunctions';
-
+import ErrorBoundary from 'react-error-boundary';
 
 type Props = {
     section : JQuery<XMLDocument>
@@ -69,11 +69,13 @@ export const Group :React.FunctionComponent<Props> = ({section})=>
         
         return (
             <div id={elemId} style={{overflow:"hidden", position:"absolute", left:rectParent[0], top:rectParent[1], width:rectParent[2]-rectParent[0], height:rectParent[3]-rectParent[1]}}>
+                <ErrorBoundary>
                 <div id={elemIdTransform} style={{transformOrigin:"left top", transform:scale}}>
                 {
                     visuObjects.map((element, index)=><React.Fragment>{element}</React.Fragment>)
                 }
                 </div>
+                </ErrorBoundary>
              </div>
         )
     }
