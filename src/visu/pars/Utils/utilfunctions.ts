@@ -1,3 +1,4 @@
+import { setReactionScheduler } from "mobx/lib/internal";
 
 export function stringToBoolean(booleanExp : string) : boolean {
     let interim = false;
@@ -72,45 +73,67 @@ export function coordArrayToBezierString(pointArray : number[][]) : string {
     })
     return bezier;
 }
-/* Copyright 2014–2015 Kenan Yildirim <http://kenany.me/>*/
 
 export function evalRPN(postfix : string) : boolean|number|null {
-    //
     let interim = "";
     if (postfix.length === 0) {
       return null;
-    } else if (postfix.charAt(postfix.length-1)){
+    } else if (postfix.charAt(postfix.length-1)=== " "){
         interim = postfix.slice(0, -1);
     } else {
         interim = postfix;
-    }
-  
+    } 
     // Split into array of tokens
     let postfixSplitted : Array<string> = interim.split(/\s+/);
-  
+    
     let stack : Array<number> = [] ;
-  
     for (var i = 0; i < postfixSplitted.length; i++) {
       var token = postfixSplitted[i];
-  
-      // Token is a value, push it onto the stack
+      
+      // Token is a value, push it on the stack
       if (!isNaN(Number(token))) {
         stack.push(parseFloat(token));
       }
-  
       // Token is operator
       else {
         // Every operation requires two arguments
         if (stack.length < 2) {
-          throw new Error('Insufficient values in expression.');
-        }
+            return(stack.pop());
+          }
   
         // Pop two items from the top of the stack and push the result of the
         // operation onto the stack.
-        var y = stack.pop();
-        var x = stack.pop();
-
-        stack.push(eval(x + token + ' ' + y));      // eval could be harmful, so remove all harmful characters before evaluating
+        let y = stack.pop();
+        let x = stack.pop();
+        let result :  number;
+        switch(token){
+            case "*":
+                result = x*y;
+                break;
+            case "/":
+                result = x/y;
+                break;
+            case "-":
+                result = x-y;
+                break;
+            case "+":
+                result = y+x;
+                break;
+            case "MAX":
+                result = x>y ? x : y;
+                break;
+            case "MIN":
+                result = x<y ? x : y;
+                break;
+            // The < and > operators must be at the end of the 
+            case "<":
+                return(x<y ? 1 : 0);
+            case ">":
+                return(x>y ? 1 : 0);
+            default:
+                console.log("The RPN-token: " + token + " is not a valid one!");
+        }
+        stack.push(result);
       }
     }
   
