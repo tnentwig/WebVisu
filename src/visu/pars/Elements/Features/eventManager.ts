@@ -3,8 +3,8 @@ import ComSocket from '../../../communication/comsocket';
 import StateManager from '../../../statemanagement/statemanager';
 // This function is parsing all <expr-...> tags like toggle color and returns a map with the expression as key and the variable as value
 
-export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape : string) : Map<string,{type:string, value:string, arithmetic:string}>{
-    let exprMap : Map<string,{type:string, value:string, arithmetic:string}>= new Map();
+export function parseDynamicShapeParameters(section : JQuery<XMLDocument>) : Map<string,string[][]>{
+    let exprMap : Map<string,string[][]>= new Map();
     let tags : Array<string>= [];
     // Styling tags
     tags.push("expr-toggle-color");         // 1) Set alarm
@@ -33,32 +33,24 @@ export function parseDynamicShapeParameters(section : JQuery<XMLDocument>, shape
     tags.push("expr-input-disabled");
 
     tags.forEach(function(entry){
-        section.children(entry).children("expr").each(function() {
-            let type ="";
-            let value ="";
-            let arithmetic ="";
-            // Determine the type of the expression. It could be a variable ("var"), placeholder or a constant ("const").
-            // There may additionally be an arithmetic operation in postfix nomenclatur.
-            let varName = $(this)!.children("var").text();          
+        let stack : string[][] = [];
+        section.children(entry).children("expr").each(function() {  
             $(this).children().each((index, element)=>{
-                // The first item is the type of the expression
-                if (index === 0){
-                    type=$(element).prop("tagName");
-                    value=$(element).text();
-                } else {
-                    switch($(element).prop("tagName")){
-                        case "const":
-                            arithmetic += $(element).text()+" ";
-                            break;
-                        case "op":
-                            arithmetic += $(element).text().split("(")[0]+" ";
-                            break;
-                    }
-                }
+                if($(element).text() !== undefined){
+                switch($(element).prop("tagName")){
+                    case "var":
+                        stack.push(["var", $(element).text()]);
+                        break;
+                    case "const":
+                        stack.push(["const", $(element).text()]);
+                        break;
+                    case "op":
+                        stack.push(["op", $(element).text().split("(")[0]]);
+                        break;
+                }}
             });
-
-            if (type.length){
-                exprMap.set(entry, {type:type, value:value, arithmetic:arithmetic});
+            if (stack.length){
+                exprMap.set(entry, stack);
             }
         })
         
