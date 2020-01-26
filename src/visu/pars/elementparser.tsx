@@ -1,5 +1,6 @@
 import * as $ from 'jquery';
 import * as React from 'react';
+import {uid} from 'react-uid';
 import { parseSimpleShape } from '../pars/Elements/Basicshapes/simpleshape';
 import { parsePolyshape } from '../pars/Elements/Basicshapes/polyshape';
 import { Button } from '../pars/Elements/Button/button';
@@ -63,7 +64,7 @@ export const VisuElements :React.FunctionComponent<Props> =({visualisation})=>{
     return (
         <React.Fragment>
             {
-                visuObjects.map((element, index)=><React.Fragment>{element}</React.Fragment>)
+                visuObjects.map((element, index)=><React.Fragment key={uid(element)}>{element}</React.Fragment>)
             }
         </React.Fragment>
     )

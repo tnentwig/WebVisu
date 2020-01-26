@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as $ from 'jquery';
+import {uid} from 'react-uid';
 import { parseSimpleShape } from '../Basicshapes/simpleshape';
 import { parsePolyshape } from '../Basicshapes/polyshape';
 import { stringToArray } from '../../Utils/utilfunctions';
@@ -68,11 +69,11 @@ export const Group :React.FunctionComponent<Props> = ({section})=>
         }, [rectParent, rightdownCorner]);
         
         return (
-            <div id={elemId} style={{overflow:"hidden", position:"absolute", left:rectParent[0], top:rectParent[1], width:rectParent[2]-rectParent[0], height:rectParent[3]-rectParent[1]}}>
+            <div style={{overflow:"hidden", position:"absolute", left:rectParent[0], top:rectParent[1], width:rectParent[2]-rectParent[0], height:rectParent[3]-rectParent[1]}}>
                 <ErrorBoundary>
-                <div id={elemIdTransform} style={{transformOrigin:"left top", transform:scale}}>
+                <div style={{transformOrigin:"left top", transform:scale}}>
                 {
-                    visuObjects.map((element, index)=><React.Fragment>{element}</React.Fragment>)
+                    visuObjects.map((element, index)=><React.Fragment key={uid(element)}>{element}</React.Fragment>)
                 }
                 </div>
                 </ErrorBoundary>
