@@ -44,7 +44,7 @@ export const Button :React.FunctionComponent<Props> = ({section})=>
       textField = null;
     }
     // Parsing of observable events (like toggle color)
-    let dynamicShapeParameters = parseDynamicShapeParameters(section, button.shape);
+    let dynamicShapeParameters = parseDynamicShapeParameters(section);
     // Parsing of user events that causes a reaction like toggle or pop up input
     let onclick =parseClickEvent(section);
     let onmousedown = parseTapEvent(section, "down");
