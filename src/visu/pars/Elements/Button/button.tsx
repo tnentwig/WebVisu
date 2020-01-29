@@ -43,6 +43,7 @@ export const Button :React.FunctionComponent<Props> = ({section})=>
     else {
       textField = null;
     }
+    let pictureInside = section.find("file-name").text().length ? true : false;
     // Parsing of observable events (like toggle color)
     let dynamicShapeParameters = parseDynamicShapeParameters(section);
     // Parsing of user events that causes a reaction like toggle or pop up input
@@ -66,7 +67,7 @@ export const Button :React.FunctionComponent<Props> = ({section})=>
             onMouseLeave={()=>onmouseup()} 
             style={{backgroundColor: state.fill, width:state.relCoord.width, height:state.relCoord.height, position:"absolute"}}>               
             </button>
-            <Image section={section} inlineElement={true}></Image>
+            {pictureInside ? <Image section={section} inlineElement={true}></Image> : null}           
             <div style={{width:"100%", height:"100%", position:"absolute", textAlign:"center",margin: "auto", top: 0, left: 0, bottom: 0, right: 0, pointerEvents:"none"}}>
               <svg width="100%" height="100%">
                 {textField}
