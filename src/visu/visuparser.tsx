@@ -26,9 +26,13 @@ function appendNewVariables(XML : XMLDocument) : Promise<boolean>{
 function getVisuxml(url : string) :Promise<XMLDocument> {
     return new Promise(resolve =>{
         fetch(url, {headers:{'Content-Type': 'text/plain; charset=UTF8'}})
-        .then(response => response.text())
-        .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
-        .then((data)=>resolve(data))
+        .then(response => response.arrayBuffer())
+        .then(buffer => {
+            let decoder = new TextDecoder("iso-8859-1");
+            let text = decoder.decode(buffer);
+            let data = new window.DOMParser().parseFromString(text, "text/xml")
+            resolve(data)
+        })
     })
 }
 
