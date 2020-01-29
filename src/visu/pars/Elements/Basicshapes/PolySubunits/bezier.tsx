@@ -25,7 +25,7 @@ export const Bezier :React.FunctionComponent<Props> = ({polyShape, textField, in
     return useObserver(()=>
     <div style={{transform: state.cssTransform, transformOrigin: state.cssTransformOrigin, cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
         {input}
-        <svg>
+        <svg style={{float: "left"}} width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge}>
             <svg
                 onClick={()=>onclick()} 
                 onMouseDown={()=>onmousedown()} 

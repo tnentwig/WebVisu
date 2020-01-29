@@ -25,7 +25,7 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
     return useObserver(()=>
     <div style={{cursor: "auto", overflow:"hidden", pointerEvents: state.eventType, visibility:state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
         {input}
-        <svg>
+        <svg style={{float: "left"}} width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge}>
         <svg 
             onClick={()=>onclick()} 
             onMouseDown={()=>onmousedown()} 
