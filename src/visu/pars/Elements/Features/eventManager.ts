@@ -32,6 +32,10 @@ export function parseDynamicShapeParameters(section : JQuery<XMLDocument>) : Map
     // Deactivate Input
     tags.push("expr-input-disabled");
 
+    // Piechart specific
+    tags.push("expr-angle1");
+    tags.push("expr-angle2");
+
     tags.forEach(function(entry){
         let stack : string[][] = [];
         section.children(entry).children("expr").each(function() {  
