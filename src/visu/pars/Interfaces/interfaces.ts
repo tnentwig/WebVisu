@@ -64,5 +64,14 @@ export interface IVisuObject{
     relPoints : number[][],
     cssTransform : string,
     cssTransformOrigin : string
+    // The following is for piechart only
+    startAngle : number,
+    endAngle : number,
+    piechartPath : string
 
+}
+
+export interface IPiechart extends IVisuObject{
+    startAngle : number,
+    endAngle : number
 }
