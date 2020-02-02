@@ -4,6 +4,7 @@ import {uid} from 'react-uid';
 import { parseSimpleShape } from '../pars/Elements/Basicshapes/simpleshape';
 import { parsePolyshape } from '../pars/Elements/Basicshapes/polyshape';
 import { Button } from '../pars/Elements/Button/button';
+import { Piechart } from '../pars/Elements/Piechart/piechart';
 import { Scrollbar } from '../pars/Elements/Scrollbar/scrollbar';
 import { parseArrayTable } from '../pars/Elements/arraytable';
 import { Bitmap } from './Elements/Bitmap/bitmap';
@@ -40,6 +41,7 @@ export const VisuElements :React.FunctionComponent<Props> =({visualisation})=>{
                 break;
             // Is a piechart
             case "piechart":
+                visuObjects.push(<Piechart section={section}></Piechart>)
                 break;
             // Is a group (Dynamic elements like a graph)
             case "group":
