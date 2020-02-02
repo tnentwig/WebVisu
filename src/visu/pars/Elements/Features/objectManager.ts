@@ -1,6 +1,6 @@
 import ComSocket from '../../../communication/comsocket';
 import {IVisuObject} from '../../Interfaces/interfaces'
-import {numberToHexColor, computeMinMaxCoord, evalRPN} from '../../Utils/utilfunctions'
+import {numberToHexColor, computeMinMaxCoord, evalRPN, pointArrayToPiechartString} from '../../Utils/utilfunctions'
 import {IBasicShape} from '../../Interfaces/interfaces'
 
 function evalFunction(stack: string[][]) : Function {
@@ -46,7 +46,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     let tooltip = basicShape.tooltip;
     let relPoints = [] as number[][];
     // The polyshape specific values will be generated if necessary
-    if (['polygon', 'bezier', 'polyline'].includes(basicShape.shape)){
+    if (['polygon', 'bezier', 'polyline', 'piechart'].includes(basicShape.shape)){
         basicShape.points.forEach(function(item, index){
             relPoints.push([item[0]-absCornerCoord.x1, item[1]-absCornerCoord.y1]);
         })
@@ -92,7 +92,12 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         // Transformed coordintes for polyhapes only
         cssTransform : "",
         cssTransformOrigin : "",
-        relPoints : relPoints
+        relPoints : relPoints,
+        // Variables for piechart
+        startAngle : 0,
+        endAngle : 0,
+        piechartPath : ""
+
     }
 
     // Processing the variables for visual elements
@@ -326,7 +331,6 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
         let element = dynamicElements!.get("expr-input-disabled");
         let returnFunc = evalFunction(element);
         let wrapperFunc = ()=>{
-            console.log("test")
             let value = returnFunc();
             if (value == "1"){
                 return "none";
@@ -338,6 +342,31 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
             get: ()=>wrapperFunc()
         });
     }
+
+    // Piechart specific stuff ( start- and endangle)
+    if (dynamicElements.has("expr-angle1")){
+        let element = dynamicElements!.get("expr-angle1");
+        let returnFunc = evalFunction(element);
+        let wrapperFunc = ()=>{
+            let value = returnFunc();
+            return (value % 360)
+        }
+        Object.defineProperty(initial, "startAngle", {
+            get: ()=>wrapperFunc()
+        });
+    }
+    if (dynamicElements.has("expr-angle2")){
+        let element = dynamicElements!.get("expr-angle2");
+        let returnFunc = evalFunction(element);
+        let wrapperFunc = ()=>{
+            let value = returnFunc();
+            return (value % 360)
+        }
+        Object.defineProperty(initial, "endAngle", {
+            get: ()=>wrapperFunc()
+        });
+    }
+
 
     // We have to compute the dependent values after all the required static values ​​have been replaced by variables, placeholders or constant values 
     // E.g. the fillcolor depends on  hasFillColor and alarm. This variables are called "computed" values. MobX will track their dependents and rerender the object by change.
@@ -393,7 +422,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
 
     // The transformed corner coordinates depends on the shapetype. The rotating operation is different for simpleshapes and polyshapes
     // Simpleshape:
-    if (['round-rect', 'circle', 'line', 'rectangle'].includes(basicShape.shape)){
+    if (['round-rect', 'circle', 'line', 'rectangle', 'piechart'].includes(basicShape.shape)){
         Object.defineProperty(initial, "transformedCornerCoord", {
             get: function() {
                 let x1 = initial.absCornerCoord.x1;
@@ -495,6 +524,17 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
                 return interim;
             }
         });
-    }   
+    }
+
+    // Piechart path calculation
+    if(['piechart'].includes(basicShape.shape)){
+        Object.defineProperty(initial, "piechartPath", {
+            get: function(){
+                let interim = pointArrayToPiechartString(initial.relPoints, initial.startAngle, initial.endAngle, initial.edge)
+                return interim;
+            }
+        });
+    }
+
     return initial;
 }
