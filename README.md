@@ -23,7 +23,7 @@ The WebVisu-SPA is still in progress but already contains numerous functionaliti
 | Polygon              | :heavy_check_mark:    |
 | Bezier               | :heavy_check_mark:    |
 | Polyline             | :heavy_check_mark:    |
-| Sector               | :heavy_check_sign:    |
+| Sector               | :heavy_check_mark:    |
 | Bitmap               | :heavy_check_mark:    |
 | Subvisualisation     | :heavy_check_mark:    |
 | Button               | :heavy_check_mark:    |
@@ -37,3 +37,6 @@ The WebVisu-SPA is still in progress but already contains numerous functionaliti
 | Bar display          | :heavy_check_mark:    |
 | Histogram            | :heavy_minus_sign:    |
 | CurrentVisu-Variable | :heavy_check_mark:    |
+| Language switching   | :heavy_minus_sign:    |
+
+## Elements 
