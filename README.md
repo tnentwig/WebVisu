@@ -27,7 +27,7 @@ The WebVisu-SPA is still in progress but already contains numerous functionaliti
 | Bitmap               | :heavy_check_mark:    |
 | Subvisualisation     | :heavy_check_mark:    |
 | Button               | :heavy_check_mark:    |
-| WMF-File             | :heavy_minus_sign:    |
+| WMF-File<sup>1</sup> | :heavy_check_mark:    |
 | Table                | :heavy_minus_sign:    |
 | Alarm table          | :heavy_minus_sign:    |
 | ActiveX-Element      | :heavy_minus_sign:    |
@@ -39,4 +39,5 @@ The WebVisu-SPA is still in progress but already contains numerous functionaliti
 | CurrentVisu-Variable | :heavy_check_mark:    |
 | Language switching   | :heavy_minus_sign:    |
 
-## Elements 
+## Comments
+<sup>1</sup>: It may take a long time to load WMF files.
