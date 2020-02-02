@@ -15,29 +15,30 @@ The SPA parse the current visualisation XML file and insert a React component dy
 ## Currently supported elements
 The WebVisu-SPA is still in progress but already contains numerous functionalities and elements.
 
-| Element/ Function    | Integrated            | 
-| -------------------- | :-------------------: | 
-| Rectangle            | :heavy_check_mark:    |
-| Roundrect            | :heavy_check_mark:    |
-| Ellipse              | :heavy_check_mark:    |
-| Polygon              | :heavy_check_mark:    |
-| Bezier               | :heavy_check_mark:    |
-| Polyline             | :heavy_check_mark:    |
-| Sector               | :heavy_check_mark:    |
-| Bitmap               | :heavy_check_mark:    |
-| Subvisualisation     | :heavy_check_mark:    |
-| Button               | :heavy_check_mark:    |
-| WMF-File<sup>1</sup> | :heavy_check_mark:    |
-| Table                | :heavy_minus_sign:    |
-| Alarm table          | :heavy_minus_sign:    |
-| ActiveX-Element      | :heavy_minus_sign:    |
-| Slider               | :heavy_check_mark:    |
-| Button               | :heavy_check_mark:    |
-| Gauge                | :heavy_check_mark:    |
-| Bar display          | :heavy_check_mark:    |
-| Histogram            | :heavy_minus_sign:    |
-| CurrentVisu-Variable | :heavy_check_mark:    |
-| Language switching   | :heavy_minus_sign:    |
+| Element/ Function             | Integrated            | 
+| --------------------          | :-------------------: | 
+| Rectangle                     | :heavy_check_mark:    |
+| Roundrect                     | :heavy_check_mark:    |
+| Ellipse                       | :heavy_check_mark:    |
+| Polygon                       | :heavy_check_mark:    |
+| Bezier                        | :heavy_check_mark:    |
+| Polyline                      | :heavy_check_mark:    |
+| Sector                        | :heavy_check_mark:    |
+| Bitmap                        | :heavy_check_mark:    |
+| Subvisualisation              | :heavy_check_mark:    |
+| Button                        | :heavy_check_mark:    |
+| WMF-File<sup>1</sup>          | :heavy_check_mark:    |
+| Table                         | :heavy_minus_sign:    |
+| Alarm table                   | :heavy_minus_sign:    |
+| Slider                        | :heavy_check_mark:    |
+| Button                        | :heavy_check_mark:    |
+| Gauge                         | :heavy_check_mark:    |
+| Bar display                   | :heavy_check_mark:    |
+| Histogram                     | :heavy_minus_sign:    |
+| CurrentVisu-Variable          | :heavy_check_mark:    |
+| Language switching            | :heavy_minus_sign:    |
+| ActiveX-Element<sup>2</sup>   | :collision:           |
 
 ## Comments
 <sup>1</sup>: It may take a long time to load WMF files.
+<sup>2</sup>: Is no longer supported in modern browsers.
