@@ -1,8 +1,13 @@
 import * as React from 'react';
+import ComSocket from '../../../communication/comsocket';
+import {useObserver, useLocalStore } from 'mobx-react-lite';
+import { stringToBoolean, rgbToHexString, stringToArray } from '../../Utils/utilfunctions';
 
-import { stringToBoolean, rgbToHexString, stringToArray } from '../Utils/utilfunctions';
+type Props = {
+    section : JQuery<XMLDocument>
+}
 
-export function parseArrayTable (section : JQuery<XMLDocument>) {
+export const ArrayTable :React.FunctionComponent<Props> = ({section}) => {
     // Parsing of the fixed parameters
     let rect = stringToArray(section.children("rect").text());
     let center = stringToArray(section.children("center").text());
@@ -20,12 +25,29 @@ export function parseArrayTable (section : JQuery<XMLDocument>) {
     let relCenterCoord = {x:center[0]-rect[0], y:center[1]-rect[1]};
     let edge = 1;
 
+    
+    const initial = {value: ""}; 
+
+    Object.defineProperty(initial, "value", {
+        get: function() {
+            let value = ComSocket.singleton().oVisuVariables.get("PLC_PRG.array1[3]")!.value ;
+            return value;
+        }
+    });
+    
+    const state  = useLocalStore(()=>initial);
     // Return of the react node
-    return (
+    return useObserver(()=>
         <div style={{position:"absolute", left:rect[0], top:rect[1], width:relCornerCoord.x2+2*edge, height:relCornerCoord.y2+2*edge}}>
+            <div>dff:{state.value}</div>
             <table style={{width:relCornerCoord.x2, height:relCornerCoord.y2, border:1}}>
                 <tbody>
-                
+                    <th>
+                        <th>PLC_PRG.array1[INDEX]</th>
+                    </th>
+                    <tr>
+                        <td>{ComSocket.singleton().oVisuVariables.get("PLC_PRG.array1[3]")!.value}</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
