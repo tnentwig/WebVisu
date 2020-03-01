@@ -24,7 +24,7 @@ export default class HTML5Visu {
         // Get the visu-ini file. There are informations like the current user level, the current visu or the user passwords
         let visuIni = await this.getVisuini('/visu_ini.xml');
         // The Comsocket has to be initilized
-        await this.initCommunication(visuIni, 200);
+        await this.initCommunication(visuIni, 100);
         // The coverted sections are inserted in the virtual react DOM
         
         const App = observer(()=> {
