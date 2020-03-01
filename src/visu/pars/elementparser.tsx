@@ -6,7 +6,7 @@ import { parsePolyshape } from '../pars/Elements/Basicshapes/polyshape';
 import { Button } from '../pars/Elements/Button/button';
 import { Piechart } from '../pars/Elements/Piechart/piechart';
 import { Scrollbar } from '../pars/Elements/Scrollbar/scrollbar';
-import { parseArrayTable } from '../pars/Elements/arraytable';
+import { ArrayTable } from './Elements/Arraytable/arraytable';
 import { Bitmap } from './Elements/Bitmap/bitmap';
 import { Group } from '../pars/Elements/Group/parseGroup';
 import { Subvisu } from '../pars/Elements/Subvisu/subvisu'
@@ -53,7 +53,7 @@ export const VisuElements :React.FunctionComponent<Props> =({visualisation})=>{
                 break;
             // Is a array table
             case "array-table":
-                visuObjects.push(parseArrayTable(section));
+                //visuObjects.push(<ArrayTable section={section}></ArrayTable>);
                 break;
             case "reference":
                 visuObjects.push(<Subvisu section={section}></Subvisu>);
