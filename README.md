@@ -15,7 +15,7 @@ The SPA parse the current visualisation XML file and insert a React component dy
 ## Demo
 <p align="center"> 
 <img src="./img/demo.gif">
-</p>)
+</p>
 
 ## Currently supported elements
 The WebVisu-SPA is still in progress but already contains numerous functionalities and elements.
