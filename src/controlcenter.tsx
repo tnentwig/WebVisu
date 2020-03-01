@@ -87,12 +87,25 @@ export default class HTML5Visu {
                     crossDomain: true
                 })
                 getPath.then((data) => {
-                    // Path must be adapted
+                    // Path must be adapted for an older Linux Controller without Linux
                     this.rootDir = this.rootDir + '/PLC';
                     resolve(true);
                 })
                 getPath.fail(()=>{
-                    resolve(false);
+                    let getPath =$.ajax({
+                        url: this.rootDir+'/webvisu/visu_ini.xml',
+                        type: 'GET',
+                        dataType: 'xml', 
+                        crossDomain: true
+                    })
+                    getPath.then((data) => {
+                        // Path must be adapted for a PFC100 or PFC200
+                        this.rootDir = this.rootDir + '/webvisu';
+                        resolve(true);
+                    })
+                    getPath.fail(()=>{
+                        resolve(false);
+                    })
                 })
             })
         })
