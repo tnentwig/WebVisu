@@ -131,7 +131,7 @@ export default class HTML5Visu {
                 let name = htmlElement[i].getAttribute("name").toString();
                 switch(name){
                     case "STARTVISU":
-                        let visuName = htmlElement[i].getAttribute("value");
+                        let visuName = htmlElement[i].getAttribute("value").toLowerCase();
                         stateManager.set(name, visuName)
                         break;
                     case "UPDATETIME":
