@@ -31,7 +31,7 @@ export default class HTML5Visu {
             return (
                 <React.Fragment>    
                     {stateManager.get("ISONLINE") === "TRUE"
-                        ? <Visualisation visuname={stateManager.get("CURRENTVISU")}></Visualisation>
+                        ? <Visualisation visuname={stateManager.get("CURRENTVISU").toLowerCase()}></Visualisation>
                         : <div>The PLC webserver is not reachable!</div>
                     }
                 </React.Fragment>
@@ -92,20 +92,7 @@ export default class HTML5Visu {
                     resolve(true);
                 })
                 getPath.fail(()=>{
-                    let getPath =$.ajax({
-                        url: this.rootDir+'/webvisu/visu_ini.xml',
-                        type: 'GET',
-                        dataType: 'xml', 
-                        crossDomain: true
-                    })
-                    getPath.then((data) => {
-                        // Path must be adapted for a PFC100 or PFC200
-                        this.rootDir = this.rootDir + '/webvisu';
-                        resolve(true);
-                    })
-                    getPath.fail(()=>{
-                        resolve(false);
-                    })
+                    resolve(false);
                 })
             })
         })
@@ -131,7 +118,7 @@ export default class HTML5Visu {
                 let name = htmlElement[i].getAttribute("name").toString();
                 switch(name){
                     case "STARTVISU":
-                        let visuName = htmlElement[i].getAttribute("value").toLowerCase();
+                        let visuName = htmlElement[i].getAttribute("value");
                         stateManager.set(name, visuName)
                         break;
                     case "UPDATETIME":
