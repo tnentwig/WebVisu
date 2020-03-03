@@ -5,8 +5,13 @@ This is a single page application (SPA) for displaying the web visualisation pag
 
 ## How to use
 Just copy the WebVisu.html and WebVisu.js from the release tab to the folder which contents are deployed by the webserver. **The path to this folder differentate by the used Wago PLC**. The FTP transfer could be made with FileZilla at example.  
-For the non Linux PLCs (like 750-880) transfer them to the */webserv* folder. For the Linux PLCs (like PFC) transfer it to */var/www/webvisu*.  
-The visualisation is available afterwards on *http://\<ip-address-of-your-plc>/WebVisu.html*.
+
+#### For the non Linux PLCs (like 750-880):
+Transfer them to the */webserv* folder. The visualisation is available afterwards on  
+*http://\<ip-address-of-your-plc>/WebVisu.html*
+#### For the Linux PLCs (like PFC200 or PFC100):
+Transfer it to */home/codesys*. The visualisation is available afterwards on  
+*http://\<ip-address-of-your-plc>/webvisu/WebVisu.html*
 
 ## How it works
 This SPA is based on the [React](https://github.com/facebook/react) and [MobX](https://github.com/mobxjs/mobx) framework. CoDeSys creates a XML description file for every user generated visualisation. Every file descripes the look and behavior of the objects shown in the specific visualisation. Besides that the file contains the used variables (e.g. "*.xToggleColor*") and their addresses on the web interface.  
