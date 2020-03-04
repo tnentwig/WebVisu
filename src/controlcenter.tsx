@@ -47,7 +47,7 @@ export default class HTML5Visu {
     async initCommunication(XML : XMLDocument, cycletime : number) : Promise<boolean> {
         return new Promise(resolve =>{
             let com = ComSocket.singleton();
-            com.setServerURL(this.rootDir + '');
+            com.setServerURL(this.rootDir + '/webvisu.htm');
             com.startCyclicUpdate(cycletime);
             this.appendVariables(XML);
             resolve(true);
@@ -73,26 +73,36 @@ export default class HTML5Visu {
                 url: this.rootDir+'/visu_ini.xml',
                 type: 'GET',
                 dataType: 'xml', 
-                crossDomain: true
             })
             getPath.then((data) => {
                 // Path is correct 
                 resolve(true);
             })
             getPath.fail(()=>{
-                let getPath =$.ajax({
+                let getPath2 =$.ajax({
                     url: this.rootDir+'/PLC/visu_ini.xml',
                     type: 'GET',
-                    dataType: 'xml', 
-                    crossDomain: true
+                    dataType: 'xml'
                 })
-                getPath.then((data) => {
+                getPath2.then((data) => {
                     // Path must be adapted for an older Linux Controller without Linux
                     this.rootDir = this.rootDir + '/PLC';
                     resolve(true);
                 })
-                getPath.fail(()=>{
-                    resolve(false);
+                getPath2.fail(()=>{
+                    let getPath3 =$.ajax({
+                        url: this.rootDir+'/webvisu/visu_ini.xml',
+                        type: 'GET',
+                        dataType: 'xml'
+                    })
+                    getPath3.then((data) => {
+                        // Path must be adapted for a Linux-PFC
+                        this.rootDir = this.rootDir + '/webvisu';
+                        resolve(true);
+                    })
+                    getPath3.fail(()=>{
+                        resolve(false);
+                    })
                 })
             })
         })
