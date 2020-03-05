@@ -37,7 +37,7 @@ export const Image : React.FunctionComponent<Props>  = ({section, inlineElement}
 
   // Set the filename, it could be a variable or static 
   if(section.children("file-name").text().length){
-    initial.filename = "/"+section.children("file-name").text();
+    initial.filename = section.children("file-name").text().replace(/.*\\/, '');
   } else if (section.children("expr-fill-color").text().length){
     section.children("expr-fill-color").children("expr").each(function(){
       let varName = $(this).children("var").text();
