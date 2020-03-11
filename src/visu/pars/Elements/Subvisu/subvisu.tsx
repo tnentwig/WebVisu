@@ -19,7 +19,7 @@ export const Subvisu :React.FunctionComponent<Props> = ({section})=>
     // Return of the react node
     return useObserver(()=>
         <div title={name} style={{position:"absolute", left:rect[0], top:rect[1], width:relCornerCoord.x2, height:relCornerCoord.y2}}>
-            <Visualisation visuname={name}></Visualisation>
+            <Visualisation visuname={name.toLowerCase()}></Visualisation>
         </div>
     )
 }
