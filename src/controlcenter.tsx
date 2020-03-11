@@ -31,7 +31,7 @@ export default class HTML5Visu {
             return (
                 <React.Fragment>    
                     {stateManager.get("ISONLINE") === "TRUE"
-                        ? <Visualisation visuname={stateManager.get("CURRENTVISU").toLowerCase()}></Visualisation>
+                        ? <Visualisation visuname={stateManager!.get("CURRENTVISU")!.toLowerCase()}></Visualisation>
                         : <div>The PLC webserver is not reachable!</div>
                     }
                 </React.Fragment>
