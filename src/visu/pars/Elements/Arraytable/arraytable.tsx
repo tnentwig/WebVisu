@@ -2,6 +2,7 @@ import * as React from 'react';
 import ComSocket from '../../../communication/comsocket';
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 import { stringToBoolean, rgbToHexString, stringToArray } from '../../Utils/utilfunctions';
+import ErrorBoundary from 'react-error-boundary';
 
 type Props = {
     section : JQuery<XMLDocument>
@@ -30,8 +31,8 @@ export const ArrayTable :React.FunctionComponent<Props> = ({section}) => {
 
     Object.defineProperty(initial, "value", {
         get: function() {
-            let value = ComSocket.singleton().oVisuVariables.get("PLC_PRG.array1[3]")!.value ;
-            return value;
+            
+            ;
         }
     });
     
@@ -39,17 +40,19 @@ export const ArrayTable :React.FunctionComponent<Props> = ({section}) => {
     // Return of the react node
     return useObserver(()=>
         <div style={{position:"absolute", left:rect[0], top:rect[1], width:relCornerCoord.x2+2*edge, height:relCornerCoord.y2+2*edge}}>
-            <div>dff:{state.value}</div>
-            <table style={{width:relCornerCoord.x2, height:relCornerCoord.y2, border:1}}>
-                <tbody>
-                    <th>
-                        <th>PLC_PRG.array1[INDEX]</th>
-                    </th>
-                    <tr>
-                        <td>{ComSocket.singleton().oVisuVariables.get("PLC_PRG.array1[3]")!.value}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <ErrorBoundary>
+                <div>dff:{state.value}</div>
+                <table style={{width:relCornerCoord.x2, height:relCornerCoord.y2, border:1}}>
+                    <tbody>
+                        <th>
+                            <th></th>
+                        </th>
+                        <tr>
+                            <td>{}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </ErrorBoundary>
         </div>
     )
 }

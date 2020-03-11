@@ -6,6 +6,7 @@ import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEven
 import {createVisuObject} from '../Features/objectManager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 import { Image } from '../Features/image'
+import ErrorBoundary from 'react-error-boundary';
 
 type Props = {
     section : JQuery<XMLDocument>
@@ -59,6 +60,7 @@ export const Button :React.FunctionComponent<Props> = ({section})=>
     // Return of the react node
     return useObserver(()=>
         <div style={{position:"absolute", left:state.transformedCornerCoord.x1, top:state.transformedCornerCoord.y1, width:state.relCoord.width, height:state.relCoord.height}}>
+          <ErrorBoundary>
             <button
             title={state.tooltip} 
             onClick={()=>onclick()} 
@@ -73,6 +75,7 @@ export const Button :React.FunctionComponent<Props> = ({section})=>
                 {textField}
               </svg>
             </div>
+            </ErrorBoundary>
         </div>
     )
 

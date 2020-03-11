@@ -3,6 +3,7 @@ import { IBasicShape } from '../../../Interfaces/interfaces';
 import {createVisuObject} from '../../Features/objectManager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 import { coordArrayToString } from '../../../Utils/utilfunctions'
+import ErrorBoundary from 'react-error-boundary';
 
 type Props = {
     polyShape: IBasicShape,
@@ -24,15 +25,16 @@ export const Polygon :React.FunctionComponent<Props> = ({polyShape, textField, i
 
     return useObserver(()=>
     <div style={{transform: state.cssTransform, transformOrigin: state.cssTransformOrigin, cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
-        {input}
-        <svg style={{float: "left"}} width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge}>
-            <svg
-                onClick={()=>onclick()} 
-                onMouseDown={()=>onmousedown()} 
-                onMouseUp={()=>onmouseup()}
-                onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
-                strokeDasharray={state.strokeDashArray}
-                >   
+        <ErrorBoundary>
+            {input}
+            <svg style={{float: "left"}} width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge}>
+                <svg
+                    onClick={()=>onclick()} 
+                    onMouseDown={()=>onmousedown()} 
+                    onMouseUp={()=>onmouseup()}
+                    onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
+                    strokeDasharray={state.strokeDashArray}
+                    >   
                 <polygon
                     points={coordArrayToString(state.relPoints)}
                     fill={state.fill}
@@ -47,6 +49,7 @@ export const Polygon :React.FunctionComponent<Props> = ({polyShape, textField, i
                     {textField}
                 </svg>
             </svg>
+        </ErrorBoundary>
     </div>
     )
 }

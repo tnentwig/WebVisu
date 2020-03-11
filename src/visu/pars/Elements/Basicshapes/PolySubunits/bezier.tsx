@@ -3,6 +3,7 @@ import { IBasicShape } from '../../../Interfaces/interfaces';
 import {createVisuObject} from '../../Features/objectManager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 import { coordArrayToBezierString } from '../../../Utils/utilfunctions'
+import ErrorBoundary from 'react-error-boundary';
 
 type Props = {
     polyShape: IBasicShape,
@@ -24,29 +25,31 @@ export const Bezier :React.FunctionComponent<Props> = ({polyShape, textField, in
 
     return useObserver(()=>
     <div style={{transform: state.cssTransform, transformOrigin: state.cssTransformOrigin, cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
-        {input}
-        <svg style={{float: "left"}} width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge}>
-            <svg
-                onClick={()=>onclick()} 
-                onMouseDown={()=>onmousedown()} 
-                onMouseUp={()=>onmouseup()}
-                onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
-                strokeDasharray={state.strokeDashArray}
-                >   
-                <path
-                    d={coordArrayToBezierString(state.relPoints)}
-                    fill={state.fill}
-                    strokeWidth={state.strokeWidth}
-                    stroke={state.stroke}
-                    />
-                    <title>{state.tooltip}</title>
+        <ErrorBoundary>
+            {input}
+            <svg style={{float: "left"}} width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge}>
+                <svg
+                    onClick={()=>onclick()} 
+                    onMouseDown={()=>onmousedown()} 
+                    onMouseUp={()=>onmouseup()}
+                    onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
+                    strokeDasharray={state.strokeDashArray}
+                    >   
+                    <path
+                        d={coordArrayToBezierString(state.relPoints)}
+                        fill={state.fill}
+                        strokeWidth={state.strokeWidth}
+                        stroke={state.stroke}
+                        />
+                        <title>{state.tooltip}</title>
+                </svg>
+                <svg
+                    width={state.relCoord.width+2*state.edge} 
+                    height={state.relCoord.height+2*state.edge} >
+                    {textField}
+                </svg>
             </svg>
-            <svg
-                width={state.relCoord.width+2*state.edge} 
-                height={state.relCoord.height+2*state.edge} >
-                {textField}
-            </svg>
-        </svg>
+        </ErrorBoundary>
     </div>
     )
 }
