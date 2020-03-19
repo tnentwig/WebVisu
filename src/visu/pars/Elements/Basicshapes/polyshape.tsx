@@ -5,7 +5,7 @@ import { IBasicShape } from '../../Interfaces/interfaces';
 import { Bezier } from './PolySubunits/bezier'
 import { Polygon } from './PolySubunits/polygon'
 import { Polyline } from './PolySubunits/polyline'
-import { Textfield } from '../Features/textManager';
+import { Textfield } from '../Features/Text/textManager';
 import { Inputfield } from '../Features/inputManager'
 import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from '../Features/eventManager';
 
