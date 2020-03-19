@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as util from '../../Utils/utilfunctions';
 import { IBasicShape } from '../../Interfaces/interfaces';
-import { Textfield } from '../Features/textManager';
+import { Textfield } from '../Features/Text/textManager';
 import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from '../Features/eventManager';
 import {createVisuObject} from '../Features/objectManager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';

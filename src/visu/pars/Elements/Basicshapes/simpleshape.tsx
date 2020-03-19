@@ -4,7 +4,7 @@ import { Roundrect } from './SimpleSubunits/roundrect'
 import { Line } from './SimpleSubunits/line';
 import { Circle } from './SimpleSubunits/circle'
 import { Rectangle } from './SimpleSubunits/rectangle';
-import { Textfield } from '../Features/textManager';
+import { Textfield } from '../Features/Text/textManager';
 import { Inputfield } from '../Features/inputManager';
 import { IBasicShape } from '../../Interfaces/interfaces';
 import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from '../Features/eventManager';
