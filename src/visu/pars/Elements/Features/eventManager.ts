@@ -81,7 +81,7 @@ export function parseDynamicTextParameters(section : JQuery<XMLDocument>, shape:
             }
             else{
                 let placeholderName = $(this)!.children("placeholder").text();
-                console.log("A placeholder variable: "+placeholderName+" at <"+shape+ "> object for <"+entry+"> was found.");
+                //console.log("A placeholder variable: "+placeholderName+" at <"+shape+ "> object for <"+entry+"> was found.");
             }
         })
     });
@@ -102,15 +102,21 @@ export function parseClickEvent(section : JQuery<XMLDocument>) : Function {
                 }
                 else{
                     let placeholderName = $(this)!.children("placeholder").text();
-                    console.log("A placeholder variable: "+placeholderName+"> was found.");
+                    //console.log("A placeholder variable: "+placeholderName+"> was found.");
                     clickFunction = function():void{;}
                 }
             })
      } else if (section.children("expr-zoom").text().length) {
         section.children("expr-zoom").children("expr").each(function() {
             let visuname = $(this).children("placeholder").text();
+            let stateVisuVariable = "ZOOMVISU";
+            if (StateManager.singleton().oState.get("USECURRENTVISU") === "TRUE"){
+                stateVisuVariable = "CURRENTVISU";
+            } else{
+                stateVisuVariable = "ZOOMVISU"
+            }
             clickFunction = function():void{
-                StateManager.singleton().oState.set("ZOOMVISU", visuname)
+                StateManager.singleton().oState.set(stateVisuVariable, visuname)
             }
         })
      } else {
@@ -145,7 +151,7 @@ export function parseTapEvent(section : JQuery<XMLDocument>, direction: string) 
                 }
                 else{
                     let placeholderName = $(this)!.children("placeholder").text();
-                    console.log("A placeholder variable: "+placeholderName+"> was found.");
+                    //console.log("A placeholder variable: "+placeholderName+"> was found.");
                     tapFunction = function():void{;}
                 }
             })
