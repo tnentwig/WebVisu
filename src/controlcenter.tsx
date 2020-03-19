@@ -31,7 +31,7 @@ export default class HTML5Visu {
             return (
                 <React.Fragment>    
                     {stateManager.get("ISONLINE") === "TRUE"
-                        ? <Visualisation visuname={stateManager!.get("CURRENTVISU")!.toLowerCase()}></Visualisation>
+                        ? <Visualisation visuname={stateManager!.get("CURRENTVISU")!.toLowerCase()} mainVisu={true} replacementSet={null}></Visualisation>
                         : <div>The PLC webserver is not reachable!</div>
                     }
                 </React.Fragment>
@@ -48,20 +48,22 @@ export default class HTML5Visu {
         return new Promise(resolve =>{
             let com = ComSocket.singleton();
             com.setServerURL(this.rootDir + '/webvisu.htm');
-            com.startCyclicUpdate(cycletime);
-            this.appendVariables(XML);
+            com.startCyclicUpdate(Number(StateManager.singleton().oState.get("UPDATETIME")));
+            this.appendGlobalVariables(XML);
+            com.initObservables();
             resolve(true);
         })
     }
 
-    appendVariables(XML : XMLDocument) : Promise<boolean>{
+    appendGlobalVariables(XML : XMLDocument) : Promise<boolean>{
         return new Promise(resolve => {
             let visuXML=$(XML);
             // Rip all of <variable> in <variablelist> section
             visuXML.children("visu-ini-file").children("variablelist").children("variable").each(function(){
                 let variable = $(this);
-                ComSocket.singleton().addObservableVar(variable.attr("name"), variable.text());
+                ComSocket.singleton().addGlobalVar(variable.attr("name"), variable.text());
             });
+            resolve(true)
         })
     }
 
@@ -115,7 +117,6 @@ export default class HTML5Visu {
             url: this.rootDir+relPath,
             type: 'GET',
             dataType: 'html', 
-            crossDomain: true
         })
         // Get a reference to the global state manager
         let stateManager = StateManager.singleton().oState;
