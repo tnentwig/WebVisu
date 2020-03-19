@@ -1,5 +1,3 @@
-import { setReactionScheduler } from "mobx/lib/internal";
-
 export function stringToBoolean(booleanExp : string) : boolean {
     let interim = false;
     try{
@@ -158,9 +156,14 @@ export function evalRPN(postfix : string) : boolean|number|null {
       }
       // Token is operator
       else {
-        // Every operation requires two arguments
+        // Every operation requires two arguments, except NOT
         if (stack.length < 2) {
-            return(stack.pop());
+            // NOT operation
+            if (token === "NOT"){
+                return(Number(!Boolean(stack.pop())))
+            } else {
+                return(stack.pop());
+            }
           }
   
         // Pop two items from the top of the stack and push the result of the
@@ -187,6 +190,8 @@ export function evalRPN(postfix : string) : boolean|number|null {
             case "MIN":
                 result = x<y ? x : y;
                 break;
+            case "=":
+                
             // The < and > operators must be at the end of the 
             case "<":
                 return(x<y ? 1 : 0);
@@ -204,4 +209,22 @@ export function evalRPN(postfix : string) : boolean|number|null {
     }
   
     return stack.pop();
+  }
+
+  export function getTextLines(text : string){
+    let match;
+    let lastMatch = 0;
+    let regEx = new RegExp(/(\n)/, "g");
+    let stringStack = [];
+    text = text.replace(/\t/g, '')
+    do {
+      match = regEx.exec(text);
+      if (match !== null) {
+        stringStack.push(text.substring(lastMatch, match.index).replace(/\| \|/g, ' '));
+        lastMatch = match.index+1;
+      } else {
+        stringStack.push(text.substring(lastMatch, text.length).replace(/\| \|/g, ' '))
+      }
+    } while (match);
+    return(stringStack.filter((el)=>el!=""))
   }
