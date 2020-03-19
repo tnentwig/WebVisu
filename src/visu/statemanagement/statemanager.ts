@@ -32,7 +32,7 @@ export default class StateManager implements IStateManager {
                         this.oState.set("CURRENTVISU", ComSocket.singleton().oVisuVariables.get(".CurrentVisu")!.value);
                     } catch {
                         this.oState.set("CURRENTVISU", this.oState.get("STARTVISU"));
-                        console.log("CurrentVisu is not defined.") 
+                        
                     }
                 } else {
                     if(this.oState.get("ZOOMVISU") !== undefined){
