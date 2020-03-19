@@ -22,11 +22,13 @@ export interface IComSocket {
     oVisuVariables: Map<string,{addr: string, value: string|undefined}>;
     // Functions
     addObservableVar(varName : string | undefined, varAddr : string) : void;
+    addGlobalVar(varName : string | undefined, varAddr : string) : void;
     updateVarList() : void;
     setValue(varName : string, varValue : number | string | boolean) : void;
     setServerURL(serverURL : string) : void;
     startCyclicUpdate(periodms : number) : void;
     toggleValue(varName : string) : void;
+    initObservables() : void
 }
 
 export interface IVisuObject{
