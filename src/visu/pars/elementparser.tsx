@@ -16,7 +16,6 @@ type Props = {
 }
 export const VisuElements :React.FunctionComponent<Props> =({visualisation})=>{
         
-    console.log("Start parsing...");
     let visuObjects: Array<(JSX.Element | undefined | null)> =[];
     // Rip all <element> sections
     visualisation.children("visualisation").children("element").each(function(){
@@ -50,10 +49,6 @@ export const VisuElements :React.FunctionComponent<Props> =({visualisation})=>{
             // Is a Scrollbar
             case "scrollbar":
                 visuObjects.push(<Scrollbar section={section}></Scrollbar>);
-                break;
-            // Is a array table
-            case "array-table":
-                //visuObjects.push(<ArrayTable section={section}></ArrayTable>);
                 break;
             case "reference":
                 visuObjects.push(<Subvisu section={section}></Subvisu>);
