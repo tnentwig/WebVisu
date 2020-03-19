@@ -10,8 +10,13 @@ function evalFunction(stack: string[][]) : Function {
             let value = stack[position][1];
             switch(stack[position][0]){
                 case "var":
-                    let varContent = ComSocket.singleton().oVisuVariables.get(value).value;                  
-                    interim += varContent + " ";
+                    if(ComSocket.singleton().oVisuVariables.has(value)){
+                        let varContent = ComSocket.singleton().oVisuVariables.get(value)!.value;                  
+                        interim += varContent + " ";
+                    } else{
+                        interim += 0 + " ";
+                    }
+
                     break;
                 case "const":
                     interim += value + " ";
