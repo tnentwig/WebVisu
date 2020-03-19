@@ -28,7 +28,7 @@ export function parseScrollbarParameters(section : JQuery<XMLDocument>) : Map<st
                 
             }else if($(this).children("placeholder").text().length){
                 let placeholderName = $(this)!.children("placeholder").text();
-                console.log("A placeholder variable: "+placeholderName+" for <"+entry+"> was found.");
+                //console.log("A placeholder variable: "+placeholderName+" for <"+entry+"> was found.");
             }
         })
     });
