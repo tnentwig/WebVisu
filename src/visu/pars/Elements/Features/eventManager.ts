@@ -43,13 +43,13 @@ export function parseDynamicShapeParameters(section : JQuery<XMLDocument>) : Map
                 if($(element).text() !== undefined){
                 switch($(element).prop("tagName")){
                     case "var":
-                        stack.push(["var", $(element).text()]);
+                        stack.push(["var", $(element).text().toLowerCase()]);
                         break;
                     case "const":
                         stack.push(["const", $(element).text()]);
                         break;
                     case "op":
-                        stack.push(["op", $(element).text().split("(")[0]]);
+                        stack.push(["op", $(element).text()]);
                         break;
                 }}
             });
@@ -75,7 +75,7 @@ export function parseDynamicTextParameters(section : JQuery<XMLDocument>, shape:
 
     tags.forEach(function(entry){
         section.children(entry).children("expr").each(function() {
-            let varName = $(this)!.children("var").text();
+            let varName = $(this)!.children("var").text().toLowerCase();
             if(ComSocket.singleton().oVisuVariables.has(varName)){
                 exprMap.set(entry, varName);
             }
@@ -93,7 +93,7 @@ export function parseClickEvent(section : JQuery<XMLDocument>) : Function {
      // Parse the <expr-toggle-var><expr><var> ... elements => toggle color
      if (section.children("expr-toggle-var").text().length){
             section.children("expr-toggle-var").children("expr").each(function() {
-                let varName = $(this).children("var").text();
+                let varName = $(this).children("var").text().toLowerCase();
                 let com = ComSocket.singleton();
                 if(com.oVisuVariables.has(varName)){
                     clickFunction = function():void{
@@ -116,6 +116,7 @@ export function parseClickEvent(section : JQuery<XMLDocument>) : Function {
                 stateVisuVariable = "ZOOMVISU"
             }
             clickFunction = function():void{
+                console.log("zoomed")
                 StateManager.singleton().oState.set(stateVisuVariable, visuname)
             }
         })
@@ -135,7 +136,7 @@ export function parseTapEvent(section : JQuery<XMLDocument>, direction: string) 
             let tapUp = (tapFalse === "false"? 0 : 1);
             // Parse the <expr-toggle-var><expr><var> ... elements => toggle color
             section.children("expr-tap-var").children("expr").each(function() {
-                let varName = $(this).children("var").text();
+                let varName = $(this).children("var").text().toLowerCase();
                 let com = ComSocket.singleton();
                 if(com.oVisuVariables.has(varName)){
                     // On mouse down or mouse up?
