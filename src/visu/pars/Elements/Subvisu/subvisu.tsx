@@ -22,7 +22,7 @@ export const Subvisu :React.FunctionComponent<Props> = ({section})=>
         let variable = $(this);
         let placeholder = variable.attr("placeholder");
         let replacement = variable.attr("replacement");
-        placeholders.set(placeholder.toLowerCase(), replacement)
+        placeholders.set(placeholder.toLowerCase(), replacement.toLowerCase())
     })
 
     // Return of the react node
