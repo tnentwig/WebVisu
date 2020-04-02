@@ -36,7 +36,7 @@ export const Inputfield : React.FunctionComponent<Props>  = ({section})  => {
   if (section.children("text-display").text().length) {
     let expr = section.children("text-display").children("expr");
     if (expr.children("var").text().length){
-      let varName = expr.children("var").text();
+      let varName = expr.children("var").text().toLowerCase();
       handleClickOutside = () => {
         setOpen(false);
       };
