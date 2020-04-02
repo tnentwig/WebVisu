@@ -59,7 +59,7 @@ export const Button :React.FunctionComponent<Props> = ({section})=>
 
     // Return of the react node
     return useObserver(()=>
-        <div style={{position:"absolute", left:state.transformedCornerCoord.x1, top:state.transformedCornerCoord.y1, width:state.relCoord.width, height:state.relCoord.height}}>
+        <div style={{position:"absolute", visibility : state.display, left:state.transformedCornerCoord.x1, top:state.transformedCornerCoord.y1, width:state.relCoord.width, height:state.relCoord.height}}>
           <ErrorBoundary>
             <button
             title={state.tooltip} 
