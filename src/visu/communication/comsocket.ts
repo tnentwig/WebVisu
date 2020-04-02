@@ -1,4 +1,3 @@
-import * as $ from 'jquery';
 import { IComSocket } from '../pars/Interfaces/interfaces';
 import { observable, action} from "mobx"
 import StateManager from "../statemanagement/statemanager"
@@ -32,13 +31,14 @@ export default class ComSocket implements IComSocket {
     }
 
     addGlobalVar(varName : string , varAddr : string){
-       this.globalVariables.set(varName,{addr : varAddr, key:varName})
+       this.globalVariables.set(varName.toLowerCase(),{addr : varAddr, key:varName})
     }
 
     addObservableVar(varName : string , varAddr : string){
         // Add new variable as object to objList
+        // Use lower case for variables names on the hole project to prevent faulty accesses to variables
         if (typeof(varName)==='string') {
-            this.oVisuVariables.set(varName,{
+            this.oVisuVariables.set(varName.toLowerCase(),{
                 addr    : varAddr,
                 value   : ""       // value is undefined at first 
             })
@@ -46,7 +46,7 @@ export default class ComSocket implements IComSocket {
         this.requestFrame.frame += this.requestFrame.listings + '|' + varAddr.replace(/,/g, '|') + '|';
         this.requestFrame.listings += 1;
         // Create reference of the key in the LUT 
-        this.lutKeyVariable.push(varName);
+        this.lutKeyVariable.push(varName.toLowerCase());
         }
     }
 
@@ -63,58 +63,55 @@ export default class ComSocket implements IComSocket {
     }
 
     updateVarList() {
-        try{
-        $.ajax({
-            type: 'POST',
-            contentType: "text/plain",
-            url: this.serverURL,
-            data: '|0|'+this.requestFrame.listings+'|'+this.requestFrame.frame,
+        fetch(this.serverURL,
+        {
+            method: 'POST',
+            headers: {"Content-Type" : "text/plain"},
+            body: '|0|'+this.requestFrame.listings+'|'+this.requestFrame.frame
         })
-        .then((response : string) => {
-            let transferarray : Array<string>= (response.slice(1,response.length-1).split('|'));
-            if (transferarray.length === this.requestFrame.listings){
-                for(let i=0; i<transferarray.length; i++) {
-                    let varName = this.lutKeyVariable[i];
-                    if (this.oVisuVariables.get(varName).value!==transferarray[i]){
-                        action(this.oVisuVariables.get(varName)!.value=transferarray[i]);   
-                    }
-                };
-                StateManager.singleton().oState.set("ISONLINE", "TRUE");
-            }
+        .then((response) => {
+            response.arrayBuffer()
+            .then((buffer : ArrayBuffer)=>{
+                let decoder = new TextDecoder("iso-8859-1");
+                let text = decoder.decode(buffer);
+                let transferarray : Array<string>= (text.slice(1,text.length-1).split('|'));
+                if (transferarray.length === this.requestFrame.listings){
+                    for(let i=0; i<transferarray.length; i++) {
+                        let varName = this.lutKeyVariable[i];
+                        if (this.oVisuVariables.get(varName).value!==transferarray[i]){
+                            action(this.oVisuVariables.get(varName)!.value=transferarray[i]);   
+                        }
+                    };
+                    StateManager.singleton().oState.set("ISONLINE", "TRUE");
+                }
+            })
         })
-
-        .fail(()=>{
+        .catch(()=>{
             console.log("Connection lost");
             StateManager.singleton().oState.set("ISONLINE", "FALSE");
         });
     }
-    catch{()=>console.log("Connection lost")}
-    }
 
     startCyclicUpdate(periodms : number) {
         window.setInterval(()=>this.updateVarList(), periodms);
+        console.log(this.oVisuVariables)
     }
 
     setValue(varName : string, varValue : number | string | boolean) {
-        $.ajax({
-            type: 'POST',
-            url: this.serverURL,
-            contentType: "text/plain",
-            data: '|1|1|0|'+ this.oVisuVariables.get(varName)!.addr.replace(/,/g, '|') + '|'+ varValue + '|',
-            success: function(data, textStatus, jqXhr) {
-                        //console.log(data);
-            },
-            error: function(jqXhr, textStatus, errorThrown) {
-                        console.log("Fehler");
-            }
-        });
+        fetch(this.serverURL,
+            {
+                method: 'POST',
+                headers: {"Content-Type" : "text/plain"},
+                body: '|1|1|0|'+ this.oVisuVariables.get(varName.toLowerCase())!.addr.replace(/,/g, '|') + '|'+ varValue + '|'
+            })
     } 
 
 
     // toggleValue : Wechselt den Wert einer boolschen Variablen 
     toggleValue(varName : string) {
-        if (this.oVisuVariables.has(varName)){
-                let value = Number(this.oVisuVariables.get(varName)!.value);
+        let variableName = varName.toLowerCase()
+        if (this.oVisuVariables.has(variableName)){
+                let value = Number(this.oVisuVariables.get(variableName)!.value);
                 if (value === 0 || 1){
                     value === 0 ? value=1 : value=0;
                     this.setValue(varName, value);
