@@ -5,6 +5,7 @@ import { stringToArray } from './pars/Utils/utilfunctions'
 import ComSocket from './communication/comsocket'
 import StateManager from '../visu/statemanagement/statemanager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
+import { autorun } from 'mobx';
 import * as JsZip from 'jszip';
 
 type Props = {
@@ -23,9 +24,10 @@ function initVariables(XML : XMLDocument, reset : boolean) : void{
         // Rip all of <variable> in <variablelist> section
         visuXML.children("visualisation").children("variablelist").children("variable").each(function(){
             let variable = $(this);
+            let varAddress = variable.text().split(",").slice(0,4).join(",");
             // Add the variable to the observables if not already existent
             if (!com.oVisuVariables.has(variable.attr("name"))){
-                com.addObservableVar(variable.attr("name"), variable.text());
+                com.addObservableVar(variable.attr("name"), varAddress);
             }
         });
 }
@@ -55,7 +57,6 @@ function getVisuxml(url : string, replacements : Map<string, string>) :Promise<X
                                 // Schlechte Implementierung von Codesys, Doppelpunkte durch einfügen von referenzen möglich
                                 // Es ist auch möglich, dass der erste Dot ganz vergessen wird
                                 variable.textContent = content.replace(/\.\./, '.');
-                                console.log(variable.textContent);
                                 placeholder.parentNode.replaceChild(variable, placeholder);
                             } 
                         } 
@@ -84,34 +85,35 @@ function getVisuxml(url : string, replacements : Map<string, string>) :Promise<X
 
 export const Visualisation :React.FunctionComponent<Props> = ({visuname, mainVisu, replacementSet})=> {
     
-    let url= StateManager.singleton().oState.get("ROOTDIR") + "/"+ visuname +".xml";
+
+    
     let store = useLocalStore(()=>({
         isLoading : true,
-        name : "",
         rect :[0,0,0,0],
-        xml : "" as any,
-        loaded(xml : JQuery<XMLDocument>){
-            store.name = xml.children("visualisation").children("name").text();
-            store.rect = stringToArray(xml.children("visualisation").children("size").text());
-            store.xml = xml;
-            store.isLoading = false;
-        }
+        xml : null as any,
+        url : "",
+        lastVisuname : ""
     }))
+
     React.useEffect(()=>{
-        let jQxml : JQuery<XMLDocument>;
-        let xml = async function(){
+        let fetchXML = async function(){
+            let url = StateManager.singleton().oState.get("ROOTDIR") + "/"+ visuname +".xml";
             let plainxml = await getVisuxml(url, replacementSet);
             initVariables(plainxml, mainVisu);
-            jQxml=$(plainxml);
-            store.loaded(jQxml);
+            let jQxml=$(plainxml);
+            store.rect = stringToArray(jQxml.children("visualisation").children("size").text());
+            store.xml = jQxml;
+            console.log("last:"+store.lastVisuname)
+            console.log("this:"+visuname);
+            store.lastVisuname = visuname;
+            store.isLoading = false;
         };
-        xml();
-
-        }, [store, url, mainVisu, replacementSet]);
+        fetchXML();
+        }, [store, mainVisu,visuname, replacementSet]);
 
     return useObserver(()=>
-        <div key={store.name} id={store.name} style={{position:"absolute", overflow:"hidden", left:0, top:0, width:store.rect[0]+1, height:store.rect[1]+1}}>
-            {store.isLoading ? <div></div> :
+        <div key={visuname} style={{position:"absolute", overflow:"hidden", left:0, top:0, width:store.rect[0]+1, height:store.rect[1]+1}}>
+            {store.isLoading ? null :
                 <VisuElements visualisation={store.xml}></VisuElements>
             }
         </div>
