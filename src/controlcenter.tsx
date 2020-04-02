@@ -24,10 +24,9 @@ export default class HTML5Visu {
         // Get the visu-ini file. There are informations like the current user level, the current visu or the user passwords
         let visuIni = await this.getVisuini('/visu_ini.xml');
         // The Comsocket has to be initilized
-        await this.initCommunication(visuIni, 100);
+        await this.initCommunication(visuIni, Number(stateManager.get("UPDATETIME")));
         // The coverted sections are inserted in the virtual react DOM
-        
-        const App = observer(()=> {
+         const App = observer(()=> {
             return (
                 <React.Fragment>    
                     {stateManager.get("ISONLINE") === "TRUE"
@@ -48,7 +47,7 @@ export default class HTML5Visu {
         return new Promise(resolve =>{
             let com = ComSocket.singleton();
             com.setServerURL(this.rootDir + '/webvisu.htm');
-            com.startCyclicUpdate(Number(StateManager.singleton().oState.get("UPDATETIME")));
+            com.startCyclicUpdate(cycletime);
             this.appendGlobalVariables(XML);
             com.initObservables();
             resolve(true);
