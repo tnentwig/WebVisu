@@ -135,80 +135,139 @@ export function coordArrayToBezierString(pointArray : number[][]) : string {
 }
 
 export function evalRPN(postfix : string) : boolean|number|null {
-    let interim = "";
+    // Return null if string is empty
     if (postfix.length === 0) {
       return null;
-    } else if (postfix.charAt(postfix.length-1)=== " "){
-        interim = postfix.slice(0, -1);
-    } else {
-        interim = postfix;
     } 
-    // Split into array of tokens
-    let postfixSplitted : Array<string> = interim.split(/\s+/);
-    
-    let stack : Array<number> = [] ;
-    for (var i = 0; i < postfixSplitted.length; i++) {
-      var token = postfixSplitted[i];
-      
-      // Token is a value, push it on the stack
+    // Remove whitespaces at the end and beginning
+    let interim = postfix.trim();
+    // Split into array of tokens, this is the resting stack
+    let restingStack : Array<string> = interim.split(/\s+/);
+    // We initilize the operating stack, this is necessary for mutliple operands
+    let operatingStack : Array<number> = [] ;
+    // Now we pop the tokens successively form the resting stack
+    for (var i = 0; i < restingStack.length; i++) {
+      var token = restingStack[i];
+      // If the token is a number: psuh them to the operating stack
       if (!isNaN(Number(token))) {
-        stack.push(parseFloat(token));
+        operatingStack.push(parseFloat(token));
       }
-      // Token is operator
+      // Else the token is a operator
       else {
-        // Every operation requires two arguments, except NOT
-        if (stack.length < 2) {
-            // NOT operation
-            if (token === "NOT"){
-                return(Number(!Boolean(stack.pop())))
-            } else {
-                return(stack.pop());
-            }
-          }
-  
-        // Pop two items from the top of the stack and push the result of the
-        // operation onto the stack.
-        let y = stack.pop();
-        let x = stack.pop();
-        let result :  number;
-        switch(token){
+        // The <op>-text has the format: <operation>(<number of involved operands>) if number > 1
+        let numberOfOperands = 2;
+        let regex = token.match(/\(([^)]+)\)/);
+        if (regex !== null){
+            numberOfOperands=Number(regex[1]);
+        } 
+        // Get the operator
+        let operator = token.split("(")[0];
+
+        // Choose the opration
+        let result :  number;  
+        let interim : number;
+        switch(operator){
             case "*":
-                result = x*y;
+                result = operatingStack.pop();
+                for (let i=1; i<numberOfOperands; i++){
+                    result = result * operatingStack.pop();
+                }
                 break;
             case "/":
-                result = x/y;
+                result = operatingStack.pop();
+                for (let i=1; i<numberOfOperands; i++){
+                    result = result / operatingStack.pop();
+                }
                 break;
             case "-":
-                result = x-y;
+                result = operatingStack.pop();
+                for (let i=1; i<numberOfOperands; i++){
+                    result = -result + operatingStack.pop();
+                }
                 break;
             case "+":
-                result = y+x;
+                result = operatingStack.pop();
+                for (let i=1; i<numberOfOperands; i++){
+                    result = result + operatingStack.pop();
+                }
                 break;
             case "MAX":
-                result = x>y ? x : y;
+                result = operatingStack.pop();
+                for (let i=1; i<numberOfOperands; i++){
+                    let y = result;
+                    let x = operatingStack.pop()
+                    result = x>y ? x : y;
+                }
                 break;
             case "MIN":
-                result = x<y ? x : y;
+                result = operatingStack.pop();
+                for (let i=1; i<numberOfOperands; i++){
+                    let y = result;
+                    let x = operatingStack.pop()
+                    result = x<y ? x : y;
+                }
                 break;
             case "=":
-                
+                interim = operatingStack.pop();
+                for (let i=1; i<2; i++){
+                    let y = interim;
+                    let x = operatingStack.pop()
+                    result = x===y ? 1 : 0;
+                }
+                break;
             // The < and > operators must be at the end of the 
             case "<":
-                return(x<y ? 1 : 0);
+                interim = operatingStack.pop();
+                for (let i=1; i<2; i++){
+                    let y = interim;
+                    let x = operatingStack.pop()
+                    result = x<y ? 1 : 0;
+                }
+                break;
             case ">":
-                return(x>y ? 1 : 0);
+                interim = operatingStack.pop();
+                for (let i=1; i<2; i++){
+                    let y = interim;
+                    let x = operatingStack.pop()
+                    result = x>y ? 1 : 0;
+                }
+                break;
+            case "<>":
+                interim = operatingStack.pop();
+                for (let i=1; i<2; i++){
+                    let y = interim;
+                    let x = operatingStack.pop()
+                    result = x!==y ? 1 : 0;
+                }
+                break;
+            case "AND":
+                interim = operatingStack.pop();
+                for (let i=1; i<numberOfOperands; i++){
+                    let swap = operatingStack.pop();
+                    interim = interim & swap;                    
+                }
+                result = interim;
+                break;
+            case "OR":
+                interim = operatingStack.pop();
+                for (let i=1; i<numberOfOperands; i++){
+                    let swap = operatingStack.pop();
+                    interim = interim | swap;
+                }
+                result = interim;
+                break;
+            case "NOT":
+                // Has only on operand
+                result = Number(!Boolean(operatingStack.pop()));
+                break;
             default:
                 console.log("The RPN-token: " + token + " is not a valid one!");
         }
-        stack.push(result);
+        operatingStack.push(result);
       }
     }
-  
-    if (stack.length > 1) {
-      throw new Error('Inputted expression has too many values.');
-    }
-  
-    return stack.pop();
+    let output = operatingStack.pop();
+    return output;
   }
 
   export function getTextLines(text : string){
