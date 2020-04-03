@@ -212,10 +212,9 @@ export function evalRPN(postfix : string) : boolean|number|null {
                 for (let i=1; i<2; i++){
                     let y = interim;
                     let x = operatingStack.pop()
-                    result = x===y ? 1 : 0;
+                    result = x==y ? 1 : 0;
                 }
                 break;
-            // The < and > operators must be at the end of the 
             case "<":
                 interim = operatingStack.pop();
                 for (let i=1; i<2; i++){
@@ -230,6 +229,22 @@ export function evalRPN(postfix : string) : boolean|number|null {
                     let y = interim;
                     let x = operatingStack.pop()
                     result = x>y ? 1 : 0;
+                }
+                break;
+            case "<=":
+                interim = operatingStack.pop();
+                for (let i=1; i<2; i++){
+                    let y = interim;
+                    let x = operatingStack.pop()
+                    result = x<=y ? 1 : 0;
+                }
+                break;
+            case ">=":
+                interim = operatingStack.pop();
+                for (let i=1; i<2; i++){
+                    let y = interim;
+                    let x = operatingStack.pop()
+                    result = x>=y ? 1 : 0;
                 }
                 break;
             case "<>":
