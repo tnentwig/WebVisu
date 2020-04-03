@@ -90,39 +90,53 @@ export function parseDynamicTextParameters(section : JQuery<XMLDocument>, shape:
 
 export function parseClickEvent(section : JQuery<XMLDocument>) : Function {
     let clickFunction : Function;
+    let stack : Array<Function> = [];
+    let clickEventDetected = false;
      // Parse the <expr-toggle-var><expr><var> ... elements => toggle color
-     if (section.children("expr-toggle-var").text().length){
-            section.children("expr-toggle-var").children("expr").each(function() {
-                let varName = $(this).children("var").text().toLowerCase();
-                let com = ComSocket.singleton();
-                if(com.oVisuVariables.has(varName)){
-                    clickFunction = function():void{
-                        com.toggleValue(varName);
-                    }
+    if (section.children("expr-toggle-var").text().length){
+        section.children("expr-toggle-var").children("expr").each(function() {
+            let varName = $(this).children("var").text().toLowerCase();
+            let com = ComSocket.singleton();
+            if(com.oVisuVariables.has(varName)){
+                clickFunction = function():void{
+                    com.toggleValue(varName);
                 }
-                else{
-                    let placeholderName = $(this)!.children("placeholder").text();
-                    //console.log("A placeholder variable: "+placeholderName+"> was found.");
-                    clickFunction = function():void{;}
-                }
-            })
-     } else if (section.children("expr-zoom").text().length) {
+                stack.push(clickFunction);
+                clickEventDetected = true;
+            }
+            else{
+                let placeholderName = $(this)!.children("placeholder").text();
+                //console.log("A placeholder variable: "+placeholderName+"> was found.");
+                clickFunction = function():void{;}
+            }
+        })
+    } 
+    if (section.children("expr-zoom").text().length) {
         section.children("expr-zoom").children("expr").each(function() {
             let visuname = $(this).children("placeholder").text();
             let stateVisuVariable = "ZOOMVISU";
             if (StateManager.singleton().oState.get("USECURRENTVISU") === "TRUE"){
                 stateVisuVariable = "CURRENTVISU";
-            } else{
+            } else {
                 stateVisuVariable = "ZOOMVISU"
             }
             clickFunction = function():void{
-                console.log("zoomed")
                 StateManager.singleton().oState.set(stateVisuVariable, visuname)
             }
+            stack.push(clickFunction);
+            clickEventDetected = true;
         })
-     } else {
+    } 
+    // Use empty callback if no click event is detected
+    if (clickEventDetected){
+        clickFunction = function():void{
+            stack.forEach(function(callback){
+                callback();
+            })
+        }
+    } else {
         clickFunction = function():void{;};
-     }
+    }
 
     return clickFunction;
 }
