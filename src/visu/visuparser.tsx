@@ -5,7 +5,6 @@ import { stringToArray } from './pars/Utils/utilfunctions'
 import ComSocket from './communication/comsocket'
 import StateManager from '../visu/statemanagement/statemanager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
-import { autorun } from 'mobx';
 import * as JsZip from 'jszip';
 
 type Props = {
@@ -26,13 +25,14 @@ function initVariables(XML : XMLDocument, reset : boolean) : void{
             let variable = $(this);
             let varAddress = variable.text().split(",").slice(0,4).join(",");
             // Add the variable to the observables if not already existent
+
             if (!com.oVisuVariables.has(variable.attr("name"))){
                 com.addObservableVar(variable.attr("name"), varAddress);
             }
         });
 }
 
-function getVisuxml(url : string, replacements : Map<string, string>) :Promise<XMLDocument> {
+function getVisuxml(url : string) :Promise<XMLDocument> {
     return new Promise(resolve =>{
         fetch(url, {headers:{'Content-Type': 'text/plain; charset=UTF8'}})
         .then((response)=>{
@@ -42,25 +42,6 @@ function getVisuxml(url : string, replacements : Map<string, string>) :Promise<X
                     let decoder = new TextDecoder("iso-8859-1");
                     let text = decoder.decode(buffer);
                     let data = new window.DOMParser().parseFromString(text, "text/xml")
-                    // Find all placeholder variables 
-                    let placeholders = data.getElementsByTagName("placeholder");
-                    // Replace all Placeholders
-                    Array.from(placeholders).forEach(function (placeholder){
-                        let regEx = new RegExp(/\$(.*)\$/gm);
-                        let match = regEx.exec(placeholder.textContent);
-                        // Replacement
-                        if (match != null){
-                            let replace = match[1];
-                            if (replacements.has(replace)){
-                                let variable = data.createElement('var');
-                                let content = placeholder.textContent.replace(/\$(.*)\$/, replacements.get(replace));
-                                // Schlechte Implementierung von Codesys, Doppelpunkte durch einfügen von referenzen möglich
-                                // Es ist auch möglich, dass der erste Dot ganz vergessen wird
-                                variable.textContent = content.replace(/\.\./, '.');
-                                placeholder.parentNode.replaceChild(variable, placeholder);
-                            } 
-                        } 
-                    })
                     resolve(data)
                 })
                 
@@ -83,9 +64,33 @@ function getVisuxml(url : string, replacements : Map<string, string>) :Promise<X
     })
 }
 
-export const Visualisation :React.FunctionComponent<Props> = ({visuname, mainVisu, replacementSet})=> {
-    
+function replacePlaceholders(data : XMLDocument, replacements : Map<string, string>){
+    // Find all placeholder variables 
+    let placeholders = data.getElementsByTagName("placeholder");
+    // Replace all Placeholders
+    Array.from(placeholders).forEach(function (placeholder){
+        let regEx = new RegExp(/\$(.*)\$/gm);
+        let match = regEx.exec(placeholder.textContent);
+        // Replacement
+        if (match != null){
+            let replace = match[1];
+            if (replacements.has(replace)){
+                let variable = data.createElement('var');
+                let content = placeholder.textContent.replace(/\$(.*)\$/, replacements.get(replace));
+                if(ComSocket.singleton().oVisuVariables.has("."+content)){
+                    content = "."+content;
+                }
+                
+                // Schlechte Implementierung von Codesys, Doppelpunkte durch einfügen von referenzen möglich
+                let textContent = content.replace(/\.\./, '.');
+                variable.textContent = textContent.toLowerCase();
+                placeholder.parentNode.replaceChild(variable, placeholder);
+            } 
+        } 
+    })
+}
 
+export const Visualisation :React.FunctionComponent<Props> = ({visuname, mainVisu, replacementSet})=> {
     
     let store = useLocalStore(()=>({
         isLoading : true,
@@ -98,13 +103,12 @@ export const Visualisation :React.FunctionComponent<Props> = ({visuname, mainVis
     React.useEffect(()=>{
         let fetchXML = async function(){
             let url = StateManager.singleton().oState.get("ROOTDIR") + "/"+ visuname +".xml";
-            let plainxml = await getVisuxml(url, replacementSet);
+            let plainxml = await getVisuxml(url);
             initVariables(plainxml, mainVisu);
+            replacePlaceholders(plainxml, replacementSet);
             let jQxml=$(plainxml);
             store.rect = stringToArray(jQxml.children("visualisation").children("size").text());
             store.xml = jQxml;
-            console.log("last:"+store.lastVisuname)
-            console.log("this:"+visuname);
             store.lastVisuname = visuname;
             store.isLoading = false;
         };
