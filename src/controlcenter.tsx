@@ -5,14 +5,27 @@ import ComSocket from './visu/communication/comsocket';
 import StateManager from './visu/statemanagement/statemanager'
 import { Visualisation } from './visu/visuparser';
 import { observer } from 'mobx-react';
+import { observable, action } from 'mobx';
 
 export default class HTML5Visu {
     rootDir: string;
+    @observable windowWidth : number;
+    @observable windowsHeight : number;
     
     constructor(){
         let path = location.protocol + '//' + window.location.host;
         this.rootDir= path;
+        this.windowWidth = window.innerWidth;
+        this.windowsHeight = window.innerHeight;
+        window.addEventListener('resize', this.updateWindowDimensions);
     }
+    @action.bound
+    updateWindowDimensions() {
+        this.windowWidth = window.innerWidth;
+        this.windowsHeight = this.windowsHeight;
+        console.log("hi")
+      }
+    
     async showMainVisu () {
         // Get a reference to the global state manager
         let stateManager = StateManager.singleton().oState;
@@ -28,12 +41,12 @@ export default class HTML5Visu {
         // The coverted sections are inserted in the virtual react DOM
          const App = observer(()=> {
             return (
-                <React.Fragment>    
+                <div style={{width: this.windowWidth, height:this.windowsHeight}}>    
                     {stateManager.get("ISONLINE") === "TRUE"
                         ? <Visualisation visuname={stateManager!.get("CURRENTVISU")!.toLowerCase()} mainVisu={true} replacementSet={null}></Visualisation>
                         : <div>The PLC webserver is not reachable!</div>
                     }
-                </React.Fragment>
+                </div>
             )
         })
         
