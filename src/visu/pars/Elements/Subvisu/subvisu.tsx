@@ -12,6 +12,7 @@ export const Subvisu :React.FunctionComponent<Props> = ({section})=>
 {
     // Parsing of the fixed parameters
     let rect = stringToArray(section.children("rect").text());
+    let width = rect[2]-rect[0];
     let name = section.children("name").text();
     let tooltip = (section.children("tooltip").text()).length>0? section.children("tooltip").text() : ""
     // Auxiliary values
@@ -28,7 +29,7 @@ export const Subvisu :React.FunctionComponent<Props> = ({section})=>
     // Return of the react node
     return useObserver(()=>
         <div title={name} style={{position:"absolute", left:rect[0], top:rect[1], width:relCornerCoord.x2, height:relCornerCoord.y2}}>
-            <Visualisation visuname={name.toLowerCase()} mainVisu={false} replacementSet={placeholders}></Visualisation>
+            <Visualisation visuname={name.toLowerCase()} mainVisu={false} replacementSet={placeholders} width={width}></Visualisation>
         </div>
     )
 }
