@@ -19,12 +19,12 @@ export default class HTML5Visu {
         this.windowsHeight = window.innerHeight;
         window.addEventListener('resize', this.updateWindowDimensions);
     }
+    // For responsive behavior 
     @action.bound
     updateWindowDimensions() {
         this.windowWidth = window.innerWidth;
-        this.windowsHeight = this.windowsHeight;
-        console.log("hi")
-      }
+        this.windowsHeight = window.innerHeight;
+    }
     
     async showMainVisu () {
         // Get a reference to the global state manager
@@ -39,11 +39,13 @@ export default class HTML5Visu {
         // The Comsocket has to be initilized
         await this.initCommunication(visuIni, Number(stateManager.get("UPDATETIME")));
         // The coverted sections are inserted in the virtual react DOM
-         const App = observer(()=> {
+
+        const App = observer(()=> {
             return (
+
                 <div style={{width: this.windowWidth, height:this.windowsHeight}}>    
                     {stateManager.get("ISONLINE") === "TRUE"
-                        ? <Visualisation visuname={stateManager!.get("CURRENTVISU")!.toLowerCase()} mainVisu={true} replacementSet={null}></Visualisation>
+                        ? <Visualisation visuname={stateManager!.get("CURRENTVISU")!.toLowerCase()} mainVisu={true} replacementSet={null} width={this.windowWidth}></Visualisation>
                         : <div>The PLC webserver is not reachable!</div>
                     }
                 </div>
@@ -151,6 +153,7 @@ export default class HTML5Visu {
                     case "USECURRENTVISU":
                         let useCurrentVisu= htmlElement[i].getAttribute("value");
                         stateManager.set(name, useCurrentVisu)
+                        break;
                 }
             }
             resolve(true);
