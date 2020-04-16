@@ -1,7 +1,6 @@
 import ComSocket from '../../../communication/comsocket';
-import {IVisuObject} from '../../Interfaces/interfaces'
+import {IVisuObject, IBasicShape} from '../../../Interfaces/interfaces'
 import {numberToHexColor, computeMinMaxCoord, evalRPN, pointArrayToPiechartString} from '../../Utils/utilfunctions'
-import {IBasicShape} from '../../Interfaces/interfaces'
 
 function evalFunction(stack: string[][]) : Function {
     var returnFunc = function () {
