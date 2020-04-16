@@ -1,8 +1,9 @@
-import { IComSocket } from '../pars/Interfaces/interfaces';
-import { observable, action} from "mobx"
+import { IComSocket } from '../../visu/Interfaces/interfaces';
+import { observable, action } from "mobx"
 import StateManager from "../statemanagement/statemanager"
 
 export default class ComSocket implements IComSocket {
+    
     private static instance : IComSocket=new ComSocket();
     // objList contains all variables as objects with the name as key and addr & value of the variable
     oVisuVariables: Map<string,{addr: string, value: string | undefined}>;

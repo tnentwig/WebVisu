@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as $ from 'jquery';
 import * as util from '../../Utils/utilfunctions';
-import { IBasicShape } from '../../Interfaces/interfaces';
+import { IBasicShape } from '../../../Interfaces/interfaces';
 import { Bezier } from './PolySubunits/bezier'
 import { Polygon } from './PolySubunits/polygon'
 import { Polyline } from './PolySubunits/polyline'

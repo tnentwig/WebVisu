@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IBasicShape } from '../../../Interfaces/interfaces';
+import { IBasicShape } from '../../../../Interfaces/interfaces';
 import {createVisuObject} from '../../Features/objectManager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 import ErrorBoundary from 'react-error-boundary';
@@ -40,8 +40,8 @@ export const Roundrect :React.FunctionComponent<Props> = ({simpleShape, textFiel
                         height={state.relCoord.height}
                         x={state.edge}
                         y={state.edge}
-                        rx={10}
-                        ry={10}
+                        rx={5}
+                        ry={5}
                         fill={state.fill}
                         stroke={state.stroke}
                         strokeWidth={state.strokeWidth}

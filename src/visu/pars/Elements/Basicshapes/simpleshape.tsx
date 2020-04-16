@@ -6,7 +6,7 @@ import { Circle } from './SimpleSubunits/circle'
 import { Rectangle } from './SimpleSubunits/rectangle';
 import { Textfield } from '../Features/Text/textManager';
 import { Inputfield } from '../Features/inputManager';
-import { IBasicShape } from '../../Interfaces/interfaces';
+import { IBasicShape } from '../../../Interfaces/interfaces';
 import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from '../Features/eventManager';
 
 export function parseSimpleShape(section : JQuery<XMLDocument>){
