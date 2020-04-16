@@ -114,15 +114,16 @@ export function parseClickEvent(section : JQuery<XMLDocument>) : Function {
     if (section.children("expr-zoom").text().length) {
         section.children("expr-zoom").children("expr").each(function() {
             let visuname = $(this).children("placeholder").text();
-            let stateVisuVariable = "ZOOMVISU";
             if (StateManager.singleton().oState.get("USECURRENTVISU") === "TRUE"){
-                stateVisuVariable = "CURRENTVISU";
+                clickFunction = function():void{
+                    ComSocket.singleton().setValue(".CurrentVisu", visuname);
+                }
             } else {
-                stateVisuVariable = "ZOOMVISU"
+                clickFunction = function():void{
+                    StateManager.singleton().oState.set("ZOOMVISU", visuname);
+                }
             }
-            clickFunction = function():void{
-                StateManager.singleton().oState.set(stateVisuVariable, visuname)
-            }
+
             stack.push(clickFunction);
             clickEventDetected = true;
         })
