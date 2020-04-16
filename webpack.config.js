@@ -1,5 +1,4 @@
 const path = require('path');
-const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
     mode: 'development',
@@ -15,10 +14,16 @@ module.exports = {
     module: {
         rules: [
             {
-                use: 'ts-loader',
+                test: /\.css$/i,
+                use: ['style-loader', 'css-loader'],
+            },
+            {
+                test: /\.tsx?$/,
+                use: ['ts-loader'],
                 exclude: /node_modules/
             },
             {
+                test: /\.tsx?$/,
                 enforce: 'pre',
                 loader: ["source-map-loader", "eslint-loader"]
             }
