@@ -12,14 +12,14 @@ import { Group } from '../pars/Elements/Group/parseGroup';
 import { Subvisu } from '../pars/Elements/Subvisu/subvisu'
 
 type Props = {
-    visualisation: JQuery<XMLDocument>
+    visualisation: XMLDocument
 }
 export const VisuElements :React.FunctionComponent<Props> =({visualisation})=>{
         
     let visuObjects: Array<(JSX.Element | undefined | null)> =[];
     // Rip all <element> sections
-    visualisation.children("visualisation").children("element").each(function(){
-        let section = $(this);
+    $(visualisation).children("visualisation").children("element").each(function(){
+        let section : JQuery<XMLDocument>= $(this);
         // Determine the type of the element
         switch(section.attr("type")) {
             // Is a simple shape like rectangle, round-rectangle, circle or line
