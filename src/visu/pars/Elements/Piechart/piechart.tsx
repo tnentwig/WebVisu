@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as $ from 'jquery';
 import * as util from '../../Utils/utilfunctions';
-import { IBasicShape, IPiechart, IVisuObject } from '../../Interfaces/interfaces';
+import { IBasicShape, IPiechart, IVisuObject } from '../../../Interfaces/interfaces';
 import { Textfield } from '../Features/Text/textManager';
 import { Inputfield } from '../Features/inputManager';
 import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from '../Features/eventManager';
