@@ -4,13 +4,14 @@ import { VisuElements } from '../visu/pars/elementparser'
 import { stringToArray } from './pars/Utils/utilfunctions'
 import ComSocket from './communication/comsocket'
 import StateManager from '../visu/statemanagement/statemanager'
-import {useObserver, useLocalStore } from 'mobx-react-lite';
+import { Spinner } from '../supplements/Spinner/spinner'
 import * as JsZip from 'jszip';
 
 type Props = {
     visuname : string,
     mainVisu : boolean,
-    replacementSet : Map<string, string>
+    replacementSet : Map<string, string>,
+    width : number
 }
 
 function initVariables(XML : XMLDocument, reset : boolean) : void{
@@ -25,18 +26,29 @@ function initVariables(XML : XMLDocument, reset : boolean) : void{
             let variable = $(this);
             let varAddress = variable.text().split(",").slice(0,4).join(",");
             // Add the variable to the observables if not already existent
-
             if (!com.oVisuVariables.has(variable.attr("name"))){
                 com.addObservableVar(variable.attr("name"), varAddress);
             }
         });
 }
 
+function stringifyVisuXML(toStringify : XMLDocument) : string{
+    let serializer = new XMLSerializer();
+    let stringCopy = serializer.serializeToString(toStringify);
+    return stringCopy;
+}
+
+function parseVisuXML(stringXML : string) : XMLDocument{
+    let parser = new DOMParser();
+    let returnXML = parser.parseFromString(stringXML, "application/xml");
+    return returnXML;
+}
+
 function getVisuxml(url : string) :Promise<XMLDocument> {
     return new Promise(resolve =>{
         fetch(url, {headers:{'Content-Type': 'text/plain; charset=UTF8'}})
         .then((response)=>{
-            if (response.status != 400 ){
+            if (response.status != 400){
                 response.arrayBuffer()
                 .then((buffer)=>{
                     let decoder = new TextDecoder("iso-8859-1");
@@ -90,35 +102,74 @@ function replacePlaceholders(data : XMLDocument, replacements : Map<string, stri
     })
 }
 
-export const Visualisation :React.FunctionComponent<Props> = ({visuname, mainVisu, replacementSet})=> {
-    
-    let store = useLocalStore(()=>({
-        isLoading : true,
-        rect :[0,0,0,0],
-        xml : null as any,
-        url : "",
-        lastVisuname : ""
-    }))
+export const Visualisation :React.FunctionComponent<Props> = ({visuname, mainVisu, replacementSet, width})=> {
+    console.log("Aufruf Visu "+ visuname)
+    const [loading, setLoading] = React.useState<Boolean>(true);
+    const [thisVisuname, setVisuname] = React.useState<string>(visuname);
+    const [XML, setXML] = React.useState<string>(null);
+    const [adaptedXML, setAdaptedXML] = React.useState<XMLDocument>();
+    const [originSize, setOriginSize] = React.useState<Array<number>>([0,0]);
+    const [scale, setScale] = React.useState("scale(1)");
 
+    // dd
     React.useEffect(()=>{
+        console.log("Aufruf mount")
+        return (()=>{setLoading(true);
+        console.log("unmount")})
+    },[])
+    React.useEffect(()=>{
+        if(visuname !== thisVisuname){
+            setVisuname(visuname);
+        }
+    },[visuname, thisVisuname])
+
+    // Get new xml on change of visuname
+    React.useEffect(()=>{
+        console.log("fetch "+thisVisuname)
         let fetchXML = async function(){
-            let url = StateManager.singleton().oState.get("ROOTDIR") + "/"+ visuname +".xml";
-            let plainxml = await getVisuxml(url);
-            initVariables(plainxml, mainVisu);
-            replacePlaceholders(plainxml, replacementSet);
-            let jQxml=$(plainxml);
-            store.rect = stringToArray(jQxml.children("visualisation").children("size").text());
-            store.xml = jQxml;
-            store.lastVisuname = visuname;
-            store.isLoading = false;
+            // Set the loading flag. This will unmount all elements from calling visu
+            setLoading(true);
+            let url = StateManager.singleton().oState.get("ROOTDIR") + "/"+ thisVisuname +".xml";
+            // Files that are needed several times will be saved internally for loading speed up
+            let plainxml : string;
+            let xmlDict = StateManager.singleton().xmlDict;
+            if (xmlDict.has(thisVisuname)){
+                plainxml = xmlDict.get(thisVisuname);
+            } else {
+                let xml = await getVisuxml(url);
+                plainxml = stringifyVisuXML(xml);
+                xmlDict.set(thisVisuname, plainxml);
+            }
+            setXML(plainxml);
+            
         };
         fetchXML();
-        }, [store, mainVisu,visuname, replacementSet]);
+        }, [thisVisuname]);
 
-    return useObserver(()=>
-        <div key={visuname} style={{position:"absolute", overflow:"hidden", left:0, top:0, width:store.rect[0]+1, height:store.rect[1]+1}}>
-            {store.isLoading ? null :
-                <VisuElements visualisation={store.xml}></VisuElements>
+    // Adapt the original xml through replacing of placeholders
+    React.useEffect(()=>{
+        if(XML !== null){
+            let xmlDoc = parseVisuXML(XML);
+            initVariables(xmlDoc, mainVisu);
+            replacePlaceholders(xmlDoc, replacementSet);
+            setAdaptedXML(xmlDoc);
+            setLoading(false);
+            // Get the original size of the visualisation
+            let jQxml=$(xmlDoc);
+            setOriginSize(stringToArray(jQxml.children("visualisation").children("size").text()));
+        }
+    },[XML, mainVisu, replacementSet])
+
+    // Scaling on main window resize for responsive behavior
+    React.useEffect(()=>{
+        let scaleFactor = width/(originSize[0]+2);
+        setScale("scale("+scaleFactor.toString()+")");
+    }, [width, originSize, mainVisu])
+
+    return (
+        <div key={visuname} style={{position:"absolute", overflow:"hidden", left:0, top:0, width:originSize[0]+1, height:originSize[1]+1, transformOrigin:"0 0", transform:scale}}>
+            {loading ? <Spinner></Spinner> :
+                <VisuElements visualisation={adaptedXML}></VisuElements>
             }
         </div>
     )
