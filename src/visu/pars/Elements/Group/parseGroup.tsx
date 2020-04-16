@@ -43,6 +43,7 @@ export const Group :React.FunctionComponent<Props> = ({section})=>
     let visuObjects: Array<(JSX.Element | undefined | null)> =[];
     
     // Rip all <element> sections
+
     section.children("element").each(function(){
         let section = $(this);
         // Determine the type of the element
@@ -59,6 +60,10 @@ export const Group :React.FunctionComponent<Props> = ({section})=>
                 break;
             case "button":
                 visuObjects.push(<Button section={section}></Button>)
+                break;
+            case "group":
+                visuObjects.push(<Group section={section}></Group>)
+                break;
             }
         });
 
@@ -102,7 +107,7 @@ export const Group :React.FunctionComponent<Props> = ({section})=>
             const state  = useLocalStore(()=>initial);
 
         return ( state.display !== "visible" ? null :
-            <div style={{visibility : state.display, overflow:"hidden", position:"absolute", left:rectParent[0], top:rectParent[1], width:rectParent[2]-rectParent[0], height:rectParent[3]-rectParent[1]}}>
+            <div style={{visibility : state.display,  position:"absolute", left:rectParent[0], top:rectParent[1], width:rectParent[2]-rectParent[0], height:rectParent[3]-rectParent[1]}}>
                 <ErrorBoundary>
                 <div style={{transformOrigin:"left top", transform:scale}}>
                 {
