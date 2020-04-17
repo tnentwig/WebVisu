@@ -116,7 +116,7 @@ export function parseClickEvent(section : JQuery<XMLDocument>) : Function {
             let visuname = $(this).children("placeholder").text();
             if (StateManager.singleton().oState.get("USECURRENTVISU") === "TRUE"){
                 clickFunction = function():void{
-                    ComSocket.singleton().setValue(".CurrentVisu", visuname);
+                    ComSocket.singleton().setValue(".currentvisu", visuname);
                 }
             } else {
                 clickFunction = function():void{
