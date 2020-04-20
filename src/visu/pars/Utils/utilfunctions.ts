@@ -148,6 +148,14 @@ export function evalRPN(postfix : string) : boolean|number|null {
     // Now we pop the tokens successively form the resting stack
     for (var i = 0; i < restingStack.length; i++) {
       var token = restingStack[i];
+      // The token could be "TRUE" or "FALSE". The we have to translate ist to 1 and 0.
+      if (token === "TRUE" ){
+        token = "1";
+      }
+      if (token === "FALSE" ){
+        token = "0";
+      }
+
       // If the token is a number: psuh them to the operating stack
       if (!isNaN(Number(token))) {
         operatingStack.push(parseFloat(token));
