@@ -38,7 +38,7 @@ export default class HTML5Visu {
         let visuIni = await this.getVisuini('/visu_ini.xml');
         // The Comsocket has to be initilized
         await this.initCommunication(visuIni, Number(stateManager.get("UPDATETIME")));
-        // The coverted sections are inserted in the virtual react DOM
+        StateManager.singleton().init();
 
         const App = observer(()=> {
             return (
