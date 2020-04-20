@@ -127,7 +127,7 @@ export const Textline :React.FunctionComponent<Props>  = ({section, dynamicParam
 
         Object.defineProperty(initial, "xpos", {
             get: function() {
-                let position = (initial.textAlignHorz == 'center') ? '50%' : ((initial.textAlignHorz == 'left') ? "10%" : "100%");
+                let position = (initial.textAlignHorz == 'center') ? '50%' : ((initial.textAlignHorz == 'left') ? "5%" : "95%");
             return position
             }
         });
