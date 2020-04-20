@@ -53,6 +53,7 @@ export function parseDynamicShapeParameters(section : JQuery<XMLDocument>) : Map
                         break;
                 }}
             });
+
             if (stack.length){
                 exprMap.set(entry, stack);
             }
@@ -127,7 +128,46 @@ export function parseClickEvent(section : JQuery<XMLDocument>) : Function {
             stack.push(clickFunction);
             clickEventDetected = true;
         })
-    } 
+    }
+    // The object has properties on "Execute program" if input-action-list is detected
+    if (section.children("input-action-list").text().length){
+        let actionList = $(section.children("input-action-list"));
+        // Assign expression
+        if (actionList.children("expr-assign").text().length){
+            actionList.children("expr-assign").each(function(){
+                let action = $(this);
+                // Left side value
+                let lvalue = action.children("lvalue").first().children("expr").first().children("var").text();
+                // Right sided expression
+                let rpnStack : string[][] = [];
+                action.children("rvalue").children("expr").each(function() {  
+                    $(this).children().each((index, element)=>{
+                        if($(element).text() !== undefined){
+                            switch($(element).prop("tagName")){
+                                case "var":
+                                    rpnStack.push(["var", $(element).text().toLowerCase()]);
+                                    break;
+                                case "const":
+                                    rpnStack.push(["const", $(element).text()]);
+                                    break;
+                                case "op":
+                                    rpnStack.push(["op", $(element).text()]);
+                                    break;
+                            }
+                        }
+                    });
+                clickFunction = function():void{
+                    let rvalue = ComSocket.singleton().evalFunction(rpnStack)();
+                    let com = ComSocket.singleton();
+                    com.setValue(lvalue, rvalue);
+                }
+                stack.push(clickFunction);
+                clickEventDetected = true;
+                })
+            })
+        }
+    }
+    
     // Use empty callback if no click event is detected
     if (clickEventDetected){
         clickFunction = function():void{
@@ -138,7 +178,6 @@ export function parseClickEvent(section : JQuery<XMLDocument>) : Function {
     } else {
         clickFunction = function():void{;};
     }
-
     return clickFunction;
 }
 
