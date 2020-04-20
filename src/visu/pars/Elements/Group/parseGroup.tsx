@@ -107,7 +107,7 @@ export const Group :React.FunctionComponent<Props> = ({section})=>
             const state  = useLocalStore(()=>initial);
 
         return ( state.display !== "visible" ? null :
-            <div style={{visibility : state.display,  position:"absolute", left:rectParent[0], top:rectParent[1], width:rectParent[2]-rectParent[0], height:rectParent[3]-rectParent[1]}}>
+            <div style={{pointerEvents: "none", position:"absolute", left:rectParent[0], top:rectParent[1], width:rectParent[2]-rectParent[0], height:rectParent[3]-rectParent[1]}}>
                 <ErrorBoundary>
                 <div style={{transformOrigin:"left top", transform:scale}}>
                 {
