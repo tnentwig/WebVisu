@@ -1,5 +1,6 @@
 import * as $ from 'jquery';
 import * as React from 'react';
+import {uid} from 'react-uid';
 import { VisuElements } from '../visu/pars/elementparser'
 import { stringToArray } from './pars/Utils/utilfunctions'
 import ComSocket from './communication/comsocket'
@@ -103,7 +104,6 @@ function replacePlaceholders(data : XMLDocument, replacements : Map<string, stri
 }
 
 export const Visualisation :React.FunctionComponent<Props> = ({visuname, mainVisu, replacementSet, width})=> {
-    console.log("Aufruf Visu "+ visuname)
     const [loading, setLoading] = React.useState<Boolean>(true);
     const [thisVisuname, setVisuname] = React.useState<string>(visuname);
     const [XML, setXML] = React.useState<string>(null);
@@ -167,7 +167,7 @@ export const Visualisation :React.FunctionComponent<Props> = ({visuname, mainVis
     }, [width, originSize, mainVisu])
 
     return (
-        <div key={visuname} style={{position:"absolute", overflow:"hidden", left:0, top:0, width:originSize[0]+1, height:originSize[1]+1, transformOrigin:"0 0", transform:scale}}>
+        <div key={uid(16)} style={{position:"absolute", overflow:"hidden", left:0, top:0, width:originSize[0]+1, height:originSize[1]+1, transformOrigin:"0 0", transform:scale}}>
             {loading ? <Spinner></Spinner> :
                 <VisuElements visualisation={adaptedXML}></VisuElements>
             }
