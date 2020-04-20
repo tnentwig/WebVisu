@@ -1,6 +1,7 @@
 import { IComSocket } from '../../visu/Interfaces/interfaces';
 import { observable, action } from "mobx"
-import StateManager from "../statemanagement/statemanager"
+import StateManager from "../statemanagement/statemanager";
+import { evalRPN } from '../pars/Utils/utilfunctions'
 
 export default class ComSocket implements IComSocket {
     
@@ -41,7 +42,7 @@ export default class ComSocket implements IComSocket {
         if (typeof(varName)==='string') {
             this.oVisuVariables.set(varName.toLowerCase(),{
                 addr    : varAddr,
-                value   : ""       // value is undefined at first 
+                value   : ""       // value is empty at first 
             })
         // Add new variable to the request frame
         this.requestFrame.frame += this.requestFrame.listings + '|' + varAddr.replace(/,/g, '|') + '|';
@@ -49,6 +50,34 @@ export default class ComSocket implements IComSocket {
         // Create reference of the key in the LUT 
         this.lutKeyVariable.push(varName.toLowerCase());
         }
+    }
+
+    evalFunction(stack: string[][]) : Function {
+        var returnFunc = function () {
+            let interim = "";
+            for(let position = 0; position<stack.length; position++){
+                let value = stack[position][1];
+                switch(stack[position][0]){
+                    case "var":
+                        if(ComSocket.singleton().oVisuVariables.has(value)){
+                            let varContent = ComSocket.singleton().oVisuVariables.get(value)!.value;                  
+                            interim += varContent + " ";
+                        } else{
+                            interim += 0 + " ";
+                        }
+    
+                        break;
+                    case "const":
+                        interim += value + " ";
+                        break;
+                    case "op":
+                        interim += value + " ";
+                        break;
+                }
+            }
+            return evalRPN(interim);
+        }
+        return returnFunc;
     }
 
     initObservables(){

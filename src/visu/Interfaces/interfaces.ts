@@ -28,7 +28,8 @@ export interface IComSocket {
     setServerURL(serverURL : string) : void;
     startCyclicUpdate(periodms : number) : void;
     toggleValue(varName : string) : void;
-    initObservables() : void
+    initObservables() : void;
+    evalFunction(stack:string[][]):Function;
 }
 
 export interface IVisuObject{
