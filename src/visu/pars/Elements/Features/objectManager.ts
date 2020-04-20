@@ -2,33 +2,7 @@ import ComSocket from '../../../communication/comsocket';
 import {IVisuObject, IBasicShape} from '../../../Interfaces/interfaces'
 import {numberToHexColor, computeMinMaxCoord, evalRPN, pointArrayToPiechartString} from '../../Utils/utilfunctions'
 
-function evalFunction(stack: string[][]) : Function {
-    var returnFunc = function () {
-        let interim = "";
-        for(let position = 0; position<stack.length; position++){
-            let value = stack[position][1];
-            switch(stack[position][0]){
-                case "var":
-                    if(ComSocket.singleton().oVisuVariables.has(value)){
-                        let varContent = ComSocket.singleton().oVisuVariables.get(value)!.value;                  
-                        interim += varContent + " ";
-                    } else{
-                        interim += 0 + " ";
-                    }
 
-                    break;
-                case "const":
-                    interim += value + " ";
-                    break;
-                case "op":
-                    interim += value + " ";
-                    break;
-            }
-        }
-        return evalRPN(interim);
-    }
-    return returnFunc;
-}
 
 export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<string,string[][]>) : IVisuObject{
 
@@ -111,7 +85,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
 
     if (dynamicElements.has("expr-toggle-color")) {
         let element = dynamicElements.get("expr-toggle-color");
-        let returnFunc = (evalFunction(element));
+        let returnFunc = (ComSocket.singleton().evalFunction(element));
         let wrapperFunc = ()=>{
             let value = returnFunc();
             return(value)
@@ -123,7 +97,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 2) Set fill color
     if (dynamicElements.has("expr-fill-color")) {
         let element = dynamicElements!.get("expr-fill-color");
-        let returnFunc = (evalFunction(element));
+        let returnFunc = (ComSocket.singleton().evalFunction(element));
         let wrapperFunc = ()=>{
             let value = returnFunc();
             let hexcolor = numberToHexColor(value);
@@ -136,7 +110,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 3) Set alarm color
     if (dynamicElements.has("expr-fill-color-alarm")) {
         let element = dynamicElements!.get("expr-fill-color-alarm");
-        let returnFunc = (evalFunction(element));
+        let returnFunc = (ComSocket.singleton().evalFunction(element));
         let wrapperFunc = ()=>{
             let value = returnFunc();
             let hexcolor = numberToHexColor(value);
@@ -149,7 +123,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 4) Set frame color
     if (dynamicElements.has("expr-frame-color")) {
         let element = dynamicElements!.get("expr-frame-color");
-        let returnFunc = (evalFunction(element));
+        let returnFunc = (ComSocket.singleton().evalFunction(element));
         let wrapperFunc = ()=>{
             let value = returnFunc();
             let hexcolor = numberToHexColor(value);
@@ -163,7 +137,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 5) Set alarm frame color
     if (dynamicElements.has("expr-frame-color-alarm")) {
         let element = dynamicElements!.get("expr-frame-color-alarm");
-        let returnFunc = (evalFunction(element));
+        let returnFunc = (ComSocket.singleton().evalFunction(element));
         let wrapperFunc = ()=>{
             let value = returnFunc();
             let hexcolor = numberToHexColor(value);
@@ -177,7 +151,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 6) Set invisible state
     if (dynamicElements.has("expr-invisible")) {
         let element = dynamicElements!.get("expr-invisible");
-        let returnFunc = evalFunction(element);
+        let returnFunc = ComSocket.singleton().evalFunction(element);
         let wrapperFunc = ()=>{
             let value = returnFunc();
             if (value!== undefined){
@@ -195,7 +169,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 7) Set fill flag state
     if (dynamicElements.has("expr-fill-flags")) {
         let element = dynamicElements!.get("expr-fill-flags");
-        let returnFunc = (evalFunction(element));
+        let returnFunc = (ComSocket.singleton().evalFunction(element));
         let wrapperFunc = ()=>{
             let value = returnFunc();
                 if (value == "1"){
@@ -211,7 +185,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 8) Set frame flag state
     if (dynamicElements.has("expr-frame-flags")) {
         let element = dynamicElements!.get("expr-frame-flags");
-        let returnFunc = evalFunction(element);
+        let returnFunc = ComSocket.singleton().evalFunction(element);
         Object.defineProperty(initial, "hasFrameColor", {
             get: function() {
                 let value = returnFunc() == "8" ? false : true;
@@ -243,7 +217,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 9) line-width
     if (dynamicElements.has("expr-line-width")) {
         let element = dynamicElements!.get("expr-line-width");
-        let returnFunc = evalFunction(element);
+        let returnFunc = ComSocket.singleton().evalFunction(element);
         let wrapperFunc = ()=>{
             let value = returnFunc();
             let width = Number(value);
@@ -261,7 +235,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 10) Left-Position
     if (dynamicElements.has("expr-left")) {
         let element = dynamicElements!.get("expr-left");
-        let returnFunc = (evalFunction(element));
+        let returnFunc = (ComSocket.singleton().evalFunction(element));
         Object.defineProperty(initial, "left", {
             get: ()=>returnFunc()
         });
@@ -269,7 +243,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 11) Right-Position
     if (dynamicElements.has("expr-right")) {
         let element = dynamicElements!.get("expr-right");
-        let returnFunc = (evalFunction(element));
+        let returnFunc = (ComSocket.singleton().evalFunction(element));
         Object.defineProperty(initial, "right", {
             get: ()=>returnFunc()
         });
@@ -277,7 +251,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 12) Top-Position 
     if (dynamicElements.has("expr-top")) {
         let element = dynamicElements!.get("expr-top");
-        let returnFunc = (evalFunction(element));
+        let returnFunc = (ComSocket.singleton().evalFunction(element));
         Object.defineProperty(initial, "top", {
             get: ()=>returnFunc()
         });
@@ -285,7 +259,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 13) Bottom-Position 
     if (dynamicElements.has("expr-bottom")) {
         let element = dynamicElements!.get("expr-bottom");
-        let returnFunc = (evalFunction(element));
+        let returnFunc = (ComSocket.singleton().evalFunction(element));
         Object.defineProperty(initial, "bottom", {
             get: ()=>returnFunc()
         });
@@ -293,7 +267,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 14) x-Position 
     if (dynamicElements.has("expr-xpos")) {
         let element = dynamicElements!.get("expr-xpos");
-        let returnFunc = (evalFunction(element));
+        let returnFunc = (ComSocket.singleton().evalFunction(element));
         Object.defineProperty(initial, "xpos", {
             get: ()=>returnFunc()
         });
@@ -301,7 +275,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 15) y-Position 
     if (dynamicElements.has("expr-ypos")) {
         let element = dynamicElements!.get("expr-ypos");
-        let returnFunc = (evalFunction(element));
+        let returnFunc = (ComSocket.singleton().evalFunction(element));
         Object.defineProperty(initial, "ypos", {
             get: ()=>returnFunc()
         });
@@ -309,7 +283,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 16) Scaling
     if (dynamicElements.has("expr-scale")) {
         let element = dynamicElements!.get("expr-scale");
-        let returnFunc = (evalFunction(element));
+        let returnFunc = (ComSocket.singleton().evalFunction(element));
         Object.defineProperty(initial, "scale", {
             get: ()=>returnFunc()
         });
@@ -317,7 +291,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 17) Rotating
     if (dynamicElements.has("expr-angle")) {
         let element = dynamicElements!.get("expr-angle");
-        let returnFunc = (evalFunction(element));
+        let returnFunc = (ComSocket.singleton().evalFunction(element));
         Object.defineProperty(initial, "angle", {
             get: ()=>returnFunc()
         });
@@ -325,7 +299,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 18) Tooltip
     if (dynamicElements.has("expr-tooltip-display")){
         let element = dynamicElements!.get("expr-tooltip-display");
-        let returnFunc = (evalFunction(element));
+        let returnFunc = (ComSocket.singleton().evalFunction(element));
         Object.defineProperty(initial, "tooltip", {
             get: ()=>returnFunc()
         });
@@ -333,7 +307,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // 19) Deactivate Input
     if (dynamicElements.has("expr-input-disabled")){
         let element = dynamicElements!.get("expr-input-disabled");
-        let returnFunc = evalFunction(element);
+        let returnFunc = ComSocket.singleton().evalFunction(element);
         let wrapperFunc = ()=>{
             let value = returnFunc();
             if (value == "1"){
@@ -350,7 +324,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     // Piechart specific stuff ( start- and endangle)
     if (dynamicElements.has("expr-angle1")){
         let element = dynamicElements!.get("expr-angle1");
-        let returnFunc = evalFunction(element);
+        let returnFunc = ComSocket.singleton().evalFunction(element);
         let wrapperFunc = ()=>{
             let value = returnFunc();
             return (value % 360)
@@ -361,7 +335,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     }
     if (dynamicElements.has("expr-angle2")){
         let element = dynamicElements!.get("expr-angle2");
-        let returnFunc = evalFunction(element);
+        let returnFunc = ComSocket.singleton().evalFunction(element);
         let wrapperFunc = ()=>{
             let value = returnFunc();
             return (value % 360)
