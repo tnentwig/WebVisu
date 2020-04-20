@@ -86,21 +86,24 @@ function replacePlaceholders(data : XMLDocument, replacements : Map<string, stri
         let match = regEx.exec(placeholder.textContent);
         // Replacement
         if (match != null){
-            let replace = match[1];
+            let replace = match[1].toLowerCase();
             if (replacements.has(replace)){
                 let variable = data.createElement('var');
-                let content = placeholder.textContent.replace(/\$(.*)\$/, replacements.get(replace));
+                let content = placeholder.textContent.replace(/\$(.*)\$/, replacements.get(replace)).toLowerCase();
                 if(ComSocket.singleton().oVisuVariables.has("."+content)){
                     content = "."+content;
+                    console.log(content)
                 }
-                
                 // Schlechte Implementierung von Codesys, Doppelpunkte durch einfügen von referenzen möglich
                 let textContent = content.replace(/\.\./, '.');
-                variable.textContent = textContent.toLowerCase();
+                variable.textContent = textContent;
                 placeholder.parentNode.replaceChild(variable, placeholder);
-            } 
-        } 
+                console.log(variable.textContent)
+            }
+        }
+        
     })
+    
 }
 
 export const Visualisation :React.FunctionComponent<Props> = ({visuname, mainVisu, replacementSet, width})=> {
@@ -113,9 +116,10 @@ export const Visualisation :React.FunctionComponent<Props> = ({visuname, mainVis
 
     // dd
     React.useEffect(()=>{
-        console.log("Aufruf mount")
+        //console.log("Aufruf mount")
         return (()=>{setLoading(true);
-        console.log("unmount")})
+        //console.log("unmount");
+    })
     },[])
     React.useEffect(()=>{
         if(visuname !== thisVisuname){
@@ -125,7 +129,7 @@ export const Visualisation :React.FunctionComponent<Props> = ({visuname, mainVis
 
     // Get new xml on change of visuname
     React.useEffect(()=>{
-        console.log("fetch "+thisVisuname)
+        //console.log("fetch "+thisVisuname)
         let fetchXML = async function(){
             // Set the loading flag. This will unmount all elements from calling visu
             setLoading(true);
