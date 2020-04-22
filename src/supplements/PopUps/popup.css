@@ -1,0 +1,16 @@
+.sup-exec{
+    background-color: #EFF0F1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: medium;
+    display: grid;
+    grid-gap: 10px;
+
+}
+.sup-exec-header {
+    background: #6EC800;
+    font-size: large;
+}
+.sup-exec-error {
+    font-style: italic;
+    color: crimson;
+}
