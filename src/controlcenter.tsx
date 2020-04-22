@@ -6,6 +6,9 @@ import StateManager from './visu/statemanagement/statemanager'
 import { Visualisation } from './visu/visuparser';
 import { observer } from 'mobx-react';
 import { observable, action } from 'mobx';
+import Popup from 'reactjs-popup';
+import { ConnectionFault } from './supplements/ConnectionFault/connectionFault';
+import { ExecutionPopup } from './supplements/PopUps/popup'
 
 export default class HTML5Visu {
     rootDir: string;
@@ -42,13 +45,20 @@ export default class HTML5Visu {
 
         const App = observer(()=> {
             return (
-
                 <div style={{width: this.windowWidth, height:this.windowsHeight}}>    
                     {stateManager.get("ISONLINE") === "TRUE"
                         ? <Visualisation visuname={stateManager!.get("CURRENTVISU")!.toLowerCase()} mainVisu={true} replacementSet={null} width={this.windowWidth}></Visualisation>
-                        : <div>The PLC webserver is not reachable!</div>
+                        : <ConnectionFault></ConnectionFault>
                     }
+                    <Popup 
+                        open={StateManager.singleton().openPopup.get()}
+                        modal
+                        onClose={()=>StateManager.singleton().openPopup.set(false)}>
+                        <ExecutionPopup></ExecutionPopup>
+                    </Popup>
                 </div>
+                
+
             )
         })
         
