@@ -134,20 +134,16 @@ export function coordArrayToBezierString(pointArray : number[][]) : string {
     return bezier;
 }
 
-export function evalRPN(postfix : string) : boolean|number|null {
+export function evalRPN(postfixStack : Array<string>) : boolean|number|null {
     // Return null if string is empty
-    if (postfix.length === 0) {
+    if (postfixStack.length === 0) {
       return null;
     } 
-    // Remove whitespaces at the end and beginning
-    let interim = postfix.trim();
-    // Split into array of tokens, this is the resting stack
-    let restingStack : Array<string> = interim.split(/\s+/);
     // We initilize the operating stack, this is necessary for mutliple operands
     let operatingStack : Array<number> = [] ;
     // Now we pop the tokens successively form the resting stack
-    for (var i = 0; i < restingStack.length; i++) {
-      var token = restingStack[i];
+    for (var i = 0; i < postfixStack.length; i++) {
+      var token = postfixStack[i];
       // The token could be "TRUE" or "FALSE". The we have to translate ist to 1 and 0.
       if (token === "TRUE" ){
         token = "1";
