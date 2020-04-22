@@ -54,24 +54,23 @@ export default class ComSocket implements IComSocket {
 
     evalFunction(stack: string[][]) : Function {
         var returnFunc = function () {
-            let interim = "";
+            let interim : Array<string> = [];
             for(let position = 0; position<stack.length; position++){
                 let value = stack[position][1];
                 switch(stack[position][0]){
                     case "var":
                         if(ComSocket.singleton().oVisuVariables.has(value)){
                             let varContent = ComSocket.singleton().oVisuVariables.get(value)!.value;                  
-                            interim += varContent + " ";
+                            interim.push(varContent);
                         } else{
-                            interim += 0 + " ";
+                            interim.push("0");
                         }
-    
                         break;
                     case "const":
-                        interim += value + " ";
+                        interim.push(value);
                         break;
                     case "op":
-                        interim += value + " ";
+                        interim.push(value);
                         break;
                 }
             }
