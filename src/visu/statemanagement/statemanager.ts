@@ -1,4 +1,4 @@
-import { observable, autorun, computed } from 'mobx';
+import { observable, autorun, computed, IObservableValue } from 'mobx';
 import ComSocket from '../communication/comsocket';
 import { IComSocket } from '../Interfaces/interfaces';
 
@@ -6,6 +6,7 @@ interface IStateManager {
     // Variables
     oState :  Map<string,string>;
     xmlDict : Map<string,string>;
+    openPopup : IObservableValue<boolean>;
     init() : void;
 }
 
@@ -14,10 +15,12 @@ export default class StateManager implements IStateManager {
     // objList contains all variables as objects with the name as key and addr & value of the variable
     oState :  Map<string,string>;
     xmlDict : Map<string,string>;
+    openPopup : IObservableValue<boolean>;
    
     // this class shall be a singleton
     private constructor() {
         this.oState  = observable(new Map());
+        this.openPopup = observable.box(false);
         this.xmlDict = new Map();
     }
 
@@ -26,10 +29,10 @@ export default class StateManager implements IStateManager {
     }
 
     init(){
+        this.oState.set("ISONLINE", "FALSE");
         /* hier besteht noch ein Problem, aus welchem Grund auch immer wird Comsocket nur einmal observiert.
         Wenn Wert einmal verändert wurde wird autorun nicht mehr ausgeführt. Ursache musss noch geklärt werden.
         Bis dahin wird per intervallabfrage manuell observiert*/
-        this.oState.set("ISONLINE", "FALSE");
         if( this.oState.get("USECURRENTVISU") === "TRUE"){
             this.oState.set("CURRENTVISU", StateManager.singleton().oState.get("STARTVISU"));
             ComSocket.singleton().setValue(".currentvisu", StateManager.singleton().oState.get("STARTVISU"))
@@ -38,8 +41,6 @@ export default class StateManager implements IStateManager {
                 let visuname = this.oState.get("CURRENTVISU").toLowerCase();
                 if (value !== undefined) {
                     if ((visuname !== value.toLowerCase()) && value != ""){
-                        console.log(visuname);
-                        console.log(value.toLowerCase());
                         this.oState.set("CURRENTVISU", value.toLowerCase());
                     }
                 }
