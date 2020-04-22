@@ -124,7 +124,6 @@ export function parseClickEvent(section : JQuery<XMLDocument>) : Function {
                     StateManager.singleton().oState.set("ZOOMVISU", visuname);
                 }
             }
-
             stack.push(clickFunction);
             clickEventDetected = true;
         })
@@ -136,7 +135,7 @@ export function parseClickEvent(section : JQuery<XMLDocument>) : Function {
         if (actionList.children("expr-assign").text().length){
             actionList.children("expr-assign").each(function(){
                 let action = $(this);
-                // Left side value
+                // Left side value. Must be a variable.
                 let lvalue = action.children("lvalue").first().children("expr").first().children("var").text();
                 // Right sided expression
                 let rpnStack : string[][] = [];
@@ -165,6 +164,43 @@ export function parseClickEvent(section : JQuery<XMLDocument>) : Function {
                 clickEventDetected = true;
                 })
             })
+        }
+        // Execute expression
+        if (actionList.children("execute").text().length){
+            // There are many available executable actions
+            actionList.children("execute").each(function(){
+                let execName = $(this).text();
+                switch (execName){
+                    case "INTERN CHANGEUSERLEVEL":
+                        clickFunction = function():void{
+                            StateManager.singleton().openPopup.set(true);
+                        }
+                        stack.push(clickFunction);
+                        clickEventDetected = true;
+                        break;
+                }
+            })
+        }
+        // Hyperlink
+        if (actionList.children("expr-link").text().length){
+            let link = actionList.children("expr-link").first().children("expr").first();
+            let type = link.children().first().prop("tagName");
+            let content = link.children().first().text();
+            if (type === "var"){
+                clickFunction = function():void{
+                    if(ComSocket.singleton().oVisuVariables.has(content.toLowerCase())){
+                        let varContent = ComSocket.singleton().oVisuVariables.get(content.toLowerCase())!.value;    
+                        window.open(varContent.split(" ")[0]);
+                    }
+                }
+            } else {
+                clickFunction = function():void{
+                    let value = ComSocket.singleton().evalFunction([[type, content.toLowerCase()]])();
+                    window.open(content);
+                }
+            }
+            stack.push(clickFunction);
+            clickEventDetected = true;
         }
     }
     
