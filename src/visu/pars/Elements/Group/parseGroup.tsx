@@ -70,7 +70,7 @@ export const Group :React.FunctionComponent<Props> = ({section})=>
         // Invisble?
         if (dynamicElements.has("expr-invisible")) {
             let element = dynamicElements!.get("expr-invisible");
-            let returnFunc = evalFunction(element);
+            let returnFunc = ComSocket.singleton().evalFunction(element);
             let wrapperFunc = ()=>{
                 let value = returnFunc();
                 if (value!== undefined){
@@ -120,31 +120,3 @@ export const Group :React.FunctionComponent<Props> = ({section})=>
     }
 
 
-
-    function evalFunction(stack: string[][]) : Function {
-        var returnFunc = function () {
-            let interim = "";
-            for(let position = 0; position<stack.length; position++){
-                let value = stack[position][1];
-                switch(stack[position][0]){
-                    case "var":
-                        if(ComSocket.singleton().oVisuVariables.has(value)){
-                            let varContent = ComSocket.singleton().oVisuVariables.get(value)!.value;                  
-                            interim += varContent + " ";
-                        } else{
-                            interim += 0 + " ";
-                        }
-    
-                        break;
-                    case "const":
-                        interim += value + " ";
-                        break;
-                    case "op":
-                        interim += value + " ";
-                        break;
-                }
-            }
-            return evalRPN(interim);
-        }
-        return returnFunc;
-    }
