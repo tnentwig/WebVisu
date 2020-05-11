@@ -1,14 +1,15 @@
 import * as $ from 'jquery';
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
-import ComSocket from './visu/communication/comsocket';
-import StateManager from './visu/statemanagement/statemanager'
-import { Visualisation } from './visu/visuparser';
 import { observer } from 'mobx-react';
 import { observable, action } from 'mobx';
 import Popup from 'reactjs-popup';
-import { ConnectionFault } from './supplements/ConnectionFault/connectionFault';
+import ComSocket from './visu/communication/comsocket';
+import StateManager from './visu/statemanagement/statemanager'
+import { Visualisation } from './visu/visuparser';
+import { ConnectionFault } from './supplements/InfoBox/infobox';
 import { ExecutionPopup } from './supplements/PopUps/popup'
+import { getVisuxml, stringifyVisuXML } from './visu/pars/Utils/fetchfunctions'
 
 export default class HTML5Visu {
     rootDir: string;
@@ -42,6 +43,8 @@ export default class HTML5Visu {
         // The Comsocket has to be initilized
         await this.initCommunication(visuIni, Number(stateManager.get("UPDATETIME")));
         StateManager.singleton().init();
+        // Preload all Visus
+        await this.preloadVisus();
 
         const App = observer(()=> {
             return (
@@ -106,13 +109,13 @@ export default class HTML5Visu {
             })
             getPath.fail(()=>{
                 let getPath2 =$.ajax({
-                    url: this.rootDir+'/PLC/visu_ini.xml',
+                    url: this.rootDir+'/plc/visu_ini.xml',
                     type: 'GET',
                     dataType: 'xml'
                 })
                 getPath2.then((data) => {
                     // Path must be adapted for an older Linux Controller without Linux
-                    this.rootDir = this.rootDir + '/PLC';
+                    this.rootDir = this.rootDir + '/plc';
                     resolve(true);
                 })
                 getPath2.fail(()=>{
@@ -153,7 +156,7 @@ export default class HTML5Visu {
                 let name = htmlElement[i].getAttribute("name").toString();
                 switch(name){
                     case "STARTVISU":
-                        let visuName = htmlElement[i].getAttribute("value");
+                        let visuName = htmlElement[i].getAttribute("value").toLowerCase();
                         stateManager.set(name, visuName)
                         break;
                     case "UPDATETIME":
@@ -188,4 +191,33 @@ export default class HTML5Visu {
             })
         })
     }
+
+    async preloadVisus(){
+        let loadedVisus : Array<string> = [];
+        let visusToBeLoaded = [StateManager.singleton().oState.get("STARTVISU").toLowerCase()]
+
+        while(visusToBeLoaded.length){
+            let visuname = visusToBeLoaded.pop();
+            let thisVisuXML = await getVisuxml(this.rootDir + "/" + visuname + ".xml");
+            // The visu does not exist on server if thisVisuXML is null
+            if (thisVisuXML !== null){
+                let xmlDict = StateManager.singleton().xmlDict;
+                if (!xmlDict.has(visuname)){
+                    let plainxml = stringifyVisuXML(thisVisuXML);
+                    xmlDict.set(visuname, plainxml);
+                }
+                loadedVisus.push(visuname);
+                let nextVisunames = thisVisuXML.getElementsByTagName("expr-zoom");
+                Array.from(nextVisunames).forEach(function (nameNode){
+                    let nextVisuname = nameNode.getElementsByTagName("placeholder")[0].textContent.toLowerCase();
+                    if (!loadedVisus.includes(nextVisuname) && !visusToBeLoaded.includes(nextVisuname)){
+                        visusToBeLoaded.push(nextVisuname);
+                    }
+                })
+            } else {
+                console.log("There is a internal problem in your CoDeSys Project. The visualisation named "+visuname+ " is referenced but not available on the server!")
+            } 
+        }
+    }
+
 }
