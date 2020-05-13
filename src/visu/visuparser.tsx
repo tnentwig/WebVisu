@@ -1,12 +1,10 @@
 import * as $ from 'jquery';
 import * as React from 'react';
-import {uid} from 'react-uid';
-import { VisuElements } from '../visu/pars/elementparser'
-import { stringToArray } from './pars/Utils/utilfunctions'
-import ComSocket from './communication/comsocket'
-import StateManager from '../visu/statemanagement/statemanager'
-import { Spinner } from '../supplements/Spinner/spinner'
-import * as JsZip from 'jszip';
+import { VisuElements } from '../visu/pars/elementparser';
+import { stringToArray } from './pars/Utils/utilfunctions';
+import { getVisuxml, stringifyVisuXML, parseVisuXML } from './pars/Utils/fetchfunctions';
+import ComSocket from './communication/comsocket';
+import StateManager from '../visu/statemanagement/statemanager';
 
 type Props = {
     visuname : string,
@@ -33,51 +31,10 @@ function initVariables(XML : XMLDocument, reset : boolean) : void{
         });
 }
 
-function stringifyVisuXML(toStringify : XMLDocument) : string{
-    let serializer = new XMLSerializer();
-    let stringCopy = serializer.serializeToString(toStringify);
-    return stringCopy;
-}
-
-function parseVisuXML(stringXML : string) : XMLDocument{
-    let parser = new DOMParser();
-    let returnXML = parser.parseFromString(stringXML, "application/xml");
-    return returnXML;
-}
-
-function getVisuxml(url : string) :Promise<XMLDocument> {
-    return new Promise(resolve =>{
-        fetch(url, {headers:{'Content-Type': 'text/plain; charset=UTF8'}})
-        .then((response)=>{
-            if (response.status != 400){
-                response.arrayBuffer()
-                .then((buffer)=>{
-                    let decoder = new TextDecoder("iso-8859-1");
-                    let text = decoder.decode(buffer);
-                    let data = new window.DOMParser().parseFromString(text, "text/xml")
-                    resolve(data)
-                })
-                
-            } else {
-                let zip = new JsZip();
-                let filename = url.split('/').pop()
-                let zipName = filename.split(".")[0]+"_xml.zip"
-                fetch(zipName, {headers:{'Content-Type': 'binary;'}})
-                .then(response => response.arrayBuffer())
-                .then((buffer)=>zip.loadAsync(buffer))
-                .then((unzipped) => unzipped.file(filename).async("arraybuffer"))
-                .then((buffer => {
-                    let decoder = new TextDecoder("iso-8859-1");
-                    let text = decoder.decode(buffer);
-                    let data = new window.DOMParser().parseFromString(text, "text/xml")
-                    resolve(data)
-                }))
-            }
-        })    
-    })
-}
-
 function replacePlaceholders(data : XMLDocument, replacements : Map<string, string>){
+    if (replacements === null){
+        return
+    }
     // Find all placeholder variables 
     let placeholders = data.getElementsByTagName("placeholder");
     // Replace all Placeholders
@@ -91,41 +48,24 @@ function replacePlaceholders(data : XMLDocument, replacements : Map<string, stri
                 let variable = data.createElement('var');
                 let content = placeholder.textContent.replace(/\$(.*)\$/, replacements.get(replace)).toLowerCase();
                 if(ComSocket.singleton().oVisuVariables.has("."+content)){
-                    content = "."+content;
-                    console.log(content)
+                    content = "." + content;
                 }
                 // Schlechte Implementierung von Codesys, Doppelpunkte durch einfügen von referenzen möglich
                 let textContent = content.replace(/\.\./, '.');
                 variable.textContent = textContent;
                 placeholder.parentNode.replaceChild(variable, placeholder);
-                console.log(variable.textContent)
             }
         }
-        
     })
-    
 }
 
-export const Visualisation :React.FunctionComponent<Props> = ({visuname, mainVisu, replacementSet, width})=> {
+export const Visualisation :React.FunctionComponent<Props> = React.memo(({ visuname, mainVisu, replacementSet, width})=> {
     const [loading, setLoading] = React.useState<Boolean>(true);
-    const [thisVisuname, setVisuname] = React.useState<string>(visuname);
+    const [display, setDisplay] = React.useState("block");
     const [XML, setXML] = React.useState<string>(null);
-    const [adaptedXML, setAdaptedXML] = React.useState<XMLDocument>();
+    const [adaptedXML, setAdaptedXML] = React.useState<XMLDocument>(null);
     const [originSize, setOriginSize] = React.useState<Array<number>>([0,0]);
     const [scale, setScale] = React.useState("scale(1)");
-
-    // dd
-    React.useEffect(()=>{
-        //console.log("Aufruf mount")
-        return (()=>{setLoading(true);
-        //console.log("unmount");
-    })
-    },[])
-    React.useEffect(()=>{
-        if(visuname !== thisVisuname){
-            setVisuname(visuname);
-        }
-    },[visuname, thisVisuname])
 
     // Get new xml on change of visuname
     React.useEffect(()=>{
@@ -133,22 +73,21 @@ export const Visualisation :React.FunctionComponent<Props> = ({visuname, mainVis
         let fetchXML = async function(){
             // Set the loading flag. This will unmount all elements from calling visu
             setLoading(true);
-            let url = StateManager.singleton().oState.get("ROOTDIR") + "/"+ thisVisuname +".xml";
+            let url = StateManager.singleton().oState.get("ROOTDIR") + "/"+ visuname +".xml";
             // Files that are needed several times will be saved internally for loading speed up
             let plainxml : string;
             let xmlDict = StateManager.singleton().xmlDict;
-            if (xmlDict.has(thisVisuname)){
-                plainxml = xmlDict.get(thisVisuname);
+            if (xmlDict.has(visuname)){
+                plainxml = xmlDict.get(visuname);
             } else {
                 let xml = await getVisuxml(url);
                 plainxml = stringifyVisuXML(xml);
-                xmlDict.set(thisVisuname, plainxml);
+                xmlDict.set(visuname, plainxml);
             }
-            setXML(plainxml);
-            
+            setXML(plainxml);  
         };
         fetchXML();
-        }, [thisVisuname]);
+        }, [visuname]);
 
     // Adapt the original xml through replacing of placeholders
     React.useEffect(()=>{
@@ -157,10 +96,10 @@ export const Visualisation :React.FunctionComponent<Props> = ({visuname, mainVis
             initVariables(xmlDoc, mainVisu);
             replacePlaceholders(xmlDoc, replacementSet);
             setAdaptedXML(xmlDoc);
-            setLoading(false);
             // Get the original size of the visualisation
             let jQxml=$(xmlDoc);
             setOriginSize(stringToArray(jQxml.children("visualisation").children("size").text()));
+            setLoading(false);
         }
     },[XML, mainVisu, replacementSet])
 
@@ -171,10 +110,10 @@ export const Visualisation :React.FunctionComponent<Props> = ({visuname, mainVis
     }, [width, originSize, mainVisu])
 
     return (
-        <div key={uid(16)} style={{position:"absolute", overflow:"hidden", left:0, top:0, width:originSize[0]+1, height:originSize[1]+1, transformOrigin:"0 0", transform:scale}}>
-            {loading ? <Spinner></Spinner> :
+        <div style={{display:display, position:"absolute", overflow:"hidden", left:0, top:0, width:originSize[0]+1, height:originSize[1]+1, transformOrigin:"0 0", transform:scale}}>
+            {loading ? null :
                 <VisuElements visualisation={adaptedXML}></VisuElements>
             }
         </div>
     )
-}
+})
