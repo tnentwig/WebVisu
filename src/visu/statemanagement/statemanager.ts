@@ -34,8 +34,8 @@ export default class StateManager implements IStateManager {
         Wenn Wert einmal verändert wurde wird autorun nicht mehr ausgeführt. Ursache musss noch geklärt werden.
         Bis dahin wird per intervallabfrage manuell observiert*/
         if( this.oState.get("USECURRENTVISU") === "TRUE"){
+            ComSocket.singleton().setValue(".currentvisu", StateManager.singleton().oState.get("STARTVISU"));
             this.oState.set("CURRENTVISU", StateManager.singleton().oState.get("STARTVISU"));
-            ComSocket.singleton().setValue(".currentvisu", StateManager.singleton().oState.get("STARTVISU"))
             setInterval(()=>{
                 let value = ComSocket.singleton().oVisuVariables.get(".currentvisu").value;
                 let visuname = this.oState.get("CURRENTVISU").toLowerCase();
