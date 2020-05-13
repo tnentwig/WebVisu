@@ -14,13 +14,10 @@ type Props = {
     onclick : Function
 }
 
-export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, input, dynamicParameters, onclick, onmousedown, onmouseup})=> 
+export const Circle :React.FunctionComponent<Props> = React.memo(({simpleShape, textField, input, dynamicParameters, onclick, onmousedown, onmouseup})=> 
 {
-    // Attach the dynamic paramters like color variable
-    let initial = createVisuObject(simpleShape, dynamicParameters)
-    
     // Convert object to an observable one
-    const state  = useLocalStore(()=>initial);
+    const state  = useLocalStore(()=>createVisuObject(simpleShape, dynamicParameters));
 
     return useObserver(()=>
     <div style={{cursor: "auto", overflow:"hidden", pointerEvents: state.eventType, visibility:state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
@@ -54,5 +51,5 @@ export const Circle :React.FunctionComponent<Props> = ({simpleShape, textField, 
         </ErrorBoundary>
     </div>
     )
-}
+})
 

@@ -16,12 +16,9 @@ type Props = {
 }
 
 export const Polygon :React.FunctionComponent<Props> = ({polyShape, textField, input, dynamicParameters, onclick, onmousedown, onmouseup})=> 
-{
-    // Attach the dynamic paramters like color variable
-    let initial = createVisuObject(polyShape, dynamicParameters)
-    
+{   
     // Convert object to an observable one
-    const state  = useLocalStore(()=>initial);
+    const state  = useLocalStore(()=>createVisuObject(polyShape, dynamicParameters));
 
     return useObserver(()=>
     <div style={{transform: state.cssTransform, transformOrigin: state.cssTransformOrigin, cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>

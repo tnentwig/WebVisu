@@ -14,45 +14,42 @@ type Props = {
     onclick : Function 
 }
 
-export const Rectangle :React.FunctionComponent<Props> = ({simpleShape, textField, input, dynamicParameters, onclick, onmousedown, onmouseup})=>
+export const Rectangle :React.FunctionComponent<Props> = React.memo(({simpleShape, textField, input, dynamicParameters, onclick, onmousedown, onmouseup})=>
 { 
- // Attach the dynamic paramters like color variable
- let initial = createVisuObject(simpleShape, dynamicParameters)
-
- // Convert object to an observable one
- const state  = useLocalStore(()=>initial);
+    // Convert object to an observable one
+    const state  = useLocalStore(()=>createVisuObject(simpleShape, dynamicParameters));
     
-return useObserver(()=>
-    <div style={{cursor: "auto", overflow:"hidden", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
-        <ErrorBoundary>
-            {input}
-            <svg style={{float: "left"}} width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge} >
-                <svg 
-                    onClick={()=>onclick()} 
-                    onMouseDown={()=>onmousedown()} 
-                    onMouseUp={()=>onmouseup()}
-                    onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
-                    width={state.relCoord.width+2*state.edge} 
-                    height={state.relCoord.height+2*state.edge} 
-                    strokeDasharray={state.strokeDashArray}>   
-                    <rect
-                        width={state.relCoord.width}
-                        height={state.relCoord.height}
-                        x={state.edge}
-                        y={state.edge}
-                        fill={state.fill}
-                        stroke={state.stroke}
-                        strokeWidth={state.strokeWidth}
-                        >
-                        <title>{state.tooltip}</title>
-                    </rect>
-                    <svg>
-                        {textField}
+    return useObserver(()=>
+        <div style={{cursor: "auto", overflow:"hidden", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
+            <ErrorBoundary>
+                {input}
+                <svg style={{float: "left"}} width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge} >
+                    <svg 
+                        onClick={()=>onclick()} 
+                        onMouseDown={()=>onmousedown()} 
+                        onMouseUp={()=>onmouseup()}
+                        onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
+                        width={state.relCoord.width+2*state.edge} 
+                        height={state.relCoord.height+2*state.edge} 
+                        strokeDasharray={state.strokeDashArray}>   
+                        <rect
+                            width={state.relCoord.width}
+                            height={state.relCoord.height}
+                            x={state.edge}
+                            y={state.edge}
+                            fill={state.fill}
+                            stroke={state.stroke}
+                            strokeWidth={state.strokeWidth}
+                            >
+                            <title>{state.tooltip}</title>
+                        </rect>
+                        <svg>
+                            {textField}
+                        </svg>
                     </svg>
                 </svg>
-            </svg>
-        </ErrorBoundary>
-    </div>
-    )
-}
+            </ErrorBoundary>
+        </div>
+        )
+})
 
