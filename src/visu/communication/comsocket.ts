@@ -123,7 +123,6 @@ export default class ComSocket implements IComSocket {
 
     startCyclicUpdate(periodms : number) {
         window.setInterval(()=>this.updateVarList(), periodms);
-        console.log(this.oVisuVariables)
     }
 
     setValue(varName : string, varValue : number | string | boolean) {
