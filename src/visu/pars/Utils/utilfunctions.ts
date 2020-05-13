@@ -145,10 +145,10 @@ export function evalRPN(postfixStack : Array<string>) : boolean|number|null {
     for (var i = 0; i < postfixStack.length; i++) {
       var token = postfixStack[i];
       // The token could be "TRUE" or "FALSE". The we have to translate ist to 1 and 0.
-      if (token === "TRUE" ){
+      if (token.toLowerCase() === "true" ){
         token = "1";
       }
-      if (token === "FALSE" ){
+      if (token.toLowerCase() === "false" ){
         token = "0";
       }
 
