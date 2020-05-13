@@ -10,17 +10,22 @@ import { Visualisation } from './visu/visuparser';
 import { ConnectionFault } from './supplements/InfoBox/infobox';
 import { ExecutionPopup } from './supplements/PopUps/popup'
 import { getVisuxml, stringifyVisuXML } from './visu/pars/Utils/fetchfunctions'
+import { Spinner } from './supplements/Spinner/spinner';
 
 export default class HTML5Visu {
     rootDir: string;
     @observable windowWidth : number;
     @observable windowsHeight : number;
+    loading : boolean;
+    spinningText : string;
     
     constructor(){
         let path = location.protocol + '//' + window.location.host;
         this.rootDir= path;
         this.windowWidth = window.innerWidth;
         this.windowsHeight = window.innerHeight;
+        this.loading = true;
+        this.spinningText = "Loading visualisations..."
         window.addEventListener('resize', this.updateWindowDimensions);
     }
     // For responsive behavior 
@@ -31,6 +36,8 @@ export default class HTML5Visu {
     }
     
     async showMainVisu () {
+        ReactDOM.render(
+            <React.StrictMode><Spinner text={this.spinningText}></Spinner></React.StrictMode>, document.getElementById("visualisation"));
         // Get a reference to the global state manager
         let stateManager = StateManager.singleton().oState;
         // Get the path to the files
@@ -43,8 +50,9 @@ export default class HTML5Visu {
         // The Comsocket has to be initilized
         await this.initCommunication(visuIni, Number(stateManager.get("UPDATETIME")));
         StateManager.singleton().init();
-        // Preload all Visus
-        await this.preloadVisus();
+        // Preload all xml files of visualisation
+        //let visuList =await this.preloadVisus();
+        this.loading = false;
 
         const App = observer(()=> {
             return (
@@ -64,7 +72,7 @@ export default class HTML5Visu {
 
             )
         })
-        
+
         // The virtual DOM will be inserted in the DOM. React will update the DOM automatically.
         ReactDOM.render(
             <React.StrictMode><App /></React.StrictMode>, document.getElementById("visualisation"));
@@ -193,31 +201,52 @@ export default class HTML5Visu {
     }
 
     async preloadVisus(){
+        let mainVisus : Array<string> = []; 
         let loadedVisus : Array<string> = [];
         let visusToBeLoaded = [StateManager.singleton().oState.get("STARTVISU").toLowerCase()]
-
+        let notExistingVisus : Array<string> = [];
         while(visusToBeLoaded.length){
             let visuname = visusToBeLoaded.pop();
-            let thisVisuXML = await getVisuxml(this.rootDir + "/" + visuname + ".xml");
-            // The visu does not exist on server if thisVisuXML is null
-            if (thisVisuXML !== null){
-                let xmlDict = StateManager.singleton().xmlDict;
-                if (!xmlDict.has(visuname)){
-                    let plainxml = stringifyVisuXML(thisVisuXML);
-                    xmlDict.set(visuname, plainxml);
-                }
-                loadedVisus.push(visuname);
-                let nextVisunames = thisVisuXML.getElementsByTagName("expr-zoom");
-                Array.from(nextVisunames).forEach(function (nameNode){
-                    let nextVisuname = nameNode.getElementsByTagName("placeholder")[0].textContent.toLowerCase();
-                    if (!loadedVisus.includes(nextVisuname) && !visusToBeLoaded.includes(nextVisuname)){
-                        visusToBeLoaded.push(nextVisuname);
+            // Check if its a placeholder variable
+            let regEx = new RegExp(/\$(.*)\$/gm);
+            let match = regEx.exec(visuname);
+            if (match == null){
+                let thisVisuXML = await getVisuxml(this.rootDir + "/" + visuname + ".xml");
+                // The visu does not exist on server if thisVisuXML is null
+                if (thisVisuXML !== null){
+                    let xmlDict = StateManager.singleton().xmlDict;
+                    if (!xmlDict.has(visuname)){
+                        let plainxml = stringifyVisuXML(thisVisuXML);
+                        xmlDict.set(visuname, plainxml);
                     }
-                })
-            } else {
-                console.log("There is a internal problem in your CoDeSys Project. The visualisation named "+visuname+ " is referenced but not available on the server!")
-            } 
+                    loadedVisus.push(visuname);
+                    // Get the visualisations which are used as main visus
+                    let mainVisunames = thisVisuXML.getElementsByTagName("expr-zoom");
+                    Array.from(mainVisunames).forEach(function (nameNode){
+                        let nextVisuname = nameNode.getElementsByTagName("placeholder")[0].textContent.toLowerCase();
+                        if (!loadedVisus.includes(nextVisuname) && !visusToBeLoaded.includes(nextVisuname) && !notExistingVisus.includes(nextVisuname)){
+                            visusToBeLoaded.push(nextVisuname);                           
+                        }
+                        if (!mainVisus.includes(visuname)){
+                            mainVisus.push(visuname);
+                        }
+                    })
+                    // Get the visualisations that are used as subvisus
+                    let subVisunames = thisVisuXML.querySelectorAll('element[type="reference"]');
+                    Array.from(subVisunames).forEach(function (nameNode){
+                        let nextVisuname = nameNode.getElementsByTagName("name")[0].textContent.toLowerCase();
+                        if (!loadedVisus.includes(nextVisuname) && !visusToBeLoaded.includes(nextVisuname) && !notExistingVisus.includes(nextVisuname)){
+                            visusToBeLoaded.push(nextVisuname);
+                        }
+                    })
+                } else {
+                    notExistingVisus.push(visuname);
+                    console.log("There is a internal problem in your CoDeSys Project. The visualisation named "+visuname+ " is referenced but not available on the server!")
+                }
+            }
         }
+        console.log(mainVisus)
+        return mainVisus
     }
 
 }
