@@ -89,6 +89,7 @@ export default class ComSocket implements IComSocket {
         this.globalVariables.forEach((keyValue)=>{
             this.addObservableVar(keyValue.key, keyValue.addr);
         })
+
     }
 
     updateVarList() {
@@ -122,6 +123,9 @@ export default class ComSocket implements IComSocket {
     }
 
     startCyclicUpdate(periodms : number) {
+        // The updateVarList function will be called once at beginning
+        this.updateVarList();
+        // And then in an interval
         window.setInterval(()=>this.updateVarList(), periodms);
     }
 
