@@ -6,7 +6,7 @@ import ErrorBoundary from 'react-error-boundary';
 
 type Props = {
     simpleShape: IBasicShape,
-    textField : JSX.Element|undefined,
+    textField : JSX.Element,
     input : JSX.Element,
     dynamicParameters :  Map<string,string[][]>,
     onmousedown : Function,
@@ -25,10 +25,10 @@ export const Rectangle :React.FunctionComponent<Props> = React.memo(({simpleShap
                 {input}
                 <svg style={{float: "left"}} width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge} >
                     <svg 
-                        onClick={()=>onclick()} 
-                        onMouseDown={()=>onmousedown()} 
-                        onMouseUp={()=>onmouseup()}
-                        onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
+                        onClick={onclick == null ? null : ()=>onclick()} 
+                        onMouseDown={onmousedown == null ? null : ()=>onmousedown()} 
+                        onMouseUp={onmouseup == null ? null : ()=>onmouseup()}
+                        onMouseLeave={onmouseup == null ? null : ()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
                         width={state.relCoord.width+2*state.edge} 
                         height={state.relCoord.height+2*state.edge} 
                         strokeDasharray={state.strokeDashArray}>   
@@ -43,9 +43,11 @@ export const Rectangle :React.FunctionComponent<Props> = React.memo(({simpleShap
                             >
                             <title>{state.tooltip}</title>
                         </rect>
+                        {textField == null ? null :
                         <svg>
                             {textField}
                         </svg>
+                    }
                     </svg>
                 </svg>
             </ErrorBoundary>

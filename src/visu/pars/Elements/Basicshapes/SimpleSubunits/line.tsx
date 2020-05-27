@@ -25,10 +25,10 @@ export const Line :React.FunctionComponent<Props> = React.memo(({simpleShape, te
             {input}
             <svg style={{float: "left"}} width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge}>
                 <svg
-                    onClick={()=>onclick()} 
-                    onMouseDown={()=>onmousedown()} 
-                    onMouseUp={()=>onmouseup()}
-                    onMouseLeave={()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
+                    onClick={onclick == null ? null : ()=>onclick()} 
+                    onMouseDown={onmousedown == null ? null : ()=>onmousedown()} 
+                    onMouseUp={onmouseup == null ? null : ()=>onmouseup()}
+                    onMouseLeave={onmouseup == null ? null : ()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
                     width={state.relCoord.width} 
                     height={state.relCoord.height}>
                     <line
@@ -41,9 +41,11 @@ export const Line :React.FunctionComponent<Props> = React.memo(({simpleShape, te
                         strokeDasharray={state.strokeDashArray}>
                         <title>{state.tooltip}</title>
                     </line>
+                    {textField == null ? null :
                     <svg>
                         {textField}
                     </svg>
+                    }
                 </svg>
             </svg>
         </ErrorBoundary>

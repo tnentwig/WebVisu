@@ -69,10 +69,10 @@ export const Bitmap :React.FunctionComponent<Props> = ({section})=>
     return useObserver(()=>
         <div 
         style={{position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}
-        onClick={()=>onclick()} 
-        onMouseDown={()=>onmousedown()} 
-        onMouseUp={()=>onmouseup()}
-        onMouseLeave={()=>onmouseup()} 
+        onClick={onclick == null ? null : ()=>onclick()} 
+        onMouseDown={onmousedown == null ? null : ()=>onmousedown()} 
+        onMouseUp={onmouseup == null ? null : ()=>onmouseup()}
+        onMouseLeave={onmouseup == null ? null : ()=>onmouseup()} 
         >
            <Image section={section} inlineElement={false}></Image>
         </div>

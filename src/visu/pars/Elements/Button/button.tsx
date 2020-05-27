@@ -15,7 +15,7 @@ type Props = {
 export const Button :React.FunctionComponent<Props> = ({section})=>
 {
     // Parsing of the fixed parameters
-
+    
     let button : IBasicShape = {
         shape : "button",
         has_inside_color : util.stringToBoolean(section.children("has-inside-color").text()),
@@ -63,10 +63,10 @@ export const Button :React.FunctionComponent<Props> = ({section})=>
           <ErrorBoundary>
             <button
             title={state.tooltip} 
-            onClick={()=>onclick()} 
-            onMouseDown={()=>onmousedown()} 
-            onMouseUp={()=>onmouseup()}
-            onMouseLeave={()=>onmouseup()} 
+            onClick={onclick == null ? null : ()=>onclick()} 
+            onMouseDown={onmousedown == null ? null : ()=>onmousedown()} 
+            onMouseUp={onmouseup == null ? null : ()=>onmouseup()}
+            onMouseLeave={onmouseup == null ? null : ()=>onmouseup()} 
             style={{backgroundColor: state.fill, width:state.relCoord.width, height:state.relCoord.height, position:"absolute"}}>               
             </button>
             {pictureInside ? <Image section={section} inlineElement={true}></Image> : null}           
