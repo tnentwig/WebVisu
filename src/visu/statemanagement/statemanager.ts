@@ -1,6 +1,5 @@
 import { observable, autorun, computed, IObservableValue } from 'mobx';
 import ComSocket from '../communication/comsocket';
-import { IComSocket } from '../Interfaces/interfaces';
 
 interface IStateManager {
     // Variables
