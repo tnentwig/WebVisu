@@ -18,9 +18,12 @@ export function getVisuxml(url : string) :Promise<XMLDocument> {
             // Try to fetch the visu as zipped file
             else {
                 let zip = new JsZip();
-                let filename = url.split('/').pop()
+                let urlStack = url.split('/');
+                let filename = urlStack.pop();
                 let zipName = filename.split(".")[0]+"_xml.zip"
-                fetch(zipName, {headers:{'Content-Type': 'binary;'}})
+                // Push the zip filename to stack
+                urlStack.push(zipName);
+                fetch(urlStack.join('/'), {headers:{'Content-Type': 'binary;'}})
                 .then((response)=>{
                     // Try to fetch the xml as unzipped file
                     if (response.ok){
