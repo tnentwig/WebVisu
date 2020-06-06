@@ -28,6 +28,10 @@ export default class ComSocket implements IComSocket {
         return this.instance;
     }
 
+    getServerURL(){
+        return this.serverURL;
+    }
+
     setServerURL(serverURL : string) {
         this.serverURL = serverURL;
     }
