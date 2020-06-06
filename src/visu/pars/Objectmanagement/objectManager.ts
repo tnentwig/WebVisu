@@ -1,10 +1,10 @@
-import ComSocket from '../../../communication/comsocket';
-import {IVisuObject, IBasicShape} from '../../../Interfaces/interfaces'
-import {numberToHexColor, computeMinMaxCoord, evalRPN, pointArrayToPiechartString} from '../../Utils/utilfunctions'
+import ComSocket from '../../communication/comsocket';
+import {IBasicObject, IBasicShape} from '../../Interfaces/interfaces'
+import {numberToHexColor, computeMinMaxCoord, evalRPN, pointArrayToPiechartString} from '../Utils/utilfunctions'
 
 
 
-export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<string,string[][]>) : IVisuObject{
+export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<string,string[][]>) : IBasicObject{
 
     // absCornerCoord are the absolute coordinates of the <div> element in relation to the origin in the top left 
     let absCornerCoord = {x1:basicShape.rect[0],y1:basicShape.rect[1],x2:basicShape.rect[2],y2:basicShape.rect[3]};
@@ -31,7 +31,7 @@ export function createVisuObject(basicShape: IBasicShape, dynamicElements : Map<
     }
 
     // Create an object with the initial parameters
-    let initial  : IVisuObject= {
+    let initial  : IBasicObject= {
         // Variables will be initialised with the parameter values 
         normalFillColor : basicShape.fill_color,
         alarmFillColor : basicShape.fill_color_alarm,

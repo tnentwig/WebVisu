@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IBasicShape } from '../../../../Interfaces/interfaces';
-import {createVisuObject} from '../../Features/objectManager'
+import {createVisuObject} from '../../../Objectmanagement/objectManager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 import { coordArrayToString } from '../../../Utils/utilfunctions'
 import ErrorBoundary from 'react-error-boundary';

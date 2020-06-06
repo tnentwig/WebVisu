@@ -1,23 +1,23 @@
 import * as React from 'react';
-import * as $ from 'jquery';
-import ComSocket from '../../../communication/comsocket';
-import * as util from '../../Utils/utilfunctions';
+import ComSocket from '../../../../communication/comsocket';
+import { stringToArray } from '../../../Utils/utilfunctions';
+import { getImage } from '../../../Utils/fetchfunctions';
 import {useObserver, useLocalStore } from 'mobx-react-lite';
-import { autorun } from 'mobx';
+import { get, set } from 'idb-keyval';
 
 type Props = {
-    section : JQuery<XMLDocument>,
+    section : Element,
     inlineElement : boolean
 }
 
 export const Image : React.FunctionComponent<Props>  = ({section, inlineElement})  => {
   
    // Auxiliary variables
-  let rect = util.stringToArray(section.children("rect").text());
+  let rect = stringToArray(section.getElementsByTagName("rect")[0].innerHTML);
  
   let initial = {
     // frameType defines the type of scaling. Possible are isotrophic, anisotrophic or static
-    frameType : section.children("frame-type").text(),
+    frameType : section.getElementsByTagName("frame-type")[0].innerHTML,
     inlineDimensions : "100%",
     // Dimensions of the surrounding div
     rectHeight : rect[3]-rect[1],
@@ -36,26 +36,24 @@ export const Image : React.FunctionComponent<Props>  = ({section, inlineElement}
   }
 
   // Set the filename, it could be a variable or static 
-  if(section.children("file-name").text().length){
-    initial.filename = section.children("file-name").text().replace(/.*\\/, '');
-  } else if (section.children("expr-fill-color").text().length){
-    section.children("expr-fill-color").children("expr").each(function(){
-      let varName = $(this).children("var").text();
-      Object.defineProperty(initial, "filename", {
-      get: function() {
-        return "/"+ComSocket.singleton().oVisuVariables.get(varName)!.value;
-        }
-      })
+if (section.getElementsByTagName("expr-fill-color").length){
+    let expression = section.getElementsByTagName("expr-fill-color")[0].getElementsByTagName("expr");
+    let varName = expression[0].getElementsByTagName("var")[0].innerHTML;
+    Object.defineProperty(initial, "filename", {
+    get: function() {
+      return "/"+ComSocket.singleton().oVisuVariables.get(varName)!.value;
+      }
     })
   }
+  /*
   // With surrounding frame?
   if (inlineElement){
-    if(section.children("no-frame-around-bitmap").text().length){
+    if(section.getElementsByTagName("no-frame-around-bitmap")[0].innerHTML.length){
       initial.inlineDimensions = "100%";
     } else {
       initial.inlineDimensions = "92%";
     }
-  }
+  }*/
 
   switch(initial.frameType){
     case "static":
@@ -74,6 +72,25 @@ export const Image : React.FunctionComponent<Props>  = ({section, inlineElement}
   }
 
   let state = useLocalStore(()=>initial);
+
+  if(section.getElementsByTagName("file-name")[0].innerHTML.length){
+    let rawFilename = section.getElementsByTagName("file-name")[0].innerHTML.replace(/.*\\/, '');
+    let path = ComSocket.singleton().getServerURL().replace("webvisu.htm", "") + rawFilename;
+    // Try to get the image from cache
+    get(rawFilename).then(
+      (cacheReturn)=>{
+        if (cacheReturn === undefined){
+          getImage(path).then(
+            (datauri)=>{
+              state.filename=datauri;
+              set(rawFilename,datauri);
+            })
+        } else {
+          state.filename = cacheReturn as any;
+        }
+      }
+    )
+    }
 
   return useObserver(()=>
       <React.Fragment>

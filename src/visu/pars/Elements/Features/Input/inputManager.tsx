@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { ClickAwayListener } from '@material-ui/core';
-import ComSocket from '../../../communication/comsocket';
+import ComSocket from '../../../../communication/comsocket';
 
 type Props = {
-    section : JQuery<XMLDocument>,
+    section : Element,
 }
 
 export const Inputfield : React.FunctionComponent<Props>  = ({section})  => {
@@ -11,33 +11,35 @@ export const Inputfield : React.FunctionComponent<Props>  = ({section})  => {
   const [open, setOpen] = React.useState(false);
   // Set and get the actual value
   const [value, setValue] = React.useState("");
+  // Check which input type is allowed: 0: text 1: number 2-4: Something that isnt listed in the doku
+  let type = "text";
+  let minvalue = null;
+  let maxvalue = null;
+
   // Define the click handler functions as null
   let handleClick : Function = null;
   let handleEnter : Function = null;
 
   // The expected behavior would be, that every called input field has a text-display node. Its an internal problem of the codesys project if not.
   let handleClickOutside : Function = ()=>console.log("An inputfield has no corresponding text-display field!");
-  // Check which input type is allowed: 0: text 1: number 2-4: Something that isnt listed in the doku
-  let type = "text";
-  let minvalue = null;
-  let maxvalue = null;
-  if (section.children("text-input-type").text().length) {
-    if(section.children("text-input-type").text()==="1"){
+
+  if (section.getElementsByTagName("text-input-type").length) {
+    if(section.getElementsByTagName("text-input-type")[0].innerHTML === "1"){
       type = "number";
       // Check for min max values
-      if (section.children("text-input-min-expr").text().length) {
-        minvalue = Number(section.children("text-input-min-expr").children("expr").children("const").text());
+      if (section.getElementsByTagName("text-input-min-expr").length) {
+        minvalue = Number(section.getElementsByTagName("text-input-min-expr")[0].getElementsByTagName("expr")[0].getElementsByTagName("const")[0].innerHTML);
       }
-      if (section.children("text-input-max-expr").text().length) {
-        minvalue = Number(section.children("text-input-max-expr").children("expr").children("const").text());
+      if (section.getElementsByTagName("text-input-max-expr").length) {
+        minvalue = Number(section.getElementsByTagName("text-input-max-expr")[0].getElementsByTagName("expr")[0].getElementsByTagName("const")[0].innerHTML);
       }
     }
   }
 
-  if (section.children("text-display").text().length) {
-    let expr = section.children("text-display").children("expr");
-    if (expr.children("var").text().length){
-      let varName = expr.children("var").text().toLowerCase();
+  if (section.getElementsByTagName("text-display").length) {
+    let expr = section.getElementsByTagName("text-display")[0].getElementsByTagName("expr")[0];
+    if (expr.getElementsByTagName("var").length){
+      let varName = expr.getElementsByTagName("var")[0].innerHTML.toLowerCase();
       handleClickOutside = () => {
         setOpen(false);
       };
