@@ -25,6 +25,7 @@ export interface IComSocket {
     addGlobalVar(varName : string | undefined, varAddr : string) : void;
     updateVarList() : void;
     setValue(varName : string, varValue : number | string | boolean) : void;
+    getServerURL() : string;
     setServerURL(serverURL : string) : void;
     startCyclicUpdate(periodms : number) : void;
     toggleValue(varName : string) : void;
@@ -32,7 +33,7 @@ export interface IComSocket {
     evalFunction(stack:string[][]):Function;
 }
 
-export interface IVisuObject{
+export interface IBasicObject{
     absCornerCoord : {x1:number,y1:number,x2:number,y2:number},
     absCenterCoord : {x:number, y:number},
     transformedCornerCoord : {x1:number,y1:number,x2:number,y2:number},
@@ -74,7 +75,14 @@ export interface IVisuObject{
 
 }
 
-export interface IPiechart extends IVisuObject{
+export interface IPiechart extends IBasicObject{
     startAngle : number,
     endAngle : number
+}
+
+export interface IPolyShape extends IBasicObject{
+    absPoints : number[][],
+    relPoints : number[][],
+    cssTransform : string,
+    cssTransformOrigin : string
 }
