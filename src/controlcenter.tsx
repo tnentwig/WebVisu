@@ -220,7 +220,7 @@ export default class HTML5Visu {
                         xmlDict.set(visuname, plainxml);
                     }
                     loadedVisus.push(visuname);
-                    // Get the visualisations which are used as main visus
+                    // Get the visualisations which are used as main visush
                     let mainVisunames = thisVisuXML.getElementsByTagName("expr-zoom");
                     Array.from(mainVisunames).forEach(function (nameNode){
                         let nextVisuname = nameNode.getElementsByTagName("placeholder")[0].textContent.toLowerCase();
@@ -245,7 +245,6 @@ export default class HTML5Visu {
                 }
             }
         }
-        console.log(mainVisus)
         return mainVisus
     }
 
