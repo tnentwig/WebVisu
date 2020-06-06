@@ -1,4 +1,3 @@
-import * as util from '../../../Utils/utilfunctions'
 import * as React from 'react';
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 import ComSocket from '../../../../communication/comsocket';
@@ -6,7 +5,7 @@ import {sprintf} from 'sprintf-js';
 
 type Props = {
     textLine : string,
-    section : JQuery<XMLDocument>,
+    section : Element,
     dynamicParameters : Map<string, string>,
     numberOfLines : number,
     firstItem : boolean
@@ -14,9 +13,9 @@ type Props = {
 
 export const Textline :React.FunctionComponent<Props>  = ({section, dynamicParameters, textLine, numberOfLines, firstItem})  =>
 {       
-    let fontHeight = Number(section.children("font-height").text());
-    let textAlignHorz = section.children("text-align-horz").text();
-    let textAlignVert = section.children("text-align-vert").text();
+    let fontHeight = Number(section.getElementsByTagName("font-height")[0].innerHTML);
+    let textAlignHorz = section.getElementsByTagName("text-align-horz")[0].innerHTML;
+    let textAlignVert = section.getElementsByTagName("text-align-vert")[0].innerHTML;
         const initial = {
             textVariable : "",
             // Vertical orientation

@@ -1,45 +1,45 @@
 import * as React from 'react';
 import * as $ from 'jquery';
 import * as util from '../../Utils/utilfunctions';
-import { IBasicShape, IPiechart, IVisuObject } from '../../../Interfaces/interfaces';
+import { IBasicShape, IPiechart, IBasicObject } from '../../../Interfaces/interfaces';
 import { Textfield } from '../Features/Text/textManager';
-import { Inputfield } from '../Features/inputManager';
-import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from '../Features/eventManager';
-import {createVisuObject} from '../Features/objectManager'
+import { Inputfield } from '../Features/Input/inputManager';
+import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from '../Features/Events/eventManager';
+import {createVisuObject} from '../../Objectmanagement/objectManager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 
 type Props = {
-    section : JQuery<XMLDocument>
+    section : Element
 }
 
 export const Piechart :React.FunctionComponent<Props> = ({section})=>
 {
     // Parsing of the fixed parameters
-
     let piechart: IBasicShape = {
         shape : "piechart",
-        has_inside_color : util.stringToBoolean(section.children("has-inside-color").text()),
-        fill_color : util.rgbToHexString(section.children("fill-color").text()),
-        fill_color_alarm : util.rgbToHexString(section.children("fill-color-alarm").text()),
-        has_frame_color : util.stringToBoolean(section.children("has-frame-color").text()),
-        frame_color : util.rgbToHexString(section.children("frame-color").text()),
-        frame_color_alarm : util.rgbToHexString(section.children("frame-color-alarm").text()),
-        line_width : Number(section.children("line-width").text()),
-        elem_id : section.children("elem-id").text(),
+        has_inside_color : util.stringToBoolean(section.getElementsByTagName("has-inside-color")[0].textContent),
+        fill_color : util.rgbToHexString(section.getElementsByTagName("fill-color")[0].textContent),
+        fill_color_alarm : util.rgbToHexString(section.getElementsByTagName("fill-color-alarm")[0].textContent),
+        has_frame_color : util.stringToBoolean(section.getElementsByTagName("has-frame-color")[0].textContent),
+        frame_color : util.rgbToHexString(section.getElementsByTagName("frame-color")[0].textContent),
+        frame_color_alarm : util.rgbToHexString(section.getElementsByTagName("frame-color-alarm")[0].textContent),
+        line_width : Number(section.getElementsByTagName("line-width")[0].textContent),
+        elem_id : section.getElementsByTagName("elem-id")[0].textContent,
         rect : [],
-        center : util.stringToArray(section.children("center").text()),
-        hidden_input : util.stringToBoolean(section.children("hidden-input").text()),
-        enable_text_input : util.stringToBoolean(section.children("enable-text-input").text()),
-        tooltip : (section.children("tooltip").text()).length>0? section.children("tooltip").text() : "",
+        center : util.stringToArray(section.getElementsByTagName("center")[0].textContent),
+        hidden_input : util.stringToBoolean(section.getElementsByTagName("hidden-input")[0].textContent),
+        enable_text_input : util.stringToBoolean(section.getElementsByTagName("enable-text-input")[0].textContent),
+        tooltip : section.getElementsByTagName("tooltip").length? section.getElementsByTagName("tooltip")[0].textContent : "",
         // Points only exists on polyforms
-        points : [],
+        points : []
       }
 
     // Parsing the point coordinates
-    section.children('point').each(function(){
-        let points = util.stringToArray($(this).text());
+    let xmlPoints = section.getElementsByTagName('point');
+    for (let i=0; i<xmlPoints.length; i++){
+        let points = util.stringToArray(xmlPoints[i].textContent);
         piechart.points.push(points);
-    });
+    };
     // The piechart points consists of only 4 items 
     //[0]-> center
     //[1]-> point bottom right
@@ -49,21 +49,26 @@ export const Piechart :React.FunctionComponent<Props> = ({section})=>
     piechart.rect = util.computePiechartRectCoord(piechart.points);
 
     // Parsing the textfields and returning a jsx object if it exists
-    let dynamicTextParameters = parseDynamicTextParameters(section, piechart.shape);
     let textField : JSX.Element;
-    if (section.find("text-id").text().length){
-      textField = <Textfield section={section} dynamicParameters={dynamicTextParameters}></Textfield>;
+    if (section.getElementsByTagName("text-format").length){
+        let dynamicTextParameters = parseDynamicTextParameters(section, piechart.shape);
+        textField = <Textfield section={section} dynamicParameters={dynamicTextParameters}></Textfield>;
+    } else {
+        textField = null;
     }
-    else {
-      textField = null;
-    }
+    
     // Parsing the inputfield
     let inputField : JSX.Element;
-    if (section.find("enable-text-input").text() === "true"){
-        inputField = <Inputfield section={section}></Inputfield>
-    }else {
+    if (section.getElementsByTagName("enable-text-input").length){
+        if(section.getElementsByTagName("enable-text-input")[0].textContent == "true"){
+            inputField = <Inputfield section={section}></Inputfield>
+        } else {
+            inputField = null;
+        }
+    } else {
         inputField = null;
     }
+
     // Parsing of observable events (like toggle color)
     let dynamicShapeParameters = parseDynamicShapeParameters(section);
     // Parsing of user events that causes a reaction like toggle or pop up input

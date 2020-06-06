@@ -1,5 +1,5 @@
-import * as $ from 'jquery';
 import * as React from 'react';
+import { get, set } from 'idb-keyval';
 import { VisuElements } from '../visu/pars/elementparser';
 import { stringToArray } from './pars/Utils/utilfunctions';
 import { getVisuxml, stringifyVisuXML, parseVisuXML } from './pars/Utils/fetchfunctions';
@@ -13,107 +13,105 @@ type Props = {
     width : number
 }
 
-function initVariables(XML : XMLDocument, reset : boolean) : void{
-        let com = ComSocket.singleton();
-        let visuXML=$(XML);
-        // We have to reset the varibales on comsocket, if necessary
-        if (reset){
-            com.initObservables()
-        }
-        // Rip all of <variable> in <variablelist> section
-        visuXML.children("visualisation").children("variablelist").children("variable").each(function(){
-            let variable = $(this);
-            let varAddress = variable.text().split(",").slice(0,4).join(",");
-            // Add the variable to the observables if not already existent
-            if (!com.oVisuVariables.has(variable.attr("name"))){
-                com.addObservableVar(variable.attr("name"), varAddress);
-            }
-        });
-}
-
-function replacePlaceholders(data : XMLDocument, replacements : Map<string, string>){
-    if (replacements === null){
-        return
-    }
-    // Find all placeholder variables 
-    let placeholders = data.getElementsByTagName("placeholder");
-    // Replace all Placeholders
-    Array.from(placeholders).forEach(function (placeholder){
-        let regEx = new RegExp(/\$(.*)\$/gm);
-        let match = regEx.exec(placeholder.textContent);
-        // Replacement
-        if (match != null){
-            let replace = match[1].toLowerCase();
-            if (replacements.has(replace)){
-                let variable = data.createElement('var');
-                let content = placeholder.textContent.replace(/\$(.*)\$/, replacements.get(replace)).toLowerCase();
-                if(ComSocket.singleton().oVisuVariables.has("."+content)){
-                    content = "." + content;
-                }
-                // Schlechte Implementierung von Codesys, Doppelpunkte durch einfügen von referenzen möglich
-                let textContent = content.replace(/\.\./, '.');
-                variable.textContent = textContent;
-                placeholder.parentNode.replaceChild(variable, placeholder);
-            }
-        }
-    })
-}
-
 export const Visualisation :React.FunctionComponent<Props> = React.memo(({ visuname, mainVisu, replacementSet, width})=> {
     const [loading, setLoading] = React.useState<Boolean>(true);
-    const [display, setDisplay] = React.useState("block");
-    const [XML, setXML] = React.useState<string>(null);
     const [adaptedXML, setAdaptedXML] = React.useState<XMLDocument>(null);
     const [originSize, setOriginSize] = React.useState<Array<number>>([0,0]);
     const [scale, setScale] = React.useState("scale(1)");
 
     // Get new xml on change of visuname
     React.useEffect(()=>{
-        //console.log("fetch "+thisVisuname)
         let fetchXML = async function(){
             // Set the loading flag. This will unmount all elements from calling visu
             setLoading(true);
             let url = StateManager.singleton().oState.get("ROOTDIR") + "/"+ visuname +".xml";
             // Files that are needed several times will be saved internally for loading speed up
             let plainxml : string;
-            let xmlDict = StateManager.singleton().xmlDict;
-            if (xmlDict.has(visuname)){
-                plainxml = xmlDict.get(visuname);
-            } else {
+            if (await get(visuname) === undefined){
                 let xml = await getVisuxml(url);
-                plainxml = stringifyVisuXML(xml);
-                xmlDict.set(visuname, plainxml);
+                if (xml == null){
+                    console.log("The requested visualisation "+ visuname + " is not available!")
+                } else {
+                    plainxml = stringifyVisuXML(xml);
+                    await set(visuname, plainxml);
+                }
+            } else {
+                plainxml = await get(visuname);
             }
-            setXML(plainxml);  
+            
+            if(plainxml !== null){
+                let xmlDoc = parseVisuXML(plainxml);
+                initVariables(xmlDoc, mainVisu);
+                replacePlaceholders(xmlDoc, replacementSet);
+                setAdaptedXML(xmlDoc);
+                setOriginSize(stringToArray(xmlDoc.getElementsByTagName("visualisation")[0].getElementsByTagName("size")[0].innerHTML));
+                setLoading(false);
+            }
         };
         fetchXML();
-        }, [visuname]);
-
-    // Adapt the original xml through replacing of placeholders
-    React.useEffect(()=>{
-        if(XML !== null){
-            let xmlDoc = parseVisuXML(XML);
-            initVariables(xmlDoc, mainVisu);
-            replacePlaceholders(xmlDoc, replacementSet);
-            setAdaptedXML(xmlDoc);
-            // Get the original size of the visualisation
-            let jQxml=$(xmlDoc);
-            setOriginSize(stringToArray(jQxml.children("visualisation").children("size").text()));
-            setLoading(false);
-        }
-    },[XML, mainVisu, replacementSet])
+        }, [visuname, mainVisu, replacementSet]);
 
     // Scaling on main window resize for responsive behavior
     React.useEffect(()=>{
-        let scaleFactor = width/(originSize[0]+2);
-        setScale("scale("+scaleFactor.toString()+")");
-    }, [width, originSize, mainVisu])
+        let xscaleFactor = width/(originSize[0]+2);
+        let yscaleFactor = width/(originSize[0]+2);
+        setScale("scale("+xscaleFactor.toString()+")");
+    }, [width, originSize])
 
+    
     return (
-        <div style={{display:display, position:"absolute", overflow:"hidden", left:0, top:0, width:originSize[0]+1, height:originSize[1]+1, transformOrigin:"0 0", transform:scale}}>
+        <div style={{display:"block", position:"absolute", overflow:"hidden", left:0, top:0, width:originSize[0]+1, height:originSize[1]+1, transformOrigin:"0 0", transform:scale}}>
             {loading ? null :
                 <VisuElements visualisation={adaptedXML}></VisuElements>
             }
         </div>
     )
+
 })
+
+function initVariables(XML : XMLDocument, reset : boolean) : void{
+    let com = ComSocket.singleton();
+    // We have to reset the varibales on comsocket, if necessary
+    if (reset){
+        com.initObservables()
+    }
+    // Rip all of <variable> in <variablelist> section
+    let variables = XML.getElementsByTagName("visualisation")[0].getElementsByTagName("variablelist")[0].getElementsByTagName("variable");
+    for (let i=0; i<variables.length; i++){
+        let varName = variables[i].getAttribute("name")
+        let rawAddress = variables[i].innerHTML;
+        let varAddress = rawAddress.split(",").slice(0,4).join(",");
+        // Add the variable to the observables if not already existent
+        if (!com.oVisuVariables.has(varName)){
+            com.addObservableVar(varName, varAddress);
+        }
+    }
+}
+
+function replacePlaceholders(data : XMLDocument, replacements : Map<string, string>){
+if (replacements === null){
+    return
+}
+// Find all placeholder variables 
+let placeholders = data.getElementsByTagName("placeholder");
+// Replace all Placeholders
+Array.from(placeholders).forEach(function (placeholder){
+    let regEx = new RegExp(/\$(.*)\$/gm);
+    let match = regEx.exec(placeholder.textContent);
+    // Replacement
+    if (match != null){
+        let replace = match[1].toLowerCase();
+        if (replacements.has(replace)){
+            let variable = data.createElement('var');
+            let content = placeholder.textContent.replace(/\$(.*)\$/, replacements.get(replace)).toLowerCase();
+            if(ComSocket.singleton().oVisuVariables.has("."+content)){
+                content = "." + content;
+            }
+            // Schlechte Implementierung von Codesys, Doppelpunkte durch einfügen von referenzen möglich
+            let textContent = content.replace(/\.\./, '.');
+            variable.textContent = textContent;
+            placeholder.parentNode.replaceChild(variable, placeholder);
+        }
+    }
+})
+}

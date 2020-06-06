@@ -1,6 +1,5 @@
-import * as $ from 'jquery';
 import * as React from 'react';
-import {uid} from 'react-uid';
+import { uid } from 'react-uid';
 import { SimpleShape } from '../pars/Elements/Basicshapes/simpleshape';
 import { PolyShape } from '../pars/Elements/Basicshapes/polyshape';
 import { Button } from '../pars/Elements/Button/button';
@@ -8,27 +7,27 @@ import { Piechart } from '../pars/Elements/Piechart/piechart';
 import { Scrollbar } from '../pars/Elements/Scrollbar/scrollbar';
 import { ArrayTable } from './Elements/Arraytable/arraytable';
 import { Bitmap } from './Elements/Bitmap/bitmap';
-import { Group } from '../pars/Elements/Group/parseGroup';
+import { Group } from './Elements/Group/Group';
 import { Subvisu } from '../pars/Elements/Subvisu/subvisu'
 
 type Props = {
     visualisation: XMLDocument
 }
-export const VisuElements :React.FunctionComponent<Props> =React.memo(({visualisation})=>{
-    // The visuObjects are stored in a state
-    const [visuObjects, setVisuObjects] = React.useState([]);
-    // Add a visuObject to the store
+export const VisuElements :React.FunctionComponent<Props> = React.memo(({visualisation})=>{
+
+    let visuObjects : Array<{obj:JSX.Element, id: string}>= [];
     const addVisuObject = (visuObject : JSX.Element) => {
         let obj = {obj: visuObject, id:uid(visuObject)};
-        setVisuObjects(visuObjects =>[...visuObjects, obj]);
+        visuObjects.push(obj)
     }
     // The effect is called if the visualisation prop change
-    React.useEffect(()=>{
-        // Rip all <element> sections
-        $(visualisation).children("visualisation").children("element").each(function(){
-            let section : JQuery<XMLDocument>= $(this);
+    // Rip all <element> sections
+    for (let i=0; i<visualisation.children[0].children.length; i++){
+        let section = visualisation.children[0].children[i];
+        if (visualisation.children[0].children[i].nodeName === "element"){
             // Determine the type of the element
-            switch(section.attr("type")) {
+            let type = section.getAttribute("type");
+            switch(type) {
                 // Is a simple shape like rectangle, round-rectangle, circle or line
                 case "simple":
                     addVisuObject(<SimpleShape section={section}></SimpleShape>);
@@ -60,11 +59,9 @@ export const VisuElements :React.FunctionComponent<Props> =React.memo(({visualis
                 case "reference":
                     addVisuObject(<Subvisu section={section}></Subvisu>);
                     break;
-                default:
-                    console.log("Type <"+section.attr("type")+"> is not supported yet!");
             }
-        });
-    },[visualisation])
+        } 
+    };
 
     return (
         <React.Fragment>
