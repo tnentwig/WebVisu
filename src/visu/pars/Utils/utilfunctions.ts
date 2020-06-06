@@ -3,7 +3,7 @@ export function stringToBoolean(booleanExp : string) : boolean {
     try{
         interim =JSON.parse(booleanExp)
     }catch{
-        throw new Error("Not a boolean expression!");
+        console.log("Not a boolean expression: ")
     }
     return interim;
 }
