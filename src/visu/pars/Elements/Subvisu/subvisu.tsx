@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Visualisation} from '../../../visuparser';
 import * as util from '../../Utils/utilfunctions';
-import { IBasicShape } from '../../../Interfaces/interfaces';
+import { IBasicShape } from '../../../Interfaces/javainterfaces';
 import { parseDynamicShapeParameters } from '../Features/Events/eventManager';
 import { createVisuObject } from '../../Objectmanagement/objectManager'
 import { useObserver, useLocalStore } from 'mobx-react-lite';
@@ -45,8 +45,6 @@ export const Subvisu :React.FunctionComponent<Props> = ({section})=>
         hidden_input: util.stringToBoolean(referenceObject["hidden-input"].textContent),
         enable_text_input: util.stringToBoolean(referenceObject["enable-text-input"].textContent),
         tooltip: "",
-        // Points only exists on polyforms
-        points: []
       }
 
     // Subvisu specials

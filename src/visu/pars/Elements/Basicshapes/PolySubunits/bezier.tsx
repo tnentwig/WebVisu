@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IBasicShape } from '../../../../Interfaces/interfaces';
+import { IBasicShape } from '../../../../Interfaces/javainterfaces';
 import {createVisuObject} from '../../../Objectmanagement/objectManager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 import { coordArrayToBezierString } from '../../../Utils/utilfunctions'

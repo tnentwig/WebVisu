@@ -6,7 +6,7 @@ import { Circle } from './SimpleSubunits/circle'
 import { Rectangle } from './SimpleSubunits/rectangle';
 import { Textfield } from '../Features/Text/textManager';
 import { Inputfield } from '../Features/Input/inputManager';
-import { IBasicShape } from '../../../Interfaces/interfaces';
+import { IBasicShape } from '../../../Interfaces/javainterfaces';
 import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from '../Features/Events/eventManager';
 
 type Props = {
@@ -35,8 +35,6 @@ export const SimpleShape : React.FunctionComponent<Props> = ({section})=>
 			hidden_input : util.stringToBoolean(section.getElementsByTagName("hidden-input")[0].innerHTML),
 			enable_text_input : util.stringToBoolean(section.getElementsByTagName("enable-text-input")[0].innerHTML),
 			tooltip : section.getElementsByTagName("tooltip").length? section.getElementsByTagName("tooltip")[0].innerHTML : "",
-			// Points only exists on polyforms
-			points : []
 		}
 		// Parsing the textfields and returning a jsx object if it exists
 		let textField : JSX.Element;

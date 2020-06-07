@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as util from '../../Utils/utilfunctions';
-import { IBasicShape } from '../../../Interfaces/interfaces';
+import { IPolyShape } from '../../../Interfaces/javainterfaces';
 import { Bezier } from './PolySubunits/bezier'
 import { Polygon } from './PolySubunits/polygon'
 import { Polyline } from './PolySubunits/polyline'
@@ -20,7 +20,7 @@ export const PolyShape : React.FunctionComponent<Props> = ({section})=>
     // Parse the common informations
     if (['polygon', 'bezier', 'polyline'].includes(shape)) {
         // Parsing of the fixed parameters
-        let polyShapeBasis : IBasicShape = {
+        let polyShapeBasis : IPolyShape = {
 			shape : shape,
 			has_inside_color : util.stringToBoolean(section.getElementsByTagName("has-inside-color")[0].innerHTML),
 			fill_color : util.rgbToHexString(section.getElementsByTagName("fill-color")[0].innerHTML),

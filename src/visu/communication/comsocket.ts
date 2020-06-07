@@ -1,4 +1,4 @@
-import { IComSocket } from '../../visu/Interfaces/interfaces';
+import { IComSocket } from '../Interfaces/jsinterfaces';
 import { observable, action } from "mobx"
 import StateManager from "../statemanagement/statemanager";
 import { evalRPN } from '../pars/Utils/utilfunctions'

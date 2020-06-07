@@ -1,7 +1,6 @@
 import * as React from 'react';
-import * as $ from 'jquery';
 import * as util from '../../Utils/utilfunctions';
-import { IBasicShape, IPiechart, IBasicObject } from '../../../Interfaces/interfaces';
+import { IPiechartShape } from '../../../Interfaces/javainterfaces';
 import { Textfield } from '../Features/Text/textManager';
 import { Inputfield } from '../Features/Input/inputManager';
 import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from '../Features/Events/eventManager';
@@ -15,7 +14,7 @@ type Props = {
 export const Piechart :React.FunctionComponent<Props> = ({section})=>
 {
     // Parsing of the fixed parameters
-    let piechart: IBasicShape = {
+    let piechart: IPiechartShape = {
         shape : "piechart",
         has_inside_color : util.stringToBoolean(section.getElementsByTagName("has-inside-color")[0].textContent),
         fill_color : util.rgbToHexString(section.getElementsByTagName("fill-color")[0].textContent),

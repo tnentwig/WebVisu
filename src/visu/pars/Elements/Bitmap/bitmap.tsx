@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as util from '../../Utils/utilfunctions';
-import { IBasicShape } from '../../../Interfaces/interfaces';
+import { IBasicShape } from '../../../Interfaces/javainterfaces';
 import { Textfield } from '../Features/Text/textManager';
 import { Inputfield } from '../Features/Input/inputManager';
 import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent, parseTapEvent } from '../Features/Events/eventManager';
@@ -30,8 +30,6 @@ export const Bitmap: React.FunctionComponent<Props> = ({ section }) => {
     hidden_input: util.stringToBoolean(section.getElementsByTagName("hidden-input")[0].textContent),
     enable_text_input: util.stringToBoolean(section.getElementsByTagName("enable-text-input")[0].textContent),
     tooltip: section.getElementsByTagName("tooltip").length ? section.getElementsByTagName("tooltip")[0].textContent : "",
-    // Points only exists on polyforms
-    points: []
   }
 
   // Parsing the textfields and returning a jsx object if it exists
@@ -42,7 +40,7 @@ export const Bitmap: React.FunctionComponent<Props> = ({ section }) => {
   } else {
     textField = null;
   }
-  console.log("2")
+
   // Parsing the inputfield
   let inputField : JSX.Element;
   if (section.getElementsByTagName("enable-text-input").length){

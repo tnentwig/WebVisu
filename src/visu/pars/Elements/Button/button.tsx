@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as util from '../../Utils/utilfunctions';
-import { IBasicShape } from '../../../Interfaces/interfaces';
+import { IBasicShape } from '../../../Interfaces/javainterfaces';
 import { Textfield } from '../Features/Text/textManager';
 import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from '../Features/Events/eventManager';
 import {createVisuObject} from '../../Objectmanagement/objectManager'
@@ -31,8 +31,6 @@ export const Button :React.FunctionComponent<Props> = ({section})=>
         hidden_input : util.stringToBoolean(section.getElementsByTagName("hidden-input")[0].innerHTML),
         enable_text_input : util.stringToBoolean(section.getElementsByTagName("enable-text-input")[0].innerHTML),
         tooltip : section.getElementsByTagName("tooltip").length>0? section.getElementsByTagName("tooltip")[0].innerHTML : "",
-        // Points only exists on polyforms
-        points : []
       }
 
     // Parsing the textfields and returning a jsx object if it exists
