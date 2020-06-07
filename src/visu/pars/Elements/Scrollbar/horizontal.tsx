@@ -1,163 +1,80 @@
 import * as React from 'react';
 import {useObserver, useLocalStore } from 'mobx-react-lite';
-import {stringToArray } from '../../Utils/utilfunctions';
-import {parseScrollbarParameters, updateScrollvalue} from '../Scrollbar/eventParser'
-import ComSocket from '../../../communication/comsocket';
-
+import { IScrollbarShape } from '../../../Interfaces/javainterfaces';
+import {createVisuObject} from '../../Objectmanagement/objectManager';
 
 type Props = {
-    section : JQuery<XMLDocument>
+    shape: IScrollbarShape,
+    dynamicParameters : Map<string,string[][]>,
+    updateFunction : Function,
 }
 
-export const HorizontalScrollbar :React.FunctionComponent<Props> = ({section})=>
+export const HorizontalScrollbar :React.FunctionComponent<Props> = ({shape, dynamicParameters, updateFunction})=>
 {
-   let rect = stringToArray(section.children("rect").text());
-   // Auxiliary values
-   let relCornerCoord = {x1:0, y1:0, x2:rect[2]-rect[0], y2:rect[3]-rect[1]};
 
-   let initial ={
-       lowerBound : 0,
-       upperBound : 0,
-       value : 0,
-       display : "visible"
-   }
+   // Convert object to an observable one
+    const state  = useLocalStore(()=>createVisuObject(shape, dynamicParameters));
 
-   let dynamicElements = parseScrollbarParameters(section);
-   let updateFunction = updateScrollvalue(section);
+    let centerx = state.relCornerCoord.y2/2;
+    let centery = state.relCornerCoord.y2/2;
 
-   if (dynamicElements.has("expr-lower-bound")){
-       let element = dynamicElements!.get("expr-lower-bound");
-       if (element.type==="var"){
-           Object.defineProperty(initial, "lowerBound", {
-               get: function() {
-                   return Number(ComSocket.singleton().oVisuVariables.get(element.value)!.value);
-                   }
-           });
-       } else if (element.type==="const"){
-           initial.lowerBound= Number(element.value);
-       }
-   }
-   if (dynamicElements.has("expr-upper-bound")){
-       let element = dynamicElements!.get("expr-upper-bound");
-       if (element.type==="var"){
-           Object.defineProperty(initial, "upperBound", {
-               get: function() {
-                   return Number(ComSocket.singleton().oVisuVariables.get(element.value)!.value);
-                   }
-           });
-       } else if (element.type==="const"){
-           initial.upperBound= Number(element.value);
-       }
-   }
-   if (dynamicElements.has("expr-invisible")){
-       let element = dynamicElements!.get("expr-invisible");
-       if (element.type==="var"){
-           Object.defineProperty(initial, "display", {
-               get: function() {
-                   let value = ComSocket.singleton().oVisuVariables.get(element.value)!.value;
-                   if (value == "0"){
-                       return "visible";
-                   } else {
-                       return "none";
-                   }
-               }
-           });
-       } else if (element.type==="const"){
-           let value;
-           if (element.value === "0"){
-               value = "visible";
-           } else {
-              value = "none";
-           }
-           initial.display =value;
-       }
-   }    
-   if (dynamicElements.has("expr-tooltip-display")){
-       let element = dynamicElements!.get("expr-tooltip-display");
-       if (element.type==="var"){
-           Object.defineProperty(initial, "tooltip", {
-               get: function() {
-                   return ComSocket.singleton().oVisuVariables.get(element.value)!.value;
-                   }
-           });
-       }
-   }
-
-   if (dynamicElements.has("expr-tap-var")){
-       let element = dynamicElements!.get("expr-tap-var");
-       if (element.type==="const"){
-           initial.value= Number(element.value);
-       }
-       else if (element.type==="var"){
-           Object.defineProperty(initial, "value", {
-               get: function() {
-                   return Number(ComSocket.singleton().oVisuVariables.get(element.value)!.value);
-                   }
-
-           });
-       }
-   }
-
+    let path1 = ""+0.4*centerx+","+centery+" "+1.6*centerx+","+0.4*centery+" "+1.6*centerx+","+1.6*centery;
+    let path2 = ""+1.6*centerx+","+centery+" "+0.4*centerx+","+1.6*centery+" "+0.4*centerx+","+0.4*centery;
 
    const handleSliderChange = (event : React.ChangeEvent<HTMLInputElement>) => {
        updateFunction(event.target.value);
    };
 
    const increment = ()=>{
-       if (initial.value < initial.upperBound){
-           updateFunction(initial.value+1)
+       console.log(state.value)
+       if (state.value < state.upperBound){
+           updateFunction(state.value+1)
        }
    }
 
    const decrement = ()=>{
-       if (initial.value > initial.lowerBound){
-           updateFunction(initial.value-1)
+       if (state.value > state.lowerBound){
+           updateFunction(state.value-1)
        }
    }
+   
 
-   function throttled(delay : number, fn : Function) {
-       let lastCall = 0;
-       return function (...args : any[]) {
-           const now = (new Date).getTime();
-           if (now - lastCall < delay) {
-           return;
-           }
-           lastCall = now;
-           return fn(...args);
-       }
-   }
-   const tHandleSliderChange = throttled(10, handleSliderChange);
-
-   const state  = useLocalStore(()=>initial);
 
    // Return of the react node
    return useObserver(()=>
-       <div style={{position:"absolute", left:0, width:relCornerCoord.x2, height:relCornerCoord.y2}}>
+    <div style={{position:"absolute", left:state.absCornerCoord.x1, top:state.absCornerCoord.y1, width:state.relCoord.width, height:state.relCoord.height, backgroundColor: "#f4f6f6"}}>
     
-           <svg style ={{
-               height: relCornerCoord.y2, 
-               width: relCornerCoord.y2,  
+           <svg 
+            onClick={decrement} 
+            style ={{
+               height: state.relCornerCoord.y2, 
+               width: state.relCornerCoord.y2,  
                position :"absolute", 
                left : 0}}>
-               <rect width={relCornerCoord.y2} height={relCornerCoord.y2} style={{fill:"grey", stroke:"darkgrey"}} onClick={decrement}  />
-           </svg>
-           
-           <svg  style ={{
-               height: relCornerCoord.y2, 
-               width: relCornerCoord.y2,
-               left : relCornerCoord.y2,
-               position :"absolute"
-               }}>
-               <rect width={relCornerCoord.x2 - 2*relCornerCoord.y2+1} height={relCornerCoord.y2} style={{fill:"grey",stroke:"darkgrey"}}  />
+                <rect width={state.relCornerCoord.y2} height={state.relCornerCoord.y2} style={{fill:"#DCDCDC", stroke:"darkgrey"}}  />
+                <polygon points={path1}/>
            </svg>
            
            <svg style ={{
-               height: relCornerCoord.y2, 
-               width: relCornerCoord.y2,  
+               height: state.relCornerCoord.y2, 
+               width: state.relCornerCoord.y2,
+               left : state.relCornerCoord.y2+state.value,
+               position :"absolute"
+               }}>
+               <rect width={state.relCornerCoord.x2 - 2*state.relCornerCoord.y2+1} height={state.relCornerCoord.y2} style={{fill:"#DCDCDC",stroke:"darkgrey"} } onMouseDown={()=>console.log("gi")} />
+           </svg>
+           
+           <svg
+            onClick={increment}
+            style ={{
+               height: state.relCornerCoord.y2, 
+               width: state.relCornerCoord.y2,  
                position :"absolute",
                right : 0}}>
-               <rect width={relCornerCoord.y2} height={relCornerCoord.y2} style={{fill:"grey",stroke:"darkgrey"}} onClick={increment}  />
+                <rect width={state.relCornerCoord.y2} height={state.relCornerCoord.y2} style={{fill:"#DCDCDC",stroke:"darkgrey"}}   />
+                <polygon points={path2} pointerEvents={"visiblePoint"}/>
            </svg>
        </div>
    )
+
 }
