@@ -1,22 +1,4 @@
 
-export interface IBasicShape {
-    shape : string;
-    has_inside_color : boolean;
-    fill_color : string;
-    fill_color_alarm : string;
-    has_frame_color : boolean;
-    frame_color : string;
-    frame_color_alarm : string;
-    line_width : number;
-    elem_id : string;
-    rect : number[];
-    center : number[];
-    hidden_input : boolean;
-    enable_text_input : boolean;
-    tooltip : string;
-    points : number[][]
-}
-
 export interface IComSocket {
     // Variables
     oVisuVariables: Map<string,{addr: string, value: string|undefined}>;
@@ -63,26 +45,30 @@ export interface IBasicObject{
     fill : string,
     stroke : string,
     strokeDashArray : string,
-    // The following variables are for polyshapes only
+}
+
+export interface IPiechartObject extends IBasicObject{
     absPoints : number[][],
     relPoints : number[][],
-    cssTransform : string,
-    cssTransformOrigin : string
-    // The following is for piechart only
     startAngle : number,
     endAngle : number,
     piechartPath : string
-
 }
 
-export interface IPiechart extends IBasicObject{
-    startAngle : number,
-    endAngle : number
-}
-
-export interface IPolyShape extends IBasicObject{
+export interface IPolyObject extends IBasicObject{
     absPoints : number[][],
     relPoints : number[][],
     cssTransform : string,
     cssTransformOrigin : string
+}
+
+export interface IScrollbarObject {
+    absCornerCoord : {x1:number,y1:number,x2:number,y2:number},
+    relCornerCoord : {x1:number,y1:number,x2:number,y2:number},
+    relMidpointCoord : {x : number, y:number},
+    relCoord : {width:number,height:number}
+    lowerBound : number;
+    upperBound : number;
+    value : number;
+    display : string
 }
