@@ -34,7 +34,13 @@ export function parseDynamicShapeParameters(section: Element): Map<string, strin
 
         // Piechart specific
         "expr-angle1",
-        "expr-angle2"]
+        "expr-angle2",
+
+        // Scrollbar specific
+        "expr-lower-bound",
+        "expr-upper-bound",
+        "expr-tap-var"
+    ]
 
     let children = section.children;
     for (let i=0; i < children.length; i++){
@@ -207,7 +213,6 @@ export function parseClickEvent(section: Element): Function {
                 let links = actionList.getElementsByTagName("expr-link");
                 for (let i=0; i<links.length; i++){
                     let link = actionList.getElementsByTagName("expr-link")[i].getElementsByTagName("expr")[0].children[0];
-                    console.log(link)
                     let type = link.tagName;
                     let content = link.textContent;
                     if (type === "var") {
@@ -287,4 +292,20 @@ export function parseTapEvent(section: Element, direction: string): Function {
         }
     } 
     return tapFunction;
+}
+
+export function parseScrollUpdate(section : Element) : Function {
+    let update : Function;
+    let updateExpr = section.getElementsByTagName("expr-tap-var");
+    if(updateExpr.length){
+        let content = updateExpr[0].getElementsByTagName("expr")[0].children[0];
+        let varName = content.textContent.toLowerCase();
+        let com = ComSocket.singleton();
+        if(com.oVisuVariables.has(varName)){
+            update = function(setValue : string):void{
+                com.setValue(varName, setValue);
+            }
+        }
+    } 
+    return update;
 }
