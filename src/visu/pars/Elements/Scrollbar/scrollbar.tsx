@@ -1,7 +1,8 @@
 import * as React from 'react';
 import {HorizontalScrollbar} from './horizontal';
+import { IScrollbarShape } from '../../../Interfaces/javainterfaces';
 import * as util from '../../Utils/utilfunctions';
-import {useObserver} from 'mobx-react-lite';
+import { parseDynamicShapeParameters, parseScrollUpdate } from '../Features/Events/eventManager';
 
 type Props = {
     section : Element
@@ -9,16 +10,24 @@ type Props = {
 
 export const Scrollbar :React.FunctionComponent<Props> = ({section})=>
 {
+    let rect = util.stringToArray(section.getElementsByTagName("rect")[0].innerHTML);
+    let horz_position : boolean = (((rect[1]-rect[0])>(rect[3]-rect[2])) ? true : false);
     // Parsing of the fixed parameters
-    let rect = util.stringToArray(section.getElementsByTagName("rect")[0].innerHTML)
-    // Compute the orientation of the slider
-    let relCornerCoord = {x1:0, y1:0, x2:rect[2]-rect[0], y2:rect[3]-rect[1]};
-    let horzOrientation : boolean = ((relCornerCoord.x2>relCornerCoord.y2) ? true : false);
+    let scrollbar : IScrollbarShape = {
+        shape : "scrollbar",
+        rect : rect,
+        horz_position : horz_position,
+        tooltip : section.getElementsByTagName("tooltip").length>0? section.getElementsByTagName("tooltip")[0].innerHTML : "",
+    }
 
+    // Parsing of observable events
+	let dynamicShapeParameters = parseDynamicShapeParameters(section);
+    // Parse the scroll update function
+    let update = parseScrollUpdate(section);
     // Return of the react node
-    return useObserver(()=>
-        <div style={{position:"absolute", left:rect[0], top:rect[1], width:rect[2]-rect[0], height:rect[3]-rect[1], backgroundColor: "lightgrey"}}>
-            {horzOrientation ? <HorizontalScrollbar section={section}></HorizontalScrollbar> : null}
-        </div>
-    )
+    if (horz_position){
+        return(<HorizontalScrollbar shape={scrollbar} dynamicParameters={dynamicShapeParameters} updateFunction={update}></HorizontalScrollbar>)
+    } else {
+        return null
+    }
 }
