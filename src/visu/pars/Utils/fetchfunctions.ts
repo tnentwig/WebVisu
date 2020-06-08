@@ -1,5 +1,4 @@
 import * as JsZip from 'jszip';
-import { get, set } from 'idb-keyval';
 
 export function getVisuxml(url : string) :Promise<XMLDocument> {
     return new Promise(resolve =>{
