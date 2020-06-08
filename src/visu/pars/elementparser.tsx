@@ -7,7 +7,7 @@ import { Piechart } from '../pars/Elements/Piechart/piechart';
 import { Scrollbar } from '../pars/Elements/Scrollbar/scrollbar';
 import { ArrayTable } from './Elements/Arraytable/arraytable';
 import { Bitmap } from './Elements/Bitmap/bitmap';
-import { Group } from './Elements/Group/Group';
+import { Group } from './Elements/Group/group';
 import { Subvisu } from '../pars/Elements/Subvisu/subvisu'
 
 type Props = {
