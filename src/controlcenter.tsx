@@ -1,4 +1,3 @@
-import {ajax} from 'jquery';
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
 import { observer } from 'mobx-react';
@@ -90,14 +89,15 @@ export default class HTML5Visu {
         })
     }
 
-    appendGlobalVariables(XML : XMLDocument) : Promise<boolean>{
+    appendGlobalVariables(visuIniXML : XMLDocument) : Promise<boolean>{
         return new Promise(resolve => {
-            let visuXML=$(XML);
             // Rip all of <variable> in <variablelist> section
-            visuXML.children("visu-ini-file").children("variablelist").children("variable").each(function(){
-                let variable = $(this);
-                ComSocket.singleton().addGlobalVar(variable.attr("name"), variable.text());
-            });
+            let variables = visuIniXML.getElementsByTagName("visu-ini-file")[0].getElementsByTagName("variablelist")[0].getElementsByTagName("variable");
+            for (let i=0; i<variables.length; i++){
+                let name = variables[i].getAttribute("name");
+                let address = variables[i].textContent;
+                ComSocket.singleton().addGlobalVar(name, address);
+            }
             resolve(true)
         })
     }
@@ -106,96 +106,94 @@ export default class HTML5Visu {
         return new Promise((resolve)=>{
         // The request will automatically forwarded to the CoDeSys folder on a PFC. On older controllers we have to forward to /PLC manually
         // A first try for get a manually forwarding
-            let getPath =ajax({
-                url: this.rootDir+'/visu_ini.xml',
-                type: 'GET',
-                dataType: 'xml', 
-            })
-            getPath.then((data) => {
+            fetch(this.rootDir+'/visu_ini.xml')
+            .then((response) => {
                 // Path is correct 
-                resolve(true);
-            })
-            getPath.fail(()=>{
-                let getPath2 =ajax({
-                    url: this.rootDir+'/plc/visu_ini.xml',
-                    type: 'GET',
-                    dataType: 'xml'
-                })
-                getPath2.then((data) => {
-                    // Path must be adapted for an older Linux Controller without Linux
-                    this.rootDir = this.rootDir + '/plc';
+                if (response.ok){
                     resolve(true);
-                })
-                getPath2.fail(()=>{
-                    let getPath3 =ajax({
-                        url: this.rootDir+'/webvisu/visu_ini.xml',
-                        type: 'GET',
-                        dataType: 'xml'
+                } else {
+                    fetch(this.rootDir + '/plc/visu_ini.xml')
+                    .then((response) => {
+                        // Path is correct 
+                        if (response.ok){
+                            // Path must be adapted for an older Linux Controller without Linux
+                            this.rootDir = this.rootDir + '/plc';
+                            resolve(true);
+                        } else {
+                            fetch(this.rootDir + '/webvisu/visu_ini.xml')
+                            .then((response) => {
+                                // Path is correct 
+                                if (response.ok){
+                                    // Path must be adapted for a Linux-PFC
+                                    this.rootDir = this.rootDir + '/webvisu';
+                                    resolve(true);
+                                } else {
+                                    resolve(false);
+                                }
+                            })
+                        }
                     })
-                    getPath3.then((data) => {
-                        // Path must be adapted for a Linux-PFC
-                        this.rootDir = this.rootDir + '/webvisu';
-                        resolve(true);
-                    })
-                    getPath3.fail(()=>{
-                        resolve(false);
-                    })
-                })
+                }
             })
         })
     }
 
     getWebvisuhtm(relPath : string) : Promise<boolean>{
-    return new Promise((resolve)=>{
-    // Get the webvisu.htm file. There are the startvisu and updatetime listed
-        let webvisuhtm =ajax({
-            url: this.rootDir+relPath,
-            type: 'GET',
-            dataType: 'html', 
-        })
-        // Get a reference to the global state manager
-        let stateManager = StateManager.singleton().oState;
-        webvisuhtm.then((data) => {
-            // Searching for cycletime and startvisuname
-            let parser = new DOMParser();
-            let htmlDoc = parser.parseFromString(data, 'text/html');
-            let htmlElement = htmlDoc.getElementsByTagName("param");
-            for (let i=0; i<htmlElement.length; i++){
-                let name = htmlElement[i].getAttribute("name").toString();
-                switch(name){
-                    case "STARTVISU":
-                        let visuName = htmlElement[i].getAttribute("value").toLowerCase();
-                        stateManager.set(name, visuName)
-                        break;
-                    case "UPDATETIME":
-                        let updateTime = htmlElement[i].getAttribute("value");
-                        stateManager.set(name, updateTime)
-                        break;
-                    case "USECURRENTVISU":
-                        let useCurrentVisu= htmlElement[i].getAttribute("value");
-                        stateManager.set(name, useCurrentVisu)
-                        break;
+        return new Promise((resolve)=>{
+            // Get a reference to the global state manager
+            let stateManager = StateManager.singleton().oState;
+            // Get the webvisu.htm file. There are the startvisu and updatetime listed
+            fetch(
+                this.rootDir+relPath, {
+                    headers:{'Content-Type': 'text/plain; charset=UTF8'},
+                    method: 'get'
                 }
-            }
-            resolve(true);
-        })       
-        .fail((error) => {
-            console.error(error);
+            ).then((response)=>{
+                // Try to fetch the xml as unzipped file
+                if (response.ok){
+                    response.text()
+                    .then((data)=>{
+                        let parser = new DOMParser();
+                        let htmlDoc = parser.parseFromString(data, 'text/html');
+                        let htmlElement = htmlDoc.getElementsByTagName("param");
+                        for (let i=0; i<htmlElement.length; i++){
+                            let name = htmlElement[i].getAttribute("name").toString();
+                            switch(name){
+                                case "STARTVISU":
+                                    let visuName = htmlElement[i].getAttribute("value").toLowerCase();
+                                    stateManager.set(name, visuName)
+                                    break;
+                                case "UPDATETIME":
+                                    let updateTime = htmlElement[i].getAttribute("value");
+                                    stateManager.set(name, updateTime)
+                                    break;
+                                case "USECURRENTVISU":
+                                    let useCurrentVisu= htmlElement[i].getAttribute("value");
+                                    stateManager.set(name, useCurrentVisu)
+                                    break;
+                            }
+                        }
+                        resolve(true);
+                    })
+                }
+            })
         })
-    })
     }
 
     getVisuini(relPath : string) : Promise<XMLDocument>{
-        return new Promise(resolve=>{
-            ajax({
-                url: this.rootDir+relPath,
-                type: 'GET',
-                dataType: 'xml', // if text => no pre-processing, if xml => parseXML preprocessing
-                crossDomain: true
-            })
-            .then((data)=>resolve(data))
-            .fail((error) => {
-                console.error(error);
+        let url = this.rootDir+relPath;
+        return new Promise(resolve =>{
+            fetch(url, {headers:{'Content-Type': 'text/plain; charset=UTF8'}})
+            .then((response)=>{
+                if (response.ok){
+                    response.arrayBuffer()
+                    .then((buffer)=>{
+                        let decoder = new TextDecoder("iso-8859-1");
+                        let text = decoder.decode(buffer);
+                        let data = new window.DOMParser().parseFromString(text, "text/xml")
+                        resolve(data)
+                    })
+                }
             })
         })
     }
