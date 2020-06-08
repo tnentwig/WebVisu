@@ -1,4 +1,4 @@
-import * as $ from 'jquery';
+import {ajax} from 'jquery';
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
 import { observer } from 'mobx-react';
@@ -106,7 +106,7 @@ export default class HTML5Visu {
         return new Promise((resolve)=>{
         // The request will automatically forwarded to the CoDeSys folder on a PFC. On older controllers we have to forward to /PLC manually
         // A first try for get a manually forwarding
-            let getPath =$.ajax({
+            let getPath =ajax({
                 url: this.rootDir+'/visu_ini.xml',
                 type: 'GET',
                 dataType: 'xml', 
@@ -116,7 +116,7 @@ export default class HTML5Visu {
                 resolve(true);
             })
             getPath.fail(()=>{
-                let getPath2 =$.ajax({
+                let getPath2 =ajax({
                     url: this.rootDir+'/plc/visu_ini.xml',
                     type: 'GET',
                     dataType: 'xml'
@@ -127,7 +127,7 @@ export default class HTML5Visu {
                     resolve(true);
                 })
                 getPath2.fail(()=>{
-                    let getPath3 =$.ajax({
+                    let getPath3 =ajax({
                         url: this.rootDir+'/webvisu/visu_ini.xml',
                         type: 'GET',
                         dataType: 'xml'
@@ -148,7 +148,7 @@ export default class HTML5Visu {
     getWebvisuhtm(relPath : string) : Promise<boolean>{
     return new Promise((resolve)=>{
     // Get the webvisu.htm file. There are the startvisu and updatetime listed
-        let webvisuhtm =$.ajax({
+        let webvisuhtm =ajax({
             url: this.rootDir+relPath,
             type: 'GET',
             dataType: 'html', 
@@ -187,7 +187,7 @@ export default class HTML5Visu {
 
     getVisuini(relPath : string) : Promise<XMLDocument>{
         return new Promise(resolve=>{
-            $.ajax({
+            ajax({
                 url: this.rootDir+relPath,
                 type: 'GET',
                 dataType: 'xml', // if text => no pre-processing, if xml => parseXML preprocessing
@@ -198,6 +198,10 @@ export default class HTML5Visu {
                 console.error(error);
             })
         })
+    }
+
+    checkCaches(){
+
     }
 
     async preloadVisus(){

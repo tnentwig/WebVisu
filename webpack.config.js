@@ -1,13 +1,21 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    mode: 'development',
+    mode: 'production',
     devtool: 'source-map',
     entry:  './src/index.ts',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'WebVisu.dev.js'
     },
+    plugins: [
+        new HtmlWebpackPlugin({
+            filename: 'WebVisu.html',
+            template: './src/index.html',
+            title: 'WebVisualisation',
+        })
+    ],
     resolve: {
         extensions: ['.ts', '.tsx', '.js'],
     },
@@ -28,5 +36,8 @@ module.exports = {
                 loader: ["source-map-loader", "eslint-loader"]
             }
         ]
+    },
+    stats: {
+        children: false, 
     },
 }
