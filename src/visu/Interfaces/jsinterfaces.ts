@@ -66,9 +66,13 @@ export interface IScrollbarObject {
     absCornerCoord : {x1:number,y1:number,x2:number,y2:number},
     relCornerCoord : {x1:number,y1:number,x2:number,y2:number},
     relMidpointCoord : {x : number, y:number},
-    relCoord : {width:number,height:number}
-    lowerBound : number;
-    upperBound : number;
-    value : number;
-    display : string
+    relCoord : {width:number,height:number},
+    lowerBound : number,
+    upperBound : number,
+    value : number,
+    scrollvalue : number,
+    display : string,
+    a : number,
+    b1:number,
+    b2:number
 }
