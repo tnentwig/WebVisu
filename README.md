@@ -37,7 +37,7 @@ The WebVisu-SPA is still in progress but already contains numerous functionaliti
 | Bitmap                        | :heavy_check_mark:    |
 | Subvisualisation              | :heavy_check_mark:    |
 | Button                        | :heavy_check_mark:    |
-| WMF-File<sup>1</sup>          | :heavy_check_mark:    |
+| WMF-File                      | :heavy_check_mark:    |
 | Table                         | :heavy_minus_sign:    |
 | Alarm table                   | :heavy_minus_sign:    |
 | Slider                        | :wrench:              |
@@ -50,11 +50,9 @@ The WebVisu-SPA is still in progress but already contains numerous functionaliti
 | ActiveX-Element<sup>2</sup>   | :collision:           |
 
 ## Meaning of the marks
-:heavy_check_mark: : Fully implemented
-:heavy_minus_sign: : Currently not supported
-:wrench: : Currently in progress
+:heavy_check_mark: : Fully implemented  
+:heavy_minus_sign: : Currently not supported  
+:wrench: : Currently in progress  
+:collision: : Is no longer supported in modern browsers
 
-## Comments
-<sup>1</sup>: It may take a longer time to load WMF files.  
-<sup>2</sup>: Is no longer supported in modern browsers.
 
