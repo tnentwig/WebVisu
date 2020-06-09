@@ -56,7 +56,7 @@ export default class HTML5Visu {
 
         const App = observer(()=> {
             return (
-                <div style={{width: this.windowWidth, height:this.windowsHeight}}>    
+                <div style={{width: this.windowWidth, height:this.windowsHeight, userSelect:"none"}}>    
                     {stateManager.get("ISONLINE") === "TRUE"
                         ? <Visualisation visuname={stateManager!.get("CURRENTVISU")!.toLowerCase()} mainVisu={true} replacementSet={null} width={this.windowWidth}></Visualisation>
                         : <ConnectionFault></ConnectionFault>
