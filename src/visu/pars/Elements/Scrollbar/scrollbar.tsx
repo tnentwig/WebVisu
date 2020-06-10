@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {HorizontalScrollbar} from './horizontal';
+import {VerticalScrollbar} from './vertical';
 import { IScrollbarShape } from '../../../Interfaces/javainterfaces';
 import * as util from '../../Utils/utilfunctions';
 import { parseDynamicShapeParameters, parseScrollUpdate } from '../Features/Events/eventManager';
@@ -28,6 +29,6 @@ export const Scrollbar :React.FunctionComponent<Props> = ({section})=>
     if (horz_position){
         return(<HorizontalScrollbar shape={scrollbar} dynamicParameters={dynamicShapeParameters} updateFunction={update}></HorizontalScrollbar>)
     } else {
-        return null
+        return(<VerticalScrollbar shape={scrollbar} dynamicParameters={dynamicShapeParameters} updateFunction={update}></VerticalScrollbar>)
     }
 }
