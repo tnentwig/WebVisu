@@ -5,7 +5,9 @@ This is a single page application (SPA) for displaying the web visualisation pag
 > :point_right: : Every release has been tested with bigger CoDeSys projects but the components are currently not automatically tested. Create an issue or send me a mail to *tristan.nentwig+webvisu@gmail.com* if you encounter a problem. 
 
 ## How to use
-Just copy the WebVisu.html and WebVisu.js from the release tab to the folder which contents are deployed by the webserver. **The path to this folder differentate by the used Wago PLC**. The FTP transfer could be made with FileZilla at example.  
+Just copy the WebVisu.html and WebVisu.js from the release tab to the folder which contents are deployed by the webserver. **The path to this folder differentate by the used Wago PLC**. The FTP transfer could be made with FileZilla at example.
+
+For displaying on client use a modern browser like Chrome, Firefox or Edge that supports ES6 constructs.
 
 #### For the non Linux PLCs (like 750-880):
 Transfer them to the */webserv* folder. The visualisation is available afterwards on  
