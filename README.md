@@ -25,11 +25,12 @@ The SPA parse the current visualisation XML file and insert a React component dy
 <img src="./img/demo.gif">
 </p>
 
-## Currently supported elements
+## Currently supported features
 The WebVisu-SPA is still in progress but already contains numerous functionalities and elements.
 
 | Element/ Function             | Integrated            | 
-| --------------------          | :-------------------: | 
+| --------------------          | :-------------------: |
+| Change userlevel              | :heavy_check_mark:    | 
 | Rectangle                     | :heavy_check_mark:    |
 | Roundrect                     | :heavy_check_mark:    |
 | Ellipse                       | :heavy_check_mark:    |
@@ -41,7 +42,7 @@ The WebVisu-SPA is still in progress but already contains numerous functionaliti
 | Subvisualisation              | :heavy_check_mark:    |
 | Button                        | :heavy_check_mark:    |
 | WMF-File                      | :heavy_check_mark:    |
-| Table                         | :heavy_minus_sign:    |
+| Table                         | :wrench:              |
 | Alarm table                   | :heavy_minus_sign:    |
 | Slider<sup>1</sup>            | :heavy_check_mark:    |
 | Button                        | :heavy_check_mark:    |
