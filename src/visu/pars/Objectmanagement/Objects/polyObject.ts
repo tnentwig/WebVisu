@@ -313,31 +313,6 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
         });
     }
 
-    // Piechart specific stuff ( start- and endangle)
-    if (dynamicElements.has("expr-angle1")){
-        let element = dynamicElements!.get("expr-angle1");
-        let returnFunc = ComSocket.singleton().evalFunction(element);
-        let wrapperFunc = ()=>{
-            let value = returnFunc();
-            return (value % 360)
-        }
-        Object.defineProperty(initial, "startAngle", {
-            get: ()=>wrapperFunc()
-        });
-    }
-    if (dynamicElements.has("expr-angle2")){
-        let element = dynamicElements!.get("expr-angle2");
-        let returnFunc = ComSocket.singleton().evalFunction(element);
-        let wrapperFunc = ()=>{
-            let value = returnFunc();
-            return (value % 360)
-        }
-        Object.defineProperty(initial, "endAngle", {
-            get: ()=>wrapperFunc()
-        });
-    }
-
-
     // We have to compute the dependent values after all the required static values ​​have been replaced by variables, placeholders or constant values 
     // E.g. the fillcolor depends on  hasFillColor and alarm. This variables are called "computed" values. MobX will track their dependents and rerender the object by change.
     // We have to note that the rotation of polylines is not the same like simpleshapes. Simpleshapes keep their originally alignment, polyhapes transform every coordinate.
