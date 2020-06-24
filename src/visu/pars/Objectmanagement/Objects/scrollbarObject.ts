@@ -114,19 +114,44 @@ export function createScrollbarObject(scrollbarShape: IScrollbarShape, dynamicEl
         });
     }
 
-    Object.defineProperty(initial, "scrollvalue", {
-        get: function() {
-            let interval = Math.abs(initial.upperBound-initial.lowerBound);
-            
-            if(interval !== 0){
-                let interim = (initial.relCoord.width-2*initial.b1-initial.b2)*Math.abs(initial.value+initial.lowerBound)/interval;
-                return(interim);
-            } else {
-                return 0;
+    if (scrollbarShape.horz_position){
+        Object.defineProperty(initial, "scrollvalue", {
+            get: function() {
+                let interval = Math.abs(initial.upperBound-initial.lowerBound);
+                if(interval !== 0){
+                    if(initial.lowerBound < initial.upperBound){
+                        let interim = (initial.relCoord.width-2*initial.b1-initial.b2)*Math.abs(initial.value-initial.lowerBound)/interval;
+                        return(interim);
+                    } else {
+                        let interim = (initial.relCoord.width-2*initial.b1-initial.b2)*(1-Math.abs(initial.value-initial.upperBound)/interval);
+                        return(interim);
+                    }
+                } else {
+                    return 0;
+                }
+                
             }
-            
-        }
-    });
+        });
+    } else {
+
+        Object.defineProperty(initial, "scrollvalue", {
+            get: function() {
+                let interval = Math.abs(initial.upperBound-initial.lowerBound);
+                if(interval !== 0){
+                    if(initial.lowerBound < initial.upperBound){
+                        let interim = (initial.relCoord.height-2*initial.b1-initial.b2)*Math.abs(initial.value-initial.lowerBound)/interval;
+                        return(interim);
+                    } else {
+                        let interim = (initial.relCoord.height-2*initial.b1-initial.b2)*(1-Math.abs(initial.value-initial.upperBound)/interval);
+                        return(interim);
+                    }
+                } else {
+                    return 0;
+                }
+                
+            }
+        });
+    }
 
     return initial
  
