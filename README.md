@@ -43,19 +43,21 @@ The WebVisu-SPA is still in progress but already contains numerous functionaliti
 | WMF-File                      | :heavy_check_mark:    |
 | Table                         | :heavy_minus_sign:    |
 | Alarm table                   | :heavy_minus_sign:    |
-| Slider                        | :wrench:              |
+| Slider<sup>1</sup>            | :heavy_check_mark:    |
 | Button                        | :heavy_check_mark:    |
 | Gauge                         | :heavy_check_mark:    |
 | Bar display                   | :heavy_check_mark:    |
 | Histogram                     | :heavy_minus_sign:    |
 | CurrentVisu-Variable          | :heavy_check_mark:    |
 | Language switching            | :heavy_minus_sign:    |
-| ActiveX-Element<sup>2</sup>   | :collision:           |
+| ActiveX-Element               | :collision:           |
 
 ## Meaning of the marks
-:heavy_check_mark: : Fully implemented  
+:heavy_check_mark:  : Fully implemented  
 :heavy_minus_sign: : Currently not supported  
 :wrench: : Currently in progress  
 :collision: : Is no longer supported in modern browsers
 
+## Comments
+<sup>1</sup> : Works fine with Firefox. Sliderchange has to be throttled on Chrome in the future.
 
