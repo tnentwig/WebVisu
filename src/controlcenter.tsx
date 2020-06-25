@@ -165,6 +165,10 @@ export default class HTML5Visu {
                                     let useCurrentVisu= htmlElement[i].getAttribute("value");
                                     stateManager.set(name, useCurrentVisu)
                                     break;
+                                case "ENCODINGSTRING":
+                                    let encodingString= htmlElement[i].getAttribute("value");
+                                    stateManager.set(name, encodingString)
+                                    break;
                             }
                         }
                         resolve(true);

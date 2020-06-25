@@ -1,14 +1,19 @@
 import * as JsZip from 'jszip';
+import StateManager from '../../statemanagement/statemanager';
 
 export function getVisuxml(url : string) :Promise<XMLDocument> {
     return new Promise(resolve =>{
+        let encoding = StateManager.singleton().oState.get("ENCODINGSTRING");
+        if(encoding === undefined){
+            encoding = "iso-8859-1";
+        }
         fetch(url, {headers:{'Content-Type': 'text/plain; charset=UTF8'}})
         .then((response)=>{
             // Try to fetch the xml as unzipped file
             if (response.ok){
                 response.arrayBuffer()
                 .then((buffer)=>{
-                    let decoder = new TextDecoder("iso-8859-1");
+                    let decoder = new TextDecoder(encoding);
                     let text = decoder.decode(buffer);
                     let data = new window.DOMParser().parseFromString(text, "text/xml")
                     resolve(data)
@@ -30,7 +35,7 @@ export function getVisuxml(url : string) :Promise<XMLDocument> {
                         .then((buffer)=>zip.loadAsync(buffer))
                         .then((unzipped) => unzipped.file(filename).async("arraybuffer"))
                         .then((buffer => {
-                            let decoder = new TextDecoder("iso-8859-1");
+                            let decoder = new TextDecoder(encoding);
                             let text = decoder.decode(buffer);
                             let data = new window.DOMParser().parseFromString(text, "text/xml")
                             resolve(data)
