@@ -20,7 +20,7 @@ Transfer it to */home/codesys*. The visualisation is available afterwards on
 This SPA is based on the [React](https://github.com/facebook/react) and [MobX](https://github.com/mobxjs/mobx) framework. CoDeSys creates a XML description file for every user generated visualisation. Every file descripes the look and behavior of the objects shown in the specific visualisation. Besides that the file contains the used variables (e.g. "*.xToggleColor*") and their addresses on the web interface.  
 The SPA parse the current visualisation XML file and insert a React component dynamically to the React-Dom as absolut positioned element. The variables depending on the element will be included to a singleton object named "ComSocket". This object saves the variables in a observable map and queries the value of the variables cyclic. If an observable value changes all dependend elements rerender. The observable map is part of the MobX framework.
 
-## Demo (of old version)
+## Demo (1.0.9)
 <p align="center"> 
 <img src="./img/demo.gif">
 </p>
