@@ -137,18 +137,36 @@ export function parseClickEvent(section: Element): Function {
             // Parse all detected expressions
             let expressions = children[i].getElementsByTagName("expr");
             for (let i=0; i<expressions.length; i++) {
-                let placeholder = expressions[i].getElementsByTagName("placeholder");
-                if (placeholder.length){
-                    let visuname = placeholder[0].textContent;
-                    if (StateManager.singleton().oState.get("USECURRENTVISU") === "TRUE") {
-                        clickFunction = function (): void {
-                            ComSocket.singleton().setValue(".currentvisu", visuname);
+                // The zoom expression can be a parameter (placeholder) or a variable (var)
+                let expr = expressions[i].children;
+                if (expr.length){
+                    let tagName = expr[0].tagName;
+                    if (tagName === "placeholder"){
+                        let visuname = expr[0].textContent;
+                        if (StateManager.singleton().oState.get("USECURRENTVISU") === "TRUE") {
+                            clickFunction = function (): void {
+                                ComSocket.singleton().setValue(".currentvisu", visuname);
+                            }
+                        } else {
+                            clickFunction = function (): void {
+                                StateManager.singleton().oState.set("ZOOMVISU", visuname);
+                            }
                         }
-                    } else {
-                        clickFunction = function (): void {
-                            StateManager.singleton().oState.set("ZOOMVISU", visuname);
+                    } else if (tagName ==="var"){
+                        let visuVariable = expr[0].textContent.toLowerCase();
+                        if (StateManager.singleton().oState.get("USECURRENTVISU") === "TRUE") {
+                            clickFunction = function (): void {
+                                let visuname = ComSocket.singleton().oVisuVariables.get(visuVariable)!.value;
+                                ComSocket.singleton().setValue(".currentvisu", visuname);
+                            }
+                        } else {
+                            clickFunction = function (): void {
+                                let visuname = ComSocket.singleton().oVisuVariables.get(visuVariable)!.value;
+                                StateManager.singleton().oState.set("ZOOMVISU", visuname);
+                            }
                         }
                     }
+                    
                     stack.push(clickFunction);
                     clickEventDetected = true;
                 }
