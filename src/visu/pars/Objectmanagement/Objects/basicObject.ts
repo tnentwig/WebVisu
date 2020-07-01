@@ -21,7 +21,6 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
     let fillColor = (basicShape.has_inside_color) ? basicShape.fill_color : 'none';
     // Tooltip
     let tooltip = basicShape.tooltip;
-    let relPoints = [] as number[][];
 
     // Create an object with the initial parameters
     let initial  : IBasicObject= {
@@ -59,6 +58,9 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
         transformedCornerCoord : absCornerCoord,
         relCoord : relCoord,
         relMidpointCoord : relMidpointCoord,
+        // Access variables
+        writeAccess : true,
+        readAccess : true
     }
 
     // Processing the variables for visual elements
@@ -434,6 +436,39 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
             let x = initial.relCoord.width/2;
             let y = initial.relCoord.height/2;
             return {x:x,y:y}
+        }
+    });
+
+    // Define the object access variables
+    Object.defineProperty(initial, "writeAccess", {
+        get: function() {
+            let current = ComSocket.singleton().oVisuVariables.get(".currentuserlevel")!.value;
+            let currentNum = Number(current);
+            if (currentNum !== NaN){
+                if (basicShape.access_levels[currentNum].includes("w")){
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                return (false)
+            }
+        }
+    });
+
+    Object.defineProperty(initial, "readAccess", {
+        get: function() {
+            let current = ComSocket.singleton().oVisuVariables.get(".currentuserlevel")!.value;
+            let currentNum = Number(current);
+            if (currentNum !== NaN){
+                if (basicShape.access_levels[currentNum].includes("r")){
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                return (false)
+            }
         }
     });
 
