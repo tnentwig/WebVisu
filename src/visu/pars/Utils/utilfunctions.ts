@@ -33,6 +33,10 @@ export function numberToHexColor(number : string) : string {
     return('#'+rgb);
 }
 
+export function parseAccessLevels(accessLevels : string) : Array<string> {
+    return (accessLevels.split(','));
+}
+
 export function stringToArray(stringExp : string) : Array<number> {
     return (stringExp.split(',')).map(Number);
 }
