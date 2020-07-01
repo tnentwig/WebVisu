@@ -91,12 +91,22 @@ export function parseDynamicTextParameters(section: Element, shape: string): Map
             let expressions = children[i].getElementsByTagName("expr");
             // The text could be dynamic with a expression reference
             for (let j = 0; j < expressions.length; j++) {
-                let varName = expressions[j].getElementsByTagName("var")[0].textContent.toLowerCase();
-                if (ComSocket.singleton().oVisuVariables.has(varName)) {
-                    exprMap.set(exprName, varName);
+                if (expressions[j].getElementsByTagName("var")[0] !== undefined) {
+                    let varName = expressions[j].getElementsByTagName("var")[0].textContent.toLowerCase();
+                    if (ComSocket.singleton().oVisuVariables.has(varName)) {
+                        exprMap.set(exprName, varName);
+                    }
+                    else {
+                        console.log("A variable textfield has no valid variable attached!");
+                    }
                 }
                 else {
-                    console.log("A variable textfield has no valid variable attached!");
+                    if (expressions[j].getElementsByTagName("const")[0] !== undefined) {
+                        let constName = expressions[j].getElementsByTagName("const")[0].textContent.toLowerCase();
+                    }
+                    else {
+                        console.log("A variable textfield has no valid variable attached!");
+                    }
                 }
             }
         }
