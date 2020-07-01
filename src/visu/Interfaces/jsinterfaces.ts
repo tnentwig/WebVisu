@@ -45,6 +45,8 @@ export interface IBasicObject{
     fill : string,
     stroke : string,
     strokeDashArray : string,
+    writeAccess : boolean,
+    readAccess : boolean
 }
 
 export interface IPiechartObject extends IBasicObject{

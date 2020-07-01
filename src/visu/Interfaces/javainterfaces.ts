@@ -13,6 +13,7 @@ export interface IBasicShape {
     hidden_input : boolean;
     enable_text_input : boolean;
     tooltip : string;
+    access_levels : string[]
 }
 
 export interface IPolyShape extends IBasicShape {
@@ -27,5 +28,5 @@ export interface IScrollbarShape {
     shape : string;
     rect : number[];
     tooltip : string;
-    horz_position : boolean
+    horz_position : boolean;
 }
