@@ -89,29 +89,29 @@ function initVariables(XML : XMLDocument, reset : boolean) : void{
 }
 
 function replacePlaceholders(data : XMLDocument, replacements : Map<string, string>){
-if (replacements === null){
-    return
-}
-// Find all placeholder variables 
-let placeholders = data.getElementsByTagName("placeholder");
-// Replace all Placeholders
-Array.from(placeholders).forEach(function (placeholder){
-    let regEx = new RegExp(/\$(.*)\$/gm);
-    let match = regEx.exec(placeholder.textContent);
-    // Replacement
-    if (match != null){
-        let replace = match[1].toLowerCase();
-        if (replacements.has(replace)){
-            let variable = data.createElement('var');
-            let content = placeholder.textContent.replace(/\$(.*)\$/, replacements.get(replace)).toLowerCase();
-            if(ComSocket.singleton().oVisuVariables.has("."+content)){
-                content = "." + content;
-            }
-            // Schlechte Implementierung von Codesys, Doppelpunkte durch einfügen von referenzen möglich
-            let textContent = content.replace(/\.\./, '.');
-            variable.textContent = textContent;
-            placeholder.parentNode.replaceChild(variable, placeholder);
-        }
+    if (replacements === null){
+        return
     }
-})
+    // Find all placeholder variables 
+    let placeholders = data.getElementsByTagName("placeholder");
+    // Replace all Placeholders
+    Array.from(placeholders).forEach(function (placeholder){
+        let regEx = new RegExp(/\$(.*)\$/gm);
+        let match = regEx.exec(placeholder.textContent);
+        // Replacement
+        if (match != null){
+            let replace = match[1].toLowerCase();
+            if (replacements.has(replace)){
+                let variable = data.createElement('var');
+                let content = placeholder.textContent.replace(/\$(.*)\$/, replacements.get(replace)).toLowerCase();
+                if(ComSocket.singleton().oVisuVariables.has("."+content)){
+                    content = "." + content;
+                }
+                // Schlechte Implementierung von Codesys, Doppelpunkte durch einfügen von referenzen möglich
+                let textContent = content.replace(/\.\./, '.');
+                variable.textContent = textContent;
+                placeholder.parentNode.replaceChild(variable, placeholder);
+            }
+        }
+    })
 }
