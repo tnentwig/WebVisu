@@ -104,6 +104,12 @@ export const Textline :React.FunctionComponent<Props>  = ({section, dynamicParam
                 }
                 else{
                     try{
+                        if (textLine.includes("%|<|")){
+                            while(textLine.includes("|")){
+                                textLine = textLine.replace("|", '');
+                            };
+                            textLine = textLine.replace("%<", '%%<');
+                        }
                         output = sprintf(textLine, initial.textVariable);
                     }catch{
                         output = "Error";
