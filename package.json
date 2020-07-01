@@ -49,7 +49,6 @@
     "react-error-boundary": "^1.2.5",
     "react-uid": "^2.2.0",
     "reactjs-popup": "^1.5.0",
-    "rpn": "^1.0.4",
     "sprintf-js": "^1.1.2"
   }
 }
