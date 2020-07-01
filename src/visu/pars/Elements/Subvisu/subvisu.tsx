@@ -44,7 +44,9 @@ export const Subvisu :React.FunctionComponent<Props> = ({section})=>
         center: util.stringToArray(referenceObject["center"].textContent),
         hidden_input: util.stringToBoolean(referenceObject["hidden-input"].textContent),
         enable_text_input: util.stringToBoolean(referenceObject["enable-text-input"].textContent),
-        tooltip: "",
+        // Optional properties
+        tooltip : section.getElementsByTagName("tooltip").length>0? section.getElementsByTagName("tooltip")[0].innerHTML : "",
+        access_levels : section.getElementsByTagName("access-levels").length ? util.parseAccessLevels(section.getElementsByTagName("access-levels")[0].innerHTML) : ["rw","rw","rw","rw","rw","rw","rw","rw"]
       }
 
     // Subvisu specials

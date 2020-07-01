@@ -15,7 +15,6 @@ type Props = {
 export const Button :React.FunctionComponent<Props> = ({section})=>
 {
     // Parsing of the fixed parameters
-    
     let button : IBasicShape = {
         shape : "button",
         has_inside_color : util.stringToBoolean(section.getElementsByTagName("has-inside-color")[0].innerHTML),
@@ -30,7 +29,9 @@ export const Button :React.FunctionComponent<Props> = ({section})=>
         center : util.stringToArray(section.getElementsByTagName("center")[0].innerHTML),
         hidden_input : util.stringToBoolean(section.getElementsByTagName("hidden-input")[0].innerHTML),
         enable_text_input : util.stringToBoolean(section.getElementsByTagName("enable-text-input")[0].innerHTML),
+        // Optional properties
         tooltip : section.getElementsByTagName("tooltip").length>0? section.getElementsByTagName("tooltip")[0].innerHTML : "",
+        access_levels : section.getElementsByTagName("access-levels").length ? util.parseAccessLevels(section.getElementsByTagName("access-levels")[0].innerHTML) : ["rw","rw","rw","rw","rw","rw","rw","rw"]
       }
 
     // Parsing the textfields and returning a jsx object if it exists
@@ -63,13 +64,14 @@ export const Button :React.FunctionComponent<Props> = ({section})=>
     // Return of the react node
     return useObserver(()=>
         <div style={{position:"absolute", visibility : state.display, left:state.transformedCornerCoord.x1, top:state.transformedCornerCoord.y1, width:state.relCoord.width, height:state.relCoord.height}}>
+          {state.readAccess ?
           <ErrorBoundary>
             <button
             title={state.tooltip} 
-            onClick={onclick == null ? null : ()=>onclick()} 
-            onMouseDown={onmousedown == null ? null : ()=>onmousedown()} 
-            onMouseUp={onmouseup == null ? null : ()=>onmouseup()}
-            onMouseLeave={onmouseup == null ? null : ()=>onmouseup()} 
+            onClick={onclick == null ? null : state.writeAccess ? ()=>onclick() : null} 
+            onMouseDown={onmousedown == null ? null : state.writeAccess ? ()=>onmousedown() : null} 
+            onMouseUp={onmouseup == null ? null : state.writeAccess ? ()=>onmouseup() : null}
+            onMouseLeave={onmouseup == null ? null : state.writeAccess ? ()=>onmouseup () : null}  // We have to reset if somebody leaves the object with pressed key
             style={{backgroundColor: state.fill, width:state.relCoord.width, height:state.relCoord.height, position:"absolute"}}>               
             </button>
             {pictureInside ? <Image section={section} inlineElement={true}></Image> : null}           
@@ -79,6 +81,7 @@ export const Button :React.FunctionComponent<Props> = ({section})=>
               </svg>
             </div>
             </ErrorBoundary>
+            : null }
         </div>
     )
 

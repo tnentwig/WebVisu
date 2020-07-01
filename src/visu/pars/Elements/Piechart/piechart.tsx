@@ -28,9 +28,11 @@ export const Piechart :React.FunctionComponent<Props> = ({section})=>
         center : util.stringToArray(section.getElementsByTagName("center")[0].textContent),
         hidden_input : util.stringToBoolean(section.getElementsByTagName("hidden-input")[0].textContent),
         enable_text_input : util.stringToBoolean(section.getElementsByTagName("enable-text-input")[0].textContent),
-        tooltip : section.getElementsByTagName("tooltip").length? section.getElementsByTagName("tooltip")[0].textContent : "",
         // Points only exists on polyforms
-        points : []
+        points : [],
+        // Optional properties
+        tooltip : section.getElementsByTagName("tooltip").length>0? section.getElementsByTagName("tooltip")[0].innerHTML : "",
+        access_levels : section.getElementsByTagName("access-levels").length ? util.parseAccessLevels(section.getElementsByTagName("access-levels")[0].innerHTML) : ["rw","rw","rw","rw","rw","rw","rw","rw"]
       }
 
     // Parsing the point coordinates
@@ -87,10 +89,10 @@ export const Piechart :React.FunctionComponent<Props> = ({section})=>
         {inputField}
         <svg style={{float: "left"}} width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge}>
             <svg
-                onClick={onclick == null ? null :()=>onclick()} 
-                onMouseDown={onmousedown == null ? null :()=>onmousedown()} 
-                onMouseUp={onmouseup == null ? null :()=>onmouseup()}
-                onMouseLeave={onmouseup == null ? null : ()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
+                onClick={onclick == null ? null : state.writeAccess ? ()=>onclick() : null} 
+                onMouseDown={onmousedown == null ? null : state.writeAccess ? ()=>onmousedown() : null} 
+                onMouseUp={onmouseup == null ? null : state.writeAccess ? ()=>onmouseup() : null}
+                onMouseLeave={onmouseup == null ? null : state.writeAccess ? ()=>onmouseup () : null}  // We have to reset if somebody leaves the object with pressed key
                 strokeDasharray={state.strokeDashArray}
                 >   
                 <path d={state.piechartPath} stroke={state.stroke} strokeWidth={state.strokeWidth} fill={state.fill}></path>

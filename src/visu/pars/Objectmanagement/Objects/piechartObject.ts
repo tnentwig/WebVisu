@@ -69,7 +69,10 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
         // Variables for piechart
         startAngle : 0,
         endAngle : 0,
-        piechartPath : ""
+        piechartPath : "",
+        // Access variables
+        writeAccess : true,
+        readAccess : true
 
     }
 
@@ -457,6 +460,39 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
             }
         });
     }
+
+    // Define the object access variables
+    Object.defineProperty(initial, "writeAccess", {
+        get: function() {
+            let current = ComSocket.singleton().oVisuVariables.get(".currentuserlevel")!.value;
+            let currentNum = Number(current);
+            if (currentNum !== NaN){
+                if (piechartShape.access_levels[currentNum].includes("w")){
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                return (false)
+            }
+        }
+    });
+
+    Object.defineProperty(initial, "readAccess", {
+        get: function() {
+            let current = ComSocket.singleton().oVisuVariables.get(".currentuserlevel")!.value;
+            let currentNum = Number(current);
+            if (currentNum !== NaN){
+                if (piechartShape.access_levels[currentNum].includes("r")){
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                return (false)
+            }
+        }
+    });
 
     return initial;
 }

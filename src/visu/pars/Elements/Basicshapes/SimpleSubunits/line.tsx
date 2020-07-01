@@ -21,14 +21,15 @@ export const Line :React.FunctionComponent<Props> = React.memo(({simpleShape, te
 
     return useObserver(()=>
     <div style={{cursor: "auto",overflow:"hidden", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
+        {state.readAccess ?
         <ErrorBoundary>
             {input}
             <svg style={{float: "left"}} width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge}>
                 <svg
-                    onClick={onclick == null ? null : ()=>onclick()} 
-                    onMouseDown={onmousedown == null ? null : ()=>onmousedown()} 
-                    onMouseUp={onmouseup == null ? null : ()=>onmouseup()}
-                    onMouseLeave={onmouseup == null ? null : ()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
+                    onClick={onclick == null ? null : state.writeAccess ? ()=>onclick() : null} 
+                    onMouseDown={onmousedown == null ? null : state.writeAccess ? ()=>onmousedown() : null} 
+                    onMouseUp={onmouseup == null ? null : state.writeAccess ? ()=>onmouseup() : null}
+                    onMouseLeave={onmouseup == null ? null : state.writeAccess ? ()=>onmouseup () : null}  // We have to reset if somebody leaves the object with pressed key
                     width={state.relCoord.width} 
                     height={state.relCoord.height}>
                     <line
@@ -49,6 +50,7 @@ export const Line :React.FunctionComponent<Props> = React.memo(({simpleShape, te
                 </svg>
             </svg>
         </ErrorBoundary>
+        : null}
     </div>
     )
 })

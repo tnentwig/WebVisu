@@ -34,7 +34,9 @@ export const SimpleShape : React.FunctionComponent<Props> = ({section})=>
 			center : util.stringToArray(section.getElementsByTagName("center")[0].innerHTML),
 			hidden_input : util.stringToBoolean(section.getElementsByTagName("hidden-input")[0].innerHTML),
 			enable_text_input : util.stringToBoolean(section.getElementsByTagName("enable-text-input")[0].innerHTML),
+			// Optional properties
 			tooltip : section.getElementsByTagName("tooltip").length? section.getElementsByTagName("tooltip")[0].innerHTML : "",
+			access_levels : section.getElementsByTagName("access-levels").length ? util.parseAccessLevels(section.getElementsByTagName("access-levels")[0].innerHTML) : ["rw","rw","rw","rw","rw","rw","rw","rw"]
 		}
 		// Parsing the textfields and returning a jsx object if it exists
 		let textField : JSX.Element;
@@ -119,7 +121,8 @@ export const SimpleShape : React.FunctionComponent<Props> = ({section})=>
 	}
 	// Else the name of the shape is not known
 	else {
-		console.error("Simple-Shape: <" + shape + "> is not supported!");
+		console.log("Simple-Shape: <" + shape + "> is not supported!");
+		return null;
 	}
 }
 

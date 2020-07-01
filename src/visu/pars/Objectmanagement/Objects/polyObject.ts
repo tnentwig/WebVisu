@@ -67,7 +67,10 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
         // Transformed coordintes for polyhapes only
         cssTransform : "",
         cssTransformOrigin : "",
-        relPoints : relPoints
+        relPoints : relPoints,
+        // Access variables
+        writeAccess : true,
+        readAccess : true
     }
 
     // Processing the variables for visual elements
@@ -408,6 +411,39 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
             let scale = initial.scale/1000;
             let interim = "scale("+scale+") rotate("+initial.angle+"deg) translate("+initial.xpos+"px, "+initial.ypos+"px)" ;
             return interim;
+        }
+    });
+
+    // Define the object access variables
+    Object.defineProperty(initial, "writeAccess", {
+        get: function() {
+            let current = ComSocket.singleton().oVisuVariables.get(".currentuserlevel")!.value;
+            let currentNum = Number(current);
+            if (currentNum !== NaN){
+                if (polyShape.access_levels[currentNum].includes("w")){
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                return (false)
+            }
+        }
+    });
+
+    Object.defineProperty(initial, "readAccess", {
+        get: function() {
+            let current = ComSocket.singleton().oVisuVariables.get(".currentuserlevel")!.value;
+            let currentNum = Number(current);
+            if (currentNum !== NaN){
+                if (polyShape.access_levels[currentNum].includes("r")){
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                return (false)
+            }
         }
     });
 

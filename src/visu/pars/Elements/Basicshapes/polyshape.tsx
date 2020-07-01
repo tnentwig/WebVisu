@@ -34,8 +34,10 @@ export const PolyShape : React.FunctionComponent<Props> = ({section})=>
 			center : util.stringToArray(section.getElementsByTagName("center")[0].innerHTML),
 			hidden_input : util.stringToBoolean(section.getElementsByTagName("hidden-input")[0].innerHTML),
 			enable_text_input : util.stringToBoolean(section.getElementsByTagName("enable-text-input")[0].innerHTML),
-			tooltip : section.getElementsByTagName("tooltip").length>0? section.getElementsByTagName("tooltip")[0].innerHTML : "",
-			points : [] as number[][],
+            points : [] as number[][],
+            // Optional properties
+            tooltip : section.getElementsByTagName("tooltip").length>0? section.getElementsByTagName("tooltip")[0].innerHTML : "",
+            access_levels : section.getElementsByTagName("access-levels").length ? util.parseAccessLevels(section.getElementsByTagName("access-levels")[0].innerHTML) : ["rw","rw","rw","rw","rw","rw","rw","rw"]
 		}
             
         // Parsing the point coordinates
@@ -116,7 +118,7 @@ export const PolyShape : React.FunctionComponent<Props> = ({section})=>
                 break;
         } 
     } else {
-        ()=>console.error("Poly-Shape: <" + shape + "> is not supported!");
+        console.log("Poly-Shape: <" + shape + "> is not supported!");
         return null;
     }
 }

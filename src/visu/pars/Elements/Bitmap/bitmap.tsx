@@ -29,7 +29,9 @@ export const Bitmap: React.FunctionComponent<Props> = ({ section }) => {
     center: util.stringToArray(section.getElementsByTagName("center")[0].textContent),
     hidden_input: util.stringToBoolean(section.getElementsByTagName("hidden-input")[0].textContent),
     enable_text_input: util.stringToBoolean(section.getElementsByTagName("enable-text-input")[0].textContent),
-    tooltip: section.getElementsByTagName("tooltip").length ? section.getElementsByTagName("tooltip")[0].textContent : "",
+    // Optional properties
+    tooltip : section.getElementsByTagName("tooltip").length>0? section.getElementsByTagName("tooltip")[0].innerHTML : "",
+    access_levels : section.getElementsByTagName("access-levels").length ? util.parseAccessLevels(section.getElementsByTagName("access-levels")[0].innerHTML) : ["rw","rw","rw","rw","rw","rw","rw","rw"]
   }
 
   // Parsing the textfields and returning a jsx object if it exists
