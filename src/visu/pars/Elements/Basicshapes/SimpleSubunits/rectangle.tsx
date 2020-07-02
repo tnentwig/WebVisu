@@ -2,7 +2,7 @@ import * as React from 'react';
 import { IBasicShape } from '../../../../Interfaces/javainterfaces';
 import {createVisuObject} from '../../../Objectmanagement/objectManager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
-import ErrorBoundary from 'react-error-boundary';
+import {ErrorBoundary} from 'react-error-boundary';
 
 type Props = {
     simpleShape: IBasicShape,
@@ -22,7 +22,7 @@ export const Rectangle :React.FunctionComponent<Props> = React.memo(({simpleShap
     return useObserver(()=>
         <div style={{cursor: "auto", overflow:"hidden", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
             {state.readAccess ?
-            <ErrorBoundary>
+            <ErrorBoundary fallback={<div>Oh no</div>}>
                 {input}
                 <svg style={{float: "left"}} width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge} >
                     <svg 

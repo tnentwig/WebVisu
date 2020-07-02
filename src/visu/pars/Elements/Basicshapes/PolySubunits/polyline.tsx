@@ -3,7 +3,7 @@ import { IBasicShape } from '../../../../Interfaces/javainterfaces';
 import {createVisuObject} from '../../../Objectmanagement/objectManager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 import { coordArrayToString } from '../../../Utils/utilfunctions'
-import ErrorBoundary from 'react-error-boundary';
+import {ErrorBoundary} from 'react-error-boundary';
 
 type Props = {
     polyShape: IBasicShape,
@@ -22,7 +22,7 @@ export const Polyline :React.FunctionComponent<Props> = ({polyShape, textField, 
 
     return useObserver(()=>
     <div style={{ transform:state.cssTransform, transformOrigin:state.cssTransformOrigin, cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.absCornerCoord.x1-state.edge, top:state.absCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
-        <ErrorBoundary>
+        <ErrorBoundary fallback={<div>Oh no</div>}>
             {input}
             <svg style={{float: "left"}} width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge}>
                 <svg

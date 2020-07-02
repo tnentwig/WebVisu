@@ -7,7 +7,7 @@ import { SimpleShape } from '../Basicshapes/simpleshape';
 import { PolyShape } from '../Basicshapes/polyshape';
 import { stringToArray } from '../../Utils/utilfunctions';
 import { parseDynamicShapeParameters } from '../Features/Events/eventManager'
-import ErrorBoundary from 'react-error-boundary';
+import {ErrorBoundary} from 'react-error-boundary';
 
 type Props = {
     section : Element
@@ -72,7 +72,7 @@ export const Group :React.FunctionComponent<Props> = React.memo(({section})=>
 
     return useObserver(()=> state.display == "visible" ?
         <div style={{pointerEvents: "none", position:"absolute", left:rectParent[0], top:rectParent[1], width:rectParent[2]-rectParent[0], height:rectParent[3]-rectParent[1]}}>
-            <ErrorBoundary>
+            <ErrorBoundary fallback={<div>Oh no</div>}>
                 <div style={{transformOrigin:"left top", transform:scale}}>
                 {
                     visuObjects.map((element, index)=><React.Fragment key={element.id}>{element.obj}</React.Fragment>)

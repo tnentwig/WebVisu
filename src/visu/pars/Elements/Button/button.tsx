@@ -6,7 +6,7 @@ import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEven
 import {createVisuObject} from '../../Objectmanagement/objectManager'
 import {useObserver, useLocalStore } from 'mobx-react-lite';
 import { Image } from '../Features/Image/image'
-import ErrorBoundary from 'react-error-boundary';
+import {ErrorBoundary} from 'react-error-boundary';
 
 type Props = {
     section : Element
@@ -65,7 +65,7 @@ export const Button :React.FunctionComponent<Props> = ({section})=>
     return useObserver(()=>
         <div style={{position:"absolute", visibility : state.display, left:state.transformedCornerCoord.x1, top:state.transformedCornerCoord.y1, width:state.relCoord.width, height:state.relCoord.height}}>
           {state.readAccess ?
-          <ErrorBoundary>
+          <ErrorBoundary fallback={<div>Oh no</div>}>
             <button
             title={state.tooltip} 
             onClick={onclick == null ? null : state.writeAccess ? ()=>onclick() : null} 
