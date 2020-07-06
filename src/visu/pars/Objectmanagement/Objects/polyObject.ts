@@ -1,7 +1,7 @@
 import ComSocket from '../../../communication/comsocket';
-import {IPolyObject} from '../../../Interfaces/jsinterfaces';
-import {IPolyShape} from '../../../Interfaces/javainterfaces'
-import {numberToHexColor, computeMinMaxCoord, pointArrayToPiechartString} from '../../Utils/utilfunctions'
+import { IPolyObject } from '../../../Interfaces/jsinterfaces';
+import { IPolyShape } from '../../../Interfaces/javainterfaces'
+import { numberToHexColor, computeMinMaxCoord, pointArrayToPiechartString } from '../../Utils/utilfunctions'
 
 export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<string,string[][]>) : IPolyObject{
 
@@ -25,10 +25,9 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
     polyShape.points.forEach(function(item, index){
         relPoints.push([item[0]-absCornerCoord.x1, item[1]-absCornerCoord.y1]);
     })
-
-
+    
     // Create an object with the initial parameters
-    let initial  : IPolyObject= {
+    let initial : IPolyObject= {
         // Variables will be initialised with the parameter values 
         normalFillColor : polyShape.fill_color,
         alarmFillColor : polyShape.fill_color_alarm,
@@ -47,7 +46,7 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
         bottom : 0,
         xpos : 0,
         ypos : 0,
-        scale : 1000,   // a scale of 1000 means a representation of 1:1
+        scale : 1000, // a scale of 1000 means a representation of 1:1
         angle : 0,
         // Activate / deactivate input
         eventType : "visible",
@@ -72,12 +71,12 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
         writeAccess : true,
         readAccess : true
     }
-
+    
     // Processing the variables for visual elements
     // A <expr-..-> tag initiate a variable, const or a placeholder
     // We have to implement the const value, the variable or the placeholdervalue if available for the static value
     // Polyshapes and Simpleshapes have the same <expr-...> possibilities
-
+    
     if (dynamicElements.has("expr-toggle-color")) {
         let element = dynamicElements.get("expr-toggle-color");
         let returnFunc = (ComSocket.singleton().evalFunction(element));
@@ -127,7 +126,7 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
         Object.defineProperty(initial, "normalFrameColor", {
             get: ()=>wrapperFunc()
         });
-
+    
     }
     // 5) Set alarm frame color
     if (dynamicElements.has("expr-frame-color-alarm")) {
@@ -142,7 +141,7 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
             get: ()=>wrapperFunc()
         });
     }
-
+    
     // 6) Set invisible state
     if (dynamicElements.has("expr-invisible")) {
         let element = dynamicElements!.get("expr-invisible");
@@ -315,9 +314,9 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
             get: ()=>wrapperFunc()
         });
     }
-
+    
     // We have to compute the dependent values after all the required static values ​​have been replaced by variables, placeholders or constant values 
-    // E.g. the fillcolor depends on  hasFillColor and alarm. This variables are called "computed" values. MobX will track their dependents and rerender the object by change.
+    // E.g. the fillcolor depends on hasFillColor and alarm. This variables are called "computed" values. MobX will track their dependents and rerender the object by change.
     // We have to note that the rotation of polylines is not the same like simpleshapes. Simpleshapes keep their originally alignment, polyhapes transform every coordinate.
     
     // The fill color
@@ -339,7 +338,7 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
             return initial.lineWidth;
             }
     });
-
+    
     Object.defineProperty(initial, "stroke", {
         get: function() {
             if (initial.alarm == false){
@@ -353,7 +352,7 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
             }
         }
     });
-
+    
     Object.defineProperty(initial, "edge", {
         get: function() {
             if (initial.hasFrameColor || initial.alarm){
@@ -367,15 +366,14 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
             }
         }
     });
-
-   
+    
     Object.defineProperty(initial, "transformedCornerCoord", {
         get: function() {
             let corners = computeMinMaxCoord(initial.absPoints);
         return {x1:corners[0],y1:corners[1],x2:corners[2],y2:corners[3]};
         }
     });
-
+    
     Object.defineProperty(initial, "relCoord", {
         get: function() {
             let width = initial.transformedCornerCoord.x2-initial.transformedCornerCoord.x1;
@@ -383,10 +381,10 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
         return {width:width,height:height}
         }
     });
-
+    
     Object.defineProperty(initial, "relPoints", {
         get: function() {
-            let points =  initial.absPoints;
+            let points = initial.absPoints;
             let interim = [];
             let xoff = initial.transformedCornerCoord.x1-initial.edge;
             let yoff = initial.transformedCornerCoord.y1-initial.edge;
@@ -398,14 +396,14 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
         return interim;
         }
     });
-
+    
     Object.defineProperty(initial, "cssTransformOrigin", {
         get: function(){
             let interim = ""+(absCenterCoord.x-absCornerCoord.x1) +"px "+(absCenterCoord.y-absCornerCoord.y1)+"px " as string;
             return interim;
         }
     });
-
+    
     Object.defineProperty(initial, "cssTransform", {
         get: function(){
             let scale = initial.scale/1000;
@@ -413,7 +411,7 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
             return interim;
         }
     });
-
+    
     // Define the object access variables
     Object.defineProperty(initial, "writeAccess", {
         get: function() {
@@ -430,7 +428,7 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
             }
         }
     });
-
+    
     Object.defineProperty(initial, "readAccess", {
         get: function() {
             let current = ComSocket.singleton().oVisuVariables.get(".currentuserlevel")!.value;
@@ -446,6 +444,6 @@ export function createPolyObject(polyShape: IPolyShape, dynamicElements : Map<st
             }
         }
     });
-
+    
     return initial;
 }

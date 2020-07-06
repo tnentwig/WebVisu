@@ -3,7 +3,7 @@ import ComSocket from '../communication/comsocket';
 
 interface IStateManager {
     // Variables
-    oState :  Map<string,string>;
+    oState : Map<string,string>;
     xmlDict : Map<string,string>;
     openPopup : IObservableValue<boolean>;
     init() : void;
@@ -12,21 +12,21 @@ interface IStateManager {
 export default class StateManager implements IStateManager {
     private static instance : IStateManager=new StateManager();
     // objList contains all variables as objects with the name as key and addr & value of the variable
-    oState :  Map<string,string>;
+    oState : Map<string,string>;
     xmlDict : Map<string,string>;
     openPopup : IObservableValue<boolean>;
-   
+    
     // this class shall be a singleton
     private constructor() {
-        this.oState  = observable(new Map());
+        this.oState = observable(new Map());
         this.openPopup = observable.box(false);
         this.xmlDict = new Map();
     }
-
+    
     public static singleton(){
         return this.instance;
     }
-
+    
     init(){
         this.oState.set("ISONLINE", "FALSE");
         /* hier besteht noch ein Problem, aus welchem Grund auch immer wird Comsocket nur einmal observiert.

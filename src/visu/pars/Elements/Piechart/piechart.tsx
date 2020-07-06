@@ -3,9 +3,9 @@ import * as util from '../../Utils/utilfunctions';
 import { IPiechartShape } from '../../../Interfaces/javainterfaces';
 import { Textfield } from '../Features/Text/textManager';
 import { Inputfield } from '../Features/Input/inputManager';
-import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent} from '../Features/Events/eventManager';
-import {createVisuObject} from '../../Objectmanagement/objectManager'
-import {useObserver, useLocalStore } from 'mobx-react-lite';
+import { parseDynamicShapeParameters, parseDynamicTextParameters, parseClickEvent ,parseTapEvent } from '../Features/Events/eventManager';
+import { createVisuObject } from '../../Objectmanagement/objectManager'
+import { useObserver, useLocalStore } from 'mobx-react-lite';
 
 type Props = {
     section : Element
@@ -77,10 +77,10 @@ export const Piechart :React.FunctionComponent<Props> = ({section})=>
     let onmousedown = parseTapEvent(section, "down");
     let onmouseup = parseTapEvent(section, "up");
 
-    let initial  = createVisuObject(piechart, dynamicShapeParameters)
+    let initial = createVisuObject(piechart, dynamicShapeParameters)
 
      // Convert object to an observable one
-    const state  = useLocalStore(()=>initial);
+    const state = useLocalStore(()=>initial);
    
 
     // Return of the react node
@@ -92,13 +92,13 @@ export const Piechart :React.FunctionComponent<Props> = ({section})=>
                 onClick={onclick == null ? null : state.writeAccess ? ()=>onclick() : null} 
                 onMouseDown={onmousedown == null ? null : state.writeAccess ? ()=>onmousedown() : null} 
                 onMouseUp={onmouseup == null ? null : state.writeAccess ? ()=>onmouseup() : null}
-                onMouseLeave={onmouseup == null ? null : state.writeAccess ? ()=>onmouseup () : null}  // We have to reset if somebody leaves the object with pressed key
+                onMouseLeave={onmouseup == null ? null : state.writeAccess ? ()=>onmouseup () : null} // We have to reset if somebody leaves the object with pressed key
                 strokeDasharray={state.strokeDashArray}
-                >   
+                >
                 <path d={state.piechartPath} stroke={state.stroke} strokeWidth={state.strokeWidth} fill={state.fill}></path>
                 <title>{state.tooltip}</title>
             </svg>
-            <svg            
+            <svg
                 width={state.relCoord.width+2*state.edge} 
                 height={state.relCoord.height+2*state.edge} >
                 {textField}
@@ -106,5 +106,4 @@ export const Piechart :React.FunctionComponent<Props> = ({section})=>
         </svg>
         </div>
     )
-
 }

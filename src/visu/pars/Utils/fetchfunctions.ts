@@ -76,7 +76,7 @@ export function getImage(url : string) :Promise<string> {
             mimeType = "image/jpeg";
             break;
     }
-
+    
     return new Promise(resolve =>{
         let base64Flag = 'data:'+mimeType+';base64,'
         fetch(url)

@@ -4,24 +4,23 @@ import StateManager from '../../visu/statemanagement/statemanager';
 import ComSocket from '../../visu/communication/comsocket';
 
 export const ExecutionPopup: React.FunctionComponent = ()=> {
-
     // Storing the desired level value
     const [level, setLevel] = React.useState("0");
     // Storing the inputted password
     const [passwd, setPasswd] = React.useState("");
     // Flag if previous inputted password was incorrect
     const [error, setError] = React.useState(false);
-
-    const handleLevelChange = (event :  any)=>{
+    
+    const handleLevelChange = (event : any)=>{
         setLevel(event.target.value);
         setError(false);
     }
-
-    const handlePasswdChange = (event :  any)=>{
+    
+    const handlePasswdChange = (event : any)=>{
         setPasswd(event.target.value);
         setError(false);
     }
-
+    
     const close =function(){
         StateManager.singleton().openPopup.set(false);
     }
@@ -38,10 +37,9 @@ export const ExecutionPopup: React.FunctionComponent = ()=> {
             // Reset inputted password
             setPasswd("");
             setError(true);
-
         }
     }
-
+    
     return (
         <div className="sup-exec">
             <div className="sup-exec-header">Change user level</div>

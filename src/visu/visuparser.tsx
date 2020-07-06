@@ -18,7 +18,7 @@ export const Visualisation :React.FunctionComponent<Props> = React.memo(({ visun
     const [adaptedXML, setAdaptedXML] = React.useState<XMLDocument>(null);
     const [originSize, setOriginSize] = React.useState<Array<number>>([0,0]);
     const [scale, setScale] = React.useState("scale(1)");
-
+    
     // Get new xml on change of visuname
     React.useEffect(()=>{
         let fetchXML = async function(){
@@ -49,15 +49,15 @@ export const Visualisation :React.FunctionComponent<Props> = React.memo(({ visun
             }
         };
         fetchXML();
-        }, [visuname, mainVisu, replacementSet]);
-
+    }, [visuname, mainVisu, replacementSet]);
+    
     // Scaling on main window resize for responsive behavior
     React.useEffect(()=>{
         let xscaleFactor = width/(originSize[0]+2);
         let yscaleFactor = width/(originSize[0]+2);
         setScale("scale("+xscaleFactor.toString()+")");
     }, [width, originSize])
-
+    
     
     return (
         <div style={{display:"block", position:"absolute", overflow:"hidden", left:0, top:0, width:originSize[0]+1, height:originSize[1]+1, transformOrigin:"0 0", transform:scale}}>
@@ -66,7 +66,6 @@ export const Visualisation :React.FunctionComponent<Props> = React.memo(({ visun
             }
         </div>
     )
-
 })
 
 function initVariables(XML : XMLDocument, reset : boolean) : void{

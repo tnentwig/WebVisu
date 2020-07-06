@@ -80,7 +80,7 @@ export function pointArrayToPiechartString(pointArray : number[][], startAngleDe
     let radiusx = Math.abs(pointArray[1][0]-1 - pointArray[0][0]);
     let radiusy = Math.abs(pointArray[1][1]-1 - pointArray[0][1]);
     // Calculate the radius of start and endpoint
-
+    
     let rStart = radius(radiusx, radiusy, startAngleRad);
     let rEnd = radius(radiusx, radiusy, endAngleRad);
     let start = [Math.cos(startAngleRad)*rStart+radiusx, Math.sin(startAngleRad)*rStart+radiusy];
@@ -88,7 +88,7 @@ export function pointArrayToPiechartString(pointArray : number[][], startAngleDe
     let interimArray = pointArray;
     interimArray[2]= start;
     interimArray[3]= end;
-
+    
     // Claculate the largeArcFlag
     let angleDiff = endAngleDegree - startAngleDegree;
     let largeArcFlag = 1;
@@ -98,29 +98,29 @@ export function pointArrayToPiechartString(pointArray : number[][], startAngleDe
         largeArcFlag = endAngleDegree - startAngleDegree <= 180 ? 0 : 1;
     }
     
-
     var d = [
         // Move to the center of the div element
         "M", interimArray[0][0], interimArray[0][1],
         "L", interimArray[2][0]+strokeWidth, interimArray[2][1]+strokeWidth, 
         "A", radiusx, radiusy, 0, largeArcFlag, 1, interimArray[3][0]+strokeWidth, interimArray[3][1]+strokeWidth,
         "Z"
-     ].join(" ");
-    return d;      
+    ].join(" ");
+    return d;
 }
+
 export function polarToCartesian(center : number[], radius : number, angleInDegrees : number) {
     var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
     return {
-      x: center[0] + (radius * Math.cos(angleInRadians)),
-      y: center[1] + (radius * Math.sin(angleInRadians))
+        x: center[0] + (radius * Math.cos(angleInRadians)),
+        y: center[1] + (radius * Math.sin(angleInRadians))
     };
-  }
+}
 
 export function coordArrayToString(pointArray : number[][]) :string {
     let interim : string[] = [];
     pointArray.forEach((element)=>interim.push(element.join(',')));
     return interim.join(' ');
-  }
+}
 
 export function coordArrayToBezierString(pointArray : number[][]) : string {
     let bezier : string = '';
@@ -141,172 +141,172 @@ export function coordArrayToBezierString(pointArray : number[][]) : string {
 export function evalRPN(postfixStack : Array<string>) : boolean|number|null {
     // Return null if string is empty
     if (postfixStack.length === 0) {
-      return null;
+        return null;
     } 
     // We initilize the operating stack, this is necessary for mutliple operands
     let operatingStack : Array<number> = [] ;
     // Now we pop the tokens successively form the resting stack
     for (var i = 0; i < postfixStack.length; i++) {
-      var token = postfixStack[i];
-      // The token could be "TRUE" or "FALSE". The we have to translate ist to 1 and 0.
-      if (token.toLowerCase() === "true" ){
-        token = "1";
-      }
-      if (token.toLowerCase() === "false" ){
-        token = "0";
-      }
-
-      // If the token is a number: psuh them to the operating stack
-      if (!isNaN(Number(token))) {
-        operatingStack.push(parseFloat(token));
-      }
-      // Else the token is a operator
-      else {
-        // The <op>-text has the format: <operation>(<number of involved operands>) if number > 1
-        let numberOfOperands = 2;
-        let regex = token.match(/\(([^)]+)\)/);
-        if (regex !== null){
-            numberOfOperands=Number(regex[1]);
-        } 
-        // Get the operator
-        let operator = token.split("(")[0];
-
-        // Choose the opration
-        let result :  number;  
-        let interim : number;
-        switch(operator){
-            case "*":
-                result = operatingStack.pop();
-                for (let i=1; i<numberOfOperands; i++){
-                    result = result * operatingStack.pop();
-                }
-                break;
-            case "/":
-                result = operatingStack.pop();
-                for (let i=1; i<numberOfOperands; i++){
-                    result = result / operatingStack.pop();
-                }
-                break;
-            case "-":
-                result = operatingStack.pop();
-                for (let i=1; i<numberOfOperands; i++){
-                    result = -result + operatingStack.pop();
-                }
-                break;
-            case "+":
-                result = operatingStack.pop();
-                for (let i=1; i<numberOfOperands; i++){
-                    result = result + operatingStack.pop();
-                }
-                break;
-            case "MAX":
-                result = operatingStack.pop();
-                for (let i=1; i<numberOfOperands; i++){
-                    let y = result;
-                    let x = operatingStack.pop()
-                    result = x>y ? x : y;
-                }
-                break;
-            case "MIN":
-                result = operatingStack.pop();
-                for (let i=1; i<numberOfOperands; i++){
-                    let y = result;
-                    let x = operatingStack.pop()
-                    result = x<y ? x : y;
-                }
-                break;
-            case "=":
-                interim = operatingStack.pop();
-                for (let i=1; i<2; i++){
-                    let y = interim;
-                    let x = operatingStack.pop()
-                    result = x==y ? 1 : 0;
-                }
-                break;
-            case "<":
-                interim = operatingStack.pop();
-                for (let i=1; i<2; i++){
-                    let y = interim;
-                    let x = operatingStack.pop()
-                    result = x<y ? 1 : 0;
-                }
-                break;
-            case ">":
-                interim = operatingStack.pop();
-                for (let i=1; i<2; i++){
-                    let y = interim;
-                    let x = operatingStack.pop()
-                    result = x>y ? 1 : 0;
-                }
-                break;
-            case "<=":
-                interim = operatingStack.pop();
-                for (let i=1; i<2; i++){
-                    let y = interim;
-                    let x = operatingStack.pop()
-                    result = x<=y ? 1 : 0;
-                }
-                break;
-            case ">=":
-                interim = operatingStack.pop();
-                for (let i=1; i<2; i++){
-                    let y = interim;
-                    let x = operatingStack.pop()
-                    result = x>=y ? 1 : 0;
-                }
-                break;
-            case "<>":
-                interim = operatingStack.pop();
-                for (let i=1; i<2; i++){
-                    let y = interim;
-                    let x = operatingStack.pop()
-                    result = x!==y ? 1 : 0;
-                }
-                break;
-            case "AND":
-                interim = operatingStack.pop();
-                for (let i=1; i<numberOfOperands; i++){
-                    let swap = operatingStack.pop();
-                    interim = interim & swap;                    
-                }
-                result = interim;
-                break;
-            case "OR":
-                interim = operatingStack.pop();
-                for (let i=1; i<numberOfOperands; i++){
-                    let swap = operatingStack.pop();
-                    interim = interim | swap;
-                }
-                result = interim;
-                break;
-            case "NOT":
-                // Has only on operand
-                result = Number(!Boolean(operatingStack.pop()));
-                break;
-            default:
-                console.log("The RPN-token: " + token + " is not a valid one!");
+        var token = postfixStack[i];
+        // The token could be "TRUE" or "FALSE". The we have to translate ist to 1 and 0.
+        if (token.toLowerCase() === "true" ){
+            token = "1";
         }
-        operatingStack.push(result);
-      }
+        if (token.toLowerCase() === "false" ){
+            token = "0";
+        }
+        
+        // If the token is a number: psuh them to the operating stack
+        if (!isNaN(Number(token))) {
+            operatingStack.push(parseFloat(token));
+        }
+        // Else the token is a operator
+        else {
+            // The <op>-text has the format: <operation>(<number of involved operands>) if number > 1
+            let numberOfOperands = 2;
+            let regex = token.match(/\(([^)]+)\)/);
+            if (regex !== null){
+                numberOfOperands=Number(regex[1]);
+            } 
+            // Get the operator
+            let operator = token.split("(")[0];
+            
+            // Choose the opration
+            let result : number;
+            let interim : number;
+            switch(operator){
+                case "*":
+                    result = operatingStack.pop();
+                    for (let i=1; i<numberOfOperands; i++){
+                        result = result * operatingStack.pop();
+                    }
+                    break;
+                case "/":
+                    result = operatingStack.pop();
+                    for (let i=1; i<numberOfOperands; i++){
+                        result = result / operatingStack.pop();
+                    }
+                    break;
+                case "-":
+                    result = operatingStack.pop();
+                    for (let i=1; i<numberOfOperands; i++){
+                        result = -result + operatingStack.pop();
+                    }
+                    break;
+                case "+":
+                    result = operatingStack.pop();
+                    for (let i=1; i<numberOfOperands; i++){
+                        result = result + operatingStack.pop();
+                    }
+                    break;
+                case "MAX":
+                    result = operatingStack.pop();
+                    for (let i=1; i<numberOfOperands; i++){
+                        let y = result;
+                        let x = operatingStack.pop()
+                        result = x>y ? x : y;
+                    }
+                    break;
+                case "MIN":
+                    result = operatingStack.pop();
+                    for (let i=1; i<numberOfOperands; i++){
+                        let y = result;
+                        let x = operatingStack.pop()
+                        result = x<y ? x : y;
+                    }
+                    break;
+                case "=":
+                    interim = operatingStack.pop();
+                    for (let i=1; i<2; i++){
+                        let y = interim;
+                        let x = operatingStack.pop()
+                        result = x==y ? 1 : 0;
+                    }
+                    break;
+                case "<":
+                    interim = operatingStack.pop();
+                    for (let i=1; i<2; i++){
+                        let y = interim;
+                        let x = operatingStack.pop()
+                        result = x<y ? 1 : 0;
+                    }
+                    break;
+                case ">":
+                    interim = operatingStack.pop();
+                    for (let i=1; i<2; i++){
+                        let y = interim;
+                        let x = operatingStack.pop()
+                        result = x>y ? 1 : 0;
+                    }
+                    break;
+                case "<=":
+                    interim = operatingStack.pop();
+                    for (let i=1; i<2; i++){
+                        let y = interim;
+                        let x = operatingStack.pop()
+                        result = x<=y ? 1 : 0;
+                    }
+                    break;
+                case ">=":
+                    interim = operatingStack.pop();
+                    for (let i=1; i<2; i++){
+                        let y = interim;
+                        let x = operatingStack.pop()
+                        result = x>=y ? 1 : 0;
+                    }
+                    break;
+                case "<>":
+                    interim = operatingStack.pop();
+                    for (let i=1; i<2; i++){
+                        let y = interim;
+                        let x = operatingStack.pop()
+                        result = x!==y ? 1 : 0;
+                    }
+                    break;
+                case "AND":
+                    interim = operatingStack.pop();
+                    for (let i=1; i<numberOfOperands; i++){
+                        let swap = operatingStack.pop();
+                        interim = interim & swap;
+                    }
+                    result = interim;
+                    break;
+                case "OR":
+                    interim = operatingStack.pop();
+                    for (let i=1; i<numberOfOperands; i++){
+                        let swap = operatingStack.pop();
+                        interim = interim | swap;
+                    }
+                    result = interim;
+                    break;
+                case "NOT":
+                    // Has only on operand
+                    result = Number(!Boolean(operatingStack.pop()));
+                    break;
+                default:
+                    console.log("The RPN-token: " + token + " is not a valid one!");
+            }
+            operatingStack.push(result);
+        }
     }
     let output = operatingStack.pop();
     return output;
-  }
+}
 
-  export function getTextLines(text : string){
+export function getTextLines(text : string){
     let match;
     let lastMatch = 0;
     let regEx = new RegExp(/(\n)/, "g");
     let stringStack = [];
     text = text.replace(/\t/g, '')
     do {
-      match = regEx.exec(text);
-      if (match !== null) {
-        stringStack.push(text.substring(lastMatch, match.index).replace(/\| \|/g, ' '));
-        lastMatch = match.index+1;
-      } else {
-        stringStack.push(text.substring(lastMatch, text.length).replace(/\| \|/g, ' '))
-      }
+        match = regEx.exec(text);
+        if (match !== null) {
+            stringStack.push(text.substring(lastMatch, match.index).replace(/\| \|/g, ' '));
+            lastMatch = match.index+1;
+        } else {
+            stringStack.push(text.substring(lastMatch, text.length).replace(/\| \|/g, ' '))
+        }
     } while (match);
     return(stringStack.filter((el)=>el!=""))
-  }
+}

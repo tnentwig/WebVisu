@@ -14,7 +14,6 @@ type Props = {
     visualisation: XMLDocument
 }
 export const VisuElements :React.FunctionComponent<Props> = React.memo(({visualisation})=>{
-
     let visuObjects : Array<{obj:JSX.Element, id: string}>= [];
     const addVisuObject = (visuObject : JSX.Element) => {
         let obj = {obj: visuObject, id:uid(visuObject)};

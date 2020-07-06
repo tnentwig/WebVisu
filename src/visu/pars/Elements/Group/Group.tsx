@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {uid} from 'react-uid';
+import { uid } from 'react-uid';
 import ComSocket from '../../../communication/comsocket'
 import { useLocalStore, useObserver } from 'mobx-react-lite';
 import { Button } from '../Button/button'
@@ -7,25 +7,25 @@ import { SimpleShape } from '../Basicshapes/simpleshape';
 import { PolyShape } from '../Basicshapes/polyshape';
 import { stringToArray } from '../../Utils/utilfunctions';
 import { parseDynamicShapeParameters } from '../Features/Events/eventManager'
-import {ErrorBoundary} from 'react-error-boundary';
+import { ErrorBoundary } from 'react-error-boundary';
 
 type Props = {
     section : Element
 }
 
 export const Group :React.FunctionComponent<Props> = React.memo(({section})=>
-{   
+{
     let scale = "scale(1)";
     const rectParent= stringToArray(section.getElementsByTagName("rect")[0].innerHTML);
     // The rightdown corner coordinates of the subvisu will be stored
     let rightDownCorner = [0, 0];
-
+    
     let visuObjects : Array<{obj:JSX.Element, id: string}>= [];
     const addVisuObject = (visuObject : JSX.Element) => {
         let obj = {obj: visuObject, id:uid(visuObject)};
         visuObjects.push(obj)
     }
-
+    
     for (let i=0; i<section.children.length; i++){
         let element = section.children[i];
         if (element.nodeName === "element"){
@@ -50,12 +50,11 @@ export const Group :React.FunctionComponent<Props> = React.memo(({section})=>
                     addVisuObject(<Group section={element}></Group>);
                     getDimension(rightDownCorner, stringToArray(element.getElementsByTagName("rect")[0].innerHTML));
                     break;
-                }
+            }
         }
     };
-
     
-// Calculate the scalefactor
+    // Calculate the scalefactor
     let setY = rectParent[3]-rectParent[1];
     let setX = rectParent[2]-rectParent[0];
     let scaleOrientation = setX/setY;
@@ -68,8 +67,8 @@ export const Group :React.FunctionComponent<Props> = React.memo(({section})=>
     }
         
     // Convert object to an observable one
-    const state  = useLocalStore(()=>createInitial(section));
-
+    const state = useLocalStore(()=>createInitial(section));
+    
     return useObserver(()=> state.display == "visible" ?
         <div style={{pointerEvents: "none", position:"absolute", left:rectParent[0], top:rectParent[1], width:rectParent[2]-rectParent[0], height:rectParent[3]-rectParent[1]}}>
             <ErrorBoundary fallback={<div>Oh no</div>}>
@@ -83,7 +82,6 @@ export const Group :React.FunctionComponent<Props> = React.memo(({section})=>
         : null
     )
 })
-
 
 function getDimension(actualDimension: Array<number>, newRect: Array<number>) {
     let len = newRect.length;
@@ -102,7 +100,7 @@ function createInitial(section : Element){
     let initial = {
         display : "hidden" as any
     }
-
+    
     let dynamicElements= parseDynamicShapeParameters(section);
     // Invisble?
     if (dynamicElements.has("expr-invisible")) {

@@ -1,7 +1,7 @@
 import * as React from 'react';
-import {useObserver, useLocalStore } from 'mobx-react-lite';
+import { useObserver, useLocalStore } from 'mobx-react-lite';
 import { IScrollbarShape } from '../../../Interfaces/javainterfaces';
-import {createVisuObject} from '../../Objectmanagement/objectManager';
+import { createVisuObject } from '../../Objectmanagement/objectManager';
 
 type Props = {
     shape: IScrollbarShape,
@@ -13,20 +13,20 @@ export const VerticalScrollbar :React.FunctionComponent<Props> = ({shape, dynami
 {
 
     // Convert object to an observable one
-    const state  = useLocalStore(()=>createVisuObject(shape, dynamicParameters));
+    const state = useLocalStore(()=>createVisuObject(shape, dynamicParameters));
     // We have to calculate the values that are specific of orientation
     let centerx = state.a/2;
     let centery = state.b1/2;
     // The paths are describing the triangles at the ends of the scrollbar
     let path1 = ""+centerx+","+0.4*centery+" "+1.6*centerx+","+1.6*centery+" "+0.4*centerx+","+1.6*centery;
     let path2 = ""+0.4*centerx+","+0.4*centery+" "+1.6*centerx+","+0.4*centery+" "+centerx+","+1.6*centery;
-
+    
     // States To manage the positiong of the slideer
     const [selected, setSelected] = React.useState(false);
     const [initial, setInitial] = React.useState([0,0]);
     // We need a reference to the rendered scrolbvar to get the rendered size of the scroll area
     const ref = React.useRef(null);
-
+    
     // At least we need functions to process the user events
     // Increment and decrement the value by click on the ends
     const increment = ()=>{
@@ -41,39 +41,38 @@ export const VerticalScrollbar :React.FunctionComponent<Props> = ({shape, dynami
             updateFunction(state.value-1)
         }
     }
-
+    
     // On click of the slider the selected bit is set to true and the size of scroll area is queried
     const start = (e : React.MouseEvent)=>{
         setSelected(true);
         setInitial([ref.current.getBoundingClientRect().top, ref.current.getBoundingClientRect().bottom]);
     }
-
+    
     // Handling the movement of the slider
     const move = (e : React.MouseEvent)=>{
         if(selected && updateFunction !== undefined){
             let delta = e.pageY-initial[0];
             let spacing = initial[1]-initial[0];
             let scrollIntervall = Math.abs(state.upperBound-state.lowerBound);
-
+            
             if(!(delta <0 || delta>spacing)){
                 // Conversion of delta to scrollvalue
-                    if(state.lowerBound > state.upperBound){
-                        let nextScrollvalue = state.lowerBound - (1-delta/spacing) * scrollIntervall;
-                        updateFunction(nextScrollvalue);
-                    } else {
-                        let nextScrollvalue = state.lowerBound + (1-delta/spacing) * scrollIntervall;
-                        updateFunction(nextScrollvalue);
-                    }
+                if(state.lowerBound > state.upperBound){
+                    let nextScrollvalue = state.lowerBound - (1-delta/spacing) * scrollIntervall;
+                    updateFunction(nextScrollvalue);
+                } else {
+                    let nextScrollvalue = state.lowerBound + (1-delta/spacing) * scrollIntervall;
+                    updateFunction(nextScrollvalue);
+                }
                 
             } else if (delta < 0){
-                    updateFunction(state.upperBound);
+                updateFunction(state.upperBound);
             } else if (delta > spacing){
-                    updateFunction(state.lowerBound);
+                updateFunction(state.lowerBound);
             }
         }
-        }
-
-
+    }
+    
     // Return of the react node
     return useObserver(()=>
         <div style={{
@@ -92,10 +91,10 @@ export const VerticalScrollbar :React.FunctionComponent<Props> = ({shape, dynami
                 cursor={"pointer"}
                 style ={{
                 height: state.b1, 
-                width: state.a,  
+                width: state.a,
                 position :"absolute", 
                 top : 0}}>
-                    <rect width={state.a} height={state.b1} style={{fill:"#d4d0c8", stroke:"darkgrey"}}  />
+                    <rect width={state.a} height={state.b1} style={{fill:"#d4d0c8", stroke:"darkgrey"}} />
                     <polygon points={path1}/>
             </svg>
             {/*Scroll area*/}
@@ -127,13 +126,12 @@ export const VerticalScrollbar :React.FunctionComponent<Props> = ({shape, dynami
                 onClick={(state.lowerBound < state.upperBound) ? decrement : increment}
                 style ={{
                 height: state.b1, 
-                width: state.a,  
+                width: state.a,
                 position :"absolute",
                 bottom : 0}}>
-                    <rect width={state.a} height={state.b1} style={{fill:"#d4d0c8",stroke:"darkgrey"}}   />
+                    <rect width={state.a} height={state.b1} style={{fill:"#d4d0c8",stroke:"darkgrey"}} />
                     <polygon points={path2}/>
             </svg>
         </div>
     )
-
 }

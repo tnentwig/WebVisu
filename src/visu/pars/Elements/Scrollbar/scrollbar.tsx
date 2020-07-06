@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {HorizontalScrollbar} from './horizontal';
-import {VerticalScrollbar} from './vertical';
+import { HorizontalScrollbar } from './horizontal';
+import { VerticalScrollbar } from './vertical';
 import { IScrollbarShape } from '../../../Interfaces/javainterfaces';
 import * as util from '../../Utils/utilfunctions';
 import { parseDynamicShapeParameters, parseScrollUpdate } from '../Features/Events/eventManager';
@@ -20,9 +20,9 @@ export const Scrollbar :React.FunctionComponent<Props> = ({section})=>
         horz_position : horz_position,
         tooltip : section.getElementsByTagName("tooltip").length>0? section.getElementsByTagName("tooltip")[0].innerHTML : "",
     }
-
+    
     // Parsing of observable events
-	let dynamicShapeParameters = parseDynamicShapeParameters(section);
+    let dynamicShapeParameters = parseDynamicShapeParameters(section);
     // Parse the scroll update function
     let update = parseScrollUpdate(section);
     // Return of the react node

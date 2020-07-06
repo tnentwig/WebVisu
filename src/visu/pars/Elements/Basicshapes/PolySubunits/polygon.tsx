@@ -1,25 +1,25 @@
 import * as React from 'react';
 import { IBasicShape } from '../../../../Interfaces/javainterfaces';
-import {createVisuObject} from '../../../Objectmanagement/objectManager'
-import {useObserver, useLocalStore } from 'mobx-react-lite';
+import { createVisuObject } from '../../../Objectmanagement/objectManager'
+import { useObserver, useLocalStore } from 'mobx-react-lite';
 import { coordArrayToString } from '../../../Utils/utilfunctions'
-import {ErrorBoundary} from 'react-error-boundary';
+import { ErrorBoundary } from 'react-error-boundary';
 
 type Props = {
     polyShape: IBasicShape,
     textField : JSX.Element|undefined,
     input : JSX.Element,
-    dynamicParameters :  Map<string,string[][]>,
+    dynamicParameters : Map<string,string[][]>,
     onmousedown : Function,
     onmouseup : Function,
     onclick : Function
 }
 
 export const Polygon :React.FunctionComponent<Props> = ({polyShape, textField, input, dynamicParameters, onclick, onmousedown, onmouseup})=> 
-{   
+{
     // Convert object to an observable one
-    const state  = useLocalStore(()=>createVisuObject(polyShape, dynamicParameters));
-
+    const state = useLocalStore(()=>createVisuObject(polyShape, dynamicParameters));
+    
     return useObserver(()=>
     <div style={{transform: state.cssTransform, transformOrigin: state.cssTransformOrigin, cursor: "auto", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+2*state.edge, height:state.relCoord.height+2*state.edge}}>
         <ErrorBoundary fallback={<div>Oh no</div>}>
@@ -29,19 +29,19 @@ export const Polygon :React.FunctionComponent<Props> = ({polyShape, textField, i
                     onClick={onclick == null ? null : ()=>onclick()} 
                     onMouseDown={onmousedown == null ? null : ()=>onmousedown()} 
                     onMouseUp={onmouseup == null ? null : ()=>onmouseup()}
-                    onMouseLeave={onmouseup == null ? null : ()=>onmouseup()}  // We have to reset if somebody leaves the object with pressed key
+                    onMouseLeave={onmouseup == null ? null : ()=>onmouseup()} // We have to reset if somebody leaves the object with pressed key
                     strokeDasharray={state.strokeDashArray}
-                    >   
-                <polygon
-                    points={coordArrayToString(state.relPoints)}
-                    fill={state.fill}
-                    strokeWidth={state.strokeWidth}
-                    stroke={state.stroke}
+                >
+                    <polygon
+                        points={coordArrayToString(state.relPoints)}
+                        fill={state.fill}
+                        strokeWidth={state.strokeWidth}
+                        stroke={state.stroke}
                     />
                     <title>{state.tooltip}</title>
                 </svg>
                 {textField == null ? null :
-                <svg            
+                <svg
                     width={state.relCoord.width+2*state.edge} 
                     height={state.relCoord.height+2*state.edge} >
                     {textField}

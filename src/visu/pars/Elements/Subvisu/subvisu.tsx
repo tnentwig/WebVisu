@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Visualisation} from '../../../visuparser';
+import { Visualisation } from '../../../visuparser';
 import * as util from '../../Utils/utilfunctions';
 import { IBasicShape } from '../../../Interfaces/javainterfaces';
 import { parseDynamicShapeParameters } from '../Features/Events/eventManager';
@@ -48,21 +48,19 @@ export const Subvisu :React.FunctionComponent<Props> = ({section})=>
         tooltip : section.getElementsByTagName("tooltip").length>0? section.getElementsByTagName("tooltip")[0].innerHTML : "",
         access_levels : section.getElementsByTagName("access-levels").length ? util.parseAccessLevels(section.getElementsByTagName("access-levels")[0].innerHTML) : ["rw","rw","rw","rw","rw","rw","rw","rw"]
       }
-
+    
     // Subvisu specials
     let visuname = section.getElementsByTagName("name")[0].innerHTML.toLowerCase();
     let placeholders = getPlaceholders(section);
-   
+    
     // Parsing of observable events (like toggle color)
     let dynamicShapeParameters = parseDynamicShapeParameters(section);
-
+    
     let initial = createVisuObject(subvisu, dynamicShapeParameters)
-
-// Convert object to an observable one
-const state = useLocalStore(() => initial);
-
-
-
+    
+    // Convert object to an observable one
+    const state = useLocalStore(() => initial);
+    
     // Return of the react node
     return useObserver(()=>
         <div 

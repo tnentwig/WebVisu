@@ -1,7 +1,7 @@
 import ComSocket from '../../../communication/comsocket';
-import {IPiechartObject} from '../../../Interfaces/jsinterfaces';
-import {IPiechartShape} from '../../../Interfaces/javainterfaces'
-import {numberToHexColor, computeMinMaxCoord, pointArrayToPiechartString} from '../../Utils/utilfunctions'
+import { IPiechartObject } from '../../../Interfaces/jsinterfaces';
+import { IPiechartShape } from '../../../Interfaces/javainterfaces'
+import { numberToHexColor, computeMinMaxCoord, pointArrayToPiechartString } from '../../Utils/utilfunctions'
 
 export function createPiechartObject(piechartShape: IPiechartShape, dynamicElements : Map<string,string[][]>) : IPiechartObject{
 
@@ -22,14 +22,14 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
     // Tooltip
     let tooltip = piechartShape.tooltip;
     let relPoints = [] as number[][];
-
+    
     // The polyshape specific values will be generated if necessary
     piechartShape.points.forEach(function(item, index){
         relPoints.push([item[0]-absCornerCoord.x1, item[1]-absCornerCoord.y1]);
     })
-
+    
     // Create an object with the initial parameters
-    let initial  : IPiechartObject= {
+    let initial : IPiechartObject= {
         // Variables will be initialised with the parameter values 
         normalFillColor : piechartShape.fill_color,
         alarmFillColor : piechartShape.fill_color_alarm,
@@ -48,7 +48,7 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
         bottom : 0,
         xpos : 0,
         ypos : 0,
-        scale : 1000,   // a scale of 1000 means a representation of 1:1
+        scale : 1000, // a scale of 1000 means a representation of 1:1
         angle : 0,
         // Activate / deactivate input
         eventType : "visible",
@@ -73,14 +73,14 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
         // Access variables
         writeAccess : true,
         readAccess : true
-
+    
     }
-
+    
     // Processing the variables for visual elements
     // A <expr-..-> tag initiate a variable, const or a placeholder
     // We have to implement the const value, the variable or the placeholdervalue if available for the static value
     // Polyshapes and Simpleshapes have the same <expr-...> possibilities
-
+    
     if (dynamicElements.has("expr-toggle-color")) {
         let element = dynamicElements.get("expr-toggle-color");
         let returnFunc = (ComSocket.singleton().evalFunction(element));
@@ -130,7 +130,7 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
         Object.defineProperty(initial, "normalFrameColor", {
             get: ()=>wrapperFunc()
         });
-
+    
     }
     // 5) Set alarm frame color
     if (dynamicElements.has("expr-frame-color-alarm")) {
@@ -145,7 +145,7 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
             get: ()=>wrapperFunc()
         });
     }
-
+    
     // 6) Set invisible state
     if (dynamicElements.has("expr-invisible")) {
         let element = dynamicElements!.get("expr-invisible");
@@ -318,7 +318,7 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
             get: ()=>wrapperFunc()
         });
     }
-
+    
     // Piechart specific stuff ( start- and endangle)
     if (dynamicElements.has("expr-angle1")){
         let element = dynamicElements!.get("expr-angle1");
@@ -342,10 +342,9 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
             get: ()=>wrapperFunc()
         });
     }
-
-
+    
     // We have to compute the dependent values after all the required static values ​​have been replaced by variables, placeholders or constant values 
-    // E.g. the fillcolor depends on  hasFillColor and alarm. This variables are called "computed" values. MobX will track their dependents and rerender the object by change.
+    // E.g. the fillcolor depends on hasFillColor and alarm. This variables are called "computed" values. MobX will track their dependents and rerender the object by change.
     // We have to note that the rotation of polylines is not the same like simpleshapes. Simpleshapes keep their originally alignment, polyhapes transform every coordinate.
     
     // The fill color
@@ -367,7 +366,7 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
             return initial.lineWidth;
             }
     });
-
+    
     Object.defineProperty(initial, "stroke", {
         get: function() {
             if (initial.alarm == false){
@@ -381,7 +380,7 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
             }
         }
     });
-
+    
     Object.defineProperty(initial, "edge", {
         get: function() {
             if (initial.hasFrameColor || initial.alarm){
@@ -395,7 +394,7 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
             }
         }
     });
-
+    
     // The transformed corner coordinates depends on the shapetype. The rotating operation is different for simpleshapes and polyshapes
     Object.defineProperty(initial, "transformedCornerCoord", {
         get: function() {
@@ -423,7 +422,7 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
             y2 += initial.ypos+ initial.bottom+yoff;
             // Init the interim return object
             let coord ={x1:x1,y1:y1,x2:x2,y2:y2};
-
+            
             if (x1>x2){
                 coord.x1 = x2;
                 coord.x2 = x1;
@@ -442,7 +441,7 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
             return {width:width,height:height}
         }
     });
-
+    
     Object.defineProperty(initial, "relMidpointCoord", {
         get: function() {
             let x = initial.relCoord.width/2;
@@ -450,7 +449,7 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
             return {x:x,y:y}
         }
     });
-
+    
     // Piechart path calculation
     if(['piechart'].includes(piechartShape.shape)){
         Object.defineProperty(initial, "piechartPath", {
@@ -460,7 +459,7 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
             }
         });
     }
-
+    
     // Define the object access variables
     Object.defineProperty(initial, "writeAccess", {
         get: function() {
@@ -477,7 +476,7 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
             }
         }
     });
-
+    
     Object.defineProperty(initial, "readAccess", {
         get: function() {
             let current = ComSocket.singleton().oVisuVariables.get(".currentuserlevel")!.value;
@@ -493,6 +492,6 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
             }
         }
     });
-
+    
     return initial;
 }

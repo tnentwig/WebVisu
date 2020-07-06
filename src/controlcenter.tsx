@@ -56,7 +56,7 @@ export default class HTML5Visu {
         
         const App = observer(()=> {
             return (
-                <div style={{width: stateManager!.get("VISUWIDTH")!.toLowerCase(), height:stateManager!.get("VISUHEIGHT")!.toLowerCase(), userSelect:"none"}}>    
+                <div style={{width: stateManager!.get("VISUWIDTH")!.toLowerCase(), height:stateManager!.get("VISUHEIGHT")!.toLowerCase(), userSelect:"none"}}>
                     {stateManager.get("ISONLINE") === "TRUE"
                         ? <Visualisation visuname={stateManager!.get("CURRENTVISU")!.toLowerCase()} mainVisu={true} replacementSet={null} width={this.windowWidth}></Visualisation>
                         : <ConnectionFault></ConnectionFault>
@@ -329,7 +329,7 @@ export default class HTML5Visu {
             })
         })
     }
-
+    
     processingVisuIni() : Promise<XMLDocument>{
         let url = this.rootDir+'/visu_ini.xml';
         return new Promise(resolve =>{
@@ -376,7 +376,7 @@ export default class HTML5Visu {
             })
         })
     }
-
+    
     async preloadVisus(){
         let mainVisus : Array<string> = []; 
         let loadedVisus : Array<string> = [];
@@ -402,7 +402,7 @@ export default class HTML5Visu {
                     Array.from(mainVisunames).forEach(function (nameNode){
                         let nextVisuname = nameNode.getElementsByTagName("placeholder")[0].textContent.toLowerCase();
                         if (!loadedVisus.includes(nextVisuname) && !visusToBeLoaded.includes(nextVisuname) && !notExistingVisus.includes(nextVisuname)){
-                            visusToBeLoaded.push(nextVisuname);                           
+                            visusToBeLoaded.push(nextVisuname);
                         }
                         if (!mainVisus.includes(visuname)){
                             mainVisus.push(visuname);
@@ -424,5 +424,4 @@ export default class HTML5Visu {
         }
         return mainVisus
     }
-
 }

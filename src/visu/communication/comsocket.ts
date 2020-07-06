@@ -14,39 +14,39 @@ export default class ComSocket implements IComSocket {
     private lutKeyVariable: Array<string>;
     private requestFrame: {frame: String, listings: number}
     private serverURL : string;
-
+    
     // this class shall be a singleton
     private constructor() {
         this.serverURL = '';
-        this.oVisuVariables  = observable(new Map());
+        this.oVisuVariables = observable(new Map());
         this.globalVariables = new Map();
         this.requestFrame = {frame:'', listings:0};
         this.lutKeyVariable = [];
     }
-
+    
     public static singleton(){
         return this.instance;
     }
-
+    
     getServerURL(){
         return this.serverURL;
     }
-
+    
     setServerURL(serverURL : string) {
         this.serverURL = serverURL;
     }
-
+    
     addGlobalVar(varName : string , varAddr : string){
        this.globalVariables.set(varName.toLowerCase(),{addr : varAddr, key:varName})
     }
-
+    
     addObservableVar(varName : string , varAddr : string){
         // Add new variable as object to objList
         // Use lower case for variables names on the hole project to prevent faulty accesses to variables
         if (typeof(varName)==='string') {
             this.oVisuVariables.set(varName.toLowerCase(),{
-                addr    : varAddr,
-                value   : ""       // value is empty at first 
+                addr : varAddr,
+                value : "" // value is empty at first 
             })
         // Add new variable to the request frame
         this.requestFrame.frame += this.requestFrame.listings + '|' + varAddr.replace(/,/g, '|') + '|';
@@ -55,7 +55,7 @@ export default class ComSocket implements IComSocket {
         this.lutKeyVariable.push(varName.toLowerCase());
         }
     }
-
+    
     evalFunction(stack: string[][]) : Function {
         var returnFunc = function () {
             let interim : Array<string> = [];
@@ -64,7 +64,7 @@ export default class ComSocket implements IComSocket {
                 switch(stack[position][0]){
                     case "var":
                         if(ComSocket.singleton().oVisuVariables.has(value)){
-                            let varContent = ComSocket.singleton().oVisuVariables.get(value)!.value;                  
+                            let varContent = ComSocket.singleton().oVisuVariables.get(value)!.value;
                             interim.push(varContent);
                         } else{
                             interim.push("0");
@@ -82,7 +82,7 @@ export default class ComSocket implements IComSocket {
         }
         return returnFunc;
     }
-
+    
     initObservables(){
         // Reset the requestFrame
         this.requestFrame.frame = "";
@@ -93,9 +93,9 @@ export default class ComSocket implements IComSocket {
         this.globalVariables.forEach((keyValue)=>{
             this.addObservableVar(keyValue.key, keyValue.addr);
         })
-
+    
     }
-
+    
     updateVarList() {
         fetch(this.serverURL,
         {
@@ -113,7 +113,7 @@ export default class ComSocket implements IComSocket {
                     for(let i=0; i<transferarray.length; i++) {
                         let varName = this.lutKeyVariable[i];
                         if (this.oVisuVariables.get(varName).value!==transferarray[i]){
-                            action(this.oVisuVariables.get(varName)!.value=transferarray[i]);   
+                            action(this.oVisuVariables.get(varName)!.value=transferarray[i]);
                         }
                     };
                     StateManager.singleton().oState.set("ISONLINE", "TRUE");
@@ -125,14 +125,14 @@ export default class ComSocket implements IComSocket {
             StateManager.singleton().oState.set("ISONLINE", "FALSE");
         });
     }
-
+    
     startCyclicUpdate(periodms : number) {
         // The updateVarList function will be called once at beginning
         this.updateVarList();
         // And then in an interval
         window.setInterval(()=>this.updateVarList(), periodms);
     }
-
+    
     setValue(varName : string, varValue : number | string | boolean) {
         fetch(this.serverURL,
             {
@@ -140,9 +140,8 @@ export default class ComSocket implements IComSocket {
                 headers: {"Content-Type" : "text/plain"},
                 body: '|1|1|0|'+ this.oVisuVariables.get(varName.toLowerCase())!.addr.replace(/,/g, '|') + '|'+ varValue + '|'
             })
-    } 
-
-
+    }
+    
     // toggleValue : Wechselt den Wert einer boolschen Variablen 
     toggleValue(varName : string) {
         let variableName = varName.toLowerCase()
@@ -160,6 +159,4 @@ export default class ComSocket implements IComSocket {
             throw new Error("The variable is not defined!")
         }
     }
-
 }
-
