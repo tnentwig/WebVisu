@@ -65,6 +65,9 @@ export default class ComSocket implements IComSocket {
                     case "var":
                         if(ComSocket.singleton().oVisuVariables.has(value)){
                             let varContent = ComSocket.singleton().oVisuVariables.get(value)!.value;
+                            if (varContent === ""){
+                                varContent = "0";
+                            }
                             interim.push(varContent);
                         } else{
                             interim.push("0");
