@@ -20,23 +20,23 @@ export const Line :React.FunctionComponent<Props> = React.memo(({simpleShape, te
     const state = useLocalStore(()=>createVisuObject(simpleShape, dynamicParameters));
     
     return useObserver(()=>
-    <div style={{cursor: "auto",overflow:"hidden", pointerEvents: state.eventType, visibility : state.display, position:"absolute", left:state.transformedCornerCoord.x1-state.edge, top:state.transformedCornerCoord.y1-state.edge, width:state.relCoord.width+state.edge, height:state.relCoord.height+state.edge}}>
+    <div style={{cursor : "auto",overflow : "hidden", pointerEvents : state.eventType, visibility : state.display, position:"absolute", left : ((state.transformedCornerCoord.x1 > state.transformedCornerCoord.x2) ? state.transformedCornerCoord.x2 : state.transformedCornerCoord.x1) - state.edge, top : ((state.transformedCornerCoord.y1 > state.transformedCornerCoord.y2) ? state.transformedCornerCoord.y2 : state.transformedCornerCoord.y1) - state.edge, width : state.relCoord.width + state.edge, height : state.relCoord.height + state.edge}}>
         {state.readAccess ?
         <ErrorBoundary fallback={<div>Oh no</div>}>
             {input}
-            <svg style={{float: "left"}} width={state.relCoord.width+2*state.edge} height={state.relCoord.height+2*state.edge}>
+            <svg style={{float: "left"}} width={state.relCoord.width + 2 * state.edge} height={state.relCoord.height + 2 * state.edge}>
                 <svg
                     onClick={onclick == null ? null : state.writeAccess ? ()=>onclick() : null} 
                     onMouseDown={onmousedown == null ? null : state.writeAccess ? ()=>onmousedown() : null} 
                     onMouseUp={onmouseup == null ? null : state.writeAccess ? ()=>onmouseup() : null}
                     onMouseLeave={onmouseup == null ? null : state.writeAccess ? ()=>onmouseup () : null} // We have to reset if somebody leaves the object with pressed key
-                    width={state.relCoord.width} 
-                    height={state.relCoord.height}>
+                    width={state.relCoord.width + state.strokeWidth} 
+                    height={state.relCoord.height + state.strokeWidth}>
                     <line
-                        x2={0}
-                        y1={0}
-                        x1={state.relCoord.width}
-                        y2={state.relCoord.height}
+                        x2={(state.transformedCornerCoord.x1 > state.transformedCornerCoord.x2) ? Math.min(1, state.strokeWidth / 2) : state.relCoord.width + Math.min(1, state.strokeWidth / 2)}
+                        y1={(state.transformedCornerCoord.y1 > state.transformedCornerCoord.y2) ? Math.min(1, state.strokeWidth / 2) : state.relCoord.height + Math.min(1, state.strokeWidth / 2)}
+                        x1={(state.transformedCornerCoord.x1 > state.transformedCornerCoord.x2) ? state.relCoord.width + Math.min(1, state.strokeWidth / 2) : Math.min(1, state.strokeWidth / 2)}
+                        y2={(state.transformedCornerCoord.y1 > state.transformedCornerCoord.y2) ? state.relCoord.height + Math.min(1, state.strokeWidth / 2) : Math.min(1, state.strokeWidth / 2)}
                         stroke={state.stroke}
                         strokeWidth={state.strokeWidth}
                         strokeDasharray={state.strokeDashArray}>

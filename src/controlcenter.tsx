@@ -58,7 +58,7 @@ export default class HTML5Visu {
             return (
                 <div style={{width: stateManager!.get("VISUWIDTH")!.toLowerCase(), height:stateManager!.get("VISUHEIGHT")!.toLowerCase(), userSelect:"none"}}>
                     {stateManager.get("ISONLINE") === "TRUE"
-                        ? <Visualisation visuname={stateManager!.get("CURRENTVISU")!.toLowerCase()} mainVisu={true} replacementSet={null} width={this.windowWidth}></Visualisation>
+                        ? <Visualisation visuname={stateManager!.get("CURRENTVISU")!.toLowerCase()} mainVisu={true} replacementSet={null} width={this.windowWidth} height={this.windowsHeight} show_frame={false} clip_frame={true} iso_frame={true} original_frame={false} original_scrollable_frame={false} no_frame_offset={true}></Visualisation>
                         : <ConnectionFault></ConnectionFault>
                     }
                     <Popup 

@@ -9,11 +9,11 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
     // absCenterCoord are the coordinates of the rotation and scale center
     let absCenterCoord = {x:basicShape.center[0], y:basicShape.center[1]};
     // relCoord are the width and the height in relation the div
-    let relCoord = {width:basicShape.rect[2]-basicShape.rect[0], height:basicShape.rect[3]-basicShape.rect[1]};
+    let relCoord = {width:basicShape.rect[2] - basicShape.rect[0], height:basicShape.rect[3] - basicShape.rect[1]};
     // the relCenterCoord are the coordinates of the midpoint of the div
-    let relMidpointCoord = {x:(basicShape.rect[2]-basicShape.rect[0])/2, y:(basicShape.rect[3]-basicShape.rect[1])/2};
+    let relMidpointCoord = {x:(basicShape.rect[2] - basicShape.rect[0]) / 2, y:(basicShape.rect[3] - basicShape.rect[1]) / 2};
     // The line_width is 0 in the xml if border width is 1 in the codesys dev env. Otherwise line_width is equal to the target border width. Very strange.
-    let edge = (basicShape.line_width === 0) ? 1 :basicShape.line_width;
+    let edge = (basicShape.line_width === 0) ? 1 : basicShape.line_width;
     // Compute the strokeWidth through has_frame_color
     let lineWidth = (basicShape.has_frame_color) ? edge : 0;
     // Compute the fill color through has_fill_color
@@ -408,7 +408,7 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
             y2 += initial.ypos + initial.bottom + yoff;
             // Init the interim return object
             let coord ={x1:x1,y1:y1,x2:x2,y2:y2};
-            
+            /*
             if (x1 > x2){
                 coord.x1 = x2;
                 coord.x2 = x1;
@@ -417,21 +417,22 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
                 coord.y1 = y2;
                 coord.y2 = y1;
             }
+            */
             return coord;
         }
     });
     Object.defineProperty(initial, "relCoord", {
         get: function() {
-            let width = initial.transformedCornerCoord.x2-initial.transformedCornerCoord.x1;
-            let height = initial.transformedCornerCoord.y2-initial.transformedCornerCoord.y1;
+            let width = Math.abs(initial.transformedCornerCoord.x2 - initial.transformedCornerCoord.x1);
+            let height = Math.abs(initial.transformedCornerCoord.y2 - initial.transformedCornerCoord.y1);
             return {width:width,height:height}
         }
     });
     
     Object.defineProperty(initial, "relMidpointCoord", {
         get: function() {
-            let x = initial.relCoord.width/2;
-            let y = initial.relCoord.height/2;
+            let x = initial.relCoord.width / 2;
+            let y = initial.relCoord.height / 2;
             return {x:x,y:y}
         }
     });

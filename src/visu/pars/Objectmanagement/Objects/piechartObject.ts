@@ -10,11 +10,11 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
     // absCenterCoord are the coordinates of the rotation and scale center
     let absCenterCoord = {x:piechartShape.center[0], y:piechartShape.center[1]};
     // relCoord are the width and the height in relation the div
-    let relCoord = {width:piechartShape.rect[2]-piechartShape.rect[0], height:piechartShape.rect[3]-piechartShape.rect[1]};
+    let relCoord = {width:piechartShape.rect[2] - piechartShape.rect[0], height:piechartShape.rect[3] - piechartShape.rect[1]};
     // the relCenterCoord are the coordinates of the midpoint of the div
-    let relMidpointCoord = {x:(piechartShape.rect[2]-piechartShape.rect[0])/2, y:(piechartShape.rect[3]-piechartShape.rect[1])/2};
+    let relMidpointCoord = {x:(piechartShape.rect[2] - piechartShape.rect[0]) / 2, y:(piechartShape.rect[3]-piechartShape.rect[1]) / 2};
     // The line_width is 0 in the xml if border width is 1 in the codesys dev env. Otherwise line_width is equal to the target border width. Very strange.
-    let edge = (piechartShape.line_width === 0) ? 1 :piechartShape.line_width ;
+    let edge = (piechartShape.line_width === 0) ? 1 :piechartShape.line_width;
     // Compute the strokeWidth through has_frame_color
     let lineWidth = (piechartShape.has_frame_color) ? edge : 0;
     // Compute the fill color through has_fill_color
@@ -405,47 +405,48 @@ export function createPiechartObject(piechartShape: IPiechartShape, dynamicEleme
             let xc = initial.absCenterCoord.x;
             let yc = initial.absCenterCoord.y;
             // Scaling: the vector isnt normalized to 1
-            let scale = (initial.scale/1000);
-            x1 = scale*(x1-xc)+xc;
-            y1 = scale*(y1-yc)+yc;
-            x2 = scale*(x2-xc)+xc;
-            y2 = scale*(y2-yc)+yc;
+            let scale = (initial.scale / 1000);
+            x1 = scale * (x1 - xc) + xc;
+            y1 = scale * (y1 - yc) + yc;
+            x2 = scale * (x2 - xc) + xc;
+            y2 = scale * (y2 - yc) + yc;
             // Rotating
-            let sinphi = Math.sin(initial.angle*(2*Math.PI)/360);
-            let cosphi = Math.cos(initial.angle*(2*Math.PI)/360);
-            let xoff = (x1-xc)*cosphi-(y1-yc)*sinphi-(x1-xc);
-            let yoff = (x1-xc)*sinphi+(y1-yc)*cosphi-(y1-yc);
+            let sinphi = Math.sin(initial.angle * (2 * Math.PI) / 360);
+            let cosphi = Math.cos(initial.angle * (2 * Math.PI) / 360);
+            let xoff = (x1 - xc) * cosphi - (y1 - yc) * sinphi - (x1 - xc);
+            let yoff = (x1 - xc) * sinphi + (y1 - yc) * cosphi - (y1 - yc);
             // Add the offset
-            x1 += initial.xpos+ initial.left+xoff;
-            x2 += initial.xpos + initial.right+xoff;
-            y1 += initial.ypos + initial.top+yoff;
-            y2 += initial.ypos+ initial.bottom+yoff;
+            x1 += initial.xpos + initial.left + xoff;
+            x2 += initial.xpos + initial.right + xoff;
+            y1 += initial.ypos + initial.top + yoff;
+            y2 += initial.ypos + initial.bottom + yoff;
             // Init the interim return object
             let coord ={x1:x1,y1:y1,x2:x2,y2:y2};
-            
-            if (x1>x2){
+            /*
+            if (x1 > x2){
                 coord.x1 = x2;
                 coord.x2 = x1;
             }
-            if (y1>y2){
+            if (y1 > y2){
                 coord.y1 = y2;
                 coord.y2 = y1;
             }
+            */
             return coord;
         }
     });
     Object.defineProperty(initial, "relCoord", {
         get: function() {
-            let width = initial.transformedCornerCoord.x2-initial.transformedCornerCoord.x1;
-            let height = initial.transformedCornerCoord.y2-initial.transformedCornerCoord.y1;
+            let width = Math.abs(initial.transformedCornerCoord.x2 - initial.transformedCornerCoord.x1);
+            let height = Math.abs(initial.transformedCornerCoord.y2 - initial.transformedCornerCoord.y1);
             return {width:width,height:height}
         }
     });
     
     Object.defineProperty(initial, "relMidpointCoord", {
         get: function() {
-            let x = initial.relCoord.width/2;
-            let y = initial.relCoord.height/2;
+            let x = initial.relCoord.width / 2;
+            let y = initial.relCoord.height / 2;
             return {x:x,y:y}
         }
     });
