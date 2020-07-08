@@ -1,6 +1,6 @@
 import ComSocket from '../../../communication/comsocket';
-import {IScrollbarObject} from '../../../Interfaces/jsinterfaces';
-import {IScrollbarShape} from '../../../Interfaces/javainterfaces'
+import { IScrollbarObject } from '../../../Interfaces/jsinterfaces';
+import { IScrollbarShape } from '../../../Interfaces/javainterfaces'
 
 export function createScrollbarObject(scrollbarShape: IScrollbarShape, dynamicElements : Map<string,string[][]>) : IScrollbarObject {
 
@@ -18,7 +18,7 @@ export function createScrollbarObject(scrollbarShape: IScrollbarShape, dynamicEl
     let a : number;
     let b1 : number;
     let b2 : number;
-
+    
     // Define the swap values in depending on the orientation
     if (scrollbarShape.horz_position){
         swap1 = relCoord.height;
@@ -27,7 +27,7 @@ export function createScrollbarObject(scrollbarShape: IScrollbarShape, dynamicEl
         swap1 = relCoord.width;
         swap2 = relCoord.height;
     }
-
+    
     // Calculate the a, b1 and b2 parameters
     a = swap1;
     // button width is a quater of overall length, but maximum as long as height
@@ -36,9 +36,9 @@ export function createScrollbarObject(scrollbarShape: IScrollbarShape, dynamicEl
     // Scrollelement width is a sixth of overall length, but maximum as long as 2/3 height
     interim = 0.167*swap2;
     b2 = interim < (0.667*a) ? interim : 0.667*a;
-   
+    
     // Create an object with the initial parameters
-    let initial  : IScrollbarObject= {
+    let initial : IScrollbarObject= {
         // Positional parameters
         absCornerCoord : absCornerCoord,
         relCoord : relCoord,
@@ -55,7 +55,7 @@ export function createScrollbarObject(scrollbarShape: IScrollbarShape, dynamicEl
         scrollvalue : 0,
         display : "visible"
     }
-
+    
     if (dynamicElements.has("expr-invisible")) {
         let element = dynamicElements!.get("expr-invisible");
         let returnFunc = ComSocket.singleton().evalFunction(element);
@@ -73,7 +73,7 @@ export function createScrollbarObject(scrollbarShape: IScrollbarShape, dynamicEl
             get: ()=>wrapperFunc()
         });
     }
-
+    
     if (dynamicElements.has("expr-lower-bound")) {
         let element = dynamicElements!.get("expr-lower-bound");
         let returnFunc = ComSocket.singleton().evalFunction(element);
@@ -85,7 +85,7 @@ export function createScrollbarObject(scrollbarShape: IScrollbarShape, dynamicEl
             get: ()=>wrapperFunc()
         });
     }
-
+    
     if (dynamicElements.has("expr-upper-bound")) {
         let element = dynamicElements!.get("expr-upper-bound");
         let returnFunc = ComSocket.singleton().evalFunction(element);
@@ -105,7 +105,7 @@ export function createScrollbarObject(scrollbarShape: IScrollbarShape, dynamicEl
             get: ()=>returnFunc()
         });
     }
-
+    
     if (dynamicElements.has("expr-tap-var")){
         let element = dynamicElements!.get("expr-tap-var");
         let returnFunc = ComSocket.singleton().evalFunction(element);
@@ -113,7 +113,7 @@ export function createScrollbarObject(scrollbarShape: IScrollbarShape, dynamicEl
             get: ()=>returnFunc()
         });
     }
-
+    
     if (scrollbarShape.horz_position){
         Object.defineProperty(initial, "scrollvalue", {
             get: function() {
@@ -133,7 +133,6 @@ export function createScrollbarObject(scrollbarShape: IScrollbarShape, dynamicEl
             }
         });
     } else {
-
         Object.defineProperty(initial, "scrollvalue", {
             get: function() {
                 let interval = Math.abs(initial.upperBound-initial.lowerBound);
@@ -152,7 +151,6 @@ export function createScrollbarObject(scrollbarShape: IScrollbarShape, dynamicEl
             }
         });
     }
-
+    
     return initial
- 
 }

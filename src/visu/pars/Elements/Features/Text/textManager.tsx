@@ -1,18 +1,18 @@
 import * as util from '../../../Utils/utilfunctions'
 import * as React from 'react';
-import {useObserver, useLocalStore } from 'mobx-react-lite';
+import { useObserver, useLocalStore } from 'mobx-react-lite';
 import ComSocket from '../../../../communication/comsocket';
-import {numberToHexColor, getTextLines} from '../../../Utils/utilfunctions'
-import {Textline} from './textline'
-import {uid} from 'react-uid';
+import { numberToHexColor, getTextLines } from '../../../Utils/utilfunctions'
+import { Textline } from './textline'
+import { uid } from 'react-uid';
 
 type Props = {
     section : Element,
     dynamicParameters : Map<string, string>
 }
 
-export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicParameters})  =>
-{       
+export const Textfield :React.FunctionComponent<Props> = ({section, dynamicParameters}) =>
+{
     // The static tags for the font
     let fontName = (section.getElementsByTagName("font-name").length) ? section.getElementsByTagName("font-name")[0].textContent : "Arial";
     let fontHeight = Number(section.getElementsByTagName("font-height")[0].textContent);
@@ -30,7 +30,7 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
     let textLines = getTextLines(text);
     // The id is used for static language change with a .vis file
     let textId = Number(section.getElementsByTagName("text-id")[0].textContent);
-
+    
     const initial = {
         // Font variables
         fontHeight : fontHeight,
@@ -53,7 +53,7 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
         fontStyle : "normal",
         textDecoration : "initial",
     };
-
+    
     // Create the variable parameters
     // 1) The text flags: 1: linksbündig, 2: rechtsbündig, 4: horizontal zentriert, 8: oben, 10: unten, 20: vertikal zentriert
     // The sum of the attributes should determine the position of the element e.g. 4 + 20 = 24 => in the center of the svg
@@ -62,19 +62,18 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
         let element = dynamicParameters!.get("expr-text-flags");
         Object.defineProperty(initial, "textAlignHorz", {
             get: function() {
-            let value = Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
-            if ((value/8)>0){
-                if (value == 4){
-                    return "center";
-                } else if (value == 2) {
-                    return "right";
-                } else if (value == 1) {
-                    return "left";
+                let value = Number(ComSocket.singleton().oVisuVariables.get(element)!.value);
+                if ((value/8)>0){
+                    if (value == 4){
+                        return "center";
+                    } else if (value == 2) {
+                        return "right";
+                    } else if (value == 1) {
+                        return "left";
+                    } else {
+                        return "left"; // This is the standard if passed textflag isn't correct
+                    }
                 }
-                else {
-                    return "left"; // This is the standard if passed textflag isn't correct
-                }
-            }
             }
         });
         Object.defineProperty(initial, "textAlignVert", {
@@ -86,8 +85,7 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
                     return "top";
                 } else if (value == 10) {
                     return "bottom";
-                }
-                else {
+                } else {
                     return "top"; // This is the standard if passed textflag isn't correct
                 }
             }
@@ -131,7 +129,7 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
             }
         });
     }
-
+    
     // 5) The font color: 
     if (dynamicParameters.has("expr-text-color")) {
         let element = dynamicParameters!.get("expr-text-color");
@@ -154,7 +152,7 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
             }
         });
     }
-
+    
     Object.defineProperty(initial, "textAnchor", {
         get: function() {
             let position = (initial.textAlignHorz == 'center') ? 'middle' : ((initial.textAlignHorz == 'left') ? 'start' : 'end')
@@ -203,7 +201,7 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
         }
     });
     
-
+    
     // Create a map of lines
     let svgTextLines: Array<(JSX.Element | undefined | null)> =[];
     svgTextLines.push(
@@ -214,8 +212,8 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
         <Textline firstItem={false} textLine={textLines[i]} numberOfLines={textLines.length} section={section} dynamicParameters={dynamicParameters}></Textline>
         )
     }
-
-    const state  = useLocalStore(()=>initial);
+    
+    const state = useLocalStore(()=>initial);
     return useObserver(()=>
         <text
             textDecoration={state.textDecoration}
@@ -235,7 +233,4 @@ export const Textfield :React.FunctionComponent<Props>  = ({section, dynamicPara
             </React.Fragment>
         </text>
     )
-    
-    
 }
-

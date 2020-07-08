@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Visualisation} from '../../../visuparser';
+import { Visualisation } from '../../../visuparser';
 import * as util from '../../Utils/utilfunctions';
 import { IBasicShape } from '../../../Interfaces/javainterfaces';
 import { parseDynamicShapeParameters } from '../Features/Events/eventManager';
@@ -45,31 +45,35 @@ export const Subvisu :React.FunctionComponent<Props> = ({section})=>
         hidden_input: util.stringToBoolean(referenceObject["hidden-input"].textContent),
         enable_text_input: util.stringToBoolean(referenceObject["enable-text-input"].textContent),
         // Optional properties
-        tooltip : section.getElementsByTagName("tooltip").length>0? section.getElementsByTagName("tooltip")[0].innerHTML : "",
+        tooltip : section.getElementsByTagName("tooltip").length > 0 ? section.getElementsByTagName("tooltip")[0].innerHTML : "",
         access_levels : section.getElementsByTagName("access-levels").length ? util.parseAccessLevels(section.getElementsByTagName("access-levels")[0].innerHTML) : ["rw","rw","rw","rw","rw","rw","rw","rw"]
       }
-
+    
     // Subvisu specials
     let visuname = section.getElementsByTagName("name")[0].innerHTML.toLowerCase();
+    let show_frame = section.getElementsByTagName("show-frame")[0].innerHTML.toLowerCase() === "true" ? true : false;
+    let clip_frame = section.getElementsByTagName("clip-frame")[0].innerHTML.toLowerCase() === "true" ? true : false;
+    let iso_frame = section.getElementsByTagName("iso-frame")[0].innerHTML.toLowerCase() === "true" ? true : false;
+    let original_frame = section.getElementsByTagName("original-frame")[0].innerHTML.toLowerCase() === "true" ? true : false;
+    let original_scrollable_frame = section.getElementsByTagName("original-scrollable-frame")[0].innerHTML.toLowerCase() === "true" ? true : false;
+    let no_frame_offset = section.getElementsByTagName("no-frame-offset")[0].innerHTML.toLowerCase() === "true" ? true : false;
     let placeholders = getPlaceholders(section);
-   
+    
     // Parsing of observable events (like toggle color)
     let dynamicShapeParameters = parseDynamicShapeParameters(section);
-
+    
     let initial = createVisuObject(subvisu, dynamicShapeParameters)
-
-// Convert object to an observable one
-const state = useLocalStore(() => initial);
-
-
-
+    
+    // Convert object to an observable one
+    const state = useLocalStore(() => initial);
+    
     // Return of the react node
     return useObserver(()=>
         <div 
             title={name} 
-            style={{ display : state.display=="visible" ?"inline":"none", position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge }}
+            style={{ display : state.display=="visible" ? "inline" : "none", position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge }}
             >
-            <Visualisation visuname={visuname} mainVisu={false} replacementSet={placeholders} width={state.relCoord.width} ></Visualisation>
+            <Visualisation visuname={visuname} mainVisu={false} replacementSet={placeholders} width={state.relCoord.width} height={state.relCoord.height} show_frame={show_frame} clip_frame={clip_frame} iso_frame={iso_frame} original_frame={original_frame} original_scrollable_frame={original_scrollable_frame} no_frame_offset={no_frame_offset}></Visualisation>
         </div>
     )
 }
