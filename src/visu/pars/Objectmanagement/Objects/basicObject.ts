@@ -20,11 +20,7 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
     let fillColor = (basicShape.has_inside_color) ? basicShape.fill_color : 'none';
     // Tooltip
     let tooltip = basicShape.tooltip;
-<<<<<<< HEAD
-
-=======
     
->>>>>>> 145d5eecda8b4836a966c38763c33eb6cb34d515
     // Create an object with the initial parameters
     let initial : IBasicObject= {
         // Variables will be initialised with the parameter values 
@@ -440,11 +436,7 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
             return {x:x,y:y}
         }
     });
-<<<<<<< HEAD
-
-=======
     
->>>>>>> 145d5eecda8b4836a966c38763c33eb6cb34d515
     // Define the object access variables
     Object.defineProperty(initial, "writeAccess", {
         get: function() {
@@ -461,11 +453,7 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
             }
         }
     });
-<<<<<<< HEAD
-
-=======
     
->>>>>>> 145d5eecda8b4836a966c38763c33eb6cb34d515
     Object.defineProperty(initial, "readAccess", {
         get: function() {
             let current = ComSocket.singleton().oVisuVariables.get(".currentuserlevel")!.value;
@@ -481,10 +469,6 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
             }
         }
     });
-<<<<<<< HEAD
-
-=======
     
->>>>>>> 145d5eecda8b4836a966c38763c33eb6cb34d515
     return initial;
 }
