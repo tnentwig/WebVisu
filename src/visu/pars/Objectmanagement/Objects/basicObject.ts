@@ -1,29 +1,28 @@
 import ComSocket from '../../../communication/comsocket';
-import {IBasicObject} from '../../../Interfaces/jsinterfaces';
-import {IBasicShape} from '../../../Interfaces/javainterfaces'
-import {numberToHexColor} from '../../Utils/utilfunctions'
+import { IBasicObject } from '../../../Interfaces/jsinterfaces';
+import { IBasicShape } from '../../../Interfaces/javainterfaces'
+import { numberToHexColor } from '../../Utils/utilfunctions'
 
 export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map<string,string[][]>) : IBasicObject{
-
     // absCornerCoord are the absolute coordinates of the <div> element in relation to the origin in the top left 
     let absCornerCoord = {x1:basicShape.rect[0],y1:basicShape.rect[1],x2:basicShape.rect[2],y2:basicShape.rect[3]};
     // absCenterCoord are the coordinates of the rotation and scale center
     let absCenterCoord = {x:basicShape.center[0], y:basicShape.center[1]};
     // relCoord are the width and the height in relation the div
-    let relCoord = {width:basicShape.rect[2]-basicShape.rect[0], height:basicShape.rect[3]-basicShape.rect[1]};
+    let relCoord = {width:basicShape.rect[2] - basicShape.rect[0], height:basicShape.rect[3] - basicShape.rect[1]};
     // the relCenterCoord are the coordinates of the midpoint of the div
-    let relMidpointCoord = {x:(basicShape.rect[2]-basicShape.rect[0])/2, y:(basicShape.rect[3]-basicShape.rect[1])/2};
+    let relMidpointCoord = {x:(basicShape.rect[2] - basicShape.rect[0]) / 2, y:(basicShape.rect[3] - basicShape.rect[1]) / 2};
     // The line_width is 0 in the xml if border width is 1 in the codesys dev env. Otherwise line_width is equal to the target border width. Very strange.
-    let edge = (basicShape.line_width === 0) ? 1 :basicShape.line_width ;
+    let edge = (basicShape.line_width === 0) ? 1 : basicShape.line_width;
     // Compute the strokeWidth through has_frame_color
     let lineWidth = (basicShape.has_frame_color) ? edge : 0;
     // Compute the fill color through has_fill_color
     let fillColor = (basicShape.has_inside_color) ? basicShape.fill_color : 'none';
     // Tooltip
     let tooltip = basicShape.tooltip;
-
+    
     // Create an object with the initial parameters
-    let initial  : IBasicObject= {
+    let initial : IBasicObject= {
         // Variables will be initialised with the parameter values 
         normalFillColor : basicShape.fill_color,
         alarmFillColor : basicShape.fill_color_alarm,
@@ -41,7 +40,7 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
         bottom : 0,
         xpos : 0,
         ypos : 0,
-        scale : 1000,   // a scale of 1000 means a representation of 1:1
+        scale : 1000, // a scale of 1000 means a representation of 1:1
         angle : 0,
         // Activate / deactivate input
         eventType : "visible",
@@ -62,12 +61,12 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
         writeAccess : true,
         readAccess : true
     }
-
+    
     // Processing the variables for visual elements
     // A <expr-..-> tag initiate a variable, const or a placeholder
     // We have to implement the const value, the variable or the placeholdervalue if available for the static value
     // Polyshapes and Simpleshapes have the same <expr-...> possibilities
-
+    
     if (dynamicElements.has("expr-toggle-color")) {
         let element = dynamicElements.get("expr-toggle-color");
         let returnFunc = (ComSocket.singleton().evalFunction(element));
@@ -117,7 +116,7 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
         Object.defineProperty(initial, "normalFrameColor", {
             get: ()=>wrapperFunc()
         });
-
+    
     }
     // 5) Set alarm frame color
     if (dynamicElements.has("expr-frame-color-alarm")) {
@@ -132,7 +131,7 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
             get: ()=>wrapperFunc()
         });
     }
-
+    
     // 6) Set invisible state
     if (dynamicElements.has("expr-invisible")) {
         let element = dynamicElements!.get("expr-invisible");
@@ -189,8 +188,7 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
                         return "5,5";
                     } else if (value == "1"){
                         return "10,10";
-                    } 
-                    else {
+                    } else {
                         return "0";
                     }
                 } else {
@@ -305,7 +303,7 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
             get: ()=>wrapperFunc()
         });
     }
-
+    
     // Piechart specific stuff ( start- and endangle)
     if (dynamicElements.has("expr-angle1")){
         let element = dynamicElements!.get("expr-angle1");
@@ -329,10 +327,9 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
             get: ()=>wrapperFunc()
         });
     }
-
-
+    
     // We have to compute the dependent values after all the required static values ​​have been replaced by variables, placeholders or constant values 
-    // E.g. the fillcolor depends on  hasFillColor and alarm. This variables are called "computed" values. MobX will track their dependents and rerender the object by change.
+    // E.g. the fillcolor depends on hasFillColor and alarm. This variables are called "computed" values. MobX will track their dependents and rerender the object by change.
     // We have to note that the rotation of polylines is not the same like simpleshapes. Simpleshapes keep their originally alignment, polyhapes transform every coordinate.
     
     // The fill color
@@ -354,7 +351,7 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
             return initial.lineWidth;
             }
     });
-
+    
     Object.defineProperty(initial, "stroke", {
         get: function() {
             if (initial.alarm == false){
@@ -368,7 +365,7 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
             }
         }
     });
-
+    
     Object.defineProperty(initial, "edge", {
         get: function() {
             if (initial.hasFrameColor || initial.alarm){
@@ -382,7 +379,7 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
             }
         }
     });
-
+    
     // The transformed corner coordinates depends on the shapetype. The rotating operation is different for simpleshapes and polyshapes
     // Simpleshape:
     Object.defineProperty(initial, "transformedCornerCoord", {
@@ -394,51 +391,52 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
             let xc = initial.absCenterCoord.x;
             let yc = initial.absCenterCoord.y;
             // Scaling: the vector isnt normalized to 1
-            let scale = (initial.scale/1000);
-            x1 = scale*(x1-xc)+xc;
-            y1 = scale*(y1-yc)+yc;
-            x2 = scale*(x2-xc)+xc;
-            y2 = scale*(y2-yc)+yc;
+            let scale = (initial.scale / 1000);
+            x1 = scale * (x1 - xc) + xc;
+            y1 = scale * (y1 - yc) + yc;
+            x2 = scale * (x2 - xc) + xc;
+            y2 = scale * (y2 - yc) + yc;
             // Rotating
-            let sinphi = Math.sin(initial.angle*(2*Math.PI)/360);
-            let cosphi = Math.cos(initial.angle*(2*Math.PI)/360);
-            let xoff = (x1-xc)*cosphi-(y1-yc)*sinphi-(x1-xc);
-            let yoff = (x1-xc)*sinphi+(y1-yc)*cosphi-(y1-yc);
+            let sinphi = Math.sin(initial.angle * (2 * Math.PI) / 360);
+            let cosphi = Math.cos(initial.angle * (2 * Math.PI) / 360);
+            let xoff = (x1 - xc) * cosphi - (y1 - yc) * sinphi - (x1 - xc);
+            let yoff = (x1 - xc) * sinphi + (y1 - yc) * cosphi - (y1 - yc);
             // Add the offset
-            x1 += initial.xpos+ initial.left+xoff;
-            x2 += initial.xpos + initial.right+xoff;
-            y1 += initial.ypos + initial.top+yoff;
-            y2 += initial.ypos+ initial.bottom+yoff;
+            x1 += initial.xpos + initial.left + xoff;
+            x2 += initial.xpos + initial.right + xoff;
+            y1 += initial.ypos + initial.top + yoff;
+            y2 += initial.ypos + initial.bottom + yoff;
             // Init the interim return object
             let coord ={x1:x1,y1:y1,x2:x2,y2:y2};
-
-            if (x1>x2){
+            /*
+            if (x1 > x2){
                 coord.x1 = x2;
                 coord.x2 = x1;
             }
-            if (y1>y2){
+            if (y1 > y2){
                 coord.y1 = y2;
                 coord.y2 = y1;
             }
+            */
             return coord;
         }
     });
     Object.defineProperty(initial, "relCoord", {
         get: function() {
-            let width = initial.transformedCornerCoord.x2-initial.transformedCornerCoord.x1;
-            let height = initial.transformedCornerCoord.y2-initial.transformedCornerCoord.y1;
+            let width = Math.abs(initial.transformedCornerCoord.x2 - initial.transformedCornerCoord.x1);
+            let height = Math.abs(initial.transformedCornerCoord.y2 - initial.transformedCornerCoord.y1);
             return {width:width,height:height}
         }
     });
-
+    
     Object.defineProperty(initial, "relMidpointCoord", {
         get: function() {
-            let x = initial.relCoord.width/2;
-            let y = initial.relCoord.height/2;
+            let x = initial.relCoord.width / 2;
+            let y = initial.relCoord.height / 2;
             return {x:x,y:y}
         }
     });
-
+    
     // Define the object access variables
     Object.defineProperty(initial, "writeAccess", {
         get: function() {
@@ -455,7 +453,7 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
             }
         }
     });
-
+    
     Object.defineProperty(initial, "readAccess", {
         get: function() {
             let current = ComSocket.singleton().oVisuVariables.get(".currentuserlevel")!.value;
@@ -471,6 +469,6 @@ export function createBasicObject(basicShape: IBasicShape, dynamicElements : Map
             }
         }
     });
-
+    
     return initial;
 }

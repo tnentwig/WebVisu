@@ -2,7 +2,7 @@ import { createBasicObject } from "./Objects/basicObject";
 import { createPolyObject } from "./Objects/polyObject";
 import { createPiechartObject } from "./Objects/piechartObject";
 import { createScrollbarObject } from "./Objects/scrollbarObject";
-import {IBasicShape, IPiechartShape, IPolyShape, IScrollbarShape} from '../../Interfaces/javainterfaces'
+import { IBasicShape, IPiechartShape, IPolyShape, IScrollbarShape } from '../../Interfaces/javainterfaces'
 
 export function createVisuObject(javaObject: any, dynamicElements : Map<string,string[][]>) : any {
     // This function acts as broker for different objects

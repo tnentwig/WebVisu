@@ -7,41 +7,41 @@ export function parseDynamicShapeParameters(section: Element): Map<string, strin
     let tags: Array<string> = [];
     // Styling tags
     tags = [
-        "expr-toggle-color",       // 1) Set alarm
-        "expr-fill-color",          // 2) Variable for the fill color
+        "expr-toggle-color", // 1) Set alarm
+        "expr-fill-color", // 2) Variable for the fill color
         "expr-fill-color-alarm",
-        "expr-frame-color",        // 4) Variable for the frame color
+        "expr-frame-color", // 4) Variable for the frame color
         "expr-frame-color-alarm",
-        "expr-invisible",           // 6) Flag to make the object invisible
-        "expr-fill-flags",           // 7) Toggles the "has-inside-color"
-        "expr-frame-flags",         // 8) Toggles the "has-frame-color"
-        "expr-line-width",        // 9) line-width
-
+        "expr-invisible", // 6) Flag to make the object invisible
+        "expr-fill-flags", // 7) Toggles the "has-inside-color"
+        "expr-frame-flags", // 8) Toggles the "has-frame-color"
+        "expr-line-width", // 9) line-width
+        
         // Transition tags
-        "expr-left",                // Relative left
-        "expr-right",                // Relative right
-        "expr-top",                  // Relative top
-        "expr-bottom",               // Relative bottom
-        "expr-xpos",                 // Absolute x-position
-        "expr-ypos",                 // Absolute y-position
-        "expr-scale",                // Scale with middle reference point
-        "expr-angle",              // Turn around center with angle
-
+        "expr-left", // Relative left
+        "expr-right", // Relative right
+        "expr-top", // Relative top
+        "expr-bottom", // Relative bottom
+        "expr-xpos", // Absolute x-position
+        "expr-ypos", // Absolute y-position
+        "expr-scale", // Scale with middle reference point
+        "expr-angle", // Turn around center with angle
+        
         // Tooltip
-        "expr-tooltip-display",     // tooltip variable
+        "expr-tooltip-display", // tooltip variable
         // Deactivate Input
         "expr-input-disabled",
-
+        
         // Piechart specific
         "expr-angle1",
         "expr-angle2",
-
+        
         // Scrollbar specific
         "expr-lower-bound",
         "expr-upper-bound",
         "expr-tap-var"
     ]
-
+    
     let children = section.children;
     for (let i=0; i < children.length; i++){
         let exprName = children[i].nodeName;
@@ -77,12 +77,13 @@ export function parseDynamicTextParameters(section: Element, shape: string): Map
     let exprMap: Map<string, string> = new Map();
     let tags: Array<string> = [];
     // Styling tags
-    tags = ["expr-text-flags",         // 1) The textflags sets the alignment of the text
-        "expr-font-flags",          // 2) The font flags sets the external appearance
-        "expr-font-name",        // 3) Sets the font name
-        "text-display",             // 4) Sets the variable that has to be displayed
-        "expr-text-color",        // 5) Sets the text color
-        "expr-font-height"]         // 6) Sets the font height
+    tags = ["expr-text-flags", // 1) The textflags sets the alignment of the text
+        "expr-font-flags", // 2) The font flags sets the external appearance
+        "expr-font-name", // 3) Sets the font name
+        "text-display", // 4) Sets the variable that has to be displayed
+        "expr-text-color", // 5) Sets the text color
+        "expr-font-height" // 6) Sets the font height
+    ]
 
     let children = section.children;
     for (let i=0; i < children.length; i++){
@@ -91,12 +92,22 @@ export function parseDynamicTextParameters(section: Element, shape: string): Map
             let expressions = children[i].getElementsByTagName("expr");
             // The text could be dynamic with a expression reference
             for (let j = 0; j < expressions.length; j++) {
-                let varName = expressions[j].getElementsByTagName("var")[0].textContent.toLowerCase();
-                if (ComSocket.singleton().oVisuVariables.has(varName)) {
-                    exprMap.set(exprName, varName);
+                if (expressions[j].getElementsByTagName("var")[0] !== undefined) {
+                    let varName = expressions[j].getElementsByTagName("var")[0].textContent.toLowerCase();
+                    if (ComSocket.singleton().oVisuVariables.has(varName)) {
+                        exprMap.set(exprName, varName);
+                    }
+                    else {
+                        console.log("A variable textfield has no valid variable attached!");
+                    }
                 }
                 else {
-                    console.log("A variable textfield has no valid variable attached!");
+                    if (expressions[j].getElementsByTagName("const")[0] !== undefined) {
+                        let constName = expressions[j].getElementsByTagName("const")[0].textContent.toLowerCase();
+                    }
+                    else {
+                        console.log("A variable textfield has no valid variable attached!");
+                    }
                 }
             }
         }
@@ -111,7 +122,7 @@ export function parseClickEvent(section: Element): Function {
     
     let children = section.children;
     for (let i=0; i < children.length; i++){
-        let exprName = children[i].nodeName;          
+        let exprName = children[i].nodeName;
         // Parse the <expr-toggle-var><expr><var> ... elements => toggle color
         if (exprName === "expr-toggle-var") {
             // Parse all detected expressions
@@ -132,7 +143,7 @@ export function parseClickEvent(section: Element): Function {
                 } 
             }
         }
-
+        
         if (exprName === "expr-zoom") {
             // Parse all detected expressions
             let expressions = children[i].getElementsByTagName("expr");
@@ -252,7 +263,7 @@ export function parseClickEvent(section: Element): Function {
             }  
         }
     }
-
+    
     // Use empty callback if no click event is detected
     if (clickEventDetected) {
         clickFunction = function (): void {
@@ -269,11 +280,11 @@ export function parseClickEvent(section: Element): Function {
 export function parseTapEvent(section: Element, direction: string): Function {
     let tapFunction: Function = null;
     let children = section.children;
-
+    
     let tapElement : Element = null;
-    let tapDown :  number;
+    let tapDown : number;
     let tapUp : number;
-
+    
     for (let i=0; i < children.length; i++){
         let exprName = children[i].nodeName;
         if (exprName === "expr-tap-var"){
@@ -283,7 +294,7 @@ export function parseTapEvent(section: Element, direction: string): Function {
             tapDown = (children[i].textContent === "false" ? 1 : 0);
             tapUp = (children[i].textContent === "false" ? 0 : 1);
         }
-
+        
         if ( tapElement !== null){
             let expressions = tapElement.getElementsByTagName("expr");
             // Parse the <expr-toggle-var><expr><var> ... elements => toggle color
