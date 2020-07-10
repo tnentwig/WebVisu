@@ -28,7 +28,7 @@ export default class StateManager implements IStateManager {
     }
     
     init(){
-        this.oState.set("ISONLINE", "FALSE");
+        this.oState.set("ISONLINE", "TRUE");
         /* hier besteht noch ein Problem, aus welchem Grund auch immer wird Comsocket nur einmal observiert.
         Wenn Wert einmal verändert wurde wird autorun nicht mehr ausgeführt. Ursache musss noch geklärt werden.
         Bis dahin wird per intervallabfrage manuell observiert*/
