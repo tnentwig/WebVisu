@@ -11,7 +11,7 @@ import { Group } from './Elements/Group/group';
 import { Subvisu } from '../pars/Elements/Subvisu/subvisu'
 
 type Props = {
-    visualisation: XMLDocument
+    visualisation: Element
 }
 export const VisuElements :React.FunctionComponent<Props> = React.memo(({visualisation})=>{
     let visuObjects : Array<{obj:JSX.Element, id: string}>= [];
@@ -21,9 +21,9 @@ export const VisuElements :React.FunctionComponent<Props> = React.memo(({visuali
     }
     // The effect is called if the visualisation prop change
     // Rip all <element> sections
-    for (let i=0; i<visualisation.children[0].children.length; i++){
-        let section = visualisation.children[0].children[i];
-        if (visualisation.children[0].children[i].nodeName === "element"){
+    for (let i=0; i<visualisation.children.length; i++){
+        let section = visualisation.children[i];
+        if (visualisation.children[i].nodeName === "element"){
             // Determine the type of the element
             let type = section.getAttribute("type");
             switch(type) {
