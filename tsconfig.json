@@ -2,14 +2,14 @@
     "compilerOptions": {
         "lib": ["es2018", "dom"],
         "outDir": "./dist/",
-        "noImplicitAny": true,
         "module": "commonjs",
-        "target": "es5",
+        "target": "es6",
+        "jsx": "react",
+        "noImplicitAny": true,
         "sourceMap": true,
         "removeComments": true,
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
-        "jsx": "react",
         "strict": true,
         "experimentalDecorators": true,
         "strictNullChecks": false // for maps returning undefined | string
