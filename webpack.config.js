@@ -7,11 +7,11 @@ module.exports = {
     entry:  './src/index.ts',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'WebVisu.dev.js'
+        filename: 'webvisu.js'
     },
     plugins: [
         new HtmlWebpackPlugin({
-            filename: 'WebVisu.html',
+            filename: 'webvisu.html',
             template: './src/index.html',
             title: 'WebVisualisation',
         })
