@@ -32,9 +32,7 @@
         "style-loader": "^1.2.1",
         "ts-loader": "^7.0.5",
         "typescript": "^3.9.6",
-        "webpack": "^4.43.0",
-        "webpack-cli": "^3.3.12",
-        "@welldone-software/why-did-you-render": "^4.2.5"
+        "webpack": "^4.43.0"
     },
     "dependencies": {
         "@material-ui/core": "^4.11.0",
