@@ -5,11 +5,12 @@ export interface IComSocket {
     // Functions
     addObservableVar(varName : string | undefined, varAddr : string) : void;
     addGlobalVar(varName : string | undefined, varAddr : string) : void;
-    updateVarList() : void;
+    updateVarList() : Promise<boolean>;
     setValue(varName : string, varValue : number | string | boolean) : void;
     getServerURL() : string;
     setServerURL(serverURL : string) : void;
-    startCyclicUpdate(periodms : number) : void;
+    startCyclicUpdate() : void;
+    stopCyclicUpdate() : void;
     toggleValue(varName : string) : void;
     initObservables() : void;
     evalFunction(stack:string[][]):Function;
@@ -77,4 +78,8 @@ export interface IScrollbarObject {
     a : number,
     b1:number,
     b2:number
+}
+
+export interface ISubvisuObject extends IBasicObject{
+    visuScale : string;
 }
