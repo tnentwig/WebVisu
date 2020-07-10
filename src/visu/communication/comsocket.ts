@@ -14,7 +14,9 @@ export default class ComSocket implements IComSocket {
     private lutKeyVariable: Array<string>;
     private requestFrame: {frame: String, listings: number}
     private serverURL : string;
-    
+    // The ID of cyclic request
+    private intervalID : number;
+
     // this class shall be a singleton
     private constructor() {
         this.serverURL = '';
@@ -96,44 +98,52 @@ export default class ComSocket implements IComSocket {
         this.globalVariables.forEach((keyValue)=>{
             this.addObservableVar(keyValue.key, keyValue.addr);
         })
-    
     }
-    
-    updateVarList() {
-        fetch(this.serverURL,
-        {
-            method: 'POST',
-            headers: {"Content-Type" : "text/plain"},
-            body: '|0|'+this.requestFrame.listings+'|'+this.requestFrame.frame
-        })
-        .then((response) => {
-            response.arrayBuffer()
-            .then((buffer : ArrayBuffer)=>{
-                let decoder = new TextDecoder("iso-8859-1");
-                let text = decoder.decode(buffer);
-                let transferarray : Array<string>= (text.slice(1,text.length-1).split('|'));
-                if (transferarray.length === this.requestFrame.listings){
-                    for(let i=0; i<transferarray.length; i++) {
-                        let varName = this.lutKeyVariable[i];
-                        if (this.oVisuVariables.get(varName).value!==transferarray[i]){
-                            action(this.oVisuVariables.get(varName)!.value=transferarray[i]);
-                        }
-                    };
-                    StateManager.singleton().oState.set("ISONLINE", "TRUE");
-                }
+
+    updateVarList() : Promise<boolean>{
+        return new Promise((resolve)=>{
+            fetch(this.serverURL,
+            {
+                method: 'POST',
+                headers: {"Content-Type" : "text/plain"},
+                body: '|0|'+this.requestFrame.listings+'|'+this.requestFrame.frame
             })
+            .then((response) => {
+                response.arrayBuffer()
+                .then((buffer : ArrayBuffer)=>{
+                    let decoder = new TextDecoder("iso-8859-1");
+                    let text = decoder.decode(buffer);
+                    let transferarray : Array<string>= (text.slice(1,text.length-1).split('|'));
+                    if (transferarray.length === this.requestFrame.listings){
+                        for(let i=0; i<transferarray.length; i++){
+                            let varName = this.lutKeyVariable[i];
+                            if (this.oVisuVariables.get(varName).value !== transferarray[i]){
+                                action(this.oVisuVariables.get(varName)!.value=transferarray[i]);   
+                            }
+                        };
+                        StateManager.singleton().oState.set("ISONLINE", "TRUE");
+                    }
+                    resolve(true)
+                })
+            })
+            .catch(()=>{
+                console.log("Connection lost");
+                StateManager.singleton().oState.set("ISONLINE", "FALSE");
+                resolve(false)
+            });
         })
-        .catch(()=>{
-            console.log("Connection lost");
-            StateManager.singleton().oState.set("ISONLINE", "FALSE");
-        });
     }
-    
-    startCyclicUpdate(periodms : number) {
+
+    startCyclicUpdate() {
         // The updateVarList function will be called once at beginning
         this.updateVarList();
+
         // And then in an interval
-        window.setInterval(()=>this.updateVarList(), periodms);
+        this.intervalID = window.setInterval(()=>this.updateVarList(), Number(StateManager.singleton().oState.get("UPDATETIME")));
+    }
+
+    stopCyclicUpdate(){
+        window.clearInterval(this.intervalID);
     }
     
     setValue(varName : string, varValue : number | string | boolean) {
