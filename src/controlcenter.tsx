@@ -49,7 +49,7 @@ export default class HTML5Visu {
         // Process the visu-ini file. There are informations like the current user level, the current visu or the user passwords
         await this.processingVisuIni();
         // The Comsocket has to be initilized
-        this.initCommunication(Number(stateManager.get("UPDATETIME")));
+        this.initCommunication();
         StateManager.singleton().init();
         // initialization finished
         this.loading = false;
@@ -58,7 +58,7 @@ export default class HTML5Visu {
             return (
                 <div style={{width: stateManager!.get("VISUWIDTH")!.toLowerCase(), height:stateManager!.get("VISUHEIGHT")!.toLowerCase(), userSelect:"none"}}>
                     {stateManager.get("ISONLINE") === "TRUE"
-                        ? <Visualisation visuname={stateManager!.get("CURRENTVISU")!.toLowerCase()} mainVisu={true} replacementSet={null} width={this.windowWidth} height={this.windowsHeight} show_frame={false} clip_frame={true} iso_frame={true} original_frame={false} original_scrollable_frame={false} no_frame_offset={true}></Visualisation>
+                        ? <Visualisation visuname={stateManager!.get("CURRENTVISU")!.toLowerCase()} width={this.windowWidth} height={this.windowsHeight} show_frame={false} clip_frame={true} iso_frame={true} original_frame={false} original_scrollable_frame={false} no_frame_offset={true}></Visualisation>
                         : <ConnectionFault></ConnectionFault>
                     }
                     <Popup 
@@ -78,10 +78,10 @@ export default class HTML5Visu {
     
     }
 
-    initCommunication(cycletime : number){
+    initCommunication(){
         let com = ComSocket.singleton();
         com.setServerURL(this.rootDir + '/webvisu.htm');
-        com.startCyclicUpdate(cycletime);
+        com.startCyclicUpdate();
         com.initObservables();
     }
 
@@ -354,21 +354,21 @@ export default class HTML5Visu {
                             // Save the downlaod id
                             localStorage.setItem("download-id", xmlDownloadID);
                             // Preload the visualisations
-                            await this.preloadVisus();
+                            //await this.preloadVisus();
                         }
                         // Get the compression value
                         let xmlCompression = data.getElementsByTagName("compression")[0].textContent;
                         if (xmlCompression === "true") {
-                          stateManager.set("COMPRESSION", "true");
+                          stateManager.set("COMPRESSION", "TRUE");
                         } else {
-                          stateManager.set("COMPRESSION", "false");
+                          stateManager.set("COMPRESSION", "FALSE");
                         }
                         // Get the best-fit value
                         let xmlBestFit = data.getElementsByTagName("best-fit")[0].textContent;
                         if (xmlBestFit === "true") {
-                          stateManager.set("BESTFIT", "true");
+                          stateManager.set("BESTFIT", "TRUE");
                         } else {
-                          stateManager.set("BESTFIT", "false");
+                          stateManager.set("BESTFIT", "FALSE");
                         }
                         resolve(data)
                     })
@@ -400,6 +400,7 @@ export default class HTML5Visu {
                     // Get the visualisations which are used as main visush
                     let mainVisunames = thisVisuXML.getElementsByTagName("expr-zoom");
                     Array.from(mainVisunames).forEach(function (nameNode){
+                        /// können auch vars sein
                         let nextVisuname = nameNode.getElementsByTagName("placeholder")[0].textContent.toLowerCase();
                         if (!loadedVisus.includes(nextVisuname) && !visusToBeLoaded.includes(nextVisuname) && !notExistingVisus.includes(nextVisuname)){
                             visusToBeLoaded.push(nextVisuname);
