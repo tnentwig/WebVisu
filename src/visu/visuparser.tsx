@@ -8,8 +8,6 @@ import StateManager from '../visu/statemanagement/statemanager';
 
 type Props = {
     visuname : string,
-    mainVisu : boolean,
-    replacementSet : Map<string, string>,
     width : number,
     height : number,
     show_frame : boolean,
@@ -20,9 +18,9 @@ type Props = {
     no_frame_offset : boolean
 }
 
-export const Visualisation :React.FunctionComponent<Props> = React.memo(({ visuname, mainVisu, replacementSet, width, height,  show_frame, clip_frame, iso_frame, original_frame, original_scrollable_frame, no_frame_offset})=> {
+export const Visualisation :React.FunctionComponent<Props> = React.memo(({ visuname, width, height,  show_frame, clip_frame, iso_frame, original_frame, original_scrollable_frame, no_frame_offset})=> {
     const [loading, setLoading] = React.useState<Boolean>(true);
-    const [adaptedXML, setAdaptedXML] = React.useState<XMLDocument>(null);
+    const [adaptedXML, setAdaptedXML] = React.useState<Element>(null);
     const [originSize, setOriginSize] = React.useState<Array<number>>([0,0]);
     const [scale, setScale] = React.useState("scale(1)");
     
@@ -48,15 +46,14 @@ export const Visualisation :React.FunctionComponent<Props> = React.memo(({ visun
             
             if(plainxml !== null){
                 let xmlDoc = parseVisuXML(plainxml);
-                initVariables(xmlDoc, mainVisu);
-                replacePlaceholders(xmlDoc, replacementSet);
-                setAdaptedXML(xmlDoc);
+                await initVariables(xmlDoc);
+                setAdaptedXML(xmlDoc.children[0]);
                 setOriginSize(stringToArray(xmlDoc.getElementsByTagName("visualisation")[0].getElementsByTagName("size")[0].innerHTML));
                 setLoading(false);
             }
         };
         fetchXML();
-    }, [visuname, mainVisu, replacementSet]);
+    }, [visuname]);
     
     // Scaling on main window resize for responsive behavior
     React.useEffect(()=>{
@@ -81,49 +78,22 @@ export const Visualisation :React.FunctionComponent<Props> = React.memo(({ visun
     )
 })
 
-function initVariables(XML : XMLDocument, reset : boolean) : void{
+async function initVariables(XML : XMLDocument) {
     let com = ComSocket.singleton();
     // We have to reset the varibales on comsocket, if necessary
-    if (reset){
-        com.initObservables()
-    }
+    com.stopCyclicUpdate();
+    com.initObservables();
     // Rip all of <variable> in <variablelist> section
     let variables = XML.getElementsByTagName("visualisation")[0].getElementsByTagName("variablelist")[0].getElementsByTagName("variable");
     for (let i=0; i<variables.length; i++){
-        let varName = variables[i].getAttribute("name")
+        let varName = variables[i].getAttribute("name");
         let rawAddress = variables[i].innerHTML;
         let varAddress = rawAddress.split(",").slice(0,4).join(",");
         // Add the variable to the observables if not already existent
-        if (!com.oVisuVariables.has(varName)){
+        if (!com.oVisuVariables.has(varName.toLowerCase())){
             com.addObservableVar(varName, varAddress);
         }
     }
-}
-
-function replacePlaceholders(data : XMLDocument, replacements : Map<string, string>){
-    if (replacements === null){
-        return
-    }
-    // Find all placeholder variables 
-    let placeholders = data.getElementsByTagName("placeholder");
-    // Replace all Placeholders
-    Array.from(placeholders).forEach(function (placeholder){
-        let regEx = new RegExp(/\$(.*)\$/gm);
-        let match = regEx.exec(placeholder.textContent);
-        // Replacement
-        if (match != null){
-            let replace = match[1].toLowerCase();
-            if (replacements.has(replace)){
-                let variable = data.createElement('var');
-                let content = placeholder.textContent.replace(/\$(.*)\$/, replacements.get(replace)).toLowerCase();
-                if(ComSocket.singleton().oVisuVariables.has("."+content)){
-                    content = "." + content;
-                }
-                // Schlechte Implementierung von Codesys, Doppelpunkte durch einfügen von referenzen möglich
-                let textContent = content.replace(/\.\./, '.');
-                variable.textContent = textContent;
-                placeholder.parentNode.replaceChild(variable, placeholder);
-            }
-        }
-    })
+    await com.updateVarList();
+    com.startCyclicUpdate();
 }

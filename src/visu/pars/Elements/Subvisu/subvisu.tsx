@@ -1,25 +1,13 @@
 import * as React from 'react';
-import { Visualisation } from '../../../visuparser';
+import { VisuElements } from '../../elementparser';
 import * as util from '../../Utils/utilfunctions';
-import { IBasicShape } from '../../../Interfaces/javainterfaces';
+import { ISubvisuShape } from '../../../Interfaces/javainterfaces';
 import { parseDynamicShapeParameters } from '../Features/Events/eventManager';
 import { createVisuObject } from '../../Objectmanagement/objectManager'
 import { useObserver, useLocalStore } from 'mobx-react-lite';
 
 type Props = {
     section : Element
-}
-
-function getPlaceholders(section : Element){
-    let placeholders : Map<string,string> = new Map();
-    let placeholderentry = section.getElementsByTagName("placeholderentry");
-    for (let i=0; i<placeholderentry.length; i++){
-        let variable = placeholderentry[i];
-        let placeholder = variable.getAttribute("placeholder");
-        let replacement = variable.getAttribute("replacement");
-        placeholders.set(placeholder.toLowerCase(), replacement.toLowerCase())
-    }
-    return placeholders;
 }
 
 export const Subvisu :React.FunctionComponent<Props> = ({section})=>
@@ -30,7 +18,7 @@ export const Subvisu :React.FunctionComponent<Props> = ({section})=>
         referenceObject[children[i].nodeName] = children[i];
     }
 
-    let subvisu: IBasicShape = {
+    let subvisu: ISubvisuShape = {
         shape: "subvisu",
         has_inside_color: util.stringToBoolean(referenceObject["has-inside-color"].textContent),
         fill_color: util.rgbToHexString(referenceObject["fill-color"].textContent),
@@ -44,36 +32,33 @@ export const Subvisu :React.FunctionComponent<Props> = ({section})=>
         center: util.stringToArray(referenceObject["center"].textContent),
         hidden_input: util.stringToBoolean(referenceObject["hidden-input"].textContent),
         enable_text_input: util.stringToBoolean(referenceObject["enable-text-input"].textContent),
+        visuname : referenceObject["name"].textContent,
+        show_frame : util.stringToBoolean(referenceObject["show-frame"].textContent),
+        clip_frame : util.stringToBoolean(referenceObject["clip-frame"].textContent),
+        iso_frame : util.stringToBoolean(referenceObject["iso-frame"].textContent),
+        original_frame : util.stringToBoolean(referenceObject["original-frame"].textContent),
+        original_scrollable_frame : util.stringToBoolean(referenceObject["original-scrollable-frame"].textContent),
+        visu_size : util.stringToArray(referenceObject["size"].textContent),
         // Optional properties
         tooltip : section.getElementsByTagName("tooltip").length > 0 ? section.getElementsByTagName("tooltip")[0].innerHTML : "",
         access_levels : section.getElementsByTagName("access-levels").length ? util.parseAccessLevels(section.getElementsByTagName("access-levels")[0].innerHTML) : ["rw","rw","rw","rw","rw","rw","rw","rw"]
       }
-    
-    // Subvisu specials
-    let visuname = section.getElementsByTagName("name")[0].innerHTML.toLowerCase();
-    let show_frame = section.getElementsByTagName("show-frame")[0].innerHTML.toLowerCase() === "true" ? true : false;
-    let clip_frame = section.getElementsByTagName("clip-frame")[0].innerHTML.toLowerCase() === "true" ? true : false;
-    let iso_frame = section.getElementsByTagName("iso-frame")[0].innerHTML.toLowerCase() === "true" ? true : false;
-    let original_frame = section.getElementsByTagName("original-frame")[0].innerHTML.toLowerCase() === "true" ? true : false;
-    let original_scrollable_frame = section.getElementsByTagName("original-scrollable-frame")[0].innerHTML.toLowerCase() === "true" ? true : false;
-    let no_frame_offset = section.getElementsByTagName("no-frame-offset")[0].innerHTML.toLowerCase() === "true" ? true : false;
-    let placeholders = getPlaceholders(section);
-    
+      
     // Parsing of observable events (like toggle color)
     let dynamicShapeParameters = parseDynamicShapeParameters(section);
     
     let initial = createVisuObject(subvisu, dynamicShapeParameters)
-    
+
     // Convert object to an observable one
     const state = useLocalStore(() => initial);
-    
+
     // Return of the react node
     return useObserver(()=>
         <div 
-            title={name} 
-            style={{ display : state.display=="visible" ? "inline" : "none", position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge }}
+            title={subvisu.visuname}
+            style={{ display : state.display=="visible" ?"inline":"none", position: "absolute", left: state.transformedCornerCoord.x1 - state.edge, top: state.transformedCornerCoord.y1 - state.edge, width: state.relCoord.width + 2 * state.edge, height: state.relCoord.height + 2 * state.edge, transform:state.visuScale, transformOrigin:"0 0"}}
             >
-            <Visualisation visuname={visuname} mainVisu={false} replacementSet={placeholders} width={state.relCoord.width} height={state.relCoord.height} show_frame={show_frame} clip_frame={clip_frame} iso_frame={iso_frame} original_frame={original_frame} original_scrollable_frame={original_scrollable_frame} no_frame_offset={no_frame_offset}></Visualisation>
+            <VisuElements visualisation={section}></VisuElements>
         </div>
     )
 }
