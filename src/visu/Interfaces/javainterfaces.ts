@@ -24,6 +24,16 @@ export interface IPiechartShape extends IBasicShape {
     points : number[][]
 }
 
+export interface ISubvisuShape extends IBasicShape {
+    visuname : string;
+    visu_size : number[];
+    show_frame : boolean;
+    clip_frame : boolean;
+    iso_frame : boolean;
+    original_frame : boolean;
+    original_scrollable_frame : boolean;
+}
+
 export interface IScrollbarShape {
     shape : string;
     rect : number[];
