@@ -5,132 +5,203 @@ import { IScrollbarShape } from '../../../Interfaces/javainterfaces';
 import { createVisuObject } from '../../Objectmanagement/objectManager';
 
 type Props = {
-    shape: IScrollbarShape,
-    dynamicParameters : Map<string,string[][]>,
-    updateFunction : Function,
-}
+    shape: IScrollbarShape;
+    dynamicParameters: Map<string, string[][]>;
+    updateFunction: Function;
+};
 
-export const HorizontalScrollbar :React.FunctionComponent<Props> = ({shape, dynamicParameters, updateFunction})=>
-{
+export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
+    shape,
+    dynamicParameters,
+    updateFunction,
+}) => {
     // Convert object to an observable one
-    const state = useLocalStore(()=>createVisuObject(shape, dynamicParameters));
+    const state = useLocalStore(() =>
+        createVisuObject(shape, dynamicParameters),
+    );
     // We have to calculate the values that are specific of orientation
-    let centerx = state.b1/2;
-    let centery = state.a/2;
+    let centerx = state.b1 / 2;
+    let centery = state.a / 2;
     // The paths are describing the triangles at the ends of the scrollbar
-    let path1 = ""+0.4*centerx+","+centery+" "+1.6*centerx+","+0.4*centery+" "+1.6*centerx+","+1.6*centery;
-    let path2 = ""+1.6*centerx+","+centery+" "+0.4*centerx+","+1.6*centery+" "+0.4*centerx+","+0.4*centery;
-    
+    let path1 =
+        '' +
+        0.4 * centerx +
+        ',' +
+        centery +
+        ' ' +
+        1.6 * centerx +
+        ',' +
+        0.4 * centery +
+        ' ' +
+        1.6 * centerx +
+        ',' +
+        1.6 * centery;
+    let path2 =
+        '' +
+        1.6 * centerx +
+        ',' +
+        centery +
+        ' ' +
+        0.4 * centerx +
+        ',' +
+        1.6 * centery +
+        ' ' +
+        0.4 * centerx +
+        ',' +
+        0.4 * centery;
+
     // States To manage the positiong of the slideer
     const [selected, setSelected] = React.useState(false);
-    const [initial, setInitial] = React.useState([0,0]);
+    const [initial, setInitial] = React.useState([0, 0]);
     // We need a reference to the rendered scrolbvar to get the rendered size of the scroll area
     const ref = React.useRef(null);
-    
+
     // At least we need functions to process the user events
-    
+
     // Increment and decrement the value by click on the ends
-    const increment = ()=>{
-        let upper = (state.lowerBound < state.upperBound) ? state.upperBound : state.lowerBound;
-        if (state.value < upper){
-            updateFunction(state.value+1)
+    const increment = () => {
+        let upper =
+            state.lowerBound < state.upperBound
+                ? state.upperBound
+                : state.lowerBound;
+        if (state.value < upper) {
+            updateFunction(state.value + 1);
         }
-    }
-    const decrement = ()=>{
-        let upper = (state.lowerBound < state.upperBound) ? state.lowerBound : state.upperBound;
-        if (state.value > upper){
-            updateFunction(state.value-1)
+    };
+    const decrement = () => {
+        let upper =
+            state.lowerBound < state.upperBound
+                ? state.lowerBound
+                : state.upperBound;
+        if (state.value > upper) {
+            updateFunction(state.value - 1);
         }
-    }
+    };
     // On click of the slider the selected bit is set to true and the size of scroll area is queried
-    const start = (e : React.MouseEvent)=>{
+    const start = (e: React.MouseEvent) => {
         setSelected(true);
-        setInitial([ref.current.getBoundingClientRect().left, ref.current.getBoundingClientRect().right]);
-    }
+        setInitial([
+            ref.current.getBoundingClientRect().left,
+            ref.current.getBoundingClientRect().right,
+        ]);
+    };
     // Handling the movement of the slider
-    const move = (e : React.MouseEvent)=>{
-        if(selected && updateFunction !== undefined){
-            let delta = e.pageX-initial[0];
-            let spacing = initial[1]-initial[0];
-            let scrollIntervall = Math.abs(state.upperBound-state.lowerBound);
-            
-            if(!(delta <0 || delta>spacing)){
+    const move = (e: React.MouseEvent) => {
+        if (selected && updateFunction !== undefined) {
+            let delta = e.pageX - initial[0];
+            let spacing = initial[1] - initial[0];
+            let scrollIntervall = Math.abs(
+                state.upperBound - state.lowerBound,
+            );
+
+            if (!(delta < 0 || delta > spacing)) {
                 // Conversion of delta to scrollvalue
-                    if(state.lowerBound > state.upperBound){
-                        let nextScrollvalue = state.lowerBound - delta/spacing * scrollIntervall;
-                        updateFunction(nextScrollvalue);
-                    } else {
-                        let nextScrollvalue = state.lowerBound + delta/spacing * scrollIntervall;
-                        updateFunction(nextScrollvalue);
-                    }
-                
-            } else if (delta < 0){
-                    updateFunction(state.lowerBound);
-            } else if (delta > spacing){
-                    updateFunction(state.upperBound);
+                if (state.lowerBound > state.upperBound) {
+                    let nextScrollvalue =
+                        state.lowerBound -
+                        (delta / spacing) * scrollIntervall;
+                    updateFunction(nextScrollvalue);
+                } else {
+                    let nextScrollvalue =
+                        state.lowerBound +
+                        (delta / spacing) * scrollIntervall;
+                    updateFunction(nextScrollvalue);
+                }
+            } else if (delta < 0) {
+                updateFunction(state.lowerBound);
+            } else if (delta > spacing) {
+                updateFunction(state.upperBound);
             }
         }
-    }
-    
+    };
+
     // Return of the react node
-    return useObserver(()=>
+    return useObserver(() => (
         <div
-            style={{position:"absolute", left:state.absCornerCoord.x1, top:state.absCornerCoord.y1, width:state.relCoord.width, height:state.relCoord.height}}
+            style={{
+                position: 'absolute',
+                left: state.absCornerCoord.x1,
+                top: state.absCornerCoord.y1,
+                width: state.relCoord.width,
+                height: state.relCoord.height,
+            }}
             onMouseMove={move}
-            onMouseUp={()=>setSelected(false)}
-            onMouseLeave={()=>setSelected(false)}
-            >
+            onMouseUp={() => setSelected(false)}
+            onMouseLeave={() => setSelected(false)}
+        >
             {/*Left button*/}
-            <svg 
-                onClick={(state.lowerBound < state.upperBound) ? decrement : increment}
-                cursor={"pointer"}
-                style ={{
-                height: state.a, 
-                width: state.b1,
-                position :"absolute", 
-                left : 0}}>
-                    <rect width={state.b1} height={state.a} style={{fill:"#d4d0c8", stroke:"darkgrey"}} />
-                    <polygon points={path1}/>
+            <svg
+                onClick={
+                    state.lowerBound < state.upperBound
+                        ? decrement
+                        : increment
+                }
+                cursor={'pointer'}
+                style={{
+                    height: state.a,
+                    width: state.b1,
+                    position: 'absolute',
+                    left: 0,
+                }}
+            >
+                <rect
+                    width={state.b1}
+                    height={state.a}
+                    style={{ fill: '#d4d0c8', stroke: 'darkgrey' }}
+                />
+                <polygon points={path1} />
             </svg>
             {/*Scroll area*/}
             <svg
-                cursor={selected ? "pointer" : null}
+                cursor={selected ? 'pointer' : null}
                 ref={ref}
-                style ={{
-                    position :"absolute", 
-                    left : state.b1,
-                    height: state.a, 
-                    width : state.relCoord.width-2*state.b1,
-                    backgroundColor: "#e6e6e6"}}>
-            </svg>
+                style={{
+                    position: 'absolute',
+                    left: state.b1,
+                    height: state.a,
+                    width: state.relCoord.width - 2 * state.b1,
+                    backgroundColor: '#e6e6e6',
+                }}
+            ></svg>
             {/*Slider*/}
             <svg
-                cursor={"pointer"}
-                style ={{
-                height: state.a, 
-                width: state.b2,
-                left : state.b1+state.scrollvalue,
-                position :"absolute"
-                }}>
-                <rect 
-                    width={state.b2} 
-                    height={state.a} 
-                    style={{fill:"#d4d0c8",stroke:"darkgrey"} } 
+                cursor={'pointer'}
+                style={{
+                    height: state.a,
+                    width: state.b2,
+                    left: state.b1 + state.scrollvalue,
+                    position: 'absolute',
+                }}
+            >
+                <rect
+                    width={state.b2}
+                    height={state.a}
+                    style={{ fill: '#d4d0c8', stroke: 'darkgrey' }}
                     onMouseDown={start}
-                    />
+                />
             </svg>
             {/*Right button*/}
             <svg
-                cursor={"pointer"}
-                onClick={(state.lowerBound < state.upperBound) ? increment : decrement}
-                style ={{
-                height: state.a,
-                width: state.b1,
-                position :"absolute",
-                right : 0}}>
-                    <rect width={state.b1} height={state.a} style={{fill:"#d4d0c8",stroke:"darkgrey"}} />
-                    <polygon points={path2}/>
+                cursor={'pointer'}
+                onClick={
+                    state.lowerBound < state.upperBound
+                        ? increment
+                        : decrement
+                }
+                style={{
+                    height: state.a,
+                    width: state.b1,
+                    position: 'absolute',
+                    right: 0,
+                }}
+            >
+                <rect
+                    width={state.b1}
+                    height={state.a}
+                    style={{ fill: '#d4d0c8', stroke: 'darkgrey' }}
+                />
+                <polygon points={path2} />
             </svg>
         </div>
-    )
-}
+    ));
+};

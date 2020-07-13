@@ -19,7 +19,7 @@
     animation: sup-spinner 1.2s linear infinite;
 }
 .sup-spinner div:after {
-    content: " ";
+    content: ' ';
     display: block;
     position: absolute;
     top: 3px;
@@ -27,7 +27,7 @@
     width: 6px;
     height: 18px;
     border-radius: 20%;
-    background: #6EC800;
+    background: #6ec800;
 }
 .sup-spinner div:nth-child(1) {
     transform: rotate(0deg);
@@ -79,9 +79,9 @@
 }
 @keyframes sup-spinner {
     0% {
-    opacity: 1;
+        opacity: 1;
     }
     100% {
-    opacity: 0;
+        opacity: 0;
     }
 }
