@@ -5,7 +5,7 @@
 
 This is a single page application (SPA) for displaying the web visualisation pages build with the **CoDeSys 2** or **WAGO-I/O-PRO** IDE without using Java. With this solution it's possible to display the existing visualisations on mobile devices or modern browsers that doesn't support Java applets anymore.
 
-> :pointright: : Every release has been tested with bigger CoDeSys projects but the components are currently not automatically tested. Create an issue or send me a mail to \_tristan.nentwig+webvisu@gmail.com* if you encounter a problem.
+> :point_right: : Every release has been tested with bigger CoDeSys projects but the components are currently not automatically tested. Create an issue or send me a mail to \_tristan.nentwig+webvisu@gmail.com* if you encounter a problem.
 
 ## How to use
 
