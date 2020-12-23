@@ -3,6 +3,7 @@ import { uid } from 'react-uid';
 import ComSocket from '../../../communication/comsocket';
 import { useLocalStore, useObserver } from 'mobx-react-lite';
 import { Button } from '../Button/button';
+import { Bitmap } from '../Bitmap/bitmap';
 import { SimpleShape } from '../Basicshapes/simpleshape';
 import { PolyShape } from '../Basicshapes/polyshape';
 import { stringToArray } from '../../Utils/utilfunctions';
@@ -13,7 +14,7 @@ type Props = {
     section: Element;
 };
 
-export const Group: React.FunctionComponent<Props> = React.memo(
+export const Group: React.FunctionComponent<Props> = 
     ({ section }) => {
         let scale = 'scale(1)';
         const rectParent = stringToArray(
@@ -66,6 +67,27 @@ export const Group: React.FunctionComponent<Props> = React.memo(
                     case 'button':
                         addVisuObject(
                             <Button section={element}></Button>,
+                        );
+                        getDimension(
+                            rightDownCorner,
+                            stringToArray(
+                                element.getElementsByTagName(
+                                    'rect',
+                                )[0].innerHTML,
+                            ),
+                        );
+                        break;
+                    case 'bitmap':
+                        addVisuObject(
+                            <Bitmap section={element}></Bitmap>,
+                        );
+                        getDimension(
+                            rightDownCorner,
+                            stringToArray(
+                                element.getElementsByTagName(
+                                    'rect',
+                                )[0].innerHTML,
+                            ),
                         );
                         break;
                     case 'group':
@@ -132,8 +154,7 @@ export const Group: React.FunctionComponent<Props> = React.memo(
                 </div>
             ) : null,
         );
-    },
-);
+    };
 
 function getDimension(
     actualDimension: Array<number>,
