@@ -128,6 +128,7 @@ export const Bitmap: React.FunctionComponent<Props> = ({
         <div
             style={{
                 position: 'absolute',
+                visibility: state.display,
                 left: state.transformedCornerCoord.x1 - state.edge,
                 top: state.transformedCornerCoord.y1 - state.edge,
                 width: state.relCoord.width + 2 * state.edge,
