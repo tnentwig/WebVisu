@@ -21,6 +21,8 @@ export default class ComSocket implements IComSocket {
     private serverURL: string;
     // The ID of cyclic request
     private intervalID: number;
+    // Indicator if a request is running
+    private runningFetch : boolean;
 
     // this class shall be a singleton
     private constructor() {
@@ -29,6 +31,7 @@ export default class ComSocket implements IComSocket {
         this.globalVariables = new Map();
         this.requestFrame = { frame: '', listings: 0 };
         this.lutKeyVariable = [];
+        this.runningFetch = false;
     }
 
     public static singleton() {
@@ -122,61 +125,71 @@ export default class ComSocket implements IComSocket {
         });
     }
 
-    updateVarList(): Promise<boolean> {
-        return new Promise((resolve) => {
-            fetch(this.serverURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain' },
-                body:
-                    '|0|' +
-                    this.requestFrame.listings +
-                    '|' +
-                    this.requestFrame.frame,
-            })
-                .then((response) => {
-                    response
-                        .arrayBuffer()
-                        .then((buffer: ArrayBuffer) => {
-                            let decoder = new TextDecoder(
-                                'iso-8859-1',
-                            );
-                            let text = decoder.decode(buffer);
-                            let transferarray: Array<string> = text
-                                .slice(1, text.length - 1)
-                                .split('|');
-                            if (
-                                transferarray.length ===
-                                this.requestFrame.listings
-                            ) {
-                                for (
-                                    let i = 0;
-                                    i < transferarray.length;
-                                    i++
-                                ) {
-                                    let varName = this.lutKeyVariable[
-                                        i
-                                    ];
-                                    if (
-                                        this.oVisuVariables.get(
-                                            varName,
-                                        ).value !== transferarray[i]
-                                    ) {
-                                        action(
-                                            (this.oVisuVariables.get(
-                                                varName,
-                                            )!.value =
-                                                transferarray[i]),
-                                        );
-                                    }
-                                }
-                                StateManager.singleton().oState.set(
-                                    'ISONLINE',
-                                    'TRUE',
-                                );
-                            }
-                            resolve(true);
-                        });
+    updateVarList(timeoutTime : number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            let controller = new AbortController();
+            let signal = controller.signal;
+            let timer = setTimeout(()=> {controller.abort()}, timeoutTime);
+            // Check if a primer fetch is running yet
+            if (!this.runningFetch){
+                this.runningFetch = true;
+                fetch(this.serverURL, {
+                    method: 'POST',
+                    signal: signal,
+                    headers: { 'Content-Type': 'text/plain' },
+                    body:
+                        '|0|' +
+                        this.requestFrame.listings +
+                        '|' +
+                        this.requestFrame.frame,
                 })
+                .then(
+                    (response) => {
+                        response
+                            .arrayBuffer()
+                            .then((buffer: ArrayBuffer) => {
+                                let decoder = new TextDecoder(
+                                    'iso-8859-1',
+                                );
+                                let text = decoder.decode(buffer);
+                                let transferarray: Array<string> = text
+                                    .slice(1, text.length - 1)
+                                    .split('|');
+                                if (
+                                    transferarray.length ===
+                                    this.requestFrame.listings
+                                ) {
+                                    for (
+                                        let i = 0;
+                                        i < transferarray.length;
+                                        i++
+                                    ) {
+                                        let varName = this.lutKeyVariable[
+                                            i
+                                        ];
+                                        if (
+                                            this.oVisuVariables.get(
+                                                varName,
+                                            ).value !== transferarray[i]
+                                        ) {
+                                            action(
+                                                (this.oVisuVariables.get(
+                                                    varName,
+                                                )!.value =
+                                                    transferarray[i]),
+                                            );
+                                        }
+                                    }
+                                    StateManager.singleton().oState.set(
+                                        'ISONLINE',
+                                        'TRUE',
+                                    );
+                                }
+                                resolve(true);
+                            });
+                    },
+                    (err) => reject (err)
+                )
                 .catch(() => {
                     console.log('Connection lost');
                     StateManager.singleton().oState.set(
@@ -184,18 +197,27 @@ export default class ComSocket implements IComSocket {
                         'FALSE',
                     );
                     resolve(false);
-                });
+                })
+                .finally(()=>
+                {
+                    clearTimeout(timer);
+                    this.runningFetch = false;
+                })
+            } else {
+                console.log("The duration of the variable fetch request is greater then the specified cyclus time in the webvisu.htm!")
+                resolve(false);
+            }
         });
+        
     }
 
     startCyclicUpdate() {
-        // The updateVarList function will be called once at beginning
-        this.updateVarList();
-
-        // And then in an interval
+        // Call the the updateVarList function cyclic
+        let updateTime = Number(StateManager.singleton().oState.get('UPDATETIME'));
+        let timeout = 5*updateTime;
         this.intervalID = window.setInterval(
-            () => this.updateVarList(),
-            Number(StateManager.singleton().oState.get('UPDATETIME')),
+            () => this.updateVarList(timeout),
+            updateTime,
         );
     }
 
