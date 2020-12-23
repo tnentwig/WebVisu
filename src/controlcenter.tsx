@@ -1,6 +1,6 @@
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import { observable, action } from 'mobx';
 import Popup from 'reactjs-popup';
 import ComSocket from './visu/communication/comsocket';
