@@ -92,7 +92,7 @@ export function getVisuxml(url: string): Promise<XMLDocument> {
         let rootPath = rootPathArray.join('/') + '/';
         // Get the main visualisation
         let protoXml = await getVisuxml2(url);
-
+        let subvisus : Map<string, XMLDocument> = new Map();
         let elements = protoXml.getElementsByTagName('element');
         // Get all possible variables of main visu
         let variableArray = [];
@@ -122,6 +122,7 @@ export function getVisuxml(url: string): Promise<XMLDocument> {
                     for (let j = 0; j < length; j++) {
                         if (childs[j].nodeName === 'name') {
                             let visuname = childs[j].textContent;
+                            
                             let subvisuXml = await getVisuxml2(
                                 rootPath +
                                     visuname.toLowerCase() +
@@ -269,59 +270,77 @@ export function getImage(url: string): Promise<string> {
 
     return new Promise((resolve) => {
         let base64Flag = 'data:' + mimeType + ';base64,';
-        fetch(url).then((response) => {
-            // Try to fetch the xml as unzipped file
-            if (response.ok) {
-                response.arrayBuffer().then((buffer) => {
-                    let binary = '';
-                    let bytes = new Uint8Array(buffer);
-                    bytes.forEach(
-                        (b) => (binary += String.fromCharCode(b)),
-                    );
-                    let base64 = window.btoa(binary);
-                    resolve(base64Flag + base64);
-                });
+
+        // Check if the compressed flag on statemanager is set
+        let compressed = false;
+        if (
+            StateManager.singleton().oState.get('COMPRESSION') !==
+            null
+        ) {
+            if (
+                StateManager.singleton().oState.get('COMPRESSION') ===
+                'TRUE'
+            ) {
+                compressed = true;
+            } else {
+                compressed = false;
             }
-            // Try to fetch the visu as zipped file
-            else {
-                let zip = new JsZip();
-                let urlStack = url.split('/');
-                let filename = urlStack.pop();
-                let zipName =
-                    filename.split('.')[0] +
-                    '_' +
-                    fileFormat +
-                    '.zip';
-                // Push the zip filename to stack
-                urlStack.push(zipName);
-                fetch(urlStack.join('/')).then((response) => {
-                    // Try to fetch the xml as unzipped file
-                    if (response.ok) {
-                        response
-                            .arrayBuffer()
-                            .then((buffer) => zip.loadAsync(buffer))
-                            .then((unzipped) =>
-                                unzipped
-                                    .file(filename)
-                                    .async('arraybuffer'),
-                            )
-                            .then((buffer) => {
-                                let binary = '';
-                                let bytes = new Uint8Array(buffer);
-                                bytes.forEach(
-                                    (b) =>
-                                        (binary += String.fromCharCode(
-                                            b,
-                                        )),
-                                );
-                                let base64 = window.btoa(binary);
-                                resolve(base64Flag + base64);
-                            });
-                    } else {
-                        resolve(null);
-                    }
-                });
-            }
-        });
+        }
+        // Fetch the xml as unzipped file
+        if (!compressed) {
+            fetch(url).then((response) => {
+                // Try to fetch the xml as unzipped file
+                if (response.ok) {
+                    response.arrayBuffer().then((buffer) => {
+                        let binary = '';
+                        let bytes = new Uint8Array(buffer);
+                        bytes.forEach(
+                            (b) => (binary += String.fromCharCode(b)),
+                        );
+                        let base64 = window.btoa(binary);
+                        resolve(base64Flag + base64);
+                    });
+                }
+            })
+        }// Try to fetch the visu as zipped file
+        else {
+            let zip = new JsZip();
+            let urlStack = url.split('/');
+            let filename = urlStack.pop();
+            let zipName =
+                filename.split('.')[0] +
+                '_' +
+                fileFormat +
+                '.zip';
+            // Push the zip filename to stack
+            urlStack.push(zipName);
+            fetch(urlStack.join('/')).then((response) => {
+                // Try to fetch the xml as unzipped file
+                if (response.ok) {
+                    response
+                        .arrayBuffer()
+                        .then((buffer) => zip.loadAsync(buffer))
+                        .then((unzipped) =>
+                            unzipped
+                                .file(filename)
+                                .async('arraybuffer'),
+                        )
+                        .then((buffer) => {
+                            let binary = '';
+                            let bytes = new Uint8Array(buffer);
+                            bytes.forEach(
+                                (b) =>
+                                    (binary += String.fromCharCode(
+                                        b,
+                                    )),
+                            );
+                            let base64 = window.btoa(binary);
+                            resolve(base64Flag + base64);
+                        });
+                } else {
+                    resolve(null);
+                }
+            });
+        }
     });
 }
