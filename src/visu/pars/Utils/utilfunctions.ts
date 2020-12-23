@@ -199,6 +199,7 @@ export function evalRPN(
     }
     // We initilize the operating stack, this is necessary for mutliple operands
     let operatingStack: Array<number> = [];
+    let test = [...postfixStack];
     // Now we pop the tokens successively form the resting stack
     for (var i = 0; i < postfixStack.length; i++) {
         var token = postfixStack[i];
@@ -337,10 +338,15 @@ export function evalRPN(
                     // Has only on operand
                     result = Number(!Boolean(operatingStack.pop()));
                     break;
+                case 'CONST':
+                    // Its a string
+                    result = operatingStack.pop();
+                    break;
                 default:
+                    console.log(test)
                     console.log(
-                        'The RPN-token: ' +
-                            token +
+                        'The RPN-combi: ' +
+                            token + " " + operator +
                             ' is not a valid one!',
                     );
             }
