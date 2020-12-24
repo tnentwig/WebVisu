@@ -76,7 +76,7 @@ export const Polygon: React.FunctionComponent<Props> = ({
                             points={coordArrayToString(
                                 state.relPoints,
                             )}
-                            fill={"None"}
+                            fill={state.fill}
                             strokeWidth={state.strokeWidth}
                             stroke={state.stroke}
                         />
