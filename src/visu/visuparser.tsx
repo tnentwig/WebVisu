@@ -56,6 +56,7 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
                 // Files that are needed several times will be saved internally for loading speed up
                 let plainxml: string;
                 if ((await get(visuname)) === undefined) {
+                    console.log(visuname)
                     let xml = await getVisuxml(url);
                     if (xml == null) {
                         console.log(
@@ -167,6 +168,6 @@ async function initVariables(XML: XMLDocument) {
             com.addObservableVar(varName, varAddress);
         }
     }
-    await com.updateVarList();
+    await com.updateVarList(1000);
     com.startCyclicUpdate();
 }
