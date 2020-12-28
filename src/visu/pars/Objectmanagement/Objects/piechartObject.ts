@@ -451,16 +451,6 @@ export function createPiechartObject(
             y2 += initial.ypos + initial.bottom + yoff;
             // Init the interim return object
             let coord = { x1: x1, y1: y1, x2: x2, y2: y2 };
-            /*
-            if (x1 > x2){
-                coord.x1 = x2;
-                coord.x2 = x1;
-            }
-            if (y1 > y2){
-                coord.y1 = y2;
-                coord.y2 = y1;
-            }
-            */
             return coord;
         },
     });
