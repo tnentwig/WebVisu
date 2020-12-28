@@ -102,14 +102,12 @@ export function pointArrayToPiechartString(
     strokeWidth: number,
 ): string {
     // Calculate the angle in radiant
-    let degreeToRad = (2 * Math.PI) / 360;
-    let startAngleRad = -startAngleDegree * degreeToRad;
-    let endAngleRad = -endAngleDegree * degreeToRad;
+    let startAngleRad = -startAngleDegree * 0.0174532925; // (2 * Math.PI) / 360 = 0.0174532925
+    let endAngleRad = -endAngleDegree * 0.0174532925;
     // Calculate the radii of the ellipse
     let radiusx = Math.abs(pointArray[1][0] - 1 - pointArray[0][0]);
     let radiusy = Math.abs(pointArray[1][1] - 1 - pointArray[0][1]);
     // Calculate the radius of start and endpoint
-
     let rStart = radius(radiusx, radiusy, startAngleRad);
     let rEnd = radius(radiusx, radiusy, endAngleRad);
     let start = [
@@ -124,35 +122,58 @@ export function pointArrayToPiechartString(
     interimArray[2] = start;
     interimArray[3] = end;
 
-    // Claculate the largeArcFlag
+    let d : string;
     let angleDiff = endAngleDegree - startAngleDegree;
-    let largeArcFlag = 1;
-    if (angleDiff > 0) {
-        largeArcFlag =
-            endAngleDegree - startAngleDegree <= 180 ? 1 : 0;
+    // Angle with 0 degree difference is shown als full arc in codesys
+    if(angleDiff % 360 == 0){
+        d = [
+            'M',
+            interimArray[0][0],
+            interimArray[0][1],
+            'L',
+            interimArray[2][0] + strokeWidth,
+            interimArray[2][1] + strokeWidth,
+            'A',
+            radiusx,
+            radiusy,
+            0,
+            1,
+            1,
+            strokeWidth,
+            interimArray[0][1] + strokeWidth,
+            'A',
+            radiusx,
+            radiusy,
+            1,
+            1,
+            1,
+            interimArray[2][0] + strokeWidth,
+            interimArray[2][1] + strokeWidth
+        ].join(' ');
     } else {
-        largeArcFlag =
-            endAngleDegree - startAngleDegree <= 180 ? 0 : 1;
+        let largeArcFlag = 1;
+        if (angleDiff > 0) {
+            largeArcFlag =
+                angleDiff <= 180 ? 1 : 0;
+        } 
+        d = [
+            'M',
+            interimArray[0][0],
+            interimArray[0][1],
+            'L',
+            interimArray[2][0] + strokeWidth,
+            interimArray[2][1] + strokeWidth,
+            'A',
+            radiusx,
+            radiusy,
+            0,
+            largeArcFlag,
+            1,
+            interimArray[3][0] + strokeWidth,
+            interimArray[3][1] + strokeWidth,
+            'Z',
+        ].join(' ');
     }
-
-    var d = [
-        // Move to the center of the div element
-        'M',
-        interimArray[0][0],
-        interimArray[0][1],
-        'L',
-        interimArray[2][0] + strokeWidth,
-        interimArray[2][1] + strokeWidth,
-        'A',
-        radiusx,
-        radiusy,
-        0,
-        largeArcFlag,
-        1,
-        interimArray[3][0] + strokeWidth,
-        interimArray[3][1] + strokeWidth,
-        'Z',
-    ].join(' ');
     return d;
 }
 
