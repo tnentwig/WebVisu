@@ -62,7 +62,6 @@ export const Piechart: React.FunctionComponent<Props> = ({
             section.getElementsByTagName('enable-text-input')[0]
                 .textContent,
         ),
-        // Points only exists on polyforms
         points: [],
         // Optional properties
         tooltip:

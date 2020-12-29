@@ -53,6 +53,18 @@ export function createPiechartObject(
             item[1] - absCornerCoord.y1,
         ]);
     });
+    // Calculate the init angles
+    let v1 = [relPoints[2][0]- relPoints[0][0], relPoints[2][1]- relPoints[0][1]];
+    let v2 = [relPoints[3][0]- relPoints[0][0], relPoints[3][1]- relPoints[0][1]];
+
+    let abs1 = v1[0]/Math.sqrt(Math.pow(v1[0], 2)+Math.pow(v1[1], 2));
+    let abs2 = v2[0]/Math.sqrt(Math.pow(v2[0], 2)+Math.pow(v2[1], 2));
+
+    let sign1 = v1[1] >= 0 ? 1 : -1;
+    let sign2 = v2[1] >= 0 ? 1 : -1;
+
+    let startAngle = sign1*(Math.acos(abs1)*57.2957795);
+    let endAngle = sign2*(Math.acos(abs2)*57.2957795);
 
     // Create an object with the initial parameters
     let initial: IPiechartObject = {
@@ -93,8 +105,8 @@ export function createPiechartObject(
         relMidpointCoord: relMidpointCoord,
         relPoints: relPoints,
         // Variables for piechart
-        startAngle: 0,
-        endAngle: 0,
+        startAngle: startAngle,
+        endAngle: endAngle,
         piechartPath: '',
         // Access variables
         writeAccess: true,

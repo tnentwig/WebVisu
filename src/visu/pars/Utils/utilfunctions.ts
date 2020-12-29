@@ -105,8 +105,8 @@ export function pointArrayToPiechartString(
     let startAngleRad = -startAngleDegree * 0.0174532925; // (2 * Math.PI) / 360 = 0.0174532925
     let endAngleRad = -endAngleDegree * 0.0174532925;
     // Calculate the radii of the ellipse
-    let radiusx = Math.abs(pointArray[1][0] - 1 - pointArray[0][0]);
-    let radiusy = Math.abs(pointArray[1][1] - 1 - pointArray[0][1]);
+    let radiusx = Math.abs(pointArray[1][0] - pointArray[0][0]);
+    let radiusy = Math.abs(pointArray[1][1] - pointArray[0][1]);
     // Calculate the radius of start and endpoint
     let rStart = radius(radiusx, radiusy, startAngleRad);
     let rEnd = radius(radiusx, radiusy, endAngleRad);
@@ -123,9 +123,9 @@ export function pointArrayToPiechartString(
     interimArray[3] = end;
 
     let d : string;
-    let angleDiff = endAngleDegree - startAngleDegree;
+    let angleDiff = (endAngleDegree - startAngleDegree)%360;
     // Angle with 0 degree difference is shown als full arc in codesys
-    if(angleDiff % 360 == 0){
+    if(angleDiff == 0){
         d = [
             'M',
             interimArray[0][0],
@@ -133,29 +133,35 @@ export function pointArrayToPiechartString(
             'L',
             interimArray[2][0] + strokeWidth,
             interimArray[2][1] + strokeWidth,
+            'M',
+            2*radiusx+ strokeWidth,
+            radiusy+ strokeWidth,
             'A',
-            radiusx,
+            radiusx-strokeWidth,
             radiusy,
             0,
             1,
             1,
             strokeWidth,
-            interimArray[0][1] + strokeWidth,
+            radiusy+ strokeWidth,
             'A',
             radiusx,
             radiusy,
             1,
             1,
             1,
-            interimArray[2][0] + strokeWidth,
-            interimArray[2][1] + strokeWidth
+            2*radiusx+ strokeWidth,
+            radiusy+ strokeWidth
         ].join(' ');
     } else {
         let largeArcFlag = 1;
-        if (angleDiff > 0) {
+        if (angleDiff > 0){
             largeArcFlag =
                 angleDiff <= 180 ? 1 : 0;
-        } 
+        } else {
+            largeArcFlag =
+                angleDiff <= -180 ? 1 : 0;
+        }
         d = [
             'M',
             interimArray[0][0],
