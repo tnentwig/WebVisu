@@ -147,7 +147,7 @@ export function pointArrayToPiechartString(
             'A',
             radiusx,
             radiusy,
-            1,
+            0,
             1,
             1,
             2*radiusx+ strokeWidth,
