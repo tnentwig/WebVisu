@@ -60,8 +60,8 @@ export function createPiechartObject(
     let abs1 = v1[0]/Math.sqrt(Math.pow(v1[0], 2)+Math.pow(v1[1], 2));
     let abs2 = v2[0]/Math.sqrt(Math.pow(v2[0], 2)+Math.pow(v2[1], 2));
 
-    let sign1 = v1[1] >= 0 ? 1 : -1;
-    let sign2 = v2[1] >= 0 ? 1 : -1;
+    let sign1 = v1[1] >= 0 ? -1 : 1;
+    let sign2 = v2[1] >= 0 ? -1 : 1;
 
     let startAngle = sign1*(Math.acos(abs1)*57.2957795);
     let endAngle = sign2*(Math.acos(abs2)*57.2957795);
