@@ -504,7 +504,7 @@ export function createPiechartObject(
                 '.currentuserlevel',
             )!.value;
             const currentNum = Number(current);
-            if (currentNum !== NaN) {
+            if (!isNaN(currentNum)) {
                 if (
                     piechartShape.accessLevels[currentNum].includes(
                         'w',
@@ -526,7 +526,7 @@ export function createPiechartObject(
                 '.currentuserlevel',
             )!.value;
             const currentNum = Number(current);
-            if (currentNum !== NaN) {
+            if (!isNaN(currentNum)) {
                 if (
                     piechartShape.accessLevels[currentNum].includes(
                         'r',

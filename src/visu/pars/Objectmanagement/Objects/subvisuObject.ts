@@ -471,7 +471,7 @@ export function createSubvisuObject(
                 '.currentuserlevel',
             )!.value;
             const currentNum = Number(current);
-            if (currentNum !== NaN) {
+            if (!isNaN(currentNum)) {
                 if (
                     subvisuShape.accessLevels[currentNum].includes(
                         'w',
@@ -493,7 +493,7 @@ export function createSubvisuObject(
                 '.currentuserlevel',
             )!.value;
             const currentNum = Number(current);
-            if (currentNum !== NaN) {
+            if (!isNaN(currentNum)) {
                 if (
                     subvisuShape.accessLevels[currentNum].includes(
                         'r',

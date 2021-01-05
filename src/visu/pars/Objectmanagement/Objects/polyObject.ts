@@ -460,7 +460,7 @@ export function createPolyObject(
                 '.currentuserlevel',
             )!.value;
             const currentNum = Number(current);
-            if (currentNum !== NaN) {
+            if (!isNaN(currentNum)) {
                 if (
                     polyShape.accessLevels[currentNum].includes('w')
                 ) {
@@ -480,7 +480,7 @@ export function createPolyObject(
                 '.currentuserlevel',
             )!.value;
             const currentNum = Number(current);
-            if (currentNum !== NaN) {
+            if (!isNaN(currentNum)) {
                 if (
                     polyShape.accessLevels[currentNum].includes('r')
                 ) {
