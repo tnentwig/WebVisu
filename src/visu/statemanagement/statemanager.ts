@@ -1,7 +1,7 @@
 import {
     observable,
     autorun,
-    computed,
+    // computed,
     IObservableValue,
 } from 'mobx';
 import ComSocket from '../communication/comsocket';
@@ -16,9 +16,12 @@ interface IStateManager {
 
 export default class StateManager implements IStateManager {
     private static instance: IStateManager = new StateManager();
+
     // objList contains all variables as objects with the name as key and addr & value of the variable
     oState: Map<string, string>;
+
     xmlDict: Map<string, string>;
+
     openPopup: IObservableValue<boolean>;
 
     // this class shall be a singleton
@@ -34,9 +37,13 @@ export default class StateManager implements IStateManager {
 
     init() {
         this.oState.set('ISONLINE', 'TRUE');
-        /* hier besteht noch ein Problem, aus welchem Grund auch immer wird Comsocket nur einmal observiert.
-        Wenn Wert einmal verändert wurde wird autorun nicht mehr ausgeführt. Ursache musss noch geklärt werden.
-        Bis dahin wird per intervallabfrage manuell observiert*/
+        /**
+         * TODO: There is still a problem here.
+         * For whatever reason Comsocket is only observed once.
+         * Once the value has been changed, autorun is no longer executed.
+         * The cause has yet to be clarified.
+         * Until then, manual monitoring is carried out using an interval query
+         */
         if (this.oState.get('USECURRENTVISU') === 'TRUE') {
             ComSocket.singleton().setValue(
                 '.currentvisu',

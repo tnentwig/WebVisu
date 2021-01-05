@@ -19,7 +19,7 @@ export const Scrollbar: React.FunctionComponent<Props> = ({
         section.getElementsByTagName('rect')[0].innerHTML,
     );
     const horzPosition: boolean =
-        rect[1] - rect[0] > rect[3] - rect[2] ? true : false;
+        rect[1] - rect[0] > rect[3] - rect[2];
     // Parsing of the fixed parameters
     const scrollbar: IScrollbarShape = {
         shape: 'scrollbar',
@@ -27,7 +27,10 @@ export const Scrollbar: React.FunctionComponent<Props> = ({
         horzPosition: horzPosition,
         tooltip:
             section.getElementsByTagName('tooltip').length > 0
-                ? section.getElementsByTagName('tooltip')[0].innerHTML
+                ? util.parseText(
+                      section.getElementsByTagName('tooltip')[0]
+                          .textContent,
+                  )
                 : '',
     };
 
@@ -40,7 +43,7 @@ export const Scrollbar: React.FunctionComponent<Props> = ({
         return (
             <HorizontalScrollbar
                 shape={scrollbar}
-                dynamicParameters={shapeParameters}
+                shapeParameters={shapeParameters}
                 updateFunction={update}
             ></HorizontalScrollbar>
         );
@@ -48,7 +51,7 @@ export const Scrollbar: React.FunctionComponent<Props> = ({
         return (
             <VerticalScrollbar
                 shape={scrollbar}
-                dynamicParameters={shapeParameters}
+                shapeParameters={shapeParameters}
                 updateFunction={update}
             ></VerticalScrollbar>
         );

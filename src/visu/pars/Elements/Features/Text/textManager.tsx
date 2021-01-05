@@ -60,7 +60,6 @@ export const Textfield: React.FunctionComponent<Props> = ({
         section.getElementsByTagName('text-id')[0].textContent,
     );
     */
-    const language = localStorage.getItem('language').toLowerCase();
     // relCoord are the width and the height in relation the div
     const relCoord = {
         width: 0,
@@ -100,7 +99,6 @@ export const Textfield: React.FunctionComponent<Props> = ({
         scale: 10, // a scale of 10 means a representation of 1:1
         angle: 0,
         transform: 'scale(1) rotate(0)',
-        language: language,
     };
 
     // relCoord are the width and the height in relation the div
@@ -321,15 +319,11 @@ export const Textfield: React.FunctionComponent<Props> = ({
                 }
             }
 
-            console.log('text', text);
-
             if (value !== '') {
                 value = value + ', Arial';
             } else {
                 value = 'Arial';
             }
-
-            console.log('font-family', value);
 
             return value;
         },
@@ -370,14 +364,6 @@ export const Textfield: React.FunctionComponent<Props> = ({
                     ? 'end'
                     : 'start';
             return position;
-        },
-    });
-
-    Object.defineProperty(initial, 'language', {
-        get: function () {
-            const language = localStorage.getItem('language').toLowerCase();
-            console.log(language);
-            return language;
         },
     });
 

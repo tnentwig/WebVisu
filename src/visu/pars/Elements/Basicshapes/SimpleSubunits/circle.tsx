@@ -7,7 +7,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 type Props = {
     simpleShape: IBasicShape;
     textField: JSX.Element | undefined;
-    input: JSX.Element;
+    inputField: JSX.Element;
     dynamicParameters: Map<string, string[][]>;
     onmousedown: Function;
     onmouseup: Function;
@@ -18,7 +18,7 @@ export const Circle: React.FunctionComponent<Props> = React.memo(
     ({
         simpleShape,
         textField,
-        input,
+        inputField,
         dynamicParameters,
         onclick,
         onmousedown,
@@ -33,7 +33,7 @@ export const Circle: React.FunctionComponent<Props> = React.memo(
             <div
                 style={{
                     cursor: 'auto',
-                    overflow: 'hidden',
+                    overflow: 'visible',
                     pointerEvents: state.eventType,
                     visibility: state.display,
                     position: 'absolute',
@@ -46,7 +46,7 @@ export const Circle: React.FunctionComponent<Props> = React.memo(
             >
                 {state.readAccess ? (
                     <ErrorBoundary fallback={<div>Oh no</div>}>
-                        {input}
+                        {inputField}
                         <svg
                             style={{ float: 'left' }}
                             width={
@@ -55,6 +55,7 @@ export const Circle: React.FunctionComponent<Props> = React.memo(
                             height={
                                 state.relCoord.height + 2 * state.edge
                             }
+                            overflow="visible"
                         >
                             <svg
                                 onClick={
@@ -103,6 +104,7 @@ export const Circle: React.FunctionComponent<Props> = React.memo(
                                 strokeDasharray={
                                     state.strokeDashArray
                                 }
+                                overflow="visible"
                             >
                                 <ellipse
                                     stroke={state.stroke}
@@ -118,12 +120,21 @@ export const Circle: React.FunctionComponent<Props> = React.memo(
                                     ry={state.relMidpointCoord.y}
                                     fill={state.fill}
                                     strokeWidth={state.strokeWidth}
+                                    transform={state.transform}
                                 >
                                     <title>{state.tooltip}</title>
                                 </ellipse>
                                 {typeof textField === 'undefined' ||
                                 textField === null ? null : (
-                                    <svg>{textField}</svg>
+                                    <svg
+                                        width={state.relCoord.width}
+                                        height={state.relCoord.height}
+                                        x={state.edge}
+                                        y={state.edge}
+                                        overflow="visible"
+                                    >
+                                        {textField}
+                                    </svg>
                                 )}
                             </svg>
                         </svg>

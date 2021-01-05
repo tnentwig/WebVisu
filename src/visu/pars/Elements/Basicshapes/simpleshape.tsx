@@ -77,7 +77,10 @@ export const SimpleShape: React.FunctionComponent<Props> = ({
             ),
             // Optional properties
             tooltip: section.getElementsByTagName('tooltip').length
-                ? section.getElementsByTagName('tooltip')[0].innerHTML
+                ? util.parseText(
+                      section.getElementsByTagName('tooltip')[0]
+                          .textContent,
+                  )
                 : '',
             accessLevels: section.getElementsByTagName(
                 'access-levels',
@@ -90,26 +93,11 @@ export const SimpleShape: React.FunctionComponent<Props> = ({
         };
 
         // Parsing of observable events (like toggle color)
-        const shapeParameters = parseShapeParameters(
-            section,
-        );
-
-        // Parsing the textfields and returning a jsx object if it exists
-        let textField: JSX.Element;
-        if (section.getElementsByTagName('text-format').length) {
-            const textParameters = parseTextParameters(
-                section,
-            );
-            textField = (
-                <Textfield
-                    section={section}
-                    textParameters={textParameters}
-                    shapeParameters={shapeParameters}
-                ></Textfield>
-            );
-        } else {
-            textField = null;
-        }
+        const shapeParameters = parseShapeParameters(section);
+        // Parsing of user events that causes a reaction like toggle or pop up input
+        const onclick = parseClickEvent(section);
+        const onmousedown = parseTapEvent(section, 'down');
+        const onmouseup = parseTapEvent(section, 'up');
 
         // Parsing the inputfield
         let inputField: JSX.Element;
@@ -130,70 +118,82 @@ export const SimpleShape: React.FunctionComponent<Props> = ({
             inputField = null;
         }
 
-        // Parsing of user events that causes a reaction like toggle or pop up input
-        const onclick = parseClickEvent(section);
-        const onmousedown = parseTapEvent(section, 'down');
-        const onmouseup = parseTapEvent(section, 'up');
+        // Parsing the textfields and returning a jsx object if it exists
+        let textField: JSX.Element;
+        if (section.getElementsByTagName('text-format').length) {
+            const textParameters = parseTextParameters(
+                section,
+            );
+            textField = (
+                <Textfield
+                    section={section}
+                    textParameters={textParameters}
+                    shapeParameters={shapeParameters}
+                ></Textfield>
+            );
+        } else {
+            textField = null;
+        }
 
         // Return of the React-Node
         switch (shape) {
-            case 'round-rect':
+            case 'round-rect': {
                 return (
                     <Roundrect
                         simpleShape={simpleShapeBasis}
                         textField={textField}
-                        input={inputField}
+                        inputField={inputField}
                         dynamicParameters={shapeParameters}
                         onclick={onclick}
                         onmousedown={onmousedown}
                         onmouseup={onmouseup}
                     />
                 );
-                break;
-            case 'circle':
+            }
+            case 'circle': {
                 return (
                     <Circle
                         simpleShape={simpleShapeBasis}
                         textField={textField}
-                        input={inputField}
+                        inputField={inputField}
                         dynamicParameters={shapeParameters}
                         onclick={onclick}
                         onmousedown={onmousedown}
                         onmouseup={onmouseup}
                     />
                 );
-                break;
-            case 'line':
+            }
+            case 'line': {
                 return (
                     <Line
                         simpleShape={simpleShapeBasis}
                         textField={textField}
-                        input={inputField}
+                        inputField={inputField}
                         dynamicParameters={shapeParameters}
                         onclick={onclick}
                         onmousedown={onmousedown}
                         onmouseup={onmouseup}
                     ></Line>
                 );
-                break;
-            case 'rectangle':
+            }
+            case 'rectangle': {
                 return (
                     <Rectangle
                         simpleShape={simpleShapeBasis}
                         textField={textField}
-                        input={inputField}
+                        inputField={inputField}
                         dynamicParameters={shapeParameters}
                         onclick={onclick}
                         onmousedown={onmousedown}
                         onmouseup={onmouseup}
                     />
                 );
-                break;
+            }
         }
     }
     // Else the name of the shape is not known
     else {
-        console.log(
+        console.warn(
             'Simple-Shape: <' + shape + '> is not supported!',
         );
         return null;

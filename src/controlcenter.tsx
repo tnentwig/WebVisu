@@ -10,7 +10,7 @@ import { Visualisation } from './visu/visuparser';
 import { ConnectionFault } from './supplements/InfoBox/infobox';
 import { ExecutionPopup } from './supplements/PopUps/popup';
 import {
-    getVisuxml,
+    getVisuXML,
     stringifyVisuXML,
 } from './visu/pars/Utils/fetchfunctions';
 import { Spinner } from './supplements/Spinner/spinner';
@@ -515,7 +515,7 @@ export default class HTML5Visu {
             const regEx = new RegExp(/\$(.*)\$/gm);
             const match = regEx.exec(visuName);
             if (typeof match === 'undefined' || match === null) {
-                const thisVisuXML = await getVisuxml(
+                const thisVisuXML = await getVisuXML(
                     this.rootDir + '/' + visuName + '.xml',
                 );
                 // The visu does not exist on server if thisVisuXML is null
@@ -568,7 +568,7 @@ export default class HTML5Visu {
                     });
                 } else {
                     notExistingVisus.push(visuName);
-                    console.log(
+                    console.warn(
                         'There is a internal problem in your CoDeSys Project. The visualisation named ' +
                             visuName +
                             ' is referenced but not available on the server!',

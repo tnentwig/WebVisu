@@ -3,7 +3,7 @@ import { get, set } from 'idb-keyval';
 import { VisuElements } from '../visu/pars/elementparser';
 import { stringToArray } from './pars/Utils/utilfunctions';
 import {
-    getVisuxml,
+    getVisuXML,
     stringifyVisuXML,
     parseVisuXML,
 } from './pars/Utils/fetchfunctions';
@@ -28,19 +28,40 @@ async function initVariables(XML: XMLDocument) {
     com.stopCyclicUpdate();
     com.initObservables();
     // Rip all of <variable> in <variablelist> section
-    const variables = XML.getElementsByTagName('visualisation')[0]
+    let variables = XML.getElementsByTagName('visualisation')[0]
         .getElementsByTagName('variablelist')[0]
         .getElementsByTagName('variable');
     for (let i = 0; i < variables.length; i++) {
         const varName = variables[i].getAttribute('name');
         const rawAddress = variables[i].innerHTML;
-        const varAddress = rawAddress.split(',').slice(0, 4).join(',');
+        const varAddress = rawAddress
+            .split(',')
+            .slice(0, 4)
+            .join(',');
         // Add the variable to the observables if not already existent
         if (!com.oVisuVariables.has(varName.toLowerCase())) {
             com.addObservableVar(varName, varAddress);
         }
     }
-    await com.updateVarList(1000);
+
+    // Rip all of <complexvariable> in <variablelist> section
+    variables = XML.getElementsByTagName('visualisation')[0]
+        .getElementsByTagName('variablelist')[0]
+        .getElementsByTagName('complexvariable');
+    for (let i = 0; i < variables.length; i++) {
+        const varName = variables[i].getAttribute('name');
+        const rawAddress = variables[i].innerHTML;
+        const varAddress = 'complex,'.concat(
+            rawAddress.split(',').slice(0, 3).join(','),
+        );
+        // Add the variable to the observables if not already existent
+        if (!com.oVisuVariables.has(varName.toLowerCase())) {
+            com.addObservableVar(varName, varAddress);
+        }
+    }
+    await com.updateVarList(1000).catch((error) => {
+        console.warn(error);
+    });
     com.startCyclicUpdate();
 }
 
@@ -49,14 +70,14 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
         visuName,
         width,
         height,
-        showFrame,
+        // showFrame,
         clipFrame,
         isoFrame,
         originalFrame,
-        originalScrollableFrame,
-        noFrameOffset,
+        // originalScrollableFrame,
+        // noFrameOffset,
     }) => {
-        const [loading, setLoading] = React.useState<Boolean>(true);
+        const [loading, setLoading] = React.useState<boolean>(true);
         const [adaptedXML, setAdaptedXML] = React.useState<Element>(
             null,
         );
@@ -78,10 +99,9 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
                 // Files that are needed several times will be saved internally for loading speed up
                 let plainxml: string;
                 if (typeof (await get(visuName)) === 'undefined') {
-                    console.log(visuName)
-                    const xml = await getVisuxml(url);
+                    const xml = await getVisuXML(url);
                     if (typeof xml === 'undefined' || xml === null) {
-                        console.log(
+                        console.warn(
                             'The requested visualisation ' +
                                 visuName +
                                 ' is not available!',

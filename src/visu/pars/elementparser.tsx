@@ -1,21 +1,24 @@
 import * as React from 'react';
 import { uid } from 'react-uid';
-import { SimpleShape } from '../pars/Elements/Basicshapes/simpleshape';
-import { PolyShape } from '../pars/Elements/Basicshapes/polyshape';
-import { Button } from '../pars/Elements/Button/button';
-import { Piechart } from '../pars/Elements/Piechart/piechart';
-import { Scrollbar } from '../pars/Elements/Scrollbar/scrollbar';
+import { SimpleShape } from './Elements/Basicshapes/simpleshape';
+import { PolyShape } from './Elements/Basicshapes/polyshape';
+import { Button } from './Elements/Button/button';
+import { Piechart } from './Elements/Piechart/piechart';
+import { Scrollbar } from './Elements/Scrollbar/scrollbar';
 import { ArrayTable } from './Elements/Arraytable/arraytable';
 import { Bitmap } from './Elements/Bitmap/bitmap';
 import { Group } from './Elements/Group/group';
-import { Subvisu } from '../pars/Elements/Subvisu/subvisu';
+import { Subvisu } from './Elements/Subvisu/subvisu';
 
 type Props = {
     visualisation: Element;
 };
 export const VisuElements: React.FunctionComponent<Props> = React.memo(
     ({ visualisation }) => {
-        const visuObjects: Array<{ obj: JSX.Element; id: string }> = [];
+        const visuObjects: Array<{
+            obj: JSX.Element;
+            id: string;
+        }> = [];
         const addVisuObject = (visuObject: JSX.Element) => {
             const obj = { obj: visuObject, id: uid(visuObject) };
             visuObjects.push(obj);
@@ -29,65 +32,88 @@ export const VisuElements: React.FunctionComponent<Props> = React.memo(
                 const type = section.getAttribute('type');
                 switch (type) {
                     // Is a simple shape like rectangle, round-rectangle, circle or line
-                    case 'simple':
+                    case 'simple': {
                         addVisuObject(
                             <SimpleShape
                                 section={section}
                             ></SimpleShape>,
                         );
                         break;
+                    }
                     // Is a bitmap
-                    case 'bitmap':
+                    case 'bitmap': {
                         addVisuObject(
-                            <Bitmap section={section}></Bitmap>,
+                            <Bitmap
+                                section={section}
+                            ></Bitmap>,
                         );
                         break;
+                    }
                     // Is a button
-                    case 'button':
+                    case 'button': {
                         addVisuObject(
-                            <Button section={section}></Button>,
+                            <Button
+                                section={section}
+                            ></Button>,
                         );
                         break;
+                    }
                     // Is a polygon - As polygon, polyline or bezier
-                    case 'polygon':
+                    case 'polygon': {
                         addVisuObject(
-                            <PolyShape section={section}></PolyShape>,
+                            <PolyShape
+                                section={section}
+                            ></PolyShape>,
                         );
                         break;
+                    }
                     // Is a piechart
-                    case 'piechart':
+                    case 'piechart': {
                         addVisuObject(
-                            <Piechart section={section}></Piechart>,
+                            <Piechart
+                                section={section}
+                            ></Piechart>,
                         );
                         break;
+                    }
                     // Is a group (Dynamic elements like a graph)
-                    case 'group':
+                    case 'group': {
                         addVisuObject(
-                            <Group section={section}></Group>,
+                            <Group
+                                section={section}
+                            ></Group>,
                         );
                         break;
+                    }
                     // Is a Scrollbar
-                    case 'scrollbar':
+                    case 'scrollbar': {
                         addVisuObject(
                             <Scrollbar section={section}></Scrollbar>,
                         );
                         break;
-                    case 'reference':
+                    }
+                    case 'reference': {
                         addVisuObject(
-                            <Subvisu section={section}></Subvisu>,
+                            <Subvisu
+                                section={section}
+                            ></Subvisu>,
                         );
                         break;
+                    }
                 }
             }
         }
 
         return (
             <React.Fragment>
-                {visuObjects.map((element, index) => (
-                    <React.Fragment key={element.id}>
-                        {element.obj}
-                    </React.Fragment>
-                ))}
+                {
+                    // visuObjects.map((element, index) => (
+                    visuObjects.map((element) => (
+                        <React.Fragment key={element.id}>
+                            {element.obj}
+                        </React.Fragment>
+                    ))
+                }
             </React.Fragment>
         );
     },

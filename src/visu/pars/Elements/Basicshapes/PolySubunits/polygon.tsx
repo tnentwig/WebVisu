@@ -8,7 +8,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 type Props = {
     polyShape: IBasicShape;
     textField: JSX.Element | undefined;
-    input: JSX.Element;
+    inputField: JSX.Element;
     dynamicParameters: Map<string, string[][]>;
     onmousedown: Function;
     onmouseup: Function;
@@ -18,7 +18,7 @@ type Props = {
 export const Polygon: React.FunctionComponent<Props> = ({
     polyShape,
     textField,
-    input,
+    inputField,
     dynamicParameters,
     onclick,
     onmousedown,
@@ -45,11 +45,12 @@ export const Polygon: React.FunctionComponent<Props> = ({
             }}
         >
             <ErrorBoundary fallback={<div>Oh no</div>}>
-                {input}
+                {inputField}
                 <svg
                     style={{ float: 'left' }}
                     width={state.relCoord.width + 2 * state.edge}
                     height={state.relCoord.height + 2 * state.edge}
+                    overflow="visible"
                 >
                     <svg
                         onClick={
@@ -77,6 +78,7 @@ export const Polygon: React.FunctionComponent<Props> = ({
                                 : () => onmouseup()
                         } // We have to reset if somebody leaves the object with pressed key
                         strokeDasharray={state.strokeDashArray}
+                        overflow="visible"
                     >
                         <polygon
                             points={coordArrayToString(
@@ -85,6 +87,7 @@ export const Polygon: React.FunctionComponent<Props> = ({
                             fill={state.fill}
                             strokeWidth={state.strokeWidth}
                             stroke={state.stroke}
+                            transform={state.transform}
                         />
                         <title>{state.tooltip}</title>
                     </svg>
@@ -97,6 +100,7 @@ export const Polygon: React.FunctionComponent<Props> = ({
                             height={
                                 state.relCoord.height + 2 * state.edge
                             }
+                            overflow="visible"
                         >
                             {textField}
                         </svg>

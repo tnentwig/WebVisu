@@ -5,18 +5,18 @@ import { createVisuObject } from '../../Objectmanagement/objectManager';
 
 type Props = {
     shape: IScrollbarShape;
-    dynamicParameters: Map<string, string[][]>;
+    shapeParameters: Map<string, string[][]>;
     updateFunction: Function;
 };
 
 export const VerticalScrollbar: React.FunctionComponent<Props> = ({
     shape,
-    dynamicParameters,
+    shapeParameters,
     updateFunction,
 }) => {
     // Convert object to an observable one
     const state = useLocalStore(() =>
-        createVisuObject(shape, dynamicParameters),
+        createVisuObject(shape, shapeParameters),
     );
     // We have to calculate the values that are specific of orientation
     const centerx = state.a / 2;
@@ -77,7 +77,8 @@ export const VerticalScrollbar: React.FunctionComponent<Props> = ({
     };
 
     // On click of the slider the selected bit is set to true and the size of scroll area is queried
-    const start = (e: React.MouseEvent) => {
+    // const start = (e: React.MouseEvent) => {
+    const start = () => {
         setSelected(true);
         setInitial([
             ref.current.getBoundingClientRect().top,
@@ -129,7 +130,7 @@ export const VerticalScrollbar: React.FunctionComponent<Props> = ({
             onMouseUp={() => setSelected(false)}
             onMouseLeave={() => setSelected(false)}
         >
-            {/*Top button*/}
+            {/* Top button */}
             <svg
                 onClick={
                     state.lowerBound < state.upperBound
@@ -151,7 +152,7 @@ export const VerticalScrollbar: React.FunctionComponent<Props> = ({
                 />
                 <polygon points={path1} />
             </svg>
-            {/*Scroll area*/}
+            {/* Scroll area */}
             <svg
                 cursor={selected ? 'pointer' : null}
                 ref={ref}
@@ -163,7 +164,7 @@ export const VerticalScrollbar: React.FunctionComponent<Props> = ({
                     backgroundColor: '#e6e6e6',
                 }}
             ></svg>
-            {/*Slider*/}
+            {/* Slider */}
             <svg
                 cursor={'pointer'}
                 style={{
@@ -180,7 +181,7 @@ export const VerticalScrollbar: React.FunctionComponent<Props> = ({
                     onMouseDown={start}
                 />
             </svg>
-            {/*Bottom button*/}
+            {/* Bottom button */}
             <svg
                 cursor={'pointer'}
                 onClick={

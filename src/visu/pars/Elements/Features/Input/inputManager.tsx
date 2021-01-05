@@ -24,7 +24,7 @@ export const Inputfield: React.FunctionComponent<Props> = ({
 
     // The expected behavior would be, that every called input field has a text-display node. Its an internal problem of the codesys project if not.
     let handleClickOutside: Function = () =>
-        console.log(
+        console.warn(
             'An inputfield has no corresponding text-display field!',
         );
 
@@ -80,7 +80,7 @@ export const Inputfield: React.FunctionComponent<Props> = ({
             };
             handleEnter = (event: any) => {
                 // Close on Enter
-                if (event.keyCode === 13) {
+                if (parseInt(event.keyCode) === 13) {
                     setOpen(false);
                     ComSocket.singleton().setValue(varName, value);
                 }

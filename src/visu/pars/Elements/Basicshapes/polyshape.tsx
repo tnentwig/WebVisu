@@ -74,8 +74,10 @@ export const PolyShape: React.FunctionComponent<Props> = ({
             // Optional properties
             tooltip:
                 section.getElementsByTagName('tooltip').length > 0
-                    ? section.getElementsByTagName('tooltip')[0]
-                          .innerHTML
+                    ? util.parseText(
+                          section.getElementsByTagName('tooltip')[0]
+                              .textContent,
+                      )
                     : '',
             accessLevels: section.getElementsByTagName(
                 'access-levels',
@@ -99,26 +101,12 @@ export const PolyShape: React.FunctionComponent<Props> = ({
         );
 
         // Parsing of observable events (like toggle color)
-        const shapeParameters = parseShapeParameters(
-            section,
-        );
+        const shapeParameters = parseShapeParameters(section);
 
-        // Parsing the textfields and returning a jsx object if it exists
-        let textField: JSX.Element;
-        if (section.getElementsByTagName('text-format').length) {
-            const textParameters = parseTextParameters(
-                section,
-            );
-            textField = (
-                <Textfield
-                    section={section}
-                    textParameters={textParameters}
-                    shapeParameters={shapeParameters}
-                ></Textfield>
-            );
-        } else {
-            textField = null;
-        }
+        // Parsing of user events that causes a reaction like toggle or pop up input
+        const onclick = parseClickEvent(section);
+        const onmousedown = parseTapEvent(section, 'down');
+        const onmouseup = parseTapEvent(section, 'up');
 
         // Parsing the inputfield
         let inputField: JSX.Element;
@@ -139,55 +127,67 @@ export const PolyShape: React.FunctionComponent<Props> = ({
             inputField = null;
         }
 
-        // Parsing of user events that causes a reaction like toggle or pop up input
-        const onclick = parseClickEvent(section);
-        const onmousedown = parseTapEvent(section, 'down');
-        const onmouseup = parseTapEvent(section, 'up');
+        // Parsing the textfields and returning a jsx object if it exists
+        let textField: JSX.Element;
+        if (section.getElementsByTagName('text-format').length) {
+            const textParameters = parseTextParameters(
+                section,
+            );
+            textField = (
+                <Textfield
+                    section={section}
+                    textParameters={textParameters}
+                    shapeParameters={shapeParameters}
+                ></Textfield>
+            );
+        } else {
+            textField = null;
+        }
 
         // Return of the React-Node
         switch (shape) {
-            case 'polygon':
+            case 'polygon': {
                 return (
                     <Polygon
                         polyShape={polyShapeBasis}
                         textField={textField}
-                        input={inputField}
+                        inputField={inputField}
                         dynamicParameters={shapeParameters}
                         onclick={onclick}
                         onmousedown={onmousedown}
                         onmouseup={onmouseup}
                     />
                 );
-                break;
-            case 'bezier':
+            }
+            case 'bezier': {
                 return (
                     <Bezier
                         polyShape={polyShapeBasis}
                         textField={textField}
-                        input={inputField}
+                        inputField={inputField}
                         dynamicParameters={shapeParameters}
                         onclick={onclick}
                         onmousedown={onmousedown}
                         onmouseup={onmouseup}
                     />
                 );
-                break;
-            case 'polyline':
+            }
+            case 'polyline': {
                 return (
                     <Polyline
                         polyShape={polyShapeBasis}
                         textField={textField}
-                        input={inputField}
+                        inputField={inputField}
                         dynamicParameters={shapeParameters}
                         onclick={onclick}
                         onmousedown={onmousedown}
                         onmouseup={onmouseup}
                     />
                 );
-                break;
+            }
         }
     } else {
-        console.log('Poly-Shape: <' + shape + '> is not supported!');
+        console.warn('Poly-Shape: <' + shape + '> is not supported!');
         return null;
     }
 };

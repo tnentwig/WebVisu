@@ -62,11 +62,15 @@ export const Piechart: React.FunctionComponent<Props> = ({
             section.getElementsByTagName('enable-text-input')[0]
                 .textContent,
         ),
+        // Points only exists on polyforms
         points: [],
         // Optional properties
         tooltip:
             section.getElementsByTagName('tooltip').length > 0
-                ? section.getElementsByTagName('tooltip')[0].innerHTML
+                ? util.parseText(
+                      section.getElementsByTagName('tooltip')[0]
+                          .textContent,
+                  )
                 : '',
         accessLevels: section.getElementsByTagName('access-levels')
             .length
@@ -84,15 +88,34 @@ export const Piechart: React.FunctionComponent<Props> = ({
         piechart.points.push(points);
     }
     // The piechart points consists of only 4 items
-    //[0]-> center
-    //[1]-> point bottom right
-    //[2]-> point startAngle
-    //[3]-> point endAngle
+    //   [0]-> center
+    //   [1]-> point bottom right
+    //   [2]-> point startAngle
+    //   [3]-> point endAngle
     // so we have to calculate the rect coordinates separatly
     piechart.rect = util.computePiechartRectCoord(piechart.points);
 
     // Parsing of observable events (like toggle color)
     const shapeParameters = parseShapeParameters(section);
+    // Parsing of user events that causes a reaction like toggle or pop up input
+    const onclick = parseClickEvent(section);
+    const onmousedown = parseTapEvent(section, 'down');
+    const onmouseup = parseTapEvent(section, 'up');
+
+    // Parsing the inputfield
+    let inputField: JSX.Element;
+    if (section.getElementsByTagName('enable-text-input').length) {
+        if (
+            section.getElementsByTagName('enable-text-input')[0]
+                .textContent === 'true'
+        ) {
+            inputField = <Inputfield section={section}></Inputfield>;
+        } else {
+            inputField = null;
+        }
+    } else {
+        inputField = null;
+    }
 
     // Parsing the textfields and returning a jsx object if it exists
     let textField: JSX.Element;
@@ -110,26 +133,6 @@ export const Piechart: React.FunctionComponent<Props> = ({
     } else {
         textField = null;
     }
-
-    // Parsing the inputfield
-    let inputField: JSX.Element;
-    if (section.getElementsByTagName('enable-text-input').length) {
-        if (
-            section.getElementsByTagName('enable-text-input')[0]
-                .textContent === 'true'
-        ) {
-            inputField = <Inputfield section={section}></Inputfield>;
-        } else {
-            inputField = null;
-        }
-    } else {
-        inputField = null;
-    }
-
-    // Parsing of user events that causes a reaction like toggle or pop up input
-    const onclick = parseClickEvent(section);
-    const onmousedown = parseTapEvent(section, 'down');
-    const onmouseup = parseTapEvent(section, 'up');
 
     const initial = createVisuObject(piechart, shapeParameters);
 
@@ -152,6 +155,7 @@ export const Piechart: React.FunctionComponent<Props> = ({
                 style={{ float: 'left' }}
                 width={state.relCoord.width + 2 * state.edge}
                 height={state.relCoord.height + 2 * state.edge}
+                overflow="visible"
             >
                 <svg
                     onClick={
@@ -187,18 +191,21 @@ export const Piechart: React.FunctionComponent<Props> = ({
                             : null
                     } // We have to reset if somebody leaves the object with pressed key
                     strokeDasharray={state.strokeDashArray}
+                    overflow="visible"
                 >
                     <path
                         d={state.piechartPath}
                         stroke={state.stroke}
                         strokeWidth={state.strokeWidth}
                         fill={state.fill}
+                        transform={state.transform}
                     ></path>
                     <title>{state.tooltip}</title>
                 </svg>
                 <svg
                     width={state.relCoord.width + 2 * state.edge}
                     height={state.relCoord.height + 2 * state.edge}
+                    overflow="visible"
                 >
                     {textField}
                 </svg>
