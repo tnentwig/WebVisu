@@ -19,44 +19,44 @@ export const Textfield: React.FunctionComponent<Props> = ({
     dynamicParameters,
 }) => {
     // The static tags for the font
-    let fontName = section.getElementsByTagName('font-name').length
+    const fontName = section.getElementsByTagName('font-name').length
         ? section.getElementsByTagName('font-name')[0].textContent
         : 'Arial';
-    let fontHeight = Number(
+    const fontHeight = Number(
         section.getElementsByTagName('font-height')[0].textContent,
     );
-    let fontWeight = Number(
+    const fontWeight = Number(
         section.getElementsByTagName('font-weight')[0].textContent,
     );
-    let isItalic = util.stringToBoolean(
+    const isItalic = util.stringToBoolean(
         section.getElementsByTagName('font-italic')[0].textContent,
     );
-    let hasStrikeOut = util.stringToBoolean(
+    const hasStrikeOut = util.stringToBoolean(
         section.getElementsByTagName('font-strike-out')[0]
             .textContent,
     );
-    let hasUnderline = util.stringToBoolean(
+    const hasUnderline = util.stringToBoolean(
         section.getElementsByTagName('font-underline')[0].textContent,
     );
-    let charSet = Number(
+    const charSet = Number(
         section.getElementsByTagName('font-char-set')[0].textContent,
     );
-    let fontColor = util.rgbToHexString(
+    const fontColor = util.rgbToHexString(
         section.getElementsByTagName('font-color')[0].textContent,
     );
     // The static text flags
 
-    let textAlignHorz = section.getElementsByTagName(
+    const textAlignHorz = section.getElementsByTagName(
         'text-align-horz',
     )[0].textContent;
-    let textAlignVert = section.getElementsByTagName(
+    const textAlignVert = section.getElementsByTagName(
         'text-align-vert',
     )[0].textContent;
-    let text = section.getElementsByTagName('text-format')[0]
+    const text = section.getElementsByTagName('text-format')[0]
         .textContent;
-    let textLines = getTextLines(text);
+    const textLines = getTextLines(text);
     // The id is used for static language change with a .vis file
-    let textId = Number(
+    const textId = Number(
         section.getElementsByTagName('text-id')[0].textContent,
     );
 
@@ -88,10 +88,10 @@ export const Textfield: React.FunctionComponent<Props> = ({
     // The sum of the attributes should determine the position of the element e.g. 4 + 20 = 24 => in the center of the svg
     // Problem: 12 is ambiguous : 8+4 and 10+2
     if (dynamicParameters.has('expr-text-flags')) {
-        let element = dynamicParameters!.get('expr-text-flags');
+        const element = dynamicParameters!.get('expr-text-flags');
         Object.defineProperty(initial, 'textAlignHorz', {
             get: function () {
-                let value = Number(
+                const value = Number(
                     ComSocket.singleton().oVisuVariables.get(element)!
                         .value,
                 );
@@ -110,7 +110,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
         });
         Object.defineProperty(initial, 'textAlignVert', {
             get: function () {
-                let value = Number(
+                const value = Number(
                     ComSocket.singleton().oVisuVariables.get(element)!
                         .value,
                 );
@@ -128,10 +128,10 @@ export const Textfield: React.FunctionComponent<Props> = ({
     }
     // 2) The font flags:
     if (dynamicParameters.has('expr-font-flags')) {
-        let element = dynamicParameters!.get('expr-font-flags');
+        const element = dynamicParameters!.get('expr-font-flags');
         Object.defineProperty(initial, 'hasUnderline', {
             get: function () {
-                let value =
+                const value =
                     (Number(
                         ComSocket.singleton().oVisuVariables.get(
                             element,
@@ -146,7 +146,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
         });
         Object.defineProperty(initial, 'isItalic', {
             get: function () {
-                let value =
+                const value =
                     (Number(
                         ComSocket.singleton().oVisuVariables.get(
                             element,
@@ -161,7 +161,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
         });
         Object.defineProperty(initial, 'hasStrikeOut', {
             get: function () {
-                let value =
+                const value =
                     (Number(
                         ComSocket.singleton().oVisuVariables.get(
                             element,
@@ -176,7 +176,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
         });
         Object.defineProperty(initial, 'fontWeight', {
             get: function () {
-                let value =
+                const value =
                     (Number(
                         ComSocket.singleton().oVisuVariables.get(
                             element,
@@ -192,10 +192,10 @@ export const Textfield: React.FunctionComponent<Props> = ({
     }
     // 3) The font name:
     if (dynamicParameters.has('expr-font-name')) {
-        let element = dynamicParameters!.get('expr-font-name');
+        const element = dynamicParameters!.get('expr-font-name');
         Object.defineProperty(initial, 'fontName', {
             get: function () {
-                let value = ComSocket.singleton().oVisuVariables.get(
+                const value = ComSocket.singleton().oVisuVariables.get(
                     element,
                 )!.value;
                 return value + ', Arial';
@@ -205,20 +205,20 @@ export const Textfield: React.FunctionComponent<Props> = ({
 
     // 5) The font color:
     if (dynamicParameters.has('expr-text-color')) {
-        let element = dynamicParameters!.get('expr-text-color');
+        const element = dynamicParameters!.get('expr-text-color');
         Object.defineProperty(initial, 'fontColor', {
             get: function () {
-                let value = ComSocket.singleton().oVisuVariables.get(
+                const value = ComSocket.singleton().oVisuVariables.get(
                     element,
                 )!.value;
-                let hex = numberToHexColor(value);
+                const hex = numberToHexColor(value);
                 return hex;
             },
         });
     }
     // 6) The font height:
     if (dynamicParameters.has('expr-font-height')) {
-        let element = dynamicParameters!.get('expr-font-height');
+        const element = dynamicParameters!.get('expr-font-height');
         Object.defineProperty(initial, 'fontHeight', {
             get: function () {
                 let value =
@@ -236,7 +236,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
 
     Object.defineProperty(initial, 'textAnchor', {
         get: function () {
-            let position =
+            const position =
                 initial.textAlignHorz == 'center'
                     ? 'middle'
                     : initial.textAlignHorz == 'left'
@@ -247,7 +247,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
     });
     Object.defineProperty(initial, 'xpos', {
         get: function () {
-            let position =
+            const position =
                 initial.textAlignHorz == 'center'
                     ? '50%'
                     : initial.textAlignHorz == 'left'
@@ -258,7 +258,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
     });
     Object.defineProperty(initial, 'ypos', {
         get: function () {
-            let position =
+            const position =
                 initial.textAlignVert == 'center'
                     ? '50%'
                     : initial.textAlignVert == 'bottom'
@@ -269,7 +269,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
     });
     Object.defineProperty(initial, 'dominantBaseline', {
         get: function () {
-            let position =
+            const position =
                 initial.textAlignVert == 'center'
                     ? 'middle'
                     : initial.textAlignVert == 'bottom'
@@ -280,7 +280,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
     });
     Object.defineProperty(initial, 'fontStyle', {
         get: function () {
-            let value =
+            const value =
                 initial.isItalic === true ? 'italic' : 'normal';
             return value;
         },
@@ -303,7 +303,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
     });
 
     // Create a map of lines
-    let svgTextLines: Array<JSX.Element | undefined | null> = [];
+    const svgTextLines: Array<JSX.Element | undefined | null> = [];
     svgTextLines.push(
         <Textline
             firstItem={true}

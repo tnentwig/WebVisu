@@ -13,13 +13,13 @@ type Props = {
 export const Subvisu: React.FunctionComponent<Props> = ({
     section,
 }) => {
-    let children = section.children;
-    let referenceObject: { [id: string]: Element } = {};
+    const children = section.children;
+    const referenceObject: { [id: string]: Element } = {};
     for (let i = 0; i < children.length; i++) {
         referenceObject[children[i].nodeName] = children[i];
     }
 
-    let subvisu: ISubvisuShape = {
+    const subvisu: ISubvisuShape = {
         shape: 'subvisu',
         hasInsideColor: util.stringToBoolean(
             referenceObject['has-inside-color'].textContent,
@@ -85,9 +85,9 @@ export const Subvisu: React.FunctionComponent<Props> = ({
     };
 
     // Parsing of observable events (like toggle color)
-    let dynamicShapeParameters = parseDynamicShapeParameters(section);
+    const dynamicShapeParameters = parseDynamicShapeParameters(section);
 
-    let initial = createVisuObject(subvisu, dynamicShapeParameters);
+    const initial = createVisuObject(subvisu, dynamicShapeParameters);
 
     // Convert object to an observable one
     const state = useLocalStore(() => initial);

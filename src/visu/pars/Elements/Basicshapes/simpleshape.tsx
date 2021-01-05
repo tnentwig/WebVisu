@@ -22,14 +22,14 @@ export const SimpleShape: React.FunctionComponent<Props> = ({
     section,
 }) => {
     // Check if its on of the allowed shapes like rectangle, round-rectangle, circle or line
-    let shape = section.getElementsByTagName('simple-shape')[0]
+    const shape = section.getElementsByTagName('simple-shape')[0]
         .innerHTML;
     // Parse the common informations
     if (
         ['round-rect', 'circle', 'line', 'rectangle'].includes(shape)
     ) {
         // Parsing of the fixed parameters
-        let simpleShapeBasis: IBasicShape = {
+        const simpleShapeBasis: IBasicShape = {
             shape: shape,
             hasInsideColor: util.stringToBoolean(
                 section.getElementsByTagName('has-inside-color')[0]
@@ -91,7 +91,7 @@ export const SimpleShape: React.FunctionComponent<Props> = ({
         // Parsing the textfields and returning a jsx object if it exists
         let textField: JSX.Element;
         if (section.getElementsByTagName('text-format').length) {
-            let dynamicTextParameters = parseDynamicTextParameters(
+            const dynamicTextParameters = parseDynamicTextParameters(
                 section,
                 shape,
             );
@@ -125,13 +125,13 @@ export const SimpleShape: React.FunctionComponent<Props> = ({
         }
 
         // Parsing of observable events (like toggle color)
-        let dynamicShapeParameters = parseDynamicShapeParameters(
+        const dynamicShapeParameters = parseDynamicShapeParameters(
             section,
         );
         // Parsing of user events that causes a reaction like toggle or pop up input
-        let onclick = parseClickEvent(section);
-        let onmousedown = parseTapEvent(section, 'down');
-        let onmouseup = parseTapEvent(section, 'up');
+        const onclick = parseClickEvent(section);
+        const onmousedown = parseTapEvent(section, 'down');
+        const onmouseup = parseTapEvent(section, 'up');
 
         // Return of the React-Node
         switch (shape) {

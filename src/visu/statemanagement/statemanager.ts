@@ -47,10 +47,10 @@ export default class StateManager implements IStateManager {
                 StateManager.singleton().oState.get('STARTVISU'),
             );
             setInterval(() => {
-                let value = ComSocket.singleton().oVisuVariables.get(
+                const value = ComSocket.singleton().oVisuVariables.get(
                     '.currentvisu',
                 ).value;
-                let visuName = this.oState
+                const visuName = this.oState
                     .get('CURRENTVISU')
                     .toLowerCase();
                 if (value !== undefined) {

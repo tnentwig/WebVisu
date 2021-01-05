@@ -9,10 +9,10 @@ export function stringToBoolean(booleanExp: string): boolean {
 }
 
 export function rgbToHexString(rgb: string): string {
-    let rgbClr = rgb.split(',');
-    let r = Number(rgbClr[0]);
-    let g = Number(rgbClr[1]);
-    let b = Number(rgbClr[2]);
+    const rgbClr = rgb.split(',');
+    const r = Number(rgbClr[0]);
+    const g = Number(rgbClr[1]);
+    const b = Number(rgbClr[2]);
     let interim = ((r << 16) | (g << 8) | b)
         .toString(16)
         .toUpperCase();
@@ -24,10 +24,10 @@ export function rgbToHexString(rgb: string): string {
 }
 
 export function numberToHexColor(number: string): string {
-    let interim = Number(number);
-    let r = interim & 255;
-    let g = (interim >> 8) & 255;
-    let b = (interim >> 16) & 255;
+    const interim = Number(number);
+    const r = interim & 255;
+    const g = (interim >> 8) & 255;
+    const b = (interim >> 16) & 255;
     let rgb = '' + ((((r << 8) + g) << 8) + b).toString(16);
     while (rgb.length !== 6) {
         rgb = '0' + rgb;
@@ -46,7 +46,7 @@ export function stringToArray(stringExp: string): Array<number> {
 }
 
 export function computeMinMaxCoord(pointArray: number[][]): number[] {
-    let rect = [
+    const rect = [
         pointArray[0][0],
         pointArray[0][1],
         pointArray[0][0],
@@ -74,19 +74,19 @@ export function computeMinMaxCoord(pointArray: number[][]): number[] {
 export function computePiechartRectCoord(
     pointArray: number[][],
 ): number[] {
-    let deltax = Math.abs(pointArray[1][0] - pointArray[0][0]);
-    let deltay = Math.abs(pointArray[1][1] - pointArray[0][1]);
-    let x1 = pointArray[0][0] - deltax;
-    let x2 = pointArray[0][0] + deltax;
-    let y1 = pointArray[0][1] - deltay;
-    let y2 = pointArray[0][1] + deltay;
-    let rect = [x1, y1, x2, y2];
+    const deltax = Math.abs(pointArray[1][0] - pointArray[0][0]);
+    const deltay = Math.abs(pointArray[1][1] - pointArray[0][1]);
+    const x1 = pointArray[0][0] - deltax;
+    const x2 = pointArray[0][0] + deltax;
+    const y1 = pointArray[0][1] - deltay;
+    const y2 = pointArray[0][1] + deltay;
+    const rect = [x1, y1, x2, y2];
     return rect;
 }
 
 // Calculate the radius of a specifc point
 function radius(a: number, b: number, angle: number) {
-    let r =
+    const r =
         (a * b) /
         Math.sqrt(
             Math.pow(b * Math.cos(angle), 2) +
@@ -102,28 +102,28 @@ export function pointArrayToPiechartString(
     strokeWidth: number,
 ): string {
     // Calculate the angle in radiant
-    let startAngleRad = -startAngleDegree * 0.0174532925; // (2 * Math.PI) / 360 = 0.0174532925
-    let endAngleRad = -endAngleDegree * 0.0174532925;
+    const startAngleRad = -startAngleDegree * 0.0174532925; // (2 * Math.PI) / 360 = 0.0174532925
+    const endAngleRad = -endAngleDegree * 0.0174532925;
     // Calculate the radii of the ellipse
-    let radiusx = Math.abs(pointArray[1][0] - pointArray[0][0]);
-    let radiusy = Math.abs(pointArray[1][1] - pointArray[0][1]);
+    const radiusx = Math.abs(pointArray[1][0] - pointArray[0][0]);
+    const radiusy = Math.abs(pointArray[1][1] - pointArray[0][1]);
     // Calculate the radius of start and endpoint
-    let rStart = radius(radiusx, radiusy, startAngleRad);
-    let rEnd = radius(radiusx, radiusy, endAngleRad);
-    let start = [
+    const rStart = radius(radiusx, radiusy, startAngleRad);
+    const rEnd = radius(radiusx, radiusy, endAngleRad);
+    const start = [
         Math.cos(startAngleRad) * rStart + radiusx,
         Math.sin(startAngleRad) * rStart + radiusy,
     ];
-    let end = [
+    const end = [
         Math.cos(endAngleRad) * rEnd + radiusx,
         Math.sin(endAngleRad) * rEnd + radiusy,
     ];
-    let interimArray = pointArray;
+    const interimArray = pointArray;
     interimArray[2] = start;
     interimArray[3] = end;
 
     let d : string;
-    let angleDiff = (endAngleDegree - startAngleDegree)%360;
+    const angleDiff = (endAngleDegree - startAngleDegree)%360;
     // Angle with 0 degree difference is shown als full arc in codesys
     if(angleDiff == 0){
         d = [
@@ -188,7 +188,7 @@ export function polarToCartesian(
     radius: number,
     angleInDegrees: number,
 ) {
-    var angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
+    const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
     return {
         x: center[0] + radius * Math.cos(angleInRadians),
         y: center[1] + radius * Math.sin(angleInRadians),
@@ -196,7 +196,7 @@ export function polarToCartesian(
 }
 
 export function coordArrayToString(pointArray: number[][]): string {
-    let interim: string[] = [];
+    const interim: string[] = [];
     pointArray.forEach((element) => interim.push(element.join(',')));
     return interim.join(' ');
 }
@@ -225,11 +225,11 @@ export function evalRPN(
         return null;
     }
     // We initilize the operating stack, this is necessary for mutliple operands
-    let operatingStack: Array<number> = [];
-    let test = [...postfixStack];
+    const operatingStack: Array<number> = [];
+    const test = [...postfixStack];
     // Now we pop the tokens successively form the resting stack
-    for (var i = 0; i < postfixStack.length; i++) {
-        var token = postfixStack[i];
+    for (let i = 0; i < postfixStack.length; i++) {
+        let token = postfixStack[i];
         // The token could be "TRUE" or "FALSE". The we have to translate ist to 1 and 0.
         if (token.toLowerCase() === 'true') {
             token = '1';
@@ -246,12 +246,12 @@ export function evalRPN(
         else {
             // The <op>-text has the format: <operation>(<number of involved operands>) if number > 1
             let numberOfOperands = 2;
-            let regex = token.match(/\(([^)]+)\)/);
+            const regex = token.match(/\(([^)]+)\)/);
             if (regex !== null) {
                 numberOfOperands = Number(regex[1]);
             }
             // Get the operator
-            let operator = token.split('(')[0];
+            const operator = token.split('(')[0];
 
             // Choose the opration
             let result: number;
@@ -284,71 +284,71 @@ export function evalRPN(
                 case 'MAX':
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
-                        let y = result;
-                        let x = operatingStack.pop();
+                        const y = result;
+                        const x = operatingStack.pop();
                         result = x > y ? x : y;
                     }
                     break;
                 case 'MIN':
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
-                        let y = result;
-                        let x = operatingStack.pop();
+                        const y = result;
+                        const x = operatingStack.pop();
                         result = x < y ? x : y;
                     }
                     break;
                 case '=':
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
-                        let y = interim;
-                        let x = operatingStack.pop();
+                        const y = interim;
+                        const x = operatingStack.pop();
                         result = x == y ? 1 : 0;
                     }
                     break;
                 case '<':
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
-                        let y = interim;
-                        let x = operatingStack.pop();
+                        const y = interim;
+                        const x = operatingStack.pop();
                         result = x < y ? 1 : 0;
                     }
                     break;
                 case '>':
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
-                        let y = interim;
-                        let x = operatingStack.pop();
+                        const y = interim;
+                        const x = operatingStack.pop();
                         result = x > y ? 1 : 0;
                     }
                     break;
                 case '<=':
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
-                        let y = interim;
-                        let x = operatingStack.pop();
+                        const y = interim;
+                        const x = operatingStack.pop();
                         result = x <= y ? 1 : 0;
                     }
                     break;
                 case '>=':
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
-                        let y = interim;
-                        let x = operatingStack.pop();
+                        const y = interim;
+                        const x = operatingStack.pop();
                         result = x >= y ? 1 : 0;
                     }
                     break;
                 case '<>':
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
-                        let y = interim;
-                        let x = operatingStack.pop();
+                        const y = interim;
+                        const x = operatingStack.pop();
                         result = x !== y ? 1 : 0;
                     }
                     break;
                 case 'AND':
                     interim = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
-                        let swap = operatingStack.pop();
+                        const swap = operatingStack.pop();
                         interim = interim & swap;
                     }
                     result = interim;
@@ -356,7 +356,7 @@ export function evalRPN(
                 case 'OR':
                     interim = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
-                        let swap = operatingStack.pop();
+                        const swap = operatingStack.pop();
                         interim = interim | swap;
                     }
                     result = interim;
@@ -380,15 +380,15 @@ export function evalRPN(
             operatingStack.push(result);
         }
     }
-    let output = operatingStack.pop();
+    const output = operatingStack.pop();
     return output;
 }
 
 export function getTextLines(text: string) {
     let match;
     let lastMatch = 0;
-    let regEx = new RegExp(/(\n)/, 'g');
-    let stringStack = [];
+    const regEx = new RegExp(/(\n)/, 'g');
+    const stringStack = [];
     text = text.replace(/\t/g, '');
     do {
         match = regEx.exec(text);

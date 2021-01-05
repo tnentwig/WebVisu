@@ -23,7 +23,7 @@ export default class HTML5Visu {
     spinningText: string;
 
     constructor() {
-        let path = location.protocol + '//' + window.location.host;
+        const path = location.protocol + '//' + window.location.host;
         this.rootDir = path;
         this.windowWidth = window.innerWidth;
         this.windowsHeight = window.innerHeight;
@@ -53,7 +53,7 @@ export default class HTML5Visu {
             document.getElementById('visualisation'),
         );
         // Get a reference to the global state manager
-        let stateManager = StateManager.singleton().oState;
+        const stateManager = StateManager.singleton().oState;
         // Get the path to the files
         await this.pathConfiguration();
         stateManager.set('ROOTDIR', this.rootDir);
@@ -122,7 +122,7 @@ export default class HTML5Visu {
     }
 
     initCommunication() {
-        let com = ComSocket.singleton();
+        const com = ComSocket.singleton();
         com.setServerURL(this.rootDir + '/webvisu.htm');
         com.startCyclicUpdate();
         com.initObservables();
@@ -130,13 +130,13 @@ export default class HTML5Visu {
 
     appendGlobalVariables(visuIniXML: XMLDocument) {
         // Rip all of <variable> in <variablelist> section
-        let variables = visuIniXML
+        const variables = visuIniXML
             .getElementsByTagName('visu-ini-file')[0]
             .getElementsByTagName('variablelist')[0]
             .getElementsByTagName('variable');
         for (let i = 0; i < variables.length; i++) {
-            let name = variables[i].getAttribute('name');
-            let address = variables[i].textContent;
+            const name = variables[i].getAttribute('name');
+            const address = variables[i].textContent;
             ComSocket.singleton().addGlobalVar(name, address);
         }
     }
@@ -144,7 +144,7 @@ export default class HTML5Visu {
     pathConfiguration(): Promise<boolean> {
         return new Promise((resolve) => {
             // Get the current path
-            let path = window.location.pathname.replace(
+            const path = window.location.pathname.replace(
                 '/webvisu.html',
                 '',
             );
@@ -205,7 +205,7 @@ export default class HTML5Visu {
     processingWebvisuHtm(): Promise<boolean> {
         return new Promise((resolve) => {
             // Get a reference to the global state manager
-            let stateManager = StateManager.singleton().oState;
+            const stateManager = StateManager.singleton().oState;
             // Get the webvisu.htm file. There are the startvisu and updatetime listed
             fetch(this.rootDir + '/webvisu.htm', {
                 headers: {
@@ -215,31 +215,31 @@ export default class HTML5Visu {
             }).then((response) => {
                 if (response.ok) {
                     response.text().then((data) => {
-                        let parser = new DOMParser();
-                        let htmlDoc = parser.parseFromString(
+                        const parser = new DOMParser();
+                        const htmlDoc = parser.parseFromString(
                             data,
                             'text/html',
                         );
 
                         // Width, height - Definition of the size of the screen. Regard the possibility to make visible this size
                         // already during creating a visualization in CoDeSys (Target Settings: Display width/height in pixel).
-                        let appletElement = htmlDoc.getElementsByTagName(
+                        const appletElement = htmlDoc.getElementsByTagName(
                             'APPLET',
                         );
-                        let visuWidth = appletElement[0].getAttribute(
+                        const visuWidth = appletElement[0].getAttribute(
                             'width',
                         );
                         stateManager.set('VISUWIDTH', visuWidth);
-                        let visuHeight = appletElement[0].getAttribute(
+                        const visuHeight = appletElement[0].getAttribute(
                             'height',
                         );
                         stateManager.set('VISUHEIGHT', visuHeight);
 
-                        let htmlElement = htmlDoc.getElementsByTagName(
+                        const htmlElement = htmlDoc.getElementsByTagName(
                             'param',
                         );
                         for (let i = 0; i < htmlElement.length; i++) {
-                            let name = htmlElement[i]
+                            const name = htmlElement[i]
                                 .getAttribute('name')
                                 .toString();
                             switch (name) {
@@ -247,7 +247,7 @@ export default class HTML5Visu {
                                 case 'STARTVISU':
                                     // Definition of the start POU
                                     // Default: PLC_VISU
-                                    let visuName = htmlElement[i]
+                                    const visuName = htmlElement[i]
                                         .getAttribute('value')
                                         .toLowerCase();
                                     stateManager.set(name, visuName);
@@ -256,7 +256,7 @@ export default class HTML5Visu {
                                 case 'UPDATETIME':
                                     // Definition of the monitoring interval (msec)
                                     // Default: 100
-                                    let updateTime = htmlElement[
+                                    const updateTime = htmlElement[
                                         i
                                     ].getAttribute('value');
                                     stateManager.set(
@@ -269,7 +269,7 @@ export default class HTML5Visu {
                                     // Definition whether an automatic change to another visualization will be done,
                                     // as soon as the system variable 'CurrentVisu' is changed by the PLC program.
                                     // Default: FALSE
-                                    let useCurrentVisu = htmlElement[
+                                    const useCurrentVisu = htmlElement[
                                         i
                                     ].getAttribute('value');
                                     stateManager.set(
@@ -300,7 +300,7 @@ export default class HTML5Visu {
                                     // CoDeSys in a packed format ("<filename>_<extension original format>.zip").
                                     // Example: FALSE
                                     // Example: TRUE
-                                    let compressedFiles = htmlElement[
+                                    const compressedFiles = htmlElement[
                                         i
                                     ].getAttribute('value');
                                     stateManager.set(
@@ -366,7 +366,7 @@ export default class HTML5Visu {
                                     // Example (German): ISO-8859-1
                                     // Example (Russian): ISO-8859-5
                                     // Example (Japanese): MS932
-                                    let encodingString = htmlElement[
+                                    const encodingString = htmlElement[
                                         i
                                     ].getAttribute('value');
                                     stateManager.set(
@@ -436,7 +436,7 @@ export default class HTML5Visu {
     }
 
     processingVisuIni(): Promise<XMLDocument> {
-        let url = this.rootDir + '/visu_ini.xml';
+        const url = this.rootDir + '/visu_ini.xml';
         return new Promise((resolve) => {
             fetch(url, {
                 headers: {
@@ -446,18 +446,18 @@ export default class HTML5Visu {
                 if (response.ok) {
                     response.arrayBuffer().then(async (buffer) => {
                         // Get a reference to the global state manager
-                        let stateManager = StateManager.singleton()
+                        const stateManager = StateManager.singleton()
                             .oState;
-                        let decoder = new TextDecoder('iso-8859-1');
-                        let text = decoder.decode(buffer);
-                        let data = new window.DOMParser().parseFromString(
+                        const decoder = new TextDecoder('iso-8859-1');
+                        const text = decoder.decode(buffer);
+                        const data = new window.DOMParser().parseFromString(
                             text,
                             'text/xml',
                         );
                         // Append the global variables
                         this.appendGlobalVariables(data);
                         // Get the download ID
-                        let xmlDownloadID = data.getElementsByTagName(
+                        const xmlDownloadID = data.getElementsByTagName(
                             'download-id',
                         )[0].textContent;
                         // Check, if saved id and received id are not equal
@@ -476,7 +476,7 @@ export default class HTML5Visu {
                             //await this.preloadVisus();
                         }
                         // Get the compression value
-                        let xmlCompression = data.getElementsByTagName(
+                        const xmlCompression = data.getElementsByTagName(
                             'compression',
                         )[0].textContent;
                         if (xmlCompression === 'true') {
@@ -485,7 +485,7 @@ export default class HTML5Visu {
                             stateManager.set('COMPRESSION', 'FALSE');
                         }
                         // Get the best-fit value
-                        let xmlBestFit = data.getElementsByTagName(
+                        const xmlBestFit = data.getElementsByTagName(
                             'best-fit',
                         )[0].textContent;
                         if (xmlBestFit === 'true') {
@@ -501,40 +501,40 @@ export default class HTML5Visu {
     }
 
     async preloadVisus() {
-        let mainVisus: Array<string> = [];
-        let loadedVisus: Array<string> = [];
-        let visusToBeLoaded = [
+        const mainVisus: Array<string> = [];
+        const loadedVisus: Array<string> = [];
+        const visusToBeLoaded = [
             StateManager.singleton()
                 .oState.get('STARTVISU')
                 .toLowerCase(),
         ];
-        let notExistingVisus: Array<string> = [];
+        const notExistingVisus: Array<string> = [];
         while (visusToBeLoaded.length) {
-            let visuName = visusToBeLoaded.pop();
+            const visuName = visusToBeLoaded.pop();
             // Check if its a placeholder variable
-            let regEx = new RegExp(/\$(.*)\$/gm);
-            let match = regEx.exec(visuName);
+            const regEx = new RegExp(/\$(.*)\$/gm);
+            const match = regEx.exec(visuName);
             if (match == null) {
-                let thisVisuXML = await getVisuxml(
+                const thisVisuXML = await getVisuxml(
                     this.rootDir + '/' + visuName + '.xml',
                 );
                 // The visu does not exist on server if thisVisuXML is null
                 if (thisVisuXML !== null) {
-                    let xmlDict = StateManager.singleton().xmlDict;
+                    const xmlDict = StateManager.singleton().xmlDict;
                     if (!xmlDict.has(visuName)) {
-                        let plainxml = stringifyVisuXML(thisVisuXML);
+                        const plainxml = stringifyVisuXML(thisVisuXML);
                         xmlDict.set(visuName, plainxml);
                     }
                     loadedVisus.push(visuName);
                     // Get the visualisations which are used as main visush
-                    let mainVisunames = thisVisuXML.getElementsByTagName(
+                    const mainVisunames = thisVisuXML.getElementsByTagName(
                         'expr-zoom',
                     );
                     Array.from(mainVisunames).forEach(function (
                         nameNode,
                     ) {
                         /// können auch vars sein
-                        let nextVisuname = nameNode
+                        const nextVisuname = nameNode
                             .getElementsByTagName('placeholder')[0]
                             .textContent.toLowerCase();
                         if (
@@ -549,13 +549,13 @@ export default class HTML5Visu {
                         }
                     });
                     // Get the visualisations that are used as subvisus
-                    let subVisunames = thisVisuXML.querySelectorAll(
+                    const subVisunames = thisVisuXML.querySelectorAll(
                         'element[type="reference"]',
                     );
                     Array.from(subVisunames).forEach(function (
                         nameNode,
                     ) {
-                        let nextVisuname = nameNode
+                        const nextVisuname = nameNode
                             .getElementsByTagName('name')[0]
                             .textContent.toLowerCase();
                         if (

@@ -15,18 +15,18 @@ type Props = {
 };
 export const VisuElements: React.FunctionComponent<Props> = React.memo(
     ({ visualisation }) => {
-        let visuObjects: Array<{ obj: JSX.Element; id: string }> = [];
+        const visuObjects: Array<{ obj: JSX.Element; id: string }> = [];
         const addVisuObject = (visuObject: JSX.Element) => {
-            let obj = { obj: visuObject, id: uid(visuObject) };
+            const obj = { obj: visuObject, id: uid(visuObject) };
             visuObjects.push(obj);
         };
         // The effect is called if the visualisation prop change
         // Rip all <element> sections
         for (let i = 0; i < visualisation.children.length; i++) {
-            let section = visualisation.children[i];
+            const section = visualisation.children[i];
             if (visualisation.children[i].nodeName === 'element') {
                 // Determine the type of the element
-                let type = section.getAttribute('type');
+                const type = section.getAttribute('type');
                 switch (type) {
                     // Is a simple shape like rectangle, round-rectangle, circle or line
                     case 'simple':

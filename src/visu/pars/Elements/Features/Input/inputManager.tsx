@@ -52,7 +52,7 @@ export const Inputfield: React.FunctionComponent<Props> = ({
                 section.getElementsByTagName('text-input-max-expr')
                     .length
             ) {
-                minvalue = Number(
+                maxvalue = Number(
                     section
                         .getElementsByTagName(
                             'text-input-max-expr',
@@ -65,11 +65,11 @@ export const Inputfield: React.FunctionComponent<Props> = ({
     }
 
     if (section.getElementsByTagName('text-display').length) {
-        let expr = section
+        const expr = section
             .getElementsByTagName('text-display')[0]
             .getElementsByTagName('expr')[0];
         if (expr.getElementsByTagName('var').length) {
-            let varName = expr
+            const varName = expr
                 .getElementsByTagName('var')[0]
                 .innerHTML.toLowerCase();
             handleClickOutside = () => {

@@ -18,13 +18,13 @@ export const Textline: React.FunctionComponent<Props> = ({
     numberOfLines,
     firstItem,
 }) => {
-    let fontHeight = Number(
+    const fontHeight = Number(
         section.getElementsByTagName('font-height')[0].innerHTML,
     );
-    let textAlignHorz = section.getElementsByTagName(
+    const textAlignHorz = section.getElementsByTagName(
         'text-align-horz',
     )[0].innerHTML;
-    let textAlignVert = section.getElementsByTagName(
+    const textAlignVert = section.getElementsByTagName(
         'text-align-vert',
     )[0].innerHTML;
     const initial = {
@@ -42,10 +42,10 @@ export const Textline: React.FunctionComponent<Props> = ({
 
     // The text variable:
     if (dynamicParameters.has('text-display')) {
-        let element = dynamicParameters!.get('text-display');
+        const element = dynamicParameters!.get('text-display');
         Object.defineProperty(initial, 'textVariable', {
             get: function () {
-                let value = ComSocket.singleton().oVisuVariables.get(
+                const value = ComSocket.singleton().oVisuVariables.get(
                     element,
                 )!.value;
                 return value;
@@ -54,7 +54,7 @@ export const Textline: React.FunctionComponent<Props> = ({
     }
     // The delta value:
     if (dynamicParameters.has('expr-font-height')) {
-        let element = dynamicParameters!.get('expr-font-height');
+        const element = dynamicParameters!.get('expr-font-height');
         Object.defineProperty(initial, 'fontHeight', {
             get: function () {
                 let value =
@@ -71,10 +71,10 @@ export const Textline: React.FunctionComponent<Props> = ({
     }
     // The horzizontal and vertical Align
     if (dynamicParameters.has('expr-text-flags')) {
-        let element = dynamicParameters!.get('expr-text-flags');
+        const element = dynamicParameters!.get('expr-text-flags');
         Object.defineProperty(initial, 'textAlignHorz', {
             get: function () {
-                let value = Number(
+                const value = Number(
                     ComSocket.singleton().oVisuVariables.get(element)!
                         .value,
                 );
@@ -93,7 +93,7 @@ export const Textline: React.FunctionComponent<Props> = ({
         });
         Object.defineProperty(initial, 'textAlignVert', {
             get: function () {
-                let value = Number(
+                const value = Number(
                     ComSocket.singleton().oVisuVariables.get(element)!
                         .value,
                 );
@@ -112,7 +112,7 @@ export const Textline: React.FunctionComponent<Props> = ({
 
     Object.defineProperty(initial, 'dominantBaseline', {
         get: function () {
-            let position =
+            const position =
                 initial.textAlignVert == 'center'
                     ? 'middle'
                     : initial.textAlignVert == 'bottom'
@@ -124,13 +124,13 @@ export const Textline: React.FunctionComponent<Props> = ({
 
     function calcDayOfYear(now: Date) {
         /*
-        let start = new Date(now.getFullYear(), 0, 0);
-        let diff = (now.valueOf() - start.valueOf()) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
-        let oneDay = 1000 * 60 * 60 * 24;
+        const start = new Date(now.getFullYear(), 0, 0);
+        const diff = (now.valueOf() - start.valueOf()) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+        const oneDay = 1000 * 60 * 60 * 24;
         temp = Math.floor(diff / oneDay).toString();
         */
-        var firstJan = new Date(now.getFullYear(), 0, 1);
-        let oneDay = 1000 * 60 * 60 * 24;
+        const firstJan = new Date(now.getFullYear(), 0, 1);
+        const oneDay = 1000 * 60 * 60 * 24;
         return Math.ceil(
             (now.valueOf() - firstJan.valueOf()) / oneDay,
         );
@@ -139,22 +139,22 @@ export const Textline: React.FunctionComponent<Props> = ({
     function calcWeekNumber8601(now: Date) {
         // The first one seem to work but I found the second one to be better suited for ISO week.
         /*
-        let workDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
-        let dayNum = workDate.getUTCDay() || 7;
+        const workDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+        const dayNum = workDate.getUTCDay() || 7;
         workDate.setUTCDate(workDate.getUTCDate() + 4 - dayNum);
-        let firstJanUTC = new Date(Date.UTC(workDate.getUTCFullYear(), 0, 1));
-        let oneDay = 1000 * 60 * 60 * 24;
+        const firstJanUTC = new Date(Date.UTC(workDate.getUTCFullYear(), 0, 1));
+        const oneDay = 1000 * 60 * 60 * 24;
         return Math.ceil((((workDate.valueOf() - firstJanUTC.valueOf()) / oneDay) + 1) / 7);
         */
-        let target = new Date(now.valueOf());
-        let dayNr = (now.getDay() + 6) % 7;
+        const target = new Date(now.valueOf());
+        const dayNr = (now.getDay() + 6) % 7;
         target.setDate(target.getDate() - dayNr + 3);
-        let firstThursday = target.valueOf();
+        const firstThursday = target.valueOf();
         target.setMonth(0, 1);
         if (target.getDay() !== 4) {
             target.setMonth(0, 1 + ((4 - target.getDay() + 7) % 7));
         }
-        let oneWeek = 1000 * 60 * 60 * 24 * 7;
+        const oneWeek = 1000 * 60 * 60 * 24 * 7;
         return (
             1 +
             Math.ceil((firstThursday - target.valueOf()) / oneWeek)
@@ -163,19 +163,19 @@ export const Textline: React.FunctionComponent<Props> = ({
 
     function calcWeekNumberUS(now: Date) {
         // I am not sure about this one ... May need more research.
-        let workDate = new Date(
+        const workDate = new Date(
             Date.UTC(
                 now.getFullYear(),
                 now.getMonth(),
                 now.getDate(),
             ),
         );
-        let dayNum = workDate.getUTCDay();
+        const dayNum = workDate.getUTCDay();
         workDate.setUTCDate(workDate.getUTCDate() - dayNum);
-        let firstJanUTC = new Date(
+        const firstJanUTC = new Date(
             Date.UTC(workDate.getUTCFullYear(), 0, 1),
         );
-        let oneDay = 1000 * 60 * 60 * 24;
+        const oneDay = 1000 * 60 * 60 * 24;
         return Math.ceil(
             ((workDate.valueOf() - firstJanUTC.valueOf()) / oneDay +
                 1) /
@@ -190,8 +190,8 @@ export const Textline: React.FunctionComponent<Props> = ({
             let output: string;
             if (textLine.includes('%t')) {
                 let temp;
-                // let array;
-                var now = new Date();
+                // const array;
+                const now = new Date();
                 textLine = textLine.replace(/%t/g, '');
                 // %a      Abbreviated weekday name
                 if (textLine.includes('%a')) {
@@ -312,7 +312,7 @@ export const Textline: React.FunctionComponent<Props> = ({
                 }
                 // %z, %Z  Time-zone name or abbreviation; no characters if time zone is unknown
                 if (textLine.includes('%z')) {
-                    let dtf = Intl.DateTimeFormat('default', {
+                    const dtf = Intl.DateTimeFormat('default', {
                         timeZoneName: 'short',
                     });
                     temp = dtf
@@ -322,7 +322,7 @@ export const Textline: React.FunctionComponent<Props> = ({
                     textLine = textLine.replace(/%z/g, temp);
                 }
                 if (textLine.includes('%Z')) {
-                    let dtf = Intl.DateTimeFormat('default', {
+                    const dtf = Intl.DateTimeFormat('default', {
                         timeZoneName: 'long',
                     });
                     temp = dtf
@@ -334,7 +334,7 @@ export const Textline: React.FunctionComponent<Props> = ({
                 /*
                 // Just in case replace all %z and %Z to the short version
                 if (textLine.includes("%z") || textLine.includes("%Z")) {
-                    let dtf = Intl.DateTimeFormat('default', {timeZoneName: 'short'});
+                    const dtf = Intl.DateTimeFormat('default', {timeZoneName: 'short'});
                     temp = dtf.formatToParts(now).find((part) => part.type == 'timeZoneName').value;
                     textLine = textLine.replace(/%z/gi, temp);
                 }
@@ -375,7 +375,7 @@ export const Textline: React.FunctionComponent<Props> = ({
     Object.defineProperty(initial, 'deltay', {
         get: function () {
             if (firstItem) {
-                let interim =
+                const interim =
                     ((numberOfLines - 1) * initial.fontHeight) / 2;
                 return interim;
             } else {
@@ -386,7 +386,7 @@ export const Textline: React.FunctionComponent<Props> = ({
 
     Object.defineProperty(initial, 'xpos', {
         get: function () {
-            let position =
+            const position =
                 initial.textAlignHorz == 'center'
                     ? '50%'
                     : initial.textAlignHorz == 'left'

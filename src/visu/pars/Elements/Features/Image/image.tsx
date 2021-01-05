@@ -15,11 +15,11 @@ export const Image: React.FunctionComponent<Props> = ({
     inlineElement,
 }) => {
     // Auxiliary variables
-    let rect = stringToArray(
+    const rect = stringToArray(
         section.getElementsByTagName('rect')[0].innerHTML,
     );
 
-    let initial = {
+    const initial = {
         // frameType defines the type of scaling. Possible are isotrophic, anisotrophic or static
         frameType: section.getElementsByTagName('frame-type')[0]
             .innerHTML,
@@ -42,10 +42,10 @@ export const Image: React.FunctionComponent<Props> = ({
 
     // Set the filename, it could be a variable or static
     if (section.getElementsByTagName('expr-fill-color').length) {
-        let expression = section
+        const expression = section
             .getElementsByTagName('expr-fill-color')[0]
             .getElementsByTagName('expr');
-        let varName = expression[0].getElementsByTagName('var')[0]
+        const varName = expression[0].getElementsByTagName('var')[0]
             .innerHTML;
         Object.defineProperty(initial, 'filename', {
             get: function () {
@@ -83,15 +83,15 @@ export const Image: React.FunctionComponent<Props> = ({
             break;
     }
 
-    let state = useLocalStore(() => initial);
+    const state = useLocalStore(() => initial);
 
     if (
         section.getElementsByTagName('file-name')[0].innerHTML.length
     ) {
-        let rawFilename = section
+        const rawFilename = section
             .getElementsByTagName('file-name')[0]
             .innerHTML.replace(/.*\\/, '');
-        let path =
+        const path =
             ComSocket.singleton()
                 .getServerURL()
                 .replace('webvisu.htm', '') + rawFilename;

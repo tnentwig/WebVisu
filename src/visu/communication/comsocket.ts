@@ -74,14 +74,14 @@ export default class ComSocket implements IComSocket {
     }
 
     evalFunction(stack: string[][]): Function {
-        var returnFunc = function () {
-            let interim: Array<string> = [];
+        const returnFunc = function () {
+            const interim: Array<string> = [];
             for (
                 let position = 0;
                 position < stack.length;
                 position++
             ) {
-                let value = stack[position][1];
+                const value = stack[position][1];
                 switch (stack[position][0]) {
                     case 'var':
                         if (
@@ -127,9 +127,9 @@ export default class ComSocket implements IComSocket {
 
     updateVarList(timeoutTime : number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            let controller = new AbortController();
-            let signal = controller.signal;
-            let timer = setTimeout(()=> {controller.abort()}, timeoutTime);
+            const controller = new AbortController();
+            const signal = controller.signal;
+            const timer = setTimeout(()=> {controller.abort()}, timeoutTime);
             // Check if a primer fetch is running yet
             if (!this.runningFetch){
                 this.runningFetch = true;
@@ -148,11 +148,11 @@ export default class ComSocket implements IComSocket {
                         response
                             .arrayBuffer()
                             .then((buffer: ArrayBuffer) => {
-                                let decoder = new TextDecoder(
+                                const decoder = new TextDecoder(
                                     'iso-8859-1',
                                 );
-                                let text = decoder.decode(buffer);
-                                let transferarray: Array<string> = text
+                                const text = decoder.decode(buffer);
+                                const transferarray: Array<string> = text
                                     .slice(1, text.length - 1)
                                     .split('|');
                                 if (
@@ -164,7 +164,7 @@ export default class ComSocket implements IComSocket {
                                         i < transferarray.length;
                                         i++
                                     ) {
-                                        let varName = this.lutKeyVariable[
+                                        const varName = this.lutKeyVariable[
                                             i
                                         ];
                                         if (
@@ -213,8 +213,8 @@ export default class ComSocket implements IComSocket {
 
     startCyclicUpdate() {
         // Call the the updateVarList function cyclic
-        let updateTime = Number(StateManager.singleton().oState.get('UPDATETIME'));
-        let timeout = 5*updateTime;
+        const updateTime = Number(StateManager.singleton().oState.get('UPDATETIME'));
+        const timeout = 5*updateTime;
         this.intervalID = window.setInterval(
             () => this.updateVarList(timeout),
             updateTime,
@@ -242,7 +242,7 @@ export default class ComSocket implements IComSocket {
 
     // toggleValue : Wechselt den Wert einer boolschen Variablen
     toggleValue(varName: string) {
-        let variableName = varName.toLowerCase();
+        const variableName = varName.toLowerCase();
         if (this.oVisuVariables.has(variableName)) {
             let value = Number(
                 this.oVisuVariables.get(variableName)!.value,

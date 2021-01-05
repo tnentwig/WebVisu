@@ -15,13 +15,13 @@ type Props = {
 export const Scrollbar: React.FunctionComponent<Props> = ({
     section,
 }) => {
-    let rect = util.stringToArray(
+    const rect = util.stringToArray(
         section.getElementsByTagName('rect')[0].innerHTML,
     );
-    let horzPosition: boolean =
+    const horzPosition: boolean =
         rect[1] - rect[0] > rect[3] - rect[2] ? true : false;
     // Parsing of the fixed parameters
-    let scrollbar: IScrollbarShape = {
+    const scrollbar: IScrollbarShape = {
         shape: 'scrollbar',
         rect: rect,
         horzPosition: horzPosition,
@@ -32,9 +32,9 @@ export const Scrollbar: React.FunctionComponent<Props> = ({
     };
 
     // Parsing of observable events
-    let dynamicShapeParameters = parseDynamicShapeParameters(section);
+    const dynamicShapeParameters = parseDynamicShapeParameters(section);
     // Parse the scroll update function
-    let update = parseScrollUpdate(section);
+    const update = parseScrollUpdate(section);
     // Return of the react node
     if (horzPosition) {
         return (

@@ -22,6 +22,28 @@ type Props = {
     noFrameOffset: boolean;
 };
 
+async function initVariables(XML: XMLDocument) {
+    const com = ComSocket.singleton();
+    // We have to reset the varibales on comsocket, if necessary
+    com.stopCyclicUpdate();
+    com.initObservables();
+    // Rip all of <variable> in <variablelist> section
+    const variables = XML.getElementsByTagName('visualisation')[0]
+        .getElementsByTagName('variablelist')[0]
+        .getElementsByTagName('variable');
+    for (let i = 0; i < variables.length; i++) {
+        const varName = variables[i].getAttribute('name');
+        const rawAddress = variables[i].innerHTML;
+        const varAddress = rawAddress.split(',').slice(0, 4).join(',');
+        // Add the variable to the observables if not already existent
+        if (!com.oVisuVariables.has(varName.toLowerCase())) {
+            com.addObservableVar(varName, varAddress);
+        }
+    }
+    await com.updateVarList(1000);
+    com.startCyclicUpdate();
+}
+
 export const Visualisation: React.FunctionComponent<Props> = React.memo(
     ({
         visuName,
@@ -45,10 +67,10 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
 
         // Get new xml on change of visuName
         React.useEffect(() => {
-            let fetchXML = async function () {
+            const fetchXML = async function () {
                 // Set the loading flag. This will unmount all elements from calling visu
                 setLoading(true);
-                let url =
+                const url =
                     StateManager.singleton().oState.get('ROOTDIR') +
                     '/' +
                     visuName +
@@ -57,7 +79,7 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
                 let plainxml: string;
                 if ((await get(visuName)) === undefined) {
                     console.log(visuName)
-                    let xml = await getVisuxml(url);
+                    const xml = await getVisuxml(url);
                     if (xml == null) {
                         console.log(
                             'The requested visualisation ' +
@@ -73,7 +95,7 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
                 }
 
                 if (plainxml !== null) {
-                    let xmlDoc = parseVisuXML(plainxml);
+                    const xmlDoc = parseVisuXML(plainxml);
                     await initVariables(xmlDoc);
                     setAdaptedXML(xmlDoc.children[0]);
                     setOriginSize(
@@ -94,8 +116,8 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
 
         // Scaling on main window resize for responsive behavior
         React.useEffect(() => {
-            let xscaleFactor = width / (originSize[0] + 2);
-            let yscaleFactor = height / (originSize[1] + 2);
+            const xscaleFactor = width / (originSize[0] + 2);
+            const yscaleFactor = height / (originSize[1] + 2);
             if (originalFrame) {
                 setScale(
                     'scale(' +
@@ -149,25 +171,3 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
         );
     },
 );
-
-async function initVariables(XML: XMLDocument) {
-    let com = ComSocket.singleton();
-    // We have to reset the varibales on comsocket, if necessary
-    com.stopCyclicUpdate();
-    com.initObservables();
-    // Rip all of <variable> in <variablelist> section
-    let variables = XML.getElementsByTagName('visualisation')[0]
-        .getElementsByTagName('variablelist')[0]
-        .getElementsByTagName('variable');
-    for (let i = 0; i < variables.length; i++) {
-        let varName = variables[i].getAttribute('name');
-        let rawAddress = variables[i].innerHTML;
-        let varAddress = rawAddress.split(',').slice(0, 4).join(',');
-        // Add the variable to the observables if not already existent
-        if (!com.oVisuVariables.has(varName.toLowerCase())) {
-            com.addObservableVar(varName, varAddress);
-        }
-    }
-    await com.updateVarList(1000);
-    com.startCyclicUpdate();
-}

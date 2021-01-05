@@ -27,7 +27,7 @@ export const ExecutionPopup: React.FunctionComponent = () => {
 
     const submit = function () {
         // Get the deafult password from socket
-        let key = '.currentpasswords[' + level + ']';
+        const key = '.currentpasswords[' + level + ']';
         // Check if password is correct
         if (
             passwd ===

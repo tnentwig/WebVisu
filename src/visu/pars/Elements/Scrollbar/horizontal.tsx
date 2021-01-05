@@ -20,10 +20,10 @@ export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
         createVisuObject(shape, dynamicParameters),
     );
     // We have to calculate the values that are specific of orientation
-    let centerx = state.b1 / 2;
-    let centery = state.a / 2;
+    const centerx = state.b1 / 2;
+    const centery = state.a / 2;
     // The paths are describing the triangles at the ends of the scrollbar
-    let path1 =
+    const path1 =
         '' +
         0.4 * centerx +
         ',' +
@@ -36,7 +36,7 @@ export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
         1.6 * centerx +
         ',' +
         1.6 * centery;
-    let path2 =
+    const path2 =
         '' +
         1.6 * centerx +
         ',' +
@@ -60,7 +60,7 @@ export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
 
     // Increment and decrement the value by click on the ends
     const increment = () => {
-        let upper =
+        const upper =
             state.lowerBound < state.upperBound
                 ? state.upperBound
                 : state.lowerBound;
@@ -69,7 +69,7 @@ export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
         }
     };
     const decrement = () => {
-        let upper =
+        const upper =
             state.lowerBound < state.upperBound
                 ? state.lowerBound
                 : state.upperBound;
@@ -88,21 +88,21 @@ export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
     // Handling the movement of the slider
     const move = (e: React.MouseEvent) => {
         if (selected && updateFunction !== undefined) {
-            let delta = e.pageX - initial[0];
-            let spacing = initial[1] - initial[0];
-            let scrollIntervall = Math.abs(
+            const delta = e.pageX - initial[0];
+            const spacing = initial[1] - initial[0];
+            const scrollIntervall = Math.abs(
                 state.upperBound - state.lowerBound,
             );
 
             if (!(delta < 0 || delta > spacing)) {
                 // Conversion of delta to scrollvalue
                 if (state.lowerBound > state.upperBound) {
-                    let nextScrollvalue =
+                    const nextScrollvalue =
                         state.lowerBound -
                         (delta / spacing) * scrollIntervall;
                     updateFunction(nextScrollvalue);
                 } else {
-                    let nextScrollvalue =
+                    const nextScrollvalue =
                         state.lowerBound +
                         (delta / spacing) * scrollIntervall;
                     updateFunction(nextScrollvalue);

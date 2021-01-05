@@ -21,7 +21,7 @@ export const Button: React.FunctionComponent<Props> = ({
     section,
 }) => {
     // Parsing of the fixed parameters
-    let button: IBasicShape = {
+    const button: IBasicShape = {
         shape: 'button',
         hasInsideColor: util.stringToBoolean(
             section.getElementsByTagName('has-inside-color')[0]
@@ -79,7 +79,7 @@ export const Button: React.FunctionComponent<Props> = ({
     // Parsing the textfields and returning a jsx object if it exists
     let textField: JSX.Element;
     if (section.getElementsByTagName('text-format').length) {
-        let dynamicTextParameters = parseDynamicTextParameters(
+        const dynamicTextParameters = parseDynamicTextParameters(
             section,
             button.shape,
         );
@@ -100,13 +100,13 @@ export const Button: React.FunctionComponent<Props> = ({
     }
 
     // Parsing of observable events (like toggle color)
-    let dynamicShapeParameters = parseDynamicShapeParameters(section);
+    const dynamicShapeParameters = parseDynamicShapeParameters(section);
     // Parsing of user events that causes a reaction like toggle or pop up input
-    let onclick = parseClickEvent(section);
-    let onmousedown = parseTapEvent(section, 'down');
-    let onmouseup = parseTapEvent(section, 'up');
+    const onclick = parseClickEvent(section);
+    const onmousedown = parseTapEvent(section, 'down');
+    const onmouseup = parseTapEvent(section, 'up');
 
-    let initial = createVisuObject(button, dynamicShapeParameters);
+    const initial = createVisuObject(button, dynamicShapeParameters);
 
     // Convert object to an observable one
     const state = useLocalStore(() => initial);

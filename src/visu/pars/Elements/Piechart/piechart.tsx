@@ -20,7 +20,7 @@ export const Piechart: React.FunctionComponent<Props> = ({
     section,
 }) => {
     // Parsing of the fixed parameters
-    let piechart: IPiechartShape = {
+    const piechart: IPiechartShape = {
         shape: 'piechart',
         hasInsideColor: util.stringToBoolean(
             section.getElementsByTagName('has-inside-color')[0]
@@ -78,9 +78,9 @@ export const Piechart: React.FunctionComponent<Props> = ({
     };
 
     // Parsing the point coordinates
-    let xmlPoints = section.getElementsByTagName('point');
+    const xmlPoints = section.getElementsByTagName('point');
     for (let i = 0; i < xmlPoints.length; i++) {
-        let points = util.stringToArray(xmlPoints[i].textContent);
+        const points = util.stringToArray(xmlPoints[i].textContent);
         piechart.points.push(points);
     }
     // The piechart points consists of only 4 items
@@ -94,7 +94,7 @@ export const Piechart: React.FunctionComponent<Props> = ({
     // Parsing the textfields and returning a jsx object if it exists
     let textField: JSX.Element;
     if (section.getElementsByTagName('text-format').length) {
-        let dynamicTextParameters = parseDynamicTextParameters(
+        const dynamicTextParameters = parseDynamicTextParameters(
             section,
             piechart.shape,
         );
@@ -124,13 +124,13 @@ export const Piechart: React.FunctionComponent<Props> = ({
     }
 
     // Parsing of observable events (like toggle color)
-    let dynamicShapeParameters = parseDynamicShapeParameters(section);
+    const dynamicShapeParameters = parseDynamicShapeParameters(section);
     // Parsing of user events that causes a reaction like toggle or pop up input
-    let onclick = parseClickEvent(section);
-    let onmousedown = parseTapEvent(section, 'down');
-    let onmouseup = parseTapEvent(section, 'up');
+    const onclick = parseClickEvent(section);
+    const onmousedown = parseTapEvent(section, 'down');
+    const onmouseup = parseTapEvent(section, 'up');
 
-    let initial = createVisuObject(piechart, dynamicShapeParameters);
+    const initial = createVisuObject(piechart, dynamicShapeParameters);
 
     // Convert object to an observable one
     const state = useLocalStore(() => initial);

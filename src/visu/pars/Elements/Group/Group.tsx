@@ -21,19 +21,19 @@ export const Group: React.FunctionComponent<Props> =
             section.getElementsByTagName('rect')[0].innerHTML,
         );
         // The rightdown corner coordinates of the subvisu will be stored
-        let rightDownCorner = [0, 0];
+        const rightDownCorner = [0, 0];
 
-        let visuObjects: Array<{ obj: JSX.Element; id: string }> = [];
+        const visuObjects: Array<{ obj: JSX.Element; id: string }> = [];
         const addVisuObject = (visuObject: JSX.Element) => {
-            let obj = { obj: visuObject, id: uid(visuObject) };
+            const obj = { obj: visuObject, id: uid(visuObject) };
             visuObjects.push(obj);
         };
 
         for (let i = 0; i < section.children.length; i++) {
-            let element = section.children[i];
+            const element = section.children[i];
             if (element.nodeName === 'element') {
                 // Determine the type of the element
-                let type = element.getAttribute('type');
+                const type = element.getAttribute('type');
                 switch (type) {
                     case 'simple':
                         addVisuObject(
@@ -54,7 +54,7 @@ export const Group: React.FunctionComponent<Props> =
                         addVisuObject(
                             <PolyShape section={element}></PolyShape>,
                         );
-                        let points = element.getElementsByTagName(
+                        const points = element.getElementsByTagName(
                             'point',
                         );
                         for (let i = 0; i < points.length; i++) {
@@ -108,17 +108,17 @@ export const Group: React.FunctionComponent<Props> =
         }
 
         // Calculate the scalefactor
-        let setY = rectParent[3] - rectParent[1];
-        let setX = rectParent[2] - rectParent[0];
-        let scaleOrientation = setX / setY;
+        const setY = rectParent[3] - rectParent[1];
+        const setX = rectParent[2] - rectParent[0];
+        const scaleOrientation = setX / setY;
         if (
             scaleOrientation <
             rightDownCorner[0] / rightDownCorner[1]
         ) {
-            let factor = setX / rightDownCorner[0];
+            const factor = setX / rightDownCorner[0];
             scale = 'scale(' + factor + ')';
         } else {
-            let factor = setY / rightDownCorner[1];
+            const factor = setY / rightDownCorner[1];
             scale = 'scale(' + factor + ')';
         }
 
@@ -160,7 +160,7 @@ function getDimension(
     actualDimension: Array<number>,
     newRect: Array<number>,
 ) {
-    let len = newRect.length;
+    const len = newRect.length;
     if (len === 4) {
         actualDimension[0] < newRect[2]
             ? (actualDimension[0] = newRect[2])
@@ -179,17 +179,17 @@ function getDimension(
 
 function createInitial(section: Element) {
     // Create a mobx store for the variables that are dependent on the comsocket variables
-    let initial = {
+    const initial = {
         display: 'hidden' as any,
     };
 
-    let dynamicElements = parseDynamicShapeParameters(section);
+    const dynamicElements = parseDynamicShapeParameters(section);
     // Invisble?
     if (dynamicElements.has('expr-invisible')) {
-        let element = dynamicElements!.get('expr-invisible');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
-        let wrapperFunc = () => {
-            let value = returnFunc();
+        const element = dynamicElements!.get('expr-invisible');
+        const returnFunc = ComSocket.singleton().evalFunction(element);
+        const wrapperFunc = () => {
+            const value = returnFunc();
             if (value !== undefined) {
                 if (value == 0) {
                     return 'visible';
