@@ -10,7 +10,7 @@ export interface IComSocket {
         varAddr: string,
     ): void;
     addGlobalVar(varName: string | undefined, varAddr: string): void;
-    updateVarList(timeoutTime : number): Promise<boolean>;
+    updateVarList(timeoutTime: number): Promise<boolean>;
     setValue(
         varName: string,
         varValue: number | string | boolean,

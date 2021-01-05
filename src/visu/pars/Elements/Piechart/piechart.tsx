@@ -22,43 +22,43 @@ export const Piechart: React.FunctionComponent<Props> = ({
     // Parsing of the fixed parameters
     let piechart: IPiechartShape = {
         shape: 'piechart',
-        has_inside_color: util.stringToBoolean(
+        hasInsideColor: util.stringToBoolean(
             section.getElementsByTagName('has-inside-color')[0]
                 .textContent,
         ),
-        fill_color: util.rgbToHexString(
+        fillColor: util.rgbToHexString(
             section.getElementsByTagName('fill-color')[0].textContent,
         ),
-        fill_color_alarm: util.rgbToHexString(
+        fillColorAlarm: util.rgbToHexString(
             section.getElementsByTagName('fill-color-alarm')[0]
                 .textContent,
         ),
-        has_frame_color: util.stringToBoolean(
+        hasFrameColor: util.stringToBoolean(
             section.getElementsByTagName('has-frame-color')[0]
                 .textContent,
         ),
-        frame_color: util.rgbToHexString(
+        frameColor: util.rgbToHexString(
             section.getElementsByTagName('frame-color')[0]
                 .textContent,
         ),
-        frame_color_alarm: util.rgbToHexString(
+        frameColorAlarm: util.rgbToHexString(
             section.getElementsByTagName('frame-color-alarm')[0]
                 .textContent,
         ),
-        line_width: Number(
+        lineWidth: Number(
             section.getElementsByTagName('line-width')[0].textContent,
         ),
-        elem_id: section.getElementsByTagName('elem-id')[0]
+        elementId: section.getElementsByTagName('elem-id')[0]
             .textContent,
         rect: [],
         center: util.stringToArray(
             section.getElementsByTagName('center')[0].textContent,
         ),
-        hidden_input: util.stringToBoolean(
+        hiddenInput: util.stringToBoolean(
             section.getElementsByTagName('hidden-input')[0]
                 .textContent,
         ),
-        enable_text_input: util.stringToBoolean(
+        enableTextInput: util.stringToBoolean(
             section.getElementsByTagName('enable-text-input')[0]
                 .textContent,
         ),
@@ -68,7 +68,7 @@ export const Piechart: React.FunctionComponent<Props> = ({
             section.getElementsByTagName('tooltip').length > 0
                 ? section.getElementsByTagName('tooltip')[0].innerHTML
                 : '',
-        access_levels: section.getElementsByTagName('access-levels')
+        accessLevels: section.getElementsByTagName('access-levels')
             .length
             ? util.parseAccessLevels(
                   section.getElementsByTagName('access-levels')[0]

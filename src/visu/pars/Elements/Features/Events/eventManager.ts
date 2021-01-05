@@ -185,7 +185,7 @@ export function parseClickEvent(section: Element): Function {
                 if (expr.length) {
                     let tagName = expr[0].tagName;
                     if (tagName === 'placeholder') {
-                        let visuname = expr[0].textContent;
+                        let visuName = expr[0].textContent;
                         if (
                             StateManager.singleton().oState.get(
                                 'USECURRENTVISU',
@@ -194,14 +194,14 @@ export function parseClickEvent(section: Element): Function {
                             clickFunction = function (): void {
                                 ComSocket.singleton().setValue(
                                     '.currentvisu',
-                                    visuname,
+                                    visuName,
                                 );
                             };
                         } else {
                             clickFunction = function (): void {
                                 StateManager.singleton().oState.set(
                                     'ZOOMVISU',
-                                    visuname,
+                                    visuName,
                                 );
                             };
                         }
@@ -213,22 +213,22 @@ export function parseClickEvent(section: Element): Function {
                             ) === 'TRUE'
                         ) {
                             clickFunction = function (): void {
-                                let visuname = ComSocket.singleton().oVisuVariables.get(
+                                let visuName = ComSocket.singleton().oVisuVariables.get(
                                     visuVariable,
                                 )!.value;
                                 ComSocket.singleton().setValue(
                                     '.currentvisu',
-                                    visuname,
+                                    visuName,
                                 );
                             };
                         } else {
                             clickFunction = function (): void {
-                                let visuname = ComSocket.singleton().oVisuVariables.get(
+                                let visuName = ComSocket.singleton().oVisuVariables.get(
                                     visuVariable,
                                 )!.value;
                                 StateManager.singleton().oState.set(
                                     'ZOOMVISU',
-                                    visuname,
+                                    visuName,
                                 );
                             };
                         }

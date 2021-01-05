@@ -121,11 +121,11 @@ export function getVisuxml(url: string): Promise<XMLDocument> {
                     // Iterate over the childs to find the subvisu name
                     for (let j = 0; j < length; j++) {
                         if (childs[j].nodeName === 'name') {
-                            let visuname = childs[j].textContent;
+                            let visuName = childs[j].textContent;
                             
                             let subvisuXml = await getVisuxml2(
                                 rootPath +
-                                    visuname.toLowerCase() +
+                                    visuName.toLowerCase() +
                                     '.xml',
                             );
                             // Replace the found placeholders

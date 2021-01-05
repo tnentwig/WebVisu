@@ -29,14 +29,14 @@ export function createBasicObject(
         x: (basicShape.rect[2] - basicShape.rect[0]) / 2,
         y: (basicShape.rect[3] - basicShape.rect[1]) / 2,
     };
-    // The line_width is 0 in the xml if border width is 1 in the codesys dev env. Otherwise line_width is equal to the target border width. Very strange.
+    // The lineWidth is 0 in the xml if border width is 1 in the codesys dev env. Otherwise lineWidth is equal to the target border width. Very strange.
     let edge =
-        basicShape.line_width === 0 ? 1 : basicShape.line_width;
-    // Compute the strokeWidth through has_frame_color
-    let lineWidth = basicShape.has_frame_color ? edge : 0;
-    // Compute the fill color through has_fill_color
-    let fillColor = basicShape.has_inside_color
-        ? basicShape.fill_color
+        basicShape.lineWidth === 0 ? 1 : basicShape.lineWidth;
+    // Compute the strokeWidth through hasFrameColor
+    let lineWidth = basicShape.hasFrameColor ? edge : 0;
+    // Compute the fill color through hasFillColor
+    let fillColor = basicShape.hasInsideColor
+        ? basicShape.fillColor
         : 'none';
     // Tooltip
     let tooltip = basicShape.tooltip;
@@ -44,12 +44,12 @@ export function createBasicObject(
     // Create an object with the initial parameters
     let initial: IBasicObject = {
         // Variables will be initialised with the parameter values
-        normalFillColor: basicShape.fill_color,
-        alarmFillColor: basicShape.fill_color_alarm,
-        normalFrameColor: basicShape.frame_color,
-        alarmFrameColor: basicShape.frame_color_alarm,
-        hasFillColor: basicShape.has_inside_color,
-        hasFrameColor: basicShape.has_frame_color,
+        normalFillColor: basicShape.fillColor,
+        alarmFillColor: basicShape.fillColorAlarm,
+        normalFrameColor: basicShape.frameColor,
+        alarmFrameColor: basicShape.frameColorAlarm,
+        hasFillColor: basicShape.hasInsideColor,
+        hasFrameColor: basicShape.hasFrameColor,
         lineWidth: lineWidth,
         // Positional arguments
         absCornerCoord: absCornerCoord,
@@ -67,7 +67,7 @@ export function createBasicObject(
         // Computed
         fill: fillColor,
         edge: edge,
-        stroke: basicShape.frame_color,
+        stroke: basicShape.frameColor,
         strokeDashArray: '0',
         display: 'visible' as any,
         alarm: false,
@@ -477,7 +477,7 @@ export function createBasicObject(
             let currentNum = Number(current);
             if (currentNum !== NaN) {
                 if (
-                    basicShape.access_levels[currentNum].includes('w')
+                    basicShape.accessLevels[currentNum].includes('w')
                 ) {
                     return true;
                 } else {
@@ -497,7 +497,7 @@ export function createBasicObject(
             let currentNum = Number(current);
             if (currentNum !== NaN) {
                 if (
-                    basicShape.access_levels[currentNum].includes('r')
+                    basicShape.accessLevels[currentNum].includes('r')
                 ) {
                     return true;
                 } else {

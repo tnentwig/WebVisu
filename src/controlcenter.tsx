@@ -82,17 +82,17 @@ export default class HTML5Visu {
                 >
                     {stateManager.get('ISONLINE') === 'TRUE' ? (
                         <Visualisation
-                            visuname={stateManager!
+                            visuName={stateManager!
                                 .get('CURRENTVISU')!
                                 .toLowerCase()}
                             width={this.windowWidth}
                             height={this.windowsHeight}
-                            show_frame={false}
-                            clip_frame={true}
-                            iso_frame={true}
-                            original_frame={false}
-                            original_scrollable_frame={false}
-                            no_frame_offset={true}
+                            showFrame={false}
+                            clipFrame={true}
+                            isoFrame={true}
+                            originalFrame={false}
+                            originalScrollableFrame={false}
+                            noFrameOffset={true}
                         ></Visualisation>
                     ) : (
                         <ConnectionFault></ConnectionFault>
@@ -510,22 +510,22 @@ export default class HTML5Visu {
         ];
         let notExistingVisus: Array<string> = [];
         while (visusToBeLoaded.length) {
-            let visuname = visusToBeLoaded.pop();
+            let visuName = visusToBeLoaded.pop();
             // Check if its a placeholder variable
             let regEx = new RegExp(/\$(.*)\$/gm);
-            let match = regEx.exec(visuname);
+            let match = regEx.exec(visuName);
             if (match == null) {
                 let thisVisuXML = await getVisuxml(
-                    this.rootDir + '/' + visuname + '.xml',
+                    this.rootDir + '/' + visuName + '.xml',
                 );
                 // The visu does not exist on server if thisVisuXML is null
                 if (thisVisuXML !== null) {
                     let xmlDict = StateManager.singleton().xmlDict;
-                    if (!xmlDict.has(visuname)) {
+                    if (!xmlDict.has(visuName)) {
                         let plainxml = stringifyVisuXML(thisVisuXML);
-                        xmlDict.set(visuname, plainxml);
+                        xmlDict.set(visuName, plainxml);
                     }
-                    loadedVisus.push(visuname);
+                    loadedVisus.push(visuName);
                     // Get the visualisations which are used as main visush
                     let mainVisunames = thisVisuXML.getElementsByTagName(
                         'expr-zoom',
@@ -544,8 +544,8 @@ export default class HTML5Visu {
                         ) {
                             visusToBeLoaded.push(nextVisuname);
                         }
-                        if (!mainVisus.includes(visuname)) {
-                            mainVisus.push(visuname);
+                        if (!mainVisus.includes(visuName)) {
+                            mainVisus.push(visuName);
                         }
                     });
                     // Get the visualisations that are used as subvisus
@@ -567,10 +567,10 @@ export default class HTML5Visu {
                         }
                     });
                 } else {
-                    notExistingVisus.push(visuname);
+                    notExistingVisus.push(visuName);
                     console.log(
                         'There is a internal problem in your CoDeSys Project. The visualisation named ' +
-                            visuname +
+                            visuName +
                             ' is referenced but not available on the server!',
                     );
                 }

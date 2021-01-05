@@ -33,14 +33,14 @@ export function createPiechartObject(
         x: (piechartShape.rect[2] - piechartShape.rect[0]) / 2,
         y: (piechartShape.rect[3] - piechartShape.rect[1]) / 2,
     };
-    // The line_width is 0 in the xml if border width is 1 in the codesys dev env. Otherwise line_width is equal to the target border width. Very strange.
+    // The lineWidth is 0 in the xml if border width is 1 in the codesys dev env. Otherwise lineWidth is equal to the target border width. Very strange.
     let edge =
-        piechartShape.line_width === 0 ? 1 : piechartShape.line_width;
-    // Compute the strokeWidth through has_frame_color
-    let lineWidth = piechartShape.has_frame_color ? edge : 0;
-    // Compute the fill color through has_fill_color
-    let fillColor = piechartShape.has_inside_color
-        ? piechartShape.fill_color
+        piechartShape.lineWidth === 0 ? 1 : piechartShape.lineWidth;
+    // Compute the strokeWidth through hasFrameColor
+    let lineWidth = piechartShape.hasFrameColor ? edge : 0;
+    // Compute the fill color through hasFillColor
+    let fillColor = piechartShape.hasInsideColor
+        ? piechartShape.fillColor
         : 'none';
     // Tooltip
     let tooltip = piechartShape.tooltip;
@@ -69,12 +69,12 @@ export function createPiechartObject(
     // Create an object with the initial parameters
     let initial: IPiechartObject = {
         // Variables will be initialised with the parameter values
-        normalFillColor: piechartShape.fill_color,
-        alarmFillColor: piechartShape.fill_color_alarm,
-        normalFrameColor: piechartShape.frame_color,
-        alarmFrameColor: piechartShape.frame_color_alarm,
-        hasFillColor: piechartShape.has_inside_color,
-        hasFrameColor: piechartShape.has_frame_color,
+        normalFillColor: piechartShape.fillColor,
+        alarmFillColor: piechartShape.fillColorAlarm,
+        normalFrameColor: piechartShape.frameColor,
+        alarmFrameColor: piechartShape.frameColorAlarm,
+        hasFillColor: piechartShape.hasInsideColor,
+        hasFrameColor: piechartShape.hasFrameColor,
         lineWidth: lineWidth,
         // Positional arguments
         absCornerCoord: absCornerCoord,
@@ -93,7 +93,7 @@ export function createPiechartObject(
         // Computed
         fill: fillColor,
         edge: edge,
-        stroke: piechartShape.frame_color,
+        stroke: piechartShape.frameColor,
         strokeDashArray: '0',
         display: 'visible' as any,
         alarm: false,
@@ -512,7 +512,7 @@ export function createPiechartObject(
             let currentNum = Number(current);
             if (currentNum !== NaN) {
                 if (
-                    piechartShape.access_levels[currentNum].includes(
+                    piechartShape.accessLevels[currentNum].includes(
                         'w',
                     )
                 ) {
@@ -534,7 +534,7 @@ export function createPiechartObject(
             let currentNum = Number(current);
             if (currentNum !== NaN) {
                 if (
-                    piechartShape.access_levels[currentNum].includes(
+                    piechartShape.accessLevels[currentNum].includes(
                         'r',
                     )
                 ) {

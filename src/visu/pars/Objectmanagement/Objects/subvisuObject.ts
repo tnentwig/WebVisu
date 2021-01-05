@@ -29,14 +29,14 @@ export function createSubvisuObject(
         x: (subvisuShape.rect[2] - subvisuShape.rect[0]) / 2,
         y: (subvisuShape.rect[3] - subvisuShape.rect[1]) / 2,
     };
-    // The line_width is 0 in the xml if border width is 1 in the codesys dev env. Otherwise line_width is equal to the target border width. Very strange.
+    // The lineWidth is 0 in the xml if border width is 1 in the codesys dev env. Otherwise lineWidth is equal to the target border width. Very strange.
     let edge =
-        subvisuShape.line_width === 0 ? 1 : subvisuShape.line_width;
-    // Compute the strokeWidth through has_frame_color
-    let lineWidth = subvisuShape.has_frame_color ? edge : 0;
-    // Compute the fill color through has_fill_color
-    let fillColor = subvisuShape.has_inside_color
-        ? subvisuShape.fill_color
+        subvisuShape.lineWidth === 0 ? 1 : subvisuShape.lineWidth;
+    // Compute the strokeWidth through hasFrameColor
+    let lineWidth = subvisuShape.hasFrameColor ? edge : 0;
+    // Compute the fill color through hasFillColor
+    let fillColor = subvisuShape.hasInsideColor
+        ? subvisuShape.fillColor
         : 'none';
     // Tooltip
     let tooltip = subvisuShape.tooltip;
@@ -44,12 +44,12 @@ export function createSubvisuObject(
     // Create an object with the initial parameters
     let initial: ISubvisuObject = {
         // Variables will be initialised with the parameter values
-        normalFillColor: subvisuShape.fill_color,
-        alarmFillColor: subvisuShape.fill_color_alarm,
-        normalFrameColor: subvisuShape.frame_color,
-        alarmFrameColor: subvisuShape.frame_color_alarm,
-        hasFillColor: subvisuShape.has_inside_color,
-        hasFrameColor: subvisuShape.has_frame_color,
+        normalFillColor: subvisuShape.fillColor,
+        alarmFillColor: subvisuShape.fillColorAlarm,
+        normalFrameColor: subvisuShape.frameColor,
+        alarmFrameColor: subvisuShape.frameColorAlarm,
+        hasFillColor: subvisuShape.hasInsideColor,
+        hasFrameColor: subvisuShape.hasFrameColor,
         lineWidth: lineWidth,
         // Positional arguments
         absCornerCoord: absCornerCoord,
@@ -67,7 +67,7 @@ export function createSubvisuObject(
         // Computed
         fill: fillColor,
         edge: edge,
-        stroke: subvisuShape.frame_color,
+        stroke: subvisuShape.frameColor,
         strokeDashArray: '0',
         display: 'visible' as any,
         alarm: false,
@@ -479,7 +479,7 @@ export function createSubvisuObject(
             let currentNum = Number(current);
             if (currentNum !== NaN) {
                 if (
-                    subvisuShape.access_levels[currentNum].includes(
+                    subvisuShape.accessLevels[currentNum].includes(
                         'w',
                     )
                 ) {
@@ -501,7 +501,7 @@ export function createSubvisuObject(
             let currentNum = Number(current);
             if (currentNum !== NaN) {
                 if (
-                    subvisuShape.access_levels[currentNum].includes(
+                    subvisuShape.accessLevels[currentNum].includes(
                         'r',
                     )
                 ) {
@@ -518,12 +518,12 @@ export function createSubvisuObject(
     Object.defineProperty(initial, 'visuScale', {
         get: function () {
             let xscaleFactor =
-                relCoord.width / subvisuShape.visu_size[0];
+                relCoord.width / subvisuShape.visuSize[0];
             let yscaleFactor =
-                relCoord.height / subvisuShape.visu_size[1];
-            if (subvisuShape.original_frame) {
+                relCoord.height / subvisuShape.visuSize[1];
+            if (subvisuShape.originalFrame) {
                 return 'scale(1)';
-            } else if (subvisuShape.iso_frame) {
+            } else if (subvisuShape.isoFrame) {
                 return (
                     'scale(' +
                     Math.min(xscaleFactor, yscaleFactor).toString() +

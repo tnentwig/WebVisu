@@ -33,13 +33,13 @@ export function createPolyObject(
         x: (polyShape.rect[2] - polyShape.rect[0]) / 2,
         y: (polyShape.rect[3] - polyShape.rect[1]) / 2,
     };
-    // The line_width is 0 in the xml if border width is 1 in the codesys dev env. Otherwise line_width is equal to the target border width. Very strange.
-    let edge = polyShape.line_width === 0 ? 1 : polyShape.line_width;
-    // Compute the strokeWidth through has_frame_color
-    let lineWidth = polyShape.has_frame_color ? edge : 0;
-    // Compute the fill color through has_fill_color
-    let fillColor = polyShape.has_inside_color
-        ? polyShape.fill_color
+    // The lineWidth is 0 in the xml if border width is 1 in the codesys dev env. Otherwise lineWidth is equal to the target border width. Very strange.
+    let edge = polyShape.lineWidth === 0 ? 1 : polyShape.lineWidth;
+    // Compute the strokeWidth through hasFrameColor
+    let lineWidth = polyShape.hasFrameColor ? edge : 0;
+    // Compute the fill color through hasFillColor
+    let fillColor = polyShape.hasInsideColor
+        ? polyShape.fillColor
         : 'none';
     // Tooltip
     let tooltip = polyShape.tooltip;
@@ -54,12 +54,12 @@ export function createPolyObject(
     // Create an object with the initial parameters
     let initial: IPolyObject = {
         // Variables will be initialised with the parameter values
-        normalFillColor: polyShape.fill_color,
-        alarmFillColor: polyShape.fill_color_alarm,
-        normalFrameColor: polyShape.frame_color,
-        alarmFrameColor: polyShape.frame_color_alarm,
-        hasFillColor: polyShape.has_inside_color,
-        hasFrameColor: polyShape.has_frame_color,
+        normalFillColor: polyShape.fillColor,
+        alarmFillColor: polyShape.fillColorAlarm,
+        normalFrameColor: polyShape.frameColor,
+        alarmFrameColor: polyShape.frameColorAlarm,
+        hasFillColor: polyShape.hasInsideColor,
+        hasFrameColor: polyShape.hasFrameColor,
         lineWidth: lineWidth,
         // Positional arguments
         absCornerCoord: absCornerCoord,
@@ -78,7 +78,7 @@ export function createPolyObject(
         // Computed
         fill: fillColor,
         edge: edge,
-        stroke: polyShape.frame_color,
+        stroke: polyShape.frameColor,
         strokeDashArray: '0',
         display: 'visible' as any,
         alarm: false,
@@ -468,7 +468,7 @@ export function createPolyObject(
             let currentNum = Number(current);
             if (currentNum !== NaN) {
                 if (
-                    polyShape.access_levels[currentNum].includes('w')
+                    polyShape.accessLevels[currentNum].includes('w')
                 ) {
                     return true;
                 } else {
@@ -488,7 +488,7 @@ export function createPolyObject(
             let currentNum = Number(current);
             if (currentNum !== NaN) {
                 if (
-                    polyShape.access_levels[currentNum].includes('r')
+                    polyShape.accessLevels[currentNum].includes('r')
                 ) {
                     return true;
                 } else {

@@ -38,7 +38,7 @@ export function createScrollbarObject(
     let b2: number;
 
     // Define the swap values in depending on the orientation
-    if (scrollbarShape.horz_position) {
+    if (scrollbarShape.horzPosition) {
         swap1 = relCoord.height;
         swap2 = relCoord.width;
     } else {
@@ -132,7 +132,7 @@ export function createScrollbarObject(
         });
     }
 
-    if (scrollbarShape.horz_position) {
+    if (scrollbarShape.horzPosition) {
         Object.defineProperty(initial, 'scrollvalue', {
             get: function () {
                 let interval = Math.abs(

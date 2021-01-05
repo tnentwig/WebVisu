@@ -11,28 +11,28 @@ import ComSocket from './communication/comsocket';
 import StateManager from '../visu/statemanagement/statemanager';
 
 type Props = {
-    visuname: string;
+    visuName: string;
     width: number;
     height: number;
-    show_frame: boolean;
-    clip_frame: boolean;
-    iso_frame: boolean;
-    original_frame: boolean;
-    original_scrollable_frame: boolean;
-    no_frame_offset: boolean;
+    showFrame: boolean;
+    clipFrame: boolean;
+    isoFrame: boolean;
+    originalFrame: boolean;
+    originalScrollableFrame: boolean;
+    noFrameOffset: boolean;
 };
 
 export const Visualisation: React.FunctionComponent<Props> = React.memo(
     ({
-        visuname,
+        visuName,
         width,
         height,
-        show_frame,
-        clip_frame,
-        iso_frame,
-        original_frame,
-        original_scrollable_frame,
-        no_frame_offset,
+        showFrame,
+        clipFrame,
+        isoFrame,
+        originalFrame,
+        originalScrollableFrame,
+        noFrameOffset,
     }) => {
         const [loading, setLoading] = React.useState<Boolean>(true);
         const [adaptedXML, setAdaptedXML] = React.useState<Element>(
@@ -43,7 +43,7 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
         >([0, 0]);
         const [scale, setScale] = React.useState('scale(1)');
 
-        // Get new xml on change of visuname
+        // Get new xml on change of visuName
         React.useEffect(() => {
             let fetchXML = async function () {
                 // Set the loading flag. This will unmount all elements from calling visu
@@ -51,25 +51,25 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
                 let url =
                     StateManager.singleton().oState.get('ROOTDIR') +
                     '/' +
-                    visuname +
+                    visuName +
                     '.xml';
                 // Files that are needed several times will be saved internally for loading speed up
                 let plainxml: string;
-                if ((await get(visuname)) === undefined) {
-                    console.log(visuname)
+                if ((await get(visuName)) === undefined) {
+                    console.log(visuName)
                     let xml = await getVisuxml(url);
                     if (xml == null) {
                         console.log(
                             'The requested visualisation ' +
-                                visuname +
+                                visuName +
                                 ' is not available!',
                         );
                     } else {
                         plainxml = stringifyVisuXML(xml);
-                        await set(visuname, plainxml);
+                        await set(visuName, plainxml);
                     }
                 } else {
-                    plainxml = await get(visuname);
+                    plainxml = await get(visuName);
                 }
 
                 if (plainxml !== null) {
@@ -90,13 +90,13 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
                 }
             };
             fetchXML();
-        }, [visuname]);
+        }, [visuName]);
 
         // Scaling on main window resize for responsive behavior
         React.useEffect(() => {
             let xscaleFactor = width / (originSize[0] + 2);
             let yscaleFactor = height / (originSize[1] + 2);
-            if (original_frame) {
+            if (originalFrame) {
                 setScale(
                     'scale(' +
                         (
@@ -106,7 +106,7 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
                         ).toString() +
                         ')',
                 );
-            } else if (iso_frame) {
+            } else if (isoFrame) {
                 setScale(
                     'scale(' +
                         Math.min(
@@ -124,14 +124,14 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
                         ')',
                 );
             }
-        }, [width, height, originSize, original_frame, iso_frame]);
+        }, [width, height, originSize, originalFrame, isoFrame]);
 
         return (
             <div
                 style={{
                     display: 'block',
                     position: 'absolute',
-                    overflow: clip_frame ? 'hidden' : 'visible',
+                    overflow: clipFrame ? 'hidden' : 'visible',
                     left: 0,
                     top: 0,
                     width: originSize[0] + 1,
