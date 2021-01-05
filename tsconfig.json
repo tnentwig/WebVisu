@@ -1,16 +1,58 @@
 {
     "compilerOptions": {
-        "lib": ["es2018", "dom"],
-        "outDir": "./dist/",
-        "module": "commonjs",
-        "target": "es6",
+        /* Project Options */
+        // Controls how JSX constructs are emitted in JavaScript files. This only affects output of JS files that started in .tsx files.
+        // Allowed: react (default), react-native, preserve 
         "jsx": "react",
-        "noImplicitAny": true,
-        "sourceMap": true,
+        // TypeScript includes a default set of type definitions for built-in JS APIs, as well as type definitions for things found in browser environments.
+        // Name         Contents
+        // ES5          Core definitions for all ES3 and ES5 functionality
+        // ES2015       Additional APIs available in ES2015 (also known as ES6) - array.find, Promise, Proxy, Symbol, Map, Set, Reflect, etc.
+        // ES6          Alias for “ES2015”
+        // ES2016       Additional APIs available in ES2016 - array.include, etc.
+        // ES7          Alias for “ES2016”
+        // ES2017       Additional APIs available in ES2017 - Object.entries, Object.values, Atomics, SharedArrayBuffer, date.formatToParts, typed arrays, etc.
+        // ES2018       Additional APIs available in ES2018 - async iterables, promise.finally, Intl.PluralRules, rexexp.groups, etc.
+        // ES2019       Additional APIs available in ES2019 - array.flat, array.flatMap, Object.fromEntries, string.trimStart, string.trimEnd, etc.
+        // ES2020       Additional APIs available in ES2020 - string.matchAll, etc.
+        // ESNext       Additional APIs available in ESNext - This changes as the JavaScript specification evolves
+        // DOM          DOM definitions - window, document, etc.
+        // WebWorker    APIs available in WebWorker contexts
+        // ScriptHost   APIs for the Windows Script Hosting System
+        "lib": [
+            "ES2018", 
+            "DOM"
+        ],
+        // Sets the module system for the program. See the Modules chapter of the handbook for more information. You very likely want "CommonJS".
+        // Allowed: CommonJS (default if target is ES3 or ES5), ES6/ES2015 (synonymous, default for target ES6 and higher), ES2020, None, UMD, AMD, System, ESNext 
+        "module": "CommonJS",
+        // If specified, .js (as well as .d.ts, .js.map, etc.) files will be emitted into this directory. 
+        "outDir": "./dist/",
+        // Strips all comments from TypeScript files when converting into JavaScript. Defaults to false
         "removeComments": true,
-        "allowSyntheticDefaultImports": true,
+        // Enables the generation of sourcemap files. These files allow debuggers and other tools to display the original TypeScript source code when actually working with the emitted JavaScript files. 
+        "sourceMap": true,
+        // Modern browsers support all ES6 features, so ES6 is a good choice.
+        // Allowed: ES3 (default), ES5, ES6/ES2015 (synonomous), ES7/ES2016, ES2017, ES2018, ES2019, ES2020, ESNext
+        "target": "ES6",
+        
+        /* Strict Checks */
+        // In some cases where no type annotations are present, TypeScript will fall back to a type of any for a variable when it cannot infer the type.
+        "noImplicitAny": true,
+        // The strict flag enables a wide range of type checking behavior that results in stronger guarantees of program correctness. 
         "strict": true,
-        "experimentalDecorators": true,
-        "strictNullChecks": false // for maps returning undefined | string
+        // When strictNullChecks is false, null and undefined are effectively ignored by the language. This can lead to unexpected errors at runtime.
+        "strictNullChecks": false, // for maps returning undefined | string
+        
+        /* Module Resolution */
+        // When set to true, allowSyntheticDefaultImports allows you to write an import like: import React from "react";
+        // instead of: import * as React from "react";
+        "allowSyntheticDefaultImports": true,
+        // Lets you set a base directory to resolve non-absolute module names.
+        "baseUrl": ".",
+
+        /* Experimental */
+        // Enables experimental support for decorators, which is in stage 2 of the TC39 standardization process.
+        "experimentalDecorators": true
     }
 }
