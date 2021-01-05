@@ -111,9 +111,7 @@ export const Subvisu: React.FunctionComponent<Props> = ({
                 transformOrigin: '0 0',
             }}
         >
-            <VisuElements
-                visualisation={section}
-            ></VisuElements>
+            <VisuElements visualisation={section}></VisuElements>
         </div>
     ));
 };

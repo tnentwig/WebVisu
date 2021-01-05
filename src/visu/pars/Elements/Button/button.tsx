@@ -49,7 +49,8 @@ export const Button: React.FunctionComponent<Props> = ({
         lineWidth: Number(
             section.getElementsByTagName('line-width')[0].innerHTML,
         ),
-        elementId: section.getElementsByTagName('elem-id')[0].innerHTML,
+        elementId: section.getElementsByTagName('elem-id')[0]
+            .innerHTML,
         rect: util.stringToArray(
             section.getElementsByTagName('rect')[0].innerHTML,
         ),
@@ -121,9 +122,7 @@ export const Button: React.FunctionComponent<Props> = ({
     // Parsing the textfields and returning a jsx object if it exists
     let textField: JSX.Element;
     if (section.getElementsByTagName('text-format').length) {
-        const textParameters = parseTextParameters(
-            section,
-        );
+        const textParameters = parseTextParameters(section);
         textField = (
             <Textfield
                 section={section}

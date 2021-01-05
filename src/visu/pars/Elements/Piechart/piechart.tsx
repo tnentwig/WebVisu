@@ -120,9 +120,7 @@ export const Piechart: React.FunctionComponent<Props> = ({
     // Parsing the textfields and returning a jsx object if it exists
     let textField: JSX.Element;
     if (section.getElementsByTagName('text-format').length) {
-        const textParameters = parseTextParameters(
-            section,
-        );
+        const textParameters = parseTextParameters(section);
         textField = (
             <Textfield
                 section={section}

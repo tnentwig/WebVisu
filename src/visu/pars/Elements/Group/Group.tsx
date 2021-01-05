@@ -94,9 +94,7 @@ export const Group: React.FunctionComponent<Props> = ({
             switch (type) {
                 case 'simple': {
                     addVisuObject(
-                        <SimpleShape
-                            section={element}
-                        ></SimpleShape>,
+                        <SimpleShape section={element}></SimpleShape>,
                     );
                     getDimension(
                         rightDownCorner,
@@ -109,9 +107,7 @@ export const Group: React.FunctionComponent<Props> = ({
                 }
                 case 'polygon': {
                     addVisuObject(
-                        <PolyShape
-                            section={element}
-                        ></PolyShape>,
+                        <PolyShape section={element}></PolyShape>,
                     );
                     const points = element.getElementsByTagName(
                         'point',
@@ -126,9 +122,7 @@ export const Group: React.FunctionComponent<Props> = ({
                 }
                 case 'button': {
                     addVisuObject(
-                        <Button
-                            section={element}
-                        ></Button>,
+                        <Button section={element}></Button>,
                     );
                     getDimension(
                         rightDownCorner,
@@ -141,9 +135,7 @@ export const Group: React.FunctionComponent<Props> = ({
                 }
                 case 'bitmap': {
                     addVisuObject(
-                        <Bitmap
-                            section={element}
-                        ></Bitmap>,
+                        <Bitmap section={element}></Bitmap>,
                     );
                     getDimension(
                         rightDownCorner,
@@ -155,11 +147,7 @@ export const Group: React.FunctionComponent<Props> = ({
                     break;
                 }
                 case 'group': {
-                    addVisuObject(
-                        <Group
-                            section={element}
-                        ></Group>,
-                    );
+                    addVisuObject(<Group section={element}></Group>);
                     getDimension(
                         rightDownCorner,
                         stringToArray(

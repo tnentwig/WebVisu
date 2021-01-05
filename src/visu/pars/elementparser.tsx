@@ -5,7 +5,7 @@ import { PolyShape } from './Elements/Basicshapes/polyshape';
 import { Button } from './Elements/Button/button';
 import { Piechart } from './Elements/Piechart/piechart';
 import { Scrollbar } from './Elements/Scrollbar/scrollbar';
-import { ArrayTable } from './Elements/Arraytable/arraytable';
+// import { ArrayTable } from './Elements/Arraytable/arraytable';
 import { Bitmap } from './Elements/Bitmap/bitmap';
 import { Group } from './Elements/Group/group';
 import { Subvisu } from './Elements/Subvisu/subvisu';
@@ -43,45 +43,35 @@ export const VisuElements: React.FunctionComponent<Props> = React.memo(
                     // Is a bitmap
                     case 'bitmap': {
                         addVisuObject(
-                            <Bitmap
-                                section={section}
-                            ></Bitmap>,
+                            <Bitmap section={section}></Bitmap>,
                         );
                         break;
                     }
                     // Is a button
                     case 'button': {
                         addVisuObject(
-                            <Button
-                                section={section}
-                            ></Button>,
+                            <Button section={section}></Button>,
                         );
                         break;
                     }
                     // Is a polygon - As polygon, polyline or bezier
                     case 'polygon': {
                         addVisuObject(
-                            <PolyShape
-                                section={section}
-                            ></PolyShape>,
+                            <PolyShape section={section}></PolyShape>,
                         );
                         break;
                     }
                     // Is a piechart
                     case 'piechart': {
                         addVisuObject(
-                            <Piechart
-                                section={section}
-                            ></Piechart>,
+                            <Piechart section={section}></Piechart>,
                         );
                         break;
                     }
                     // Is a group (Dynamic elements like a graph)
                     case 'group': {
                         addVisuObject(
-                            <Group
-                                section={section}
-                            ></Group>,
+                            <Group section={section}></Group>,
                         );
                         break;
                     }
@@ -94,9 +84,7 @@ export const VisuElements: React.FunctionComponent<Props> = React.memo(
                     }
                     case 'reference': {
                         addVisuObject(
-                            <Subvisu
-                                section={section}
-                            ></Subvisu>,
+                            <Subvisu section={section}></Subvisu>,
                         );
                         break;
                     }

@@ -91,7 +91,6 @@ export const ImageField: React.FunctionComponent<Props> = ({
         }
     }
 
-
     // Set the fileName, it could be a variable or static
     if (section.getElementsByTagName('file-name').length) {
         if (

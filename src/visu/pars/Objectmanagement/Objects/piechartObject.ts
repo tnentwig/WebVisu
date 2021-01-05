@@ -57,17 +57,25 @@ export function createPiechartObject(
     });
 
     // Calculate the init angles
-    const v1 = [relPoints[2][0]- relPoints[0][0], relPoints[2][1]- relPoints[0][1]];
-    const v2 = [relPoints[3][0]- relPoints[0][0], relPoints[3][1]- relPoints[0][1]];
+    const v1 = [
+        relPoints[2][0] - relPoints[0][0],
+        relPoints[2][1] - relPoints[0][1],
+    ];
+    const v2 = [
+        relPoints[3][0] - relPoints[0][0],
+        relPoints[3][1] - relPoints[0][1],
+    ];
 
-    const abs1 = v1[0]/Math.sqrt(Math.pow(v1[0], 2)+Math.pow(v1[1], 2));
-    const abs2 = v2[0]/Math.sqrt(Math.pow(v2[0], 2)+Math.pow(v2[1], 2));
+    const abs1 =
+        v1[0] / Math.sqrt(Math.pow(v1[0], 2) + Math.pow(v1[1], 2));
+    const abs2 =
+        v2[0] / Math.sqrt(Math.pow(v2[0], 2) + Math.pow(v2[1], 2));
 
     const sign1 = v1[1] >= 0 ? -1 : 1;
     const sign2 = v2[1] >= 0 ? -1 : 1;
 
-    const startAngle = sign1*(Math.acos(abs1)*57.2957795);
-    const endAngle = sign2*(Math.acos(abs2)*57.2957795);
+    const startAngle = sign1 * (Math.acos(abs1) * 57.2957795);
+    const endAngle = sign2 * (Math.acos(abs2) * 57.2957795);
 
     // Create an object with the initial parameters
     const initial: IPiechartObject = {
@@ -487,7 +495,7 @@ export function createPiechartObject(
         });
     }
 
-    // We have to compute the dependent values after all the required static values ​​have been replaced by variables, placeholders or constant values
+    // We have to compute the dependent values after all the required static values have been replaced by variables, placeholders or constant values
     // E.g. the fillcolor depends on hasFillColor and alarm. This variables are called "computed" values. MobX will track their dependents and rerender the object by change.
     // We have to note that the rotation of polylines is not the same like simpleshapes. Simpleshapes keep their originally alignment, polyhapes transform every coordinate.
 

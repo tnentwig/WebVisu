@@ -124,10 +124,10 @@ export function pointArrayToPiechartString(
     interimArray[2] = start;
     interimArray[3] = end;
 
-    let d : string;
-    const angleDiff = (endAngleDegree - startAngleDegree)%360;
+    let d: string;
+    const angleDiff = (endAngleDegree - startAngleDegree) % 360;
     // Angle with 0 degree difference is shown als full arc in codesys
-    if(angleDiff === 0){
+    if (angleDiff === 0) {
         d = [
             'M',
             interimArray[0][0],
@@ -136,33 +136,31 @@ export function pointArrayToPiechartString(
             interimArray[2][0] + strokeWidth,
             interimArray[2][1] + strokeWidth,
             'M',
-            2*radiusx+ strokeWidth,
-            radiusy+ strokeWidth,
+            2 * radiusx + strokeWidth,
+            radiusy + strokeWidth,
             'A',
-            radiusx-strokeWidth,
+            radiusx - strokeWidth,
             radiusy,
             0,
             1,
             1,
             strokeWidth,
-            radiusy+ strokeWidth,
+            radiusy + strokeWidth,
             'A',
             radiusx,
             radiusy,
             0,
             1,
             1,
-            2*radiusx+ strokeWidth,
-            radiusy+ strokeWidth
+            2 * radiusx + strokeWidth,
+            radiusy + strokeWidth,
         ].join(' ');
     } else {
         let largeArcFlag = 1;
-        if (angleDiff > 0){
-            largeArcFlag =
-                angleDiff <= 180 ? 1 : 0;
+        if (angleDiff > 0) {
+            largeArcFlag = angleDiff <= 180 ? 1 : 0;
         } else {
-            largeArcFlag =
-                angleDiff <= -180 ? 1 : 0;
+            largeArcFlag = angleDiff <= -180 ? 1 : 0;
         }
         d = [
             'M',
