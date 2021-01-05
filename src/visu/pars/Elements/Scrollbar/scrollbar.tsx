@@ -4,7 +4,7 @@ import { VerticalScrollbar } from './vertical';
 import { IScrollbarShape } from '../../../Interfaces/javainterfaces';
 import * as util from '../../Utils/utilfunctions';
 import {
-    parseDynamicShapeParameters,
+    parseShapeParameters,
     parseScrollUpdate,
 } from '../Features/Events/eventManager';
 
@@ -32,7 +32,7 @@ export const Scrollbar: React.FunctionComponent<Props> = ({
     };
 
     // Parsing of observable events
-    const dynamicShapeParameters = parseDynamicShapeParameters(section);
+    const dynamicShapeParameters = parseShapeParameters(section);
     // Parse the scroll update function
     const update = parseScrollUpdate(section);
     // Return of the react node

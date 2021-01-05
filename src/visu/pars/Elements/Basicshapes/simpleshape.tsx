@@ -8,8 +8,8 @@ import { Textfield } from '../Features/Text/textManager';
 import { Inputfield } from '../Features/Input/inputManager';
 import { IBasicShape } from '../../../Interfaces/javainterfaces';
 import {
-    parseDynamicShapeParameters,
-    parseDynamicTextParameters,
+    parseShapeParameters,
+    parseTextParameters,
     parseClickEvent,
     parseTapEvent,
 } from '../Features/Events/eventManager';
@@ -91,7 +91,7 @@ export const SimpleShape: React.FunctionComponent<Props> = ({
         // Parsing the textfields and returning a jsx object if it exists
         let textField: JSX.Element;
         if (section.getElementsByTagName('text-format').length) {
-            const dynamicTextParameters = parseDynamicTextParameters(
+            const dynamicTextParameters = parseTextParameters(
                 section,
                 shape,
             );
@@ -125,7 +125,7 @@ export const SimpleShape: React.FunctionComponent<Props> = ({
         }
 
         // Parsing of observable events (like toggle color)
-        const dynamicShapeParameters = parseDynamicShapeParameters(
+        const dynamicShapeParameters = parseShapeParameters(
             section,
         );
         // Parsing of user events that causes a reaction like toggle or pop up input

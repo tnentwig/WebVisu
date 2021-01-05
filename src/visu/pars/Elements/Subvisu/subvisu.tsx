@@ -2,7 +2,7 @@ import * as React from 'react';
 import { VisuElements } from '../../elementparser';
 import * as util from '../../Utils/utilfunctions';
 import { ISubvisuShape } from '../../../Interfaces/javainterfaces';
-import { parseDynamicShapeParameters } from '../Features/Events/eventManager';
+import { parseShapeParameters } from '../Features/Events/eventManager';
 import { createVisuObject } from '../../Objectmanagement/objectManager';
 import { useObserver, useLocalStore } from 'mobx-react-lite';
 
@@ -85,7 +85,7 @@ export const Subvisu: React.FunctionComponent<Props> = ({
     };
 
     // Parsing of observable events (like toggle color)
-    const dynamicShapeParameters = parseDynamicShapeParameters(section);
+    const dynamicShapeParameters = parseShapeParameters(section);
 
     const initial = createVisuObject(subvisu, dynamicShapeParameters);
 

@@ -2,7 +2,7 @@ import ComSocket from '../../../../communication/comsocket';
 import StateManager from '../../../../statemanagement/statemanager';
 // This function is parsing all <expr-...> tags like toggle color and returns a map with the expression as key and the variable as value
 
-export function parseDynamicShapeParameters(
+export function parseShapeParameters(
     section: Element,
 ): Map<string, string[][]> {
     const exprMap: Map<string, string[][]> = new Map();
@@ -77,7 +77,7 @@ export function parseDynamicShapeParameters(
     return exprMap;
 }
 
-export function parseDynamicTextParameters(
+export function parseTextParameters(
     section: Element,
     shape: string,
 ): Map<string, string> {

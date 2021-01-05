@@ -7,7 +7,7 @@ import { Bitmap } from '../Bitmap/bitmap';
 import { SimpleShape } from '../Basicshapes/simpleshape';
 import { PolyShape } from '../Basicshapes/polyshape';
 import { stringToArray } from '../../Utils/utilfunctions';
-import { parseDynamicShapeParameters } from '../Features/Events/eventManager';
+import { parseShapeParameters } from '../Features/Events/eventManager';
 import { ErrorBoundary } from 'react-error-boundary';
 
 type Props = {
@@ -183,7 +183,7 @@ function createInitial(section: Element) {
         display: 'hidden' as any,
     };
 
-    const dynamicElements = parseDynamicShapeParameters(section);
+    const dynamicElements = parseShapeParameters(section);
     // Invisble?
     if (dynamicElements.has('expr-invisible')) {
         const element = dynamicElements!.get('expr-invisible');

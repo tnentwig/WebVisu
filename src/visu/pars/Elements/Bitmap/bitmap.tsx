@@ -4,8 +4,8 @@ import { IBasicShape } from '../../../Interfaces/javainterfaces';
 import { Textfield } from '../Features/Text/textManager';
 import { Inputfield } from '../Features/Input/inputManager';
 import {
-    parseDynamicShapeParameters,
-    parseDynamicTextParameters,
+    parseShapeParameters,
+    parseTextParameters,
     parseClickEvent,
     parseTapEvent,
 } from '../Features/Events/eventManager';
@@ -83,7 +83,7 @@ export const Bitmap: React.FunctionComponent<Props> = ({
     // Parsing the textfields and returning a jsx object if it exists
     let textField: JSX.Element;
     if (section.getElementsByTagName('text-format').length) {
-        const dynamicTextParameters = parseDynamicTextParameters(
+        const dynamicTextParameters = parseTextParameters(
             section,
             bitmap.shape,
         );
@@ -112,7 +112,7 @@ export const Bitmap: React.FunctionComponent<Props> = ({
         inputField = null;
     }
     // Parsing of observable events (like toggle color)
-    const dynamicShapeParameters = parseDynamicShapeParameters(section);
+    const dynamicShapeParameters = parseShapeParameters(section);
     // Parsing of user events that causes a reaction like toggle or pop up input
     const onclick = parseClickEvent(section);
     const onmousedown = parseTapEvent(section, 'down');
