@@ -79,11 +79,11 @@ export const Textline: React.FunctionComponent<Props> = ({
                         .value,
                 );
                 if (value / 8 > 0) {
-                    if (value == 4) {
+                    if (value === 4) {
                         return 'center';
-                    } else if (value == 2) {
+                    } else if (value === 2) {
                         return 'right';
-                    } else if (value == 1) {
+                    } else if (value === 1) {
                         return 'left';
                     } else {
                         return 'left'; // This is the standard if passed textflag isn't correct
@@ -97,11 +97,11 @@ export const Textline: React.FunctionComponent<Props> = ({
                     ComSocket.singleton().oVisuVariables.get(element)!
                         .value,
                 );
-                if (value == 20) {
+                if (value === 20) {
                     return 'center';
-                } else if (value == 8) {
+                } else if (value === 8) {
                     return 'top';
-                } else if (value == 10) {
+                } else if (value === 10) {
                     return 'bottom';
                 } else {
                     return 'top'; // This is the standard if passed textflag isn't correct
@@ -113,9 +113,9 @@ export const Textline: React.FunctionComponent<Props> = ({
     Object.defineProperty(initial, 'dominantBaseline', {
         get: function () {
             const position =
-                initial.textAlignVert == 'center'
+                initial.textAlignVert === 'center'
                     ? 'middle'
-                    : initial.textAlignVert == 'bottom'
+                    : initial.textAlignVert === 'bottom'
                     ? 'baseline'
                     : 'hanging';
             return position;
@@ -317,7 +317,7 @@ export const Textline: React.FunctionComponent<Props> = ({
                     });
                     temp = dtf
                         .formatToParts(now)
-                        .find((part) => part.type == 'timeZoneName')
+                        .find((part) => part.type === 'timeZoneName')
                         .value;
                     textLine = textLine.replace(/%z/g, temp);
                 }
@@ -327,7 +327,7 @@ export const Textline: React.FunctionComponent<Props> = ({
                     });
                     temp = dtf
                         .formatToParts(now)
-                        .find((part) => part.type == 'timeZoneName')
+                        .find((part) => part.type === 'timeZoneName')
                         .value;
                     textLine = textLine.replace(/%Z/g, temp);
                 }
@@ -335,7 +335,7 @@ export const Textline: React.FunctionComponent<Props> = ({
                 // Just in case replace all %z and %Z to the short version
                 if (textLine.includes("%z") || textLine.includes("%Z")) {
                     const dtf = Intl.DateTimeFormat('default', {timeZoneName: 'short'});
-                    temp = dtf.formatToParts(now).find((part) => part.type == 'timeZoneName').value;
+                    temp = dtf.formatToParts(now).find((part) => part.type === 'timeZoneName').value;
                     textLine = textLine.replace(/%z/gi, temp);
                 }
                 */
@@ -387,9 +387,9 @@ export const Textline: React.FunctionComponent<Props> = ({
     Object.defineProperty(initial, 'xpos', {
         get: function () {
             const position =
-                initial.textAlignHorz == 'center'
+                initial.textAlignHorz === 'center'
                     ? '50%'
-                    : initial.textAlignHorz == 'left'
+                    : initial.textAlignHorz === 'left'
                     ? '5%'
                     : '95%';
             return position;

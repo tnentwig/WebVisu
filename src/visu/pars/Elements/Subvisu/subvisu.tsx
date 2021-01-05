@@ -98,7 +98,7 @@ export const Subvisu: React.FunctionComponent<Props> = ({
             title={subvisu.visuName}
             style={{
                 display:
-                    state.display == 'visible' ? 'inline' : 'none',
+                    state.display === 'visible' ? 'inline' : 'none',
                 position: 'absolute',
                 left: state.transformedCornerCoord.x1 - state.edge,
                 top: state.transformedCornerCoord.y1 - state.edge,

@@ -53,20 +53,26 @@ export const Bezier: React.FunctionComponent<Props> = ({
                 >
                     <svg
                         onClick={
-                            onclick == null ? null : () => onclick()
+                            typeof onclick === 'undefined' ||
+                            onclick === null
+                                ? null
+                                : () => onclick()
                         }
                         onMouseDown={
-                            onmousedown == null
+                            typeof onmousedown === 'undefined' ||
+                            onmousedown === null
                                 ? null
                                 : () => onmousedown()
                         }
                         onMouseUp={
-                            onmouseup == null
+                            typeof onmouseup === 'undefined' ||
+                            onmouseup === null
                                 ? null
                                 : () => onmouseup()
                         }
                         onMouseLeave={
-                            onmouseup == null
+                            typeof onmouseup === 'undefined' ||
+                            onmouseup === null
                                 ? null
                                 : () => onmouseup()
                         } // We have to reset if somebody leaves the object with pressed key
@@ -82,7 +88,8 @@ export const Bezier: React.FunctionComponent<Props> = ({
                         />
                         <title>{state.tooltip}</title>
                     </svg>
-                    {textField == null ? null : (
+                    {typeof textField === 'undefined' ||
+                    textField === null ? null : (
                         <svg
                             width={
                                 state.relCoord.width + 2 * state.edge

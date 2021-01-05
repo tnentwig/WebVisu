@@ -80,7 +80,7 @@ export const Inputfield: React.FunctionComponent<Props> = ({
             };
             handleEnter = (event: any) => {
                 // Close on Enter
-                if (event.keyCode == 13) {
+                if (event.keyCode === 13) {
                     setOpen(false);
                     ComSocket.singleton().setValue(varName, value);
                 }

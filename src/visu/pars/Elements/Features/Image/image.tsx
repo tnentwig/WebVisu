@@ -97,7 +97,7 @@ export const Image: React.FunctionComponent<Props> = ({
                 .replace('webvisu.htm', '') + rawFilename;
         // Try to get the image from cache
         get(rawFilename).then((cacheReturn) => {
-            if (cacheReturn === undefined) {
+            if (typeof cacheReturn === 'undefined') {
                 getImage(path).then((datauri) => {
                     state.filename = datauri;
                     set(rawFilename, datauri);

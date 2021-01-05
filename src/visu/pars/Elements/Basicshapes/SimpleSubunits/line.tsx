@@ -67,28 +67,35 @@ export const Line: React.FunctionComponent<Props> = React.memo(
                         >
                             <svg
                                 onClick={
-                                    onclick == null
+                                    typeof onclick === 'undefined' ||
+                                    onclick === null
                                         ? null
                                         : state.writeAccess
                                         ? () => onclick()
                                         : null
                                 }
                                 onMouseDown={
-                                    onmousedown == null
+                                    typeof onmousedown ===
+                                        'undefined' ||
+                                    onmousedown === null
                                         ? null
                                         : state.writeAccess
                                         ? () => onmousedown()
                                         : null
                                 }
                                 onMouseUp={
-                                    onmouseup == null
+                                    typeof onmouseup ===
+                                        'undefined' ||
+                                    onmouseup === null
                                         ? null
                                         : state.writeAccess
                                         ? () => onmouseup()
                                         : null
                                 }
                                 onMouseLeave={
-                                    onmouseup == null
+                                    typeof onmouseup ===
+                                        'undefined' ||
+                                    onmouseup === null
                                         ? null
                                         : state.writeAccess
                                         ? () => onmouseup()
@@ -180,7 +187,8 @@ export const Line: React.FunctionComponent<Props> = React.memo(
                                 >
                                     <title>{state.tooltip}</title>
                                 </line>
-                                {textField == null ? null : (
+                                {typeof textField === 'undefined' ||
+                                textField === null ? null : (
                                     <svg>{textField}</svg>
                                 )}
                             </svg>

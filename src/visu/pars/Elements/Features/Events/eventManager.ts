@@ -103,8 +103,8 @@ export function parseDynamicTextParameters(
             // The text could be dynamic with a expression reference
             for (let j = 0; j < expressions.length; j++) {
                 if (
-                    expressions[j].getElementsByTagName('var')[0] !==
-                    undefined
+                    typeof expressions[j].getElementsByTagName('var')[0] !==
+                    'undefined'
                 ) {
                     const varName = expressions[j]
                         .getElementsByTagName('var')[0]
@@ -122,9 +122,9 @@ export function parseDynamicTextParameters(
                     }
                 } else {
                     if (
-                        expressions[j].getElementsByTagName(
+                        typeof expressions[j].getElementsByTagName(
                             'const',
-                        )[0] !== undefined
+                        )[0] !== 'undefined'
                     ) {
                         const constName = expressions[j]
                             .getElementsByTagName('const')[0]

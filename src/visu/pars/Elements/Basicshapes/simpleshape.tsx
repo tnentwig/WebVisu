@@ -112,7 +112,7 @@ export const SimpleShape: React.FunctionComponent<Props> = ({
         ) {
             if (
                 section.getElementsByTagName('enable-text-input')[0]
-                    .innerHTML == 'true'
+                    .innerHTML === 'true'
             ) {
                 inputField = (
                     <Inputfield section={section}></Inputfield>

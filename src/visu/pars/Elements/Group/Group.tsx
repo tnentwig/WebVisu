@@ -126,7 +126,7 @@ export const Group: React.FunctionComponent<Props> =
         const state = useLocalStore(() => createInitial(section));
 
         return useObserver(() =>
-            state.display == 'visible' ? (
+            state.display === 'visible' ? (
                 <div
                     style={{
                         pointerEvents: 'none',
@@ -190,8 +190,8 @@ function createInitial(section: Element) {
         const returnFunc = ComSocket.singleton().evalFunction(element);
         const wrapperFunc = () => {
             const value = returnFunc();
-            if (value !== undefined) {
-                if (value == 0) {
+            if (typeof value !== 'undefined') {
+                if (parseInt(value) === 0) {
                     return 'visible';
                 } else {
                     return 'hidden';

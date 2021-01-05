@@ -75,13 +75,15 @@ export function createScrollbarObject(
         const element = dynamicElements!.get('expr-invisible');
         const returnFunc = ComSocket.singleton().evalFunction(element);
         const wrapperFunc = () => {
-            const value = returnFunc();
-            if (value !== undefined) {
-                if (value == 0) {
+            const value = Number(returnFunc());
+            if (value !== null && typeof value !== 'undefined') {
+                if (value === 0) {
                     return 'visible';
                 } else {
                     return 'hidden';
                 }
+            } else {
+                return 'visible';
             }
         };
         Object.defineProperty(initial, 'display', {

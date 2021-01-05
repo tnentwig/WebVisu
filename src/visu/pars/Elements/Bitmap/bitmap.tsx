@@ -102,7 +102,7 @@ export const Bitmap: React.FunctionComponent<Props> = ({
     if (section.getElementsByTagName('enable-text-input').length) {
         if (
             section.getElementsByTagName('enable-text-input')[0]
-                .textContent == 'true'
+                .textContent === 'true'
         ) {
             inputField = <Inputfield section={section}></Inputfield>;
         } else {
@@ -134,13 +134,13 @@ export const Bitmap: React.FunctionComponent<Props> = ({
                 width: state.relCoord.width + 2 * state.edge,
                 height: state.relCoord.height + 2 * state.edge,
             }}
-            onClick={onclick == null ? null : () => onclick()}
+            onClick={typeof onclick === 'undefined' || onclick === null ? null : () => onclick()}
             onMouseDown={
-                onmousedown == null ? null : () => onmousedown()
+                typeof onmousedown === 'undefined' || onmousedown === null ? null : () => onmousedown()
             }
-            onMouseUp={onmouseup == null ? null : () => onmouseup()}
+            onMouseUp={typeof onmouseup === 'undefined' || onmouseup === null ? null : () => onmouseup()}
             onMouseLeave={
-                onmouseup == null ? null : () => onmouseup()
+                typeof onmouseup === 'undefined' || onmouseup === null ? null : () => onmouseup()
             }
         >
             <Image section={section} inlineElement={false}></Image>

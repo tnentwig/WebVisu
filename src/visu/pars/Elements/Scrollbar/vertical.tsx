@@ -87,7 +87,7 @@ export const VerticalScrollbar: React.FunctionComponent<Props> = ({
 
     // Handling the movement of the slider
     const move = (e: React.MouseEvent) => {
-        if (selected && updateFunction !== undefined) {
+        if (selected && typeof updateFunction !== 'undefined') {
             const delta = e.pageY - initial[0];
             const spacing = initial[1] - initial[0];
             const scrollIntervall = Math.abs(

@@ -125,7 +125,7 @@ export function pointArrayToPiechartString(
     let d : string;
     const angleDiff = (endAngleDegree - startAngleDegree)%360;
     // Angle with 0 degree difference is shown als full arc in codesys
-    if(angleDiff == 0){
+    if(angleDiff === 0){
         d = [
             'M',
             interimArray[0][0],
@@ -302,7 +302,12 @@ export function evalRPN(
                     for (let i = 1; i < 2; i++) {
                         const y = interim;
                         const x = operatingStack.pop();
-                        result = x == y ? 1 : 0;
+                        result =
+                            typeof x !== 'undefined' &&
+                            x !== null &&
+                            x === y
+                                ? 1
+                                : 0;
                     }
                     break;
                 case '<':
@@ -407,5 +412,7 @@ export function getTextLines(text: string) {
             );
         }
     } while (match);
-    return stringStack.filter((el) => el != '');
+    return stringStack.filter(
+        (el) => typeof el !== 'undefined' && el !== null,
+    );
 }

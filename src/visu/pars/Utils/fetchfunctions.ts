@@ -6,7 +6,7 @@ export function getVisuxml2(url: string): Promise<XMLDocument> {
         let encoding = StateManager.singleton().oState.get(
             'ENCODINGSTRING',
         );
-        if (encoding === undefined) {
+        if (typeof encoding === 'undefined') {
             encoding = 'iso-8859-1';
         }
         // Check if the compressed flag on statemanager is set
@@ -197,7 +197,7 @@ function replacePlaceholders(
         const regEx = new RegExp(/\$(.*)\$/gm);
         const match = regEx.exec(placeholder.textContent);
         // Replacement
-        if (match != null) {
+        if (typeof match !== 'undefined' && match !== null) {
             const replace = match[1].toLowerCase();
             if (replacements.has(replace)) {
                 const variable = data.createElement('var');
