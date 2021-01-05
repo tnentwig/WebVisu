@@ -98,17 +98,22 @@ export const PolyShape: React.FunctionComponent<Props> = ({
             polyShapeBasis.points,
         );
 
+        // Parsing of observable events (like toggle color)
+        const shapeParameters = parseShapeParameters(
+            section,
+        );
+
         // Parsing the textfields and returning a jsx object if it exists
         let textField: JSX.Element;
         if (section.getElementsByTagName('text-format').length) {
-            const dynamicTextParameters = parseTextParameters(
+            const textParameters = parseTextParameters(
                 section,
-                shape,
             );
             textField = (
                 <Textfield
                     section={section}
-                    dynamicParameters={dynamicTextParameters}
+                    textParameters={textParameters}
+                    shapeParameters={shapeParameters}
                 ></Textfield>
             );
         } else {
@@ -134,11 +139,6 @@ export const PolyShape: React.FunctionComponent<Props> = ({
             inputField = null;
         }
 
-        // Parsing of observable events (like toggle color)
-        const dynamicShapeParameters = parseShapeParameters(
-            section,
-        );
-
         // Parsing of user events that causes a reaction like toggle or pop up input
         const onclick = parseClickEvent(section);
         const onmousedown = parseTapEvent(section, 'down');
@@ -152,7 +152,7 @@ export const PolyShape: React.FunctionComponent<Props> = ({
                         polyShape={polyShapeBasis}
                         textField={textField}
                         input={inputField}
-                        dynamicParameters={dynamicShapeParameters}
+                        dynamicParameters={shapeParameters}
                         onclick={onclick}
                         onmousedown={onmousedown}
                         onmouseup={onmouseup}
@@ -165,7 +165,7 @@ export const PolyShape: React.FunctionComponent<Props> = ({
                         polyShape={polyShapeBasis}
                         textField={textField}
                         input={inputField}
-                        dynamicParameters={dynamicShapeParameters}
+                        dynamicParameters={shapeParameters}
                         onclick={onclick}
                         onmousedown={onmousedown}
                         onmouseup={onmouseup}
@@ -178,7 +178,7 @@ export const PolyShape: React.FunctionComponent<Props> = ({
                         polyShape={polyShapeBasis}
                         textField={textField}
                         input={inputField}
-                        dynamicParameters={dynamicShapeParameters}
+                        dynamicParameters={shapeParameters}
                         onclick={onclick}
                         onmousedown={onmousedown}
                         onmouseup={onmouseup}

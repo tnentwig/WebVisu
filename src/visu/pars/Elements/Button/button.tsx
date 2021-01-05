@@ -1,7 +1,9 @@
 import * as React from 'react';
 import * as util from '../../Utils/utilfunctions';
-import { IBasicShape } from '../../../Interfaces/javainterfaces';
+import { ImageField } from '../Features/Image/image';
 import { Textfield } from '../Features/Text/textManager';
+import { Inputfield } from '../Features/Input/inputManager';
+import { IBasicShape } from '../../../Interfaces/javainterfaces';
 import {
     parseShapeParameters,
     parseTextParameters,
@@ -10,7 +12,6 @@ import {
 } from '../Features/Events/eventManager';
 import { createVisuObject } from '../../Objectmanagement/objectManager';
 import { useObserver, useLocalStore } from 'mobx-react-lite';
-import { Image } from '../Features/Image/image';
 import { ErrorBoundary } from 'react-error-boundary';
 
 type Props = {
@@ -63,10 +64,12 @@ export const Button: React.FunctionComponent<Props> = ({
                 .innerHTML,
         ),
         // Optional properties
-        tooltip:
-            section.getElementsByTagName('tooltip').length > 0
-                ? section.getElementsByTagName('tooltip')[0].innerHTML
-                : '',
+        tooltip: section.getElementsByTagName('tooltip').length
+            ? util.parseText(
+                  section.getElementsByTagName('tooltip')[0]
+                      .textContent,
+              )
+            : '',
         accessLevels: section.getElementsByTagName('access-levels')
             .length
             ? util.parseAccessLevels(
@@ -76,47 +79,76 @@ export const Button: React.FunctionComponent<Props> = ({
             : ['rw', 'rw', 'rw', 'rw', 'rw', 'rw', 'rw', 'rw'],
     };
 
+    // Parsing of observable events (like toggle color)
+    const shapeParameters = parseShapeParameters(section);
+
+    // Parsing of user events that causes a reaction like toggle or pop up input
+    const onclick = parseClickEvent(section);
+    const onmousedown = parseTapEvent(section, 'down');
+    const onmouseup = parseTapEvent(section, 'up');
+
+    // Parsing the inputfield and returning a jsx object if it exists
+    let inputField: JSX.Element;
+    if (section.getElementsByTagName('enable-text-input').length) {
+        if (
+            section.getElementsByTagName('enable-text-input')[0]
+                .innerHTML === 'true'
+        ) {
+            inputField = <Inputfield section={section}></Inputfield>;
+        } else {
+            inputField = null;
+        }
+    } else {
+        inputField = null;
+    }
+
+    // Parsing the imageField and returning a jsx object if it exists
+    let imageField: JSX.Element;
+    if (
+        section.getElementsByTagName('file-name').length ||
+        section.getElementsByTagName('expr-fill-color').length
+    ) {
+        imageField = (
+            <ImageField
+                section={section}
+                inlineElement={true}
+            ></ImageField>
+        );
+    } else {
+        imageField = null;
+    }
+
     // Parsing the textfields and returning a jsx object if it exists
     let textField: JSX.Element;
     if (section.getElementsByTagName('text-format').length) {
-        const dynamicTextParameters = parseTextParameters(
+        const textParameters = parseTextParameters(
             section,
-            button.shape,
         );
         textField = (
             <Textfield
                 section={section}
-                dynamicParameters={dynamicTextParameters}
+                textParameters={textParameters}
+                shapeParameters={shapeParameters}
             ></Textfield>
         );
     } else {
         textField = null;
     }
 
-    // Parsing the inline picture if necessary
-    let pictureInside = false;
-    if (section.getElementsByTagName('file-name').length) {
-        pictureInside = true;
-    }
-
-    // Parsing of observable events (like toggle color)
-    const dynamicShapeParameters = parseShapeParameters(section);
-    // Parsing of user events that causes a reaction like toggle or pop up input
-    const onclick = parseClickEvent(section);
-    const onmousedown = parseTapEvent(section, 'down');
-    const onmouseup = parseTapEvent(section, 'up');
-
-    const initial = createVisuObject(button, dynamicShapeParameters);
-
     // Convert object to an observable one
-    const state = useLocalStore(() => initial);
+    const state = useLocalStore(() =>
+        createVisuObject(button, shapeParameters),
+    );
 
     // Return of the react node
     return useObserver(() => (
         <div
             style={{
-                position: 'absolute',
+                cursor: 'auto',
+                overflow: 'visible',
+                pointerEvents: state.eventType,
                 visibility: state.display,
+                position: 'absolute',
                 left: state.transformedCornerCoord.x1,
                 top: state.transformedCornerCoord.y1,
                 width: state.relCoord.width,
@@ -125,6 +157,7 @@ export const Button: React.FunctionComponent<Props> = ({
         >
             {state.readAccess ? (
                 <ErrorBoundary fallback={<div>Oh no</div>}>
+                    {inputField}
                     <button
                         title={state.tooltip}
                         onClick={
@@ -161,35 +194,37 @@ export const Button: React.FunctionComponent<Props> = ({
                         } // We have to reset if somebody leaves the object with pressed key
                         style={{
                             backgroundColor: state.fill,
+                            borderColor: state.fill,
                             width: state.relCoord.width,
                             height: state.relCoord.height,
                             position: 'absolute',
-                        }}
-                    ></button>
-                    {pictureInside ? (
-                        <Image
-                            section={section}
-                            inlineElement={true}
-                        ></Image>
-                    ) : null}
-                    <div
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                            position: 'absolute',
-                            textAlign: 'center',
-                            margin: 'auto',
-                            top: 0,
-                            left: 0,
-                            bottom: 0,
-                            right: 0,
-                            pointerEvents: 'none',
+                            textIndent: '-45%',
                         }}
                     >
-                        <svg width="100%" height="100%">
-                            {textField}
+                        <svg
+                            width={state.relCoord.width - 4}
+                            height={state.relCoord.height - 4}
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                position: 'absolute',
+                                textAlign: 'center',
+                                // margin: 'auto',
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                right: 0,
+                                pointerEvents: 'none',
+                            }}
+                            overflow="visible"
+                        >
+                            {imageField}
+                            {typeof textField === 'undefined' ||
+                            textField === null
+                                ? null
+                                : textField}
                         </svg>
-                    </div>
+                    </button>
                 </ErrorBoundary>
             ) : null}
         </div>

@@ -1,10 +1,11 @@
 import ComSocket from '../../../communication/comsocket';
 import { IScrollbarObject } from '../../../Interfaces/jsinterfaces';
 import { IScrollbarShape } from '../../../Interfaces/javainterfaces';
+import { sprintf } from 'sprintf-js';
 
 export function createScrollbarObject(
     scrollbarShape: IScrollbarShape,
-    dynamicElements: Map<string, string[][]>,
+    shapeParameters: Map<string, string[][]>,
 ): IScrollbarObject {
     // absCornerCoord are the absolute coordinates of the <div> element in relation to the origin in the top left
     const absCornerCoord = {
@@ -42,7 +43,6 @@ export function createScrollbarObject(
         swap2 = relCoord.height;
     }
 
-    // Calc of the button and slidersize
     // Calculate the a, b1 and b2 parameters
     const a = swap1;
     // button width is a quater of overall length, but maximum as long as height
@@ -51,6 +51,8 @@ export function createScrollbarObject(
     // Scrollelement width is a sixth of overall length, but maximum as long as 2/3 height
     interim = 0.167 * swap2;
     const b2 = interim < 0.667 * a ? interim : 0.667 * a;
+    // Tooltip
+    const tooltip = scrollbarShape.tooltip;
 
     // Create an object with the initial parameters
     const initial: IScrollbarObject = {
@@ -69,11 +71,14 @@ export function createScrollbarObject(
         value: 0,
         scrollvalue: 0,
         display: 'visible',
+        tooltip: tooltip,
     };
 
-    if (dynamicElements.has('expr-invisible')) {
-        const element = dynamicElements!.get('expr-invisible');
-        const returnFunc = ComSocket.singleton().evalFunction(element);
+    if (shapeParameters.has('expr-invisible')) {
+        const element = shapeParameters!.get('expr-invisible');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
         const wrapperFunc = () => {
             const value = Number(returnFunc());
             if (value !== null && typeof value !== 'undefined') {
@@ -91,9 +96,11 @@ export function createScrollbarObject(
         });
     }
 
-    if (dynamicElements.has('expr-lower-bound')) {
-        const element = dynamicElements!.get('expr-lower-bound');
-        const returnFunc = ComSocket.singleton().evalFunction(element);
+    if (shapeParameters.has('expr-lower-bound')) {
+        const element = shapeParameters!.get('expr-lower-bound');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
         const wrapperFunc = () => {
             const value = returnFunc();
             return Number(value);
@@ -103,9 +110,11 @@ export function createScrollbarObject(
         });
     }
 
-    if (dynamicElements.has('expr-upper-bound')) {
-        const element = dynamicElements!.get('expr-upper-bound');
-        const returnFunc = ComSocket.singleton().evalFunction(element);
+    if (shapeParameters.has('expr-upper-bound')) {
+        const element = shapeParameters!.get('expr-upper-bound');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
         const wrapperFunc = () => {
             const value = returnFunc();
             return Number(value);
@@ -115,17 +124,56 @@ export function createScrollbarObject(
         });
     }
 
-    if (dynamicElements.has('expr-tooltip-display')) {
-        const element = dynamicElements!.get('expr-tooltip-display');
-        const returnFunc = ComSocket.singleton().evalFunction(element);
+    // 18) Tooltip
+    if (shapeParameters.has('expr-tooltip-display')) {
+        const element = shapeParameters!.get('expr-tooltip-display');
         Object.defineProperty(initial, 'tooltip', {
-            get: () => returnFunc(),
+            get: function () {
+                let output = '';
+                let parsedTooltip =
+                    tooltip === null || typeof tooltip === 'undefined'
+                        ? ''
+                        : tooltip;
+                const value = ComSocket.singleton().getFunction(
+                    element,
+                )();
+                try {
+                    if (
+                        parsedTooltip.includes('|<|') ||
+                        parsedTooltip.includes('|>|')
+                    ) {
+                        parsedTooltip = parsedTooltip.replace(
+                            /\|<\|/g,
+                            '<',
+                        );
+                        parsedTooltip = parsedTooltip.replace(
+                            /\|>\|/g,
+                            '>',
+                        );
+                        output = parsedTooltip;
+                    } else {
+                        output = sprintf(parsedTooltip, value);
+                    }
+                } catch {
+                    if (
+                        !(
+                            !parsedTooltip ||
+                            /^\s*$/.test(parsedTooltip)
+                        )
+                    ) {
+                        output = parsedTooltip;
+                    }
+                }
+                return output;
+            },
         });
     }
 
-    if (dynamicElements.has('expr-tap-var')) {
-        const element = dynamicElements!.get('expr-tap-var');
-        const returnFunc = ComSocket.singleton().evalFunction(element);
+    if (shapeParameters.has('expr-tap-var')) {
+        const element = shapeParameters!.get('expr-tap-var');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
         Object.defineProperty(initial, 'value', {
             get: () => returnFunc(),
         });

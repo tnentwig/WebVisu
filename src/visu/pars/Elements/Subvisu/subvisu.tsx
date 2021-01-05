@@ -85,9 +85,9 @@ export const Subvisu: React.FunctionComponent<Props> = ({
     };
 
     // Parsing of observable events (like toggle color)
-    const dynamicShapeParameters = parseShapeParameters(section);
+    const shapeParameters = parseShapeParameters(section);
 
-    const initial = createVisuObject(subvisu, dynamicShapeParameters);
+    const initial = createVisuObject(subvisu, shapeParameters);
 
     // Convert object to an observable one
     const state = useLocalStore(() => initial);

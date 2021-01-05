@@ -3,7 +3,9 @@ export function stringToBoolean(booleanExp: string): boolean {
     try {
         interim = JSON.parse(booleanExp);
     } catch {
-        console.log('Not a boolean expression: ');
+        console.warn(
+            '[' + booleanExp + '] is not a boolean expression',
+        );
     }
     return interim;
 }
@@ -204,7 +206,7 @@ export function coordArrayToString(pointArray: number[][]): string {
 export function coordArrayToBezierString(
     pointArray: number[][],
 ): string {
-    let bezier: string = '';
+    let bezier = '';
     pointArray.forEach((element, index) => {
         if (index === 0) {
             bezier += 'M' + element.join(' ');
@@ -219,18 +221,34 @@ export function coordArrayToBezierString(
 
 export function evalRPN(
     postfixStack: Array<string>,
-): boolean | number | null {
+): boolean | number | string | null {
     // Return null if string is empty
     if (postfixStack.length === 0) {
         return null;
     }
+    if (postfixStack.length === 1) {
+        let token = postfixStack[0];
+        if (token.toLowerCase() === 'true') {
+            token = '1';
+        }
+        if (token.toLowerCase() === 'false') {
+            token = '0';
+        }
+        // If the token is a number:
+        if (!isNaN(parseFloat(token))) {
+            return parseFloat(token);
+        }
+        // Else the token is a string
+        else {
+            return token;
+        }
+    }
     // We initilize the operating stack, this is necessary for mutliple operands
     const operatingStack: Array<number> = [];
-    const test = [...postfixStack];
     // Now we pop the tokens successively form the resting stack
     for (let i = 0; i < postfixStack.length; i++) {
         let token = postfixStack[i];
-        // The token could be "TRUE" or "FALSE". The we have to translate ist to 1 and 0.
+        // The token could be "TRUE" or "FALSE". The we have to translate it to 1 and 0.
         if (token.toLowerCase() === 'true') {
             token = '1';
         }
@@ -238,7 +256,7 @@ export function evalRPN(
             token = '0';
         }
 
-        // If the token is a number: psuh them to the operating stack
+        // If the token is a number: push them to the operating stack
         if (!isNaN(Number(token))) {
             operatingStack.push(parseFloat(token));
         }
@@ -252,36 +270,39 @@ export function evalRPN(
             }
             // Get the operator
             const operator = token.split('(')[0];
-
             // Choose the opration
             let result: number;
             let interim: number;
             switch (operator) {
-                case '*':
+                case '*': {
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
                         result = result * operatingStack.pop();
                     }
                     break;
-                case '/':
+                }
+                case '/': {
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
                         result = result / operatingStack.pop();
                     }
                     break;
-                case '-':
+                }
+                case '-': {
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
                         result = -result + operatingStack.pop();
                     }
                     break;
-                case '+':
+                }
+                case '+': {
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
                         result = result + operatingStack.pop();
                     }
                     break;
-                case 'MAX':
+                }
+                case 'MAX': {
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
                         const y = result;
@@ -289,7 +310,8 @@ export function evalRPN(
                         result = x > y ? x : y;
                     }
                     break;
-                case 'MIN':
+                }
+                case 'MIN': {
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
                         const y = result;
@@ -297,7 +319,8 @@ export function evalRPN(
                         result = x < y ? x : y;
                     }
                     break;
-                case '=':
+                }
+                case '=': {
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
                         const y = interim;
@@ -310,7 +333,8 @@ export function evalRPN(
                                 : 0;
                     }
                     break;
-                case '<':
+                }
+                case '<': {
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
                         const y = interim;
@@ -318,7 +342,8 @@ export function evalRPN(
                         result = x < y ? 1 : 0;
                     }
                     break;
-                case '>':
+                }
+                case '>': {
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
                         const y = interim;
@@ -326,7 +351,8 @@ export function evalRPN(
                         result = x > y ? 1 : 0;
                     }
                     break;
-                case '<=':
+                }
+                case '<=': {
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
                         const y = interim;
@@ -334,7 +360,8 @@ export function evalRPN(
                         result = x <= y ? 1 : 0;
                     }
                     break;
-                case '>=':
+                }
+                case '>=': {
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
                         const y = interim;
@@ -342,7 +369,8 @@ export function evalRPN(
                         result = x >= y ? 1 : 0;
                     }
                     break;
-                case '<>':
+                }
+                case '<>': {
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
                         const y = interim;
@@ -350,7 +378,8 @@ export function evalRPN(
                         result = x !== y ? 1 : 0;
                     }
                     break;
-                case 'AND':
+                }
+                case 'AND': {
                     interim = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
                         const swap = operatingStack.pop();
@@ -358,7 +387,8 @@ export function evalRPN(
                     }
                     result = interim;
                     break;
-                case 'OR':
+                }
+                case 'OR': {
                     interim = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
                         const swap = operatingStack.pop();
@@ -366,21 +396,21 @@ export function evalRPN(
                     }
                     result = interim;
                     break;
-                case 'NOT':
+                }
+                case 'NOT': {
                     // Has only on operand
-                    result = Number(!Boolean(operatingStack.pop()));
+                    result = Number(!operatingStack.pop());
                     break;
-                case 'CONST':
-                    // Its a string
-                    result = operatingStack.pop();
-                    break;
-                default:
-                    console.log(test)
-                    console.log(
+                }
+                default: {
+                    console.warn(
                         'The RPN-combi: ' +
-                            token + " " + operator +
+                            token +
+                            ' ' +
+                            operator +
                             ' is not a valid one!',
                     );
+                }
             }
             operatingStack.push(result);
         }
@@ -389,12 +419,35 @@ export function evalRPN(
     return output;
 }
 
+export function parseText(text: string) {
+    // Replace the \r\n by single \n
+    text = text.replace(/\r\n/g, '\n');
+    // Replace the \n\r by single \n
+    text = text.replace(/\n\r/g, '\n');
+    // Replace the \r by single \n
+    text = text.replace(/\r/g, '\n');
+    // We should only have \n as new line
+
+    // Replace the tabs
+    text = text.replace(/\n\t/g, '');
+    text = text.replace(/\t/g, '');
+
+    // Replace <![CDATA[
+    // text = text.replace(/\<\!\[CDATA\[/, '');
+    // Replace ]]>
+    // text = text.replace(/(\]\]\>)(?!.*\1)/, '');
+
+    return text;
+}
+
 export function getTextLines(text: string) {
     let match;
     let lastMatch = 0;
     const regEx = new RegExp(/(\n)/, 'g');
     const stringStack = [];
-    text = text.replace(/\t/g, '');
+
+    text = parseText(text);
+
     do {
         match = regEx.exec(text);
         if (match !== null) {

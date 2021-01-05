@@ -32,7 +32,7 @@ export const Scrollbar: React.FunctionComponent<Props> = ({
     };
 
     // Parsing of observable events
-    const dynamicShapeParameters = parseShapeParameters(section);
+    const shapeParameters = parseShapeParameters(section);
     // Parse the scroll update function
     const update = parseScrollUpdate(section);
     // Return of the react node
@@ -40,7 +40,7 @@ export const Scrollbar: React.FunctionComponent<Props> = ({
         return (
             <HorizontalScrollbar
                 shape={scrollbar}
-                dynamicParameters={dynamicShapeParameters}
+                dynamicParameters={shapeParameters}
                 updateFunction={update}
             ></HorizontalScrollbar>
         );
@@ -48,7 +48,7 @@ export const Scrollbar: React.FunctionComponent<Props> = ({
         return (
             <VerticalScrollbar
                 shape={scrollbar}
-                dynamicParameters={dynamicShapeParameters}
+                dynamicParameters={shapeParameters}
                 updateFunction={update}
             ></VerticalScrollbar>
         );

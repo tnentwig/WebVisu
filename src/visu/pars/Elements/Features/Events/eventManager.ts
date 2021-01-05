@@ -27,7 +27,7 @@ export function parseShapeParameters(
         'expr-xpos', // Absolute x-position
         'expr-ypos', // Absolute y-position
         'expr-scale', // Scale with middle reference point
-        'expr-angle', // Turn around center with angle
+        'expr-angle', // Turn around the reference point with angle
 
         // Tooltip
         'expr-tooltip-display', // tooltip variable
@@ -42,13 +42,14 @@ export function parseShapeParameters(
         'expr-lower-bound',
         'expr-upper-bound',
         'expr-tap-var',
+        'expr-toggle-var',
     ];
 
     const children = section.children;
     for (let i = 0; i < children.length; i++) {
         const exprName = children[i].nodeName;
         if (tags.includes(exprName)) {
-            // Now parse the expression stacky
+            // Now parse the expression stack
             // The stack is included in a <expr></expr>
             const expressions = children[i].getElementsByTagName(
                 'expr',
@@ -60,15 +61,29 @@ export function parseShapeParameters(
                 const ident = expressions[j].tagName;
                 const value = expressions[j].textContent;
                 switch (ident) {
-                    case 'var':
+                    case 'var': {
                         stack.push(['var', value.toLowerCase()]);
                         break;
-                    case 'const':
+                    }
+                    case 'const': {
                         stack.push(['const', value]);
                         break;
-                    case 'op':
+                    }
+                    case 'op': {
                         stack.push(['op', value]);
                         break;
+                    }
+                    default: {
+                        console.warn(
+                            'The expression ' +
+                                exprName +
+                                ' with ident ' +
+                                ident +
+                                ' which has for value ' +
+                                value +
+                                ' is not attached!',
+                        );
+                    }
                 }
             }
             exprMap.set(exprName, stack);
@@ -79,9 +94,9 @@ export function parseShapeParameters(
 
 export function parseTextParameters(
     section: Element,
-    shape: string,
-): Map<string, string> {
-    const exprMap: Map<string, string> = new Map();
+    // shape: string,
+): Map<string, string[][]> {
+    const exprMap: Map<string, string[][]> = new Map();
     let tags: Array<string> = [];
     // Styling tags
     tags = [
@@ -97,45 +112,44 @@ export function parseTextParameters(
     for (let i = 0; i < children.length; i++) {
         const exprName = children[i].nodeName;
         if (tags.includes(exprName)) {
+            // Now parse the expression stack
+            // The stack is included in a <expr></expr>
             const expressions = children[i].getElementsByTagName(
                 'expr',
-            );
-            // The text could be dynamic with a expression reference
+            )[0].children;
+            // Init a helper stack
+            const stack: string[][] = [];
+            // Iterate over all expressions
             for (let j = 0; j < expressions.length; j++) {
-                if (
-                    typeof expressions[j].getElementsByTagName('var')[0] !==
-                    'undefined'
-                ) {
-                    const varName = expressions[j]
-                        .getElementsByTagName('var')[0]
-                        .textContent.toLowerCase();
-                    if (
-                        ComSocket.singleton().oVisuVariables.has(
-                            varName,
-                        )
-                    ) {
-                        exprMap.set(exprName, varName);
-                    } else {
-                        console.log(
-                            'A variable textfield has no valid variable attached!',
-                        );
+                const ident = expressions[j].tagName;
+                const value = expressions[j].textContent;
+                switch (ident) {
+                    case 'var': {
+                        stack.push(['var', value.toLowerCase()]);
+                        break;
                     }
-                } else {
-                    if (
-                        typeof expressions[j].getElementsByTagName(
-                            'const',
-                        )[0] !== 'undefined'
-                    ) {
-                        const constName = expressions[j]
-                            .getElementsByTagName('const')[0]
-                            .textContent.toLowerCase();
-                    } else {
-                        console.log(
-                            'A variable textfield has no valid variable attached!',
+                    case 'const': {
+                        stack.push(['const', value]);
+                        break;
+                    }
+                    case 'op': {
+                        stack.push(['op', value]);
+                        break;
+                    }
+                    default: {
+                        console.warn(
+                            'The expression ' +
+                                exprName +
+                                ' with ident ' +
+                                ident +
+                                ' which has for value ' +
+                                value +
+                                ' is not attached!',
                         );
                     }
                 }
             }
+            exprMap.set(exprName, stack);
         }
     }
     return exprMap;
@@ -147,6 +161,7 @@ export function parseClickEvent(section: Element): Function {
     let clickEventDetected = false;
 
     const children = section.children;
+
     for (let i = 0; i < children.length; i++) {
         const exprName = children[i].nodeName;
         // Parse the <expr-toggle-var><expr><var> ... elements => toggle color
@@ -250,7 +265,7 @@ export function parseClickEvent(section: Element): Function {
                     'expr-assign',
                 );
                 for (let i = 0; i < assigns.length; i++) {
-                    const action = assigns[0];
+                    const action = assigns[i];
                     // Left side value. Must be a variable.
                     const lvalue = action
                         .getElementsByTagName('lvalue')[0]
@@ -265,18 +280,21 @@ export function parseClickEvent(section: Element): Function {
                         const ident = rvalue[j].tagName;
                         const value = rvalue[j].textContent;
                         switch (ident) {
-                            case 'var':
+                            case 'var': {
                                 rpnStack.push([
                                     'var',
                                     value.toLowerCase(),
                                 ]);
                                 break;
-                            case 'const':
+                            }
+                            case 'const': {
                                 rpnStack.push(['const', value]);
                                 break;
-                            case 'op':
+                            }
+                            case 'op': {
                                 rpnStack.push(['op', value]);
                                 break;
+                            }
                         }
                     }
                     clickFunction = function (): void {
@@ -298,16 +316,34 @@ export function parseClickEvent(section: Element): Function {
                 );
                 for (let i = 0; i < executes.length; i++) {
                     const execName = executes[i].textContent;
-                    switch (execName) {
-                        case 'INTERN CHANGEUSERLEVEL':
-                            clickFunction = function (): void {
-                                StateManager.singleton().openPopup.set(
-                                    true,
-                                );
-                            };
-                            stack.push(clickFunction);
-                            clickEventDetected = true;
-                            break;
+                    const execList = execName.split(' ');
+                    if (
+                        typeof execList[0] !== 'undefined' &&
+                        execList[0] !== null
+                    ) {
+                        switch (execList[0]) {
+                            case 'INTERN': {
+                                if (
+                                    typeof execList[1] !==
+                                        'undefined' &&
+                                    execList[1] !== null
+                                ) {
+                                    switch (execList[1]) {
+                                        case 'CHANGEUSERLEVEL': {
+                                            clickFunction = function (): void {
+                                                StateManager.singleton().openPopup.set(
+                                                    true,
+                                                );
+                                            };
+                                            stack.push(clickFunction);
+                                            clickEventDetected = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -317,9 +353,10 @@ export function parseClickEvent(section: Element): Function {
                     'expr-link',
                 );
                 for (let i = 0; i < links.length; i++) {
+                    // prettier-ignore
                     const link = actionList
-                        .getElementsByTagName('expr-link')
-                        [i].getElementsByTagName('expr')[0]
+                        .getElementsByTagName('expr-link')[i]
+                        .getElementsByTagName('expr')[0]
                         .children[0];
                     const type = link.tagName;
                     const content = link.textContent;
@@ -338,10 +375,18 @@ export function parseClickEvent(section: Element): Function {
                         };
                     } else {
                         clickFunction = function (): void {
+                            // TODO: shouldn't we open the value instead ???
+                            /*
                             const value = ComSocket.singleton().evalFunction(
                                 [[type, content.toLowerCase()]],
                             )();
                             window.open(content);
+                            */
+                            // TODO: check if this is right ???
+                            const value = ComSocket.singleton().evalFunction(
+                                [[type, content.toLowerCase()]],
+                            )();
+                            window.open(value);
                         };
                     }
                     stack.push(clickFunction);
@@ -386,7 +431,9 @@ export function parseTapEvent(
         }
 
         if (tapElement !== null) {
-            const expressions = tapElement.getElementsByTagName('expr');
+            const expressions = tapElement.getElementsByTagName(
+                'expr',
+            );
             // Parse the <expr-toggle-var><expr><var> ... elements => toggle color
             for (let i = 0; i < expressions.length; i++) {
                 // Check if variable exists

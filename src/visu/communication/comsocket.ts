@@ -5,24 +5,31 @@ import { evalRPN } from '../pars/Utils/utilfunctions';
 
 export default class ComSocket implements IComSocket {
     private static instance: IComSocket = new ComSocket();
+
     // objList contains all variables as objects with the name as key and addr & value of the variable
     oVisuVariables: Map<
         string,
         { addr: string; value: string | undefined }
     >;
+
     // The objList has no clear sequence. To get the possibily of correct access with numbers as indices use the look up table
     private globalVariables: Map<
         string,
         { addr: string; key: string }
     >;
+
     // the actual list and map
     private lutKeyVariable: Array<string>;
-    private requestFrame: { frame: String; listings: number };
+
+    private requestFrame: { frame: string; listings: number };
+
     private serverURL: string;
+
     // The ID of cyclic request
     private intervalID: number;
+
     // Indicator if a request is running
-    private runningFetch : boolean;
+    private runningFetch: boolean;
 
     // this class shall be a singleton
     private constructor() {
@@ -83,7 +90,7 @@ export default class ComSocket implements IComSocket {
             ) {
                 const value = stack[position][1];
                 switch (stack[position][0]) {
-                    case 'var':
+                    case 'var': {
                         if (
                             ComSocket.singleton().oVisuVariables.has(
                                 value,
@@ -92,7 +99,11 @@ export default class ComSocket implements IComSocket {
                             let varContent = ComSocket.singleton().oVisuVariables.get(
                                 value,
                             )!.value;
-                            if (varContent === '') {
+                            if (
+                                varContent === null ||
+                                typeof varContent === 'undefined' ||
+                                varContent === ''
+                            ) {
                                 varContent = '0';
                             }
                             interim.push(varContent);
@@ -100,15 +111,61 @@ export default class ComSocket implements IComSocket {
                             interim.push('0');
                         }
                         break;
-                    case 'const':
+                    }
+                    case 'const': {
                         interim.push(value);
                         break;
-                    case 'op':
+                    }
+                    case 'op': {
                         interim.push(value);
                         break;
+                    }
                 }
             }
             return evalRPN(interim);
+        };
+        return returnFunc;
+    }
+
+    getFunction(stack: string[][]): Function {
+        const returnFunc = function () {
+            let interim = '';
+            for (
+                let position = 0;
+                position < stack.length;
+                position++
+            ) {
+                const value = stack[position][1];
+                switch (stack[position][0]) {
+                    case 'var': {
+                        if (
+                            ComSocket.singleton().oVisuVariables.has(
+                                value,
+                            )
+                        ) {
+                            const varContent = ComSocket.singleton().oVisuVariables.get(
+                                value,
+                            )!.value;
+                            if (
+                                varContent === null ||
+                                typeof varContent !== 'undefined'
+                            ) {
+                                interim = interim + varContent;
+                            }
+                        }
+                        break;
+                    }
+                    case 'const': {
+                        interim = interim + value;
+                        break;
+                    }
+                    case 'op': {
+                        interim = interim + value;
+                        break;
+                    }
+                }
+            }
+            return interim;
         };
         return returnFunc;
     }
@@ -125,13 +182,15 @@ export default class ComSocket implements IComSocket {
         });
     }
 
-    updateVarList(timeoutTime : number): Promise<boolean> {
+    updateVarList(timeoutTime: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             const controller = new AbortController();
             const signal = controller.signal;
-            const timer = setTimeout(()=> {controller.abort()}, timeoutTime);
+            const timer = setTimeout(() => {
+                controller.abort();
+            }, timeoutTime);
             // Check if a primer fetch is running yet
-            if (!this.runningFetch){
+            if (!this.runningFetch) {
                 this.runningFetch = true;
                 fetch(this.serverURL, {
                     method: 'POST',
@@ -143,86 +202,103 @@ export default class ComSocket implements IComSocket {
                         '|' +
                         this.requestFrame.frame,
                 })
-                .then(
-                    (response) => {
-                        response
-                            .arrayBuffer()
-                            .then((buffer: ArrayBuffer) => {
-                                const decoder = new TextDecoder(
-                                    'iso-8859-1',
-                                );
-                                const text = decoder.decode(buffer);
-                                const transferarray: Array<string> = text
-                                    .slice(1, text.length - 1)
-                                    .split('|');
-                                if (
-                                    transferarray.length ===
-                                    this.requestFrame.listings
-                                ) {
-                                    for (
-                                        let i = 0;
-                                        i < transferarray.length;
-                                        i++
-                                    ) {
-                                        const varName = this.lutKeyVariable[
-                                            i
-                                        ];
-                                        if (
-                                            this.oVisuVariables.get(
-                                                varName,
-                                            ).value !== transferarray[i]
-                                        ) {
-                                            action(
-                                                (this.oVisuVariables.get(
-                                                    varName,
-                                                )!.value =
-                                                    transferarray[i]),
-                                            );
-                                        }
-                                    }
-                                    StateManager.singleton().oState.set(
-                                        'ISONLINE',
-                                        'TRUE',
+                    .then(
+                        (response) => {
+                            response
+                                .arrayBuffer()
+                                .then((buffer: ArrayBuffer) => {
+                                    const decoder = new TextDecoder(
+                                        'iso-8859-1',
                                     );
-                                }
-                                resolve(true);
-                            });
-                    },
-                    (err) => reject (err)
-                )
-                .catch(() => {
-                    console.log('Connection lost');
-                    StateManager.singleton().oState.set(
-                        'ISONLINE',
-                        'FALSE',
-                    );
-                    resolve(false);
-                })
-                .finally(()=>
-                {
-                    clearTimeout(timer);
-                    this.runningFetch = false;
-                })
+                                    const text = decoder.decode(
+                                        buffer,
+                                    );
+                                    const transferarray: Array<string> = text
+                                        .slice(1, text.length - 1)
+                                        .split('|');
+                                    if (
+                                        transferarray.length ===
+                                        this.requestFrame.listings
+                                    ) {
+                                        for (
+                                            let i = 0;
+                                            i < transferarray.length;
+                                            i++
+                                        ) {
+                                            const varName = this
+                                                .lutKeyVariable[i];
+                                            if (
+                                                this.oVisuVariables.get(
+                                                    varName,
+                                                ).value !==
+                                                transferarray[i]
+                                            ) {
+                                                action(
+                                                    (this.oVisuVariables.get(
+                                                        varName,
+                                                    )!.value =
+                                                        transferarray[
+                                                            i
+                                                        ]),
+                                                );
+                                            }
+                                        }
+                                        StateManager.singleton().oState.set(
+                                            'ISONLINE',
+                                            'TRUE',
+                                        );
+                                    }
+                                    resolve(true);
+                                });
+                        },
+                        (err) => {
+                            reject(err);
+                        },
+                    )
+                    .catch(() => {
+                        console.warn('Connection lost');
+                        StateManager.singleton().oState.set(
+                            'ISONLINE',
+                            'FALSE',
+                        );
+                        resolve(false);
+                    })
+                    .finally(() => {
+                        clearTimeout(timer);
+                        this.runningFetch = false;
+                    });
             } else {
-                console.log("The duration of the variable fetch request is greater then the specified cyclus time in the webvisu.htm!")
+                /*
+                console.warn(
+                    'The duration of the variable fetch request is greater then the specified cyclus time in the webvisu.htm!',
+                );
+                */
                 resolve(false);
             }
         });
-        
     }
 
     startCyclicUpdate() {
-        // Call the the updateVarList function cyclic
-        const updateTime = Number(StateManager.singleton().oState.get('UPDATETIME'));
-        const timeout = 5*updateTime;
+        // Call the the updateVarList function cyclicly
+        let updateTime = Number(
+            StateManager.singleton().oState.get('UPDATETIME'),
+        );
+        if (typeof updateTime === 'undefined') {
+            updateTime = 500;
+        }
+        const timeout = 5 * updateTime;
         this.intervalID = window.setInterval(
-            () => this.updateVarList(timeout),
+            () =>
+                this.updateVarList(timeout).catch((error) => {
+                    console.warn(error, timeout + 'ms');
+                }),
             updateTime,
         );
     }
 
     stopCyclicUpdate() {
         window.clearInterval(this.intervalID);
+        this.intervalID = undefined;
     }
 
     setValue(varName: string, varValue: number | string | boolean) {
@@ -247,7 +323,7 @@ export default class ComSocket implements IComSocket {
             let value = Number(
                 this.oVisuVariables.get(variableName)!.value,
             );
-            if (value === 0 || 1) {
+            if (value === 0 || value === 1) {
                 value === 0 ? (value = 1) : (value = 0);
                 this.setValue(varName, value);
             } else {

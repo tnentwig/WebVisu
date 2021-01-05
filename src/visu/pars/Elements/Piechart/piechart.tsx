@@ -91,17 +91,20 @@ export const Piechart: React.FunctionComponent<Props> = ({
     // so we have to calculate the rect coordinates separatly
     piechart.rect = util.computePiechartRectCoord(piechart.points);
 
+    // Parsing of observable events (like toggle color)
+    const shapeParameters = parseShapeParameters(section);
+
     // Parsing the textfields and returning a jsx object if it exists
     let textField: JSX.Element;
     if (section.getElementsByTagName('text-format').length) {
-        const dynamicTextParameters = parseTextParameters(
+        const textParameters = parseTextParameters(
             section,
-            piechart.shape,
         );
         textField = (
             <Textfield
                 section={section}
-                dynamicParameters={dynamicTextParameters}
+                textParameters={textParameters}
+                shapeParameters={shapeParameters}
             ></Textfield>
         );
     } else {
@@ -123,14 +126,12 @@ export const Piechart: React.FunctionComponent<Props> = ({
         inputField = null;
     }
 
-    // Parsing of observable events (like toggle color)
-    const dynamicShapeParameters = parseShapeParameters(section);
     // Parsing of user events that causes a reaction like toggle or pop up input
     const onclick = parseClickEvent(section);
     const onmousedown = parseTapEvent(section, 'down');
     const onmouseup = parseTapEvent(section, 'up');
 
-    const initial = createVisuObject(piechart, dynamicShapeParameters);
+    const initial = createVisuObject(piechart, shapeParameters);
 
     // Convert object to an observable one
     const state = useLocalStore(() => initial);
