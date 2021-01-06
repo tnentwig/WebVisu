@@ -153,7 +153,7 @@ export default class HTML5Visu {
                 '/webvisu.html',
                 '',
             );
-            fetch(this.rootDir + path + '/visu_ini.xml').then(
+            fetch(this.rootDir + path + '/visu_ini.xml' + '?v=' + Date.now()).then(
                 (response) => {
                     // Path is correct
                     if (response.ok) {
@@ -164,7 +164,7 @@ export default class HTML5Visu {
                         // roll back to manual 'try ? success : fail' style
                         // The request will automatically forwarded to the CoDeSys folder on a PFC. On older controllers we have to forward to /PLC manually
                         // A first try for get a manually forwarding
-                        fetch(this.rootDir + '/visu_ini.xml').then(
+                        fetch(this.rootDir + '/visu_ini.xml' + '?v=' + Date.now()).then(
                             (response) => {
                                 // Path is correct
                                 if (response.ok) {
@@ -172,7 +172,7 @@ export default class HTML5Visu {
                                 } else {
                                     fetch(
                                         this.rootDir +
-                                            '/plc/visu_ini.xml',
+                                            '/plc/visu_ini.xml' + '?v=' + Date.now(),
                                     ).then((response) => {
                                         // Path is correct
                                         if (response.ok) {
@@ -183,7 +183,7 @@ export default class HTML5Visu {
                                         } else {
                                             fetch(
                                                 this.rootDir +
-                                                    '/webvisu/visu_ini.xml',
+                                                    '/webvisu/visu_ini.xml' + '?v=' + Date.now(),
                                             ).then((response) => {
                                                 // Path is correct
                                                 if (response.ok) {
@@ -212,7 +212,7 @@ export default class HTML5Visu {
             // Get a reference to the global state manager
             const stateManager = StateManager.singleton().oState;
             // Get the webvisu.htm file. There are the startvisu and updatetime listed
-            fetch(this.rootDir + '/webvisu.htm', {
+            fetch(this.rootDir + '/webvisu.htm' + '?v=' + Date.now(), {
                 headers: {
                     'Content-Type': 'text/plain; charset=UTF8',
                 },
@@ -450,7 +450,7 @@ export default class HTML5Visu {
     processingVisuIni(): Promise<XMLDocument> {
         const url = this.rootDir + '/visu_ini.xml';
         return new Promise((resolve) => {
-            fetch(url, {
+            fetch(url + '?v=' + Date.now(), {
                 headers: {
                     'Content-Type': 'text/plain; charset=UTF8',
                 },
@@ -473,14 +473,18 @@ export default class HTML5Visu {
                             'download-id',
                         )[0].textContent;
                         // Check, if saved id and received id are not equal
+
+                        // TODO: just a test
+                        // clear();
+
                         if (
-                            localStorage.getItem('download-id') !==
+                            sessionStorage.getItem('download-id') !==
                             xmlDownloadID
                         ) {
                             // Clear old indexedDB
                             clear();
                             // Save the downlaod id
-                            localStorage.setItem(
+                            sessionStorage.setItem(
                                 'download-id',
                                 xmlDownloadID,
                             );

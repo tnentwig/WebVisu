@@ -21,6 +21,7 @@ export const Inputfield: React.FunctionComponent<Props> = ({
     // Define the click handler functions as null
     let handleClick: Function = null;
     let handleEnter: Function = null;
+    let cursor = '';
 
     // The expected behavior would be, that every called input field has a text-display node. Its an internal problem of the codesys project if not.
     let handleClickOutside: Function = () =>
@@ -85,18 +86,23 @@ export const Inputfield: React.FunctionComponent<Props> = ({
                     ComSocket.singleton().setValue(varName, value);
                 }
             };
+            
+            cursor =
+                (typeof handleClickOutside !== 'undefined' &&
+                handleClickOutside !== null) ||
+                (typeof handleClick !== 'undefined' &&
+                handleClick !== null) ||
+                (typeof handleEnter !== 'undefined' &&
+                handleEnter !== null)
+                    ? 'pointer'
+                    : null;
+            
         }
     }
 
     return (
         <ClickAwayListener onClickAway={() => handleClickOutside()}>
             <div
-                style={{
-                    position: 'absolute',
-                    width: '100%',
-                    height: '100%',
-                    pointerEvents: 'auto',
-                }}
                 onClick={
                     handleClick === null ? null : () => handleClick()
                 }
@@ -105,6 +111,13 @@ export const Inputfield: React.FunctionComponent<Props> = ({
                         ? null
                         : () => handleEnter(event)
                 }
+                style={{
+                    cursor: cursor,
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    pointerEvents: 'auto',
+                }}
             >
                 {open ? (
                     <input

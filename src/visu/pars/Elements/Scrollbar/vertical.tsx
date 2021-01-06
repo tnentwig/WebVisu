@@ -183,12 +183,12 @@ export const VerticalScrollbar: React.FunctionComponent<Props> = ({
             </svg>
             {/* Bottom button */}
             <svg
-                cursor={'pointer'}
                 onClick={
                     state.lowerBound < state.upperBound
                         ? decrement
                         : increment
                 }
+                cursor={'pointer'}
                 style={{
                     height: state.b1,
                     width: state.a,

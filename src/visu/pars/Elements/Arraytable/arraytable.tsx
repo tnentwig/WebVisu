@@ -175,6 +175,16 @@ export const ArrayTable: React.FunctionComponent<Props> = ({
                                 ? () => onmouseup()
                                 : null
                         } // We have to reset if somebody leaves the object with pressed key
+                        cursor={
+                            (typeof onclick !== 'undefined' &&
+                            onclick !== null) ||
+                            (typeof onmousedown !== 'undefined' &&
+                            onmousedown !== null) ||
+                            (typeof onmouseup !== 'undefined' &&
+                            onmouseup !== null)
+                                ? 'pointer'
+                                : null
+                        }
                         width={state.relCoord.width + 2 * state.edge}
                         height={
                             state.relCoord.height + 2 * state.edge

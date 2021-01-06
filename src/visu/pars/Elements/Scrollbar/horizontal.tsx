@@ -183,12 +183,12 @@ export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
             </svg>
             {/* Right button */}
             <svg
-                cursor={'pointer'}
                 onClick={
                     state.lowerBound < state.upperBound
                         ? increment
                         : decrement
                 }
+                cursor={'pointer'}
                 style={{
                     height: state.a,
                     width: state.b1,

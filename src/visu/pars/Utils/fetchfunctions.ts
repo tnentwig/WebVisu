@@ -88,7 +88,7 @@ export function getVisuXML_(url: string): Promise<XMLDocument> {
         const zipped = checkCompression();
         // Fetch the xml as unzipped file
         if (!zipped) {
-            fetch(url, {
+            fetch(url + '?v=' + Date.now(), {
                 headers: {
                     'Content-Type': 'text/plain; charset=UTF-8',
                 },
@@ -116,7 +116,7 @@ export function getVisuXML_(url: string): Promise<XMLDocument> {
             const zipName = filename.split('.')[0] + '_xml.zip';
             // Push the zip filename to stack
             urlStack.push(zipName);
-            fetch(urlStack.join('/'), {
+            fetch(urlStack.join('/') + '?v=' + Date.now(), {
                 headers: { 'Content-Type': 'binary;' },
             }).then((response) => {
                 if (response.ok) {
@@ -188,7 +188,7 @@ export function getImage(url: string): Promise<string> {
         const zipped = checkCompression();
         // Fetch the image as unzipped file
         if (!zipped) {
-            fetch(url).then((response) => {
+            fetch(url + '?v=' + Date.now()).then((response) => {
                 if (response.ok) {
                     response.arrayBuffer().then((buffer) => {
                         let binary = '';
@@ -213,7 +213,7 @@ export function getImage(url: string): Promise<string> {
                 filename.split('.')[0] + '_' + fileFormat + '.zip';
             // Push the zip filename to stack
             urlStack.push(zipName);
-            fetch(urlStack.join('/')).then((response) => {
+            fetch(urlStack.join('/') + '?v=' + Date.now()).then((response) => {
                 if (response.ok) {
                     response
                         .arrayBuffer()

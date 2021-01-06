@@ -87,7 +87,15 @@ export const Button: React.FunctionComponent<Props> = ({
     const onclick = parseClickEvent(section);
     const onmousedown = parseTapEvent(section, 'down');
     const onmouseup = parseTapEvent(section, 'up');
-
+    const cursor =
+        (typeof onclick !== 'undefined' &&
+        onclick !== null) ||
+        (typeof onmousedown !== 'undefined' &&
+        onmousedown !== null) ||
+        (typeof onmouseup !== 'undefined' &&
+        onmouseup !== null)
+            ? 'pointer'
+            : null;
     // Parsing the inputfield and returning a jsx object if it exists
     let inputField: JSX.Element;
     if (section.getElementsByTagName('enable-text-input').length) {
@@ -192,6 +200,7 @@ export const Button: React.FunctionComponent<Props> = ({
                                 : null
                         } // We have to reset if somebody leaves the object with pressed key
                         style={{
+                            cursor: cursor,
                             backgroundColor: state.fill,
                             borderColor: state.fill,
                             width: state.relCoord.width,
