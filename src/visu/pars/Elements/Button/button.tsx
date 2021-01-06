@@ -88,12 +88,10 @@ export const Button: React.FunctionComponent<Props> = ({
     const onmousedown = parseTapEvent(section, 'down');
     const onmouseup = parseTapEvent(section, 'up');
     const cursor =
-        (typeof onclick !== 'undefined' &&
-        onclick !== null) ||
+        (typeof onclick !== 'undefined' && onclick !== null) ||
         (typeof onmousedown !== 'undefined' &&
-        onmousedown !== null) ||
-        (typeof onmouseup !== 'undefined' &&
-        onmouseup !== null)
+            onmousedown !== null) ||
+        (typeof onmouseup !== 'undefined' && onmouseup !== null)
             ? 'pointer'
             : null;
     // Parsing the inputfield and returning a jsx object if it exists

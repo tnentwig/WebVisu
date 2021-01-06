@@ -191,11 +191,11 @@ export const Bitmap: React.FunctionComponent<Props> = ({
                         } // We have to reset if somebody leaves the object with pressed key
                         cursor={
                             (typeof onclick !== 'undefined' &&
-                            onclick !== null) ||
+                                onclick !== null) ||
                             (typeof onmousedown !== 'undefined' &&
-                            onmousedown !== null) ||
+                                onmousedown !== null) ||
                             (typeof onmouseup !== 'undefined' &&
-                            onmouseup !== null)
+                                onmouseup !== null)
                                 ? 'pointer'
                                 : null
                         }

@@ -213,32 +213,34 @@ export function getImage(url: string): Promise<string> {
                 filename.split('.')[0] + '_' + fileFormat + '.zip';
             // Push the zip filename to stack
             urlStack.push(zipName);
-            fetch(urlStack.join('/') + '?v=' + Date.now()).then((response) => {
-                if (response.ok) {
-                    response
-                        .arrayBuffer()
-                        .then((buffer) => zip.loadAsync(buffer))
-                        .then((unzipped) =>
-                            unzipped
-                                .file(filename)
-                                .async('arraybuffer'),
-                        )
-                        .then((buffer) => {
-                            let binary = '';
-                            const bytes = new Uint8Array(buffer);
-                            bytes.forEach(
-                                (b) =>
-                                    (binary += String.fromCharCode(
-                                        b,
-                                    )),
-                            );
-                            const base64 = window.btoa(binary);
-                            resolve(base64Flag + base64);
-                        });
-                } else {
-                    resolve(null);
-                }
-            });
+            fetch(urlStack.join('/') + '?v=' + Date.now()).then(
+                (response) => {
+                    if (response.ok) {
+                        response
+                            .arrayBuffer()
+                            .then((buffer) => zip.loadAsync(buffer))
+                            .then((unzipped) =>
+                                unzipped
+                                    .file(filename)
+                                    .async('arraybuffer'),
+                            )
+                            .then((buffer) => {
+                                let binary = '';
+                                const bytes = new Uint8Array(buffer);
+                                bytes.forEach(
+                                    (b) =>
+                                        (binary += String.fromCharCode(
+                                            b,
+                                        )),
+                                );
+                                const base64 = window.btoa(binary);
+                                resolve(base64Flag + base64);
+                            });
+                    } else {
+                        resolve(null);
+                    }
+                },
+            );
         }
     });
 }

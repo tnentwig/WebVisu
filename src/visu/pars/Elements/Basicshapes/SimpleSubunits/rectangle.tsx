@@ -95,11 +95,13 @@ export const Rectangle: React.FunctionComponent<Props> = React.memo(
                                 } // We have to reset if somebody leaves the object with pressed key
                                 cursor={
                                     (typeof onclick !== 'undefined' &&
-                                    onclick !== null) ||
-                                    (typeof onmousedown !== 'undefined' &&
-                                    onmousedown !== null) ||
-                                    (typeof onmouseup !== 'undefined' &&
-                                    onmouseup !== null)
+                                        onclick !== null) ||
+                                    (typeof onmousedown !==
+                                        'undefined' &&
+                                        onmousedown !== null) ||
+                                    (typeof onmouseup !==
+                                        'undefined' &&
+                                        onmouseup !== null)
                                         ? 'pointer'
                                         : null
                                 }

@@ -86,17 +86,16 @@ export const Inputfield: React.FunctionComponent<Props> = ({
                     ComSocket.singleton().setValue(varName, value);
                 }
             };
-            
+
             cursor =
                 (typeof handleClickOutside !== 'undefined' &&
-                handleClickOutside !== null) ||
+                    handleClickOutside !== null) ||
                 (typeof handleClick !== 'undefined' &&
-                handleClick !== null) ||
+                    handleClick !== null) ||
                 (typeof handleEnter !== 'undefined' &&
-                handleEnter !== null)
+                    handleEnter !== null)
                     ? 'pointer'
                     : null;
-            
         }
     }
 
