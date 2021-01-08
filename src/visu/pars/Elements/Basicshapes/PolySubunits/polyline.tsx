@@ -95,6 +95,7 @@ export const Polyline: React.FunctionComponent<Props> = ({
                                 state.relPoints,
                             )}
                             fill="none"
+                            pointer-events="stroke"
                             strokeWidth={state.strokeWidth}
                             stroke={state.stroke}
                             transform={state.transform}

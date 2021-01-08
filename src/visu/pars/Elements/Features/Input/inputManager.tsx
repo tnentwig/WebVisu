@@ -94,7 +94,7 @@ export const Inputfield: React.FunctionComponent<Props> = ({
                     handleClick !== null) ||
                 (typeof handleEnter !== 'undefined' &&
                     handleEnter !== null)
-                    ? 'pointer'
+                    ? 'text'
                     : null;
         }
     }
