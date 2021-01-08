@@ -140,6 +140,7 @@ export const Textline: React.FunctionComponent<Props> = ({
             x={state.xPos}
             dy={state.deltaY}
             visibility={state.visibility}
+            style={{ whiteSpace: 'pre' }}
         >
             {state.textOutput}
         </tspan>

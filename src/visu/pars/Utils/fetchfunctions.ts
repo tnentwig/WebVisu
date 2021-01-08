@@ -160,6 +160,47 @@ export function parseVisuXML(stringXML: string): XMLDocument {
     return returnXML;
 }
 
+export function getLastModified(
+    url: string,
+    image: boolean,
+): Promise<string> {
+    return new Promise((resolve) => {
+        const zipped = checkCompression();
+        if (zipped) {
+            const urlStack = url.split('/');
+            const filename = urlStack.pop();
+            let zipName = '';
+            if (image) {
+                const fileFormat = url.split('.').pop();
+                zipName =
+                    filename.split('.')[0] +
+                    '_' +
+                    fileFormat +
+                    '.zip';
+            } else {
+                zipName = filename.split('.')[0] + '_xml.zip';
+            }
+            // Push the zip filename to stack
+            urlStack.push(zipName);
+            url = urlStack.join('/');
+        }
+        fetch(url, {
+            method: 'HEAD',
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'text/plain; charset=UTF8',
+            },
+        }).then((response) => {
+            if (response.ok) {
+                const data = response.headers.get('Last-Modified');
+                resolve(data);
+            } else {
+                resolve(null);
+            }
+        });
+    });
+}
+
 export function getImage(url: string): Promise<string> {
     // Calculate the mimeType
     let mimeType = '';

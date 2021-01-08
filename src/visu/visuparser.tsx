@@ -3,6 +3,7 @@ import { get, set } from 'idb-keyval';
 import { VisuElements } from '../visu/pars/elementparser';
 import { stringToArray } from './pars/Utils/utilfunctions';
 import {
+    getLastModified,
     getVisuXML,
     stringifyVisuXML,
     parseVisuXML,
@@ -98,7 +99,21 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
                     '.xml';
                 // Files that are needed several times will be saved internally for loading speed up
                 let plainxml: string;
-                if (typeof (await get(visuName)) === 'undefined') {
+
+                const lastModified = await getLastModified(
+                    url,
+                    false,
+                );
+                if (
+                    typeof (await get(visuName)) === 'undefined' ||
+                    localStorage.getItem(visuName) !== lastModified
+                ) {
+                    console.log(
+                        visuName + ' Last-Modified: ',
+                        lastModified,
+                    );
+                    // Save the last modified
+                    localStorage.setItem(visuName, lastModified);
                     const xml = await getVisuXML(url);
                     if (typeof xml === 'undefined' || xml === null) {
                         console.warn(

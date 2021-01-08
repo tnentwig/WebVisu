@@ -487,18 +487,14 @@ export default class HTML5Visu {
                             'download-id',
                         )[0].textContent;
                         // Check, if saved id and received id are not equal
-
-                        // TODO: just a test
-                        // clear();
-
                         if (
-                            sessionStorage.getItem('download-id') !==
+                            localStorage.getItem('download-id') !==
                             xmlDownloadID
                         ) {
                             // Clear old indexedDB
                             clear();
-                            // Save the downlaod id
-                            sessionStorage.setItem(
+                            // Save the download-id
+                            localStorage.setItem(
                                 'download-id',
                                 xmlDownloadID,
                             );

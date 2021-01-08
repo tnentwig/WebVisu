@@ -2,7 +2,10 @@ import * as React from 'react';
 import { useObserver, useLocalStore } from 'mobx-react-lite';
 import ComSocket from '../../../../communication/comsocket';
 import { stringToArray } from '../../../Utils/utilfunctions';
-import { getImage } from '../../../Utils/fetchfunctions';
+import {
+    getLastModified,
+    getImage,
+} from '../../../Utils/fetchfunctions';
 import { get, set } from 'idb-keyval';
 
 type Props = {
@@ -134,11 +137,24 @@ export const ImageField: React.FunctionComponent<Props> = ({
             ) {
                 // Try to get the image from cache
                 let plainImg: string = null;
-                if (typeof (await get(rawFileName)) === 'undefined') {
-                    const path =
-                        ComSocket.singleton()
-                            .getServerURL()
-                            .replace('webvisu.htm', '') + rawFileName;
+                const path =
+                    ComSocket.singleton()
+                        .getServerURL()
+                        .replace('webvisu.htm', '') + rawFileName;
+                const lastModified = await getLastModified(
+                    path,
+                    true,
+                );
+                if (
+                    typeof (await get(rawFileName)) === 'undefined' ||
+                    localStorage.getItem(rawFileName) !== lastModified
+                ) {
+                    console.log(
+                        rawFileName + ' Last-Modified: ',
+                        lastModified,
+                    );
+                    // Save the last modified
+                    localStorage.setItem(rawFileName, lastModified);
                     plainImg = await getImage(path);
                     if (
                         typeof plainImg === 'undefined' ||
