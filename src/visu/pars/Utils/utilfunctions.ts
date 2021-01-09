@@ -3,16 +3,18 @@ export function stringToBoolean(booleanExp: string): boolean {
     try {
         interim = JSON.parse(booleanExp);
     } catch {
-        console.log('Not a boolean expression: ');
+        console.warn(
+            '[' + booleanExp + '] is not a boolean expression',
+        );
     }
     return interim;
 }
 
 export function rgbToHexString(rgb: string): string {
-    let rgbClr = rgb.split(',');
-    let r = Number(rgbClr[0]);
-    let g = Number(rgbClr[1]);
-    let b = Number(rgbClr[2]);
+    const rgbClr = rgb.split(',');
+    const r = Number(rgbClr[0]);
+    const g = Number(rgbClr[1]);
+    const b = Number(rgbClr[2]);
     let interim = ((r << 16) | (g << 8) | b)
         .toString(16)
         .toUpperCase();
@@ -24,10 +26,10 @@ export function rgbToHexString(rgb: string): string {
 }
 
 export function numberToHexColor(number: string): string {
-    let interim = Number(number);
-    let r = interim & 255;
-    let g = (interim >> 8) & 255;
-    let b = (interim >> 16) & 255;
+    const interim = Number(number);
+    const r = interim & 255;
+    const g = (interim >> 8) & 255;
+    const b = (interim >> 16) & 255;
     let rgb = '' + ((((r << 8) + g) << 8) + b).toString(16);
     while (rgb.length !== 6) {
         rgb = '0' + rgb;
@@ -46,7 +48,7 @@ export function stringToArray(stringExp: string): Array<number> {
 }
 
 export function computeMinMaxCoord(pointArray: number[][]): number[] {
-    let rect = [
+    const rect = [
         pointArray[0][0],
         pointArray[0][1],
         pointArray[0][0],
@@ -74,19 +76,19 @@ export function computeMinMaxCoord(pointArray: number[][]): number[] {
 export function computePiechartRectCoord(
     pointArray: number[][],
 ): number[] {
-    let deltax = Math.abs(pointArray[1][0] - pointArray[0][0]);
-    let deltay = Math.abs(pointArray[1][1] - pointArray[0][1]);
-    let x1 = pointArray[0][0] - deltax;
-    let x2 = pointArray[0][0] + deltax;
-    let y1 = pointArray[0][1] - deltay;
-    let y2 = pointArray[0][1] + deltay;
-    let rect = [x1, y1, x2, y2];
+    const deltax = Math.abs(pointArray[1][0] - pointArray[0][0]);
+    const deltay = Math.abs(pointArray[1][1] - pointArray[0][1]);
+    const x1 = pointArray[0][0] - deltax;
+    const x2 = pointArray[0][0] + deltax;
+    const y1 = pointArray[0][1] - deltay;
+    const y2 = pointArray[0][1] + deltay;
+    const rect = [x1, y1, x2, y2];
     return rect;
 }
 
 // Calculate the radius of a specifc point
 function radius(a: number, b: number, angle: number) {
-    let r =
+    const r =
         (a * b) /
         Math.sqrt(
             Math.pow(b * Math.cos(angle), 2) +
@@ -102,30 +104,30 @@ export function pointArrayToPiechartString(
     strokeWidth: number,
 ): string {
     // Calculate the angle in radiant
-    let startAngleRad = -startAngleDegree * 0.0174532925; // (2 * Math.PI) / 360 = 0.0174532925
-    let endAngleRad = -endAngleDegree * 0.0174532925;
+    const startAngleRad = -startAngleDegree * 0.0174532925; // (2 * Math.PI) / 360 = 0.0174532925
+    const endAngleRad = -endAngleDegree * 0.0174532925;
     // Calculate the radii of the ellipse
-    let radiusx = Math.abs(pointArray[1][0] - pointArray[0][0]);
-    let radiusy = Math.abs(pointArray[1][1] - pointArray[0][1]);
+    const radiusx = Math.abs(pointArray[1][0] - pointArray[0][0]);
+    const radiusy = Math.abs(pointArray[1][1] - pointArray[0][1]);
     // Calculate the radius of start and endpoint
-    let rStart = radius(radiusx, radiusy, startAngleRad);
-    let rEnd = radius(radiusx, radiusy, endAngleRad);
-    let start = [
+    const rStart = radius(radiusx, radiusy, startAngleRad);
+    const rEnd = radius(radiusx, radiusy, endAngleRad);
+    const start = [
         Math.cos(startAngleRad) * rStart + radiusx,
         Math.sin(startAngleRad) * rStart + radiusy,
     ];
-    let end = [
+    const end = [
         Math.cos(endAngleRad) * rEnd + radiusx,
         Math.sin(endAngleRad) * rEnd + radiusy,
     ];
-    let interimArray = pointArray;
+    const interimArray = pointArray;
     interimArray[2] = start;
     interimArray[3] = end;
 
-    let d : string;
-    let angleDiff = (endAngleDegree - startAngleDegree)%360;
+    let d: string;
+    const angleDiff = (endAngleDegree - startAngleDegree) % 360;
     // Angle with 0 degree difference is shown als full arc in codesys
-    if(angleDiff == 0){
+    if (angleDiff === 0) {
         d = [
             'M',
             interimArray[0][0],
@@ -134,33 +136,31 @@ export function pointArrayToPiechartString(
             interimArray[2][0] + strokeWidth,
             interimArray[2][1] + strokeWidth,
             'M',
-            2*radiusx+ strokeWidth,
-            radiusy+ strokeWidth,
+            2 * radiusx + strokeWidth,
+            radiusy + strokeWidth,
             'A',
-            radiusx-strokeWidth,
+            radiusx - strokeWidth,
             radiusy,
             0,
             1,
             1,
             strokeWidth,
-            radiusy+ strokeWidth,
+            radiusy + strokeWidth,
             'A',
             radiusx,
             radiusy,
             0,
             1,
             1,
-            2*radiusx+ strokeWidth,
-            radiusy+ strokeWidth
+            2 * radiusx + strokeWidth,
+            radiusy + strokeWidth,
         ].join(' ');
     } else {
         let largeArcFlag = 1;
-        if (angleDiff > 0){
-            largeArcFlag =
-                angleDiff <= 180 ? 1 : 0;
+        if (angleDiff > 0) {
+            largeArcFlag = angleDiff <= 180 ? 1 : 0;
         } else {
-            largeArcFlag =
-                angleDiff <= -180 ? 1 : 0;
+            largeArcFlag = angleDiff <= -180 ? 1 : 0;
         }
         d = [
             'M',
@@ -188,7 +188,7 @@ export function polarToCartesian(
     radius: number,
     angleInDegrees: number,
 ) {
-    var angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
+    const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
     return {
         x: center[0] + radius * Math.cos(angleInRadians),
         y: center[1] + radius * Math.sin(angleInRadians),
@@ -196,7 +196,7 @@ export function polarToCartesian(
 }
 
 export function coordArrayToString(pointArray: number[][]): string {
-    let interim: string[] = [];
+    const interim: string[] = [];
     pointArray.forEach((element) => interim.push(element.join(',')));
     return interim.join(' ');
 }
@@ -204,7 +204,7 @@ export function coordArrayToString(pointArray: number[][]): string {
 export function coordArrayToBezierString(
     pointArray: number[][],
 ): string {
-    let bezier: string = '';
+    let bezier = '';
     pointArray.forEach((element, index) => {
         if (index === 0) {
             bezier += 'M' + element.join(' ');
@@ -219,18 +219,34 @@ export function coordArrayToBezierString(
 
 export function evalRPN(
     postfixStack: Array<string>,
-): boolean | number | null {
+): boolean | number | string | null {
     // Return null if string is empty
     if (postfixStack.length === 0) {
         return null;
     }
+    if (postfixStack.length === 1) {
+        let token = postfixStack[0];
+        if (token.toLowerCase() === 'true') {
+            token = '1';
+        }
+        if (token.toLowerCase() === 'false') {
+            token = '0';
+        }
+        // If the token is a number:
+        if (!isNaN(parseFloat(token))) {
+            return parseFloat(token);
+        }
+        // Else the token is a string
+        else {
+            return token;
+        }
+    }
     // We initilize the operating stack, this is necessary for mutliple operands
-    let operatingStack: Array<number> = [];
-    let test = [...postfixStack];
+    const operatingStack: Array<number> = [];
     // Now we pop the tokens successively form the resting stack
-    for (var i = 0; i < postfixStack.length; i++) {
-        var token = postfixStack[i];
-        // The token could be "TRUE" or "FALSE". The we have to translate ist to 1 and 0.
+    for (let i = 0; i < postfixStack.length; i++) {
+        let token = postfixStack[i];
+        // The token could be "TRUE" or "FALSE". The we have to translate it to 1 and 0.
         if (token.toLowerCase() === 'true') {
             token = '1';
         }
@@ -238,7 +254,7 @@ export function evalRPN(
             token = '0';
         }
 
-        // If the token is a number: psuh them to the operating stack
+        // If the token is a number: push them to the operating stack
         if (!isNaN(Number(token))) {
             operatingStack.push(parseFloat(token));
         }
@@ -246,150 +262,190 @@ export function evalRPN(
         else {
             // The <op>-text has the format: <operation>(<number of involved operands>) if number > 1
             let numberOfOperands = 2;
-            let regex = token.match(/\(([^)]+)\)/);
+            const regex = token.match(/\(([^)]+)\)/);
             if (regex !== null) {
                 numberOfOperands = Number(regex[1]);
             }
             // Get the operator
-            let operator = token.split('(')[0];
-
+            const operator = token.split('(')[0];
             // Choose the opration
             let result: number;
             let interim: number;
             switch (operator) {
-                case '*':
+                case '*': {
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
                         result = result * operatingStack.pop();
                     }
                     break;
-                case '/':
+                }
+                case '/': {
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
                         result = result / operatingStack.pop();
                     }
                     break;
-                case '-':
+                }
+                case '-': {
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
                         result = -result + operatingStack.pop();
                     }
                     break;
-                case '+':
+                }
+                case '+': {
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
                         result = result + operatingStack.pop();
                     }
                     break;
-                case 'MAX':
+                }
+                case 'MAX': {
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
-                        let y = result;
-                        let x = operatingStack.pop();
+                        const y = result;
+                        const x = operatingStack.pop();
                         result = x > y ? x : y;
                     }
                     break;
-                case 'MIN':
+                }
+                case 'MIN': {
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
-                        let y = result;
-                        let x = operatingStack.pop();
+                        const y = result;
+                        const x = operatingStack.pop();
                         result = x < y ? x : y;
                     }
                     break;
-                case '=':
+                }
+                case '=': {
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
-                        let y = interim;
-                        let x = operatingStack.pop();
-                        result = x == y ? 1 : 0;
+                        const y = interim;
+                        const x = operatingStack.pop();
+                        result =
+                            typeof x !== 'undefined' &&
+                            x !== null &&
+                            x === y
+                                ? 1
+                                : 0;
                     }
                     break;
-                case '<':
+                }
+                case '<': {
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
-                        let y = interim;
-                        let x = operatingStack.pop();
+                        const y = interim;
+                        const x = operatingStack.pop();
                         result = x < y ? 1 : 0;
                     }
                     break;
-                case '>':
+                }
+                case '>': {
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
-                        let y = interim;
-                        let x = operatingStack.pop();
+                        const y = interim;
+                        const x = operatingStack.pop();
                         result = x > y ? 1 : 0;
                     }
                     break;
-                case '<=':
+                }
+                case '<=': {
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
-                        let y = interim;
-                        let x = operatingStack.pop();
+                        const y = interim;
+                        const x = operatingStack.pop();
                         result = x <= y ? 1 : 0;
                     }
                     break;
-                case '>=':
+                }
+                case '>=': {
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
-                        let y = interim;
-                        let x = operatingStack.pop();
+                        const y = interim;
+                        const x = operatingStack.pop();
                         result = x >= y ? 1 : 0;
                     }
                     break;
-                case '<>':
+                }
+                case '<>': {
                     interim = operatingStack.pop();
                     for (let i = 1; i < 2; i++) {
-                        let y = interim;
-                        let x = operatingStack.pop();
+                        const y = interim;
+                        const x = operatingStack.pop();
                         result = x !== y ? 1 : 0;
                     }
                     break;
-                case 'AND':
+                }
+                case 'AND': {
                     interim = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
-                        let swap = operatingStack.pop();
+                        const swap = operatingStack.pop();
                         interim = interim & swap;
                     }
                     result = interim;
                     break;
-                case 'OR':
+                }
+                case 'OR': {
                     interim = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
-                        let swap = operatingStack.pop();
+                        const swap = operatingStack.pop();
                         interim = interim | swap;
                     }
                     result = interim;
                     break;
-                case 'NOT':
+                }
+                case 'NOT': {
                     // Has only on operand
-                    result = Number(!Boolean(operatingStack.pop()));
+                    result = Number(!operatingStack.pop());
                     break;
-                case 'CONST':
-                    // Its a string
-                    result = operatingStack.pop();
-                    break;
-                default:
-                    console.log(test)
-                    console.log(
+                }
+                default: {
+                    console.warn(
                         'The RPN-combi: ' +
-                            token + " " + operator +
+                            token +
+                            ' ' +
+                            operator +
                             ' is not a valid one!',
                     );
+                }
             }
             operatingStack.push(result);
         }
     }
-    let output = operatingStack.pop();
+    const output = operatingStack.pop();
     return output;
+}
+
+export function parseText(text: string) {
+    // Replace the \r\n by single \n
+    text = text.replace(/\r\n/g, '\n');
+    // Replace the \n\r by single \n
+    text = text.replace(/\n\r/g, '\n');
+    // Replace the \r by single \n
+    text = text.replace(/\r/g, '\n');
+    // We should only have \n as new line
+
+    // Replace the tabs
+    text = text.replace(/\n\t/g, '');
+    text = text.replace(/\t/g, '');
+
+    // Replace <![CDATA[
+    // text = text.replace(/\<\!\[CDATA\[/, '');
+    // Replace ]]>
+    // text = text.replace(/(\]\]\>)(?!.*\1)/, '');
+
+    return text;
 }
 
 export function getTextLines(text: string) {
     let match;
     let lastMatch = 0;
-    let regEx = new RegExp(/(\n)/, 'g');
-    let stringStack = [];
-    text = text.replace(/\t/g, '');
+    const regEx = new RegExp(/(\n)/, 'g');
+    const stringStack = [];
+
+    text = parseText(text);
+
     do {
         match = regEx.exec(text);
         if (match !== null) {
@@ -407,5 +463,7 @@ export function getTextLines(text: string) {
             );
         }
     } while (match);
-    return stringStack.filter((el) => el != '');
+    return stringStack.filter(
+        (el) => typeof el !== 'undefined' && el !== null,
+    );
 }

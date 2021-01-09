@@ -1,0 +1,12 @@
+{
+    "extends": "./tsconfig.json",
+    "include": [
+        "src/**/*.ts",
+        ".eslintrc"
+    ],
+    "exclude": [
+        "dist",
+        "img",
+        "node_modules"
+    ]
+}

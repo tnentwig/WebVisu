@@ -3,7 +3,8 @@ import { get, set } from 'idb-keyval';
 import { VisuElements } from '../visu/pars/elementparser';
 import { stringToArray } from './pars/Utils/utilfunctions';
 import {
-    getVisuxml,
+    getLastModified,
+    getVisuXML,
     stringifyVisuXML,
     parseVisuXML,
 } from './pars/Utils/fetchfunctions';
@@ -11,30 +12,73 @@ import ComSocket from './communication/comsocket';
 import StateManager from '../visu/statemanagement/statemanager';
 
 type Props = {
-    visuname: string;
+    visuName: string;
     width: number;
     height: number;
-    show_frame: boolean;
-    clip_frame: boolean;
-    iso_frame: boolean;
-    original_frame: boolean;
-    original_scrollable_frame: boolean;
-    no_frame_offset: boolean;
+    showFrame: boolean;
+    clipFrame: boolean;
+    isoFrame: boolean;
+    originalFrame: boolean;
+    originalScrollableFrame: boolean;
+    noFrameOffset: boolean;
 };
+
+async function initVariables(XML: XMLDocument) {
+    const com = ComSocket.singleton();
+    // We have to reset the varibales on comsocket, if necessary
+    com.stopCyclicUpdate();
+    com.initObservables();
+    // Rip all of <variable> in <variablelist> section
+    let variables = XML.getElementsByTagName('visualisation')[0]
+        .getElementsByTagName('variablelist')[0]
+        .getElementsByTagName('variable');
+    for (let i = 0; i < variables.length; i++) {
+        const varName = variables[i].getAttribute('name');
+        const rawAddress = variables[i].innerHTML;
+        const varAddress = rawAddress
+            .split(',')
+            .slice(0, 4)
+            .join(',');
+        // Add the variable to the observables if not already existent
+        if (!com.oVisuVariables.has(varName.toLowerCase())) {
+            com.addObservableVar(varName, varAddress);
+        }
+    }
+
+    // Rip all of <complexvariable> in <variablelist> section
+    variables = XML.getElementsByTagName('visualisation')[0]
+        .getElementsByTagName('variablelist')[0]
+        .getElementsByTagName('complexvariable');
+    for (let i = 0; i < variables.length; i++) {
+        const varName = variables[i].getAttribute('name');
+        const rawAddress = variables[i].innerHTML;
+        const varAddress = 'complex,'.concat(
+            rawAddress.split(',').slice(0, 3).join(','),
+        );
+        // Add the variable to the observables if not already existent
+        if (!com.oVisuVariables.has(varName.toLowerCase())) {
+            com.addObservableVar(varName, varAddress);
+        }
+    }
+    await com.updateVarList(1000).catch((error) => {
+        console.warn(error);
+    });
+    com.startCyclicUpdate();
+}
 
 export const Visualisation: React.FunctionComponent<Props> = React.memo(
     ({
-        visuname,
+        visuName,
         width,
         height,
-        show_frame,
-        clip_frame,
-        iso_frame,
-        original_frame,
-        original_scrollable_frame,
-        no_frame_offset,
+        // showFrame,
+        clipFrame,
+        isoFrame,
+        originalFrame,
+        // originalScrollableFrame,
+        // noFrameOffset,
     }) => {
-        const [loading, setLoading] = React.useState<Boolean>(true);
+        const [loading, setLoading] = React.useState<boolean>(true);
         const [adaptedXML, setAdaptedXML] = React.useState<Element>(
             null,
         );
@@ -43,37 +87,50 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
         >([0, 0]);
         const [scale, setScale] = React.useState('scale(1)');
 
-        // Get new xml on change of visuname
+        // Get new xml on change of visuName
         React.useEffect(() => {
-            let fetchXML = async function () {
+            const fetchXML = async function () {
                 // Set the loading flag. This will unmount all elements from calling visu
                 setLoading(true);
-                let url =
+                const url =
                     StateManager.singleton().oState.get('ROOTDIR') +
                     '/' +
-                    visuname +
+                    visuName +
                     '.xml';
                 // Files that are needed several times will be saved internally for loading speed up
                 let plainxml: string;
-                if ((await get(visuname)) === undefined) {
-                    console.log(visuname)
-                    let xml = await getVisuxml(url);
-                    if (xml == null) {
-                        console.log(
+
+                const lastModified = await getLastModified(
+                    url,
+                    false,
+                );
+                if (
+                    typeof (await get(visuName)) === 'undefined' ||
+                    localStorage.getItem(visuName) !== lastModified
+                ) {
+                    console.log(
+                        visuName + ' Last-Modified: ',
+                        lastModified,
+                    );
+                    // Save the last modified
+                    localStorage.setItem(visuName, lastModified);
+                    const xml = await getVisuXML(url);
+                    if (typeof xml === 'undefined' || xml === null) {
+                        console.warn(
                             'The requested visualisation ' +
-                                visuname +
+                                visuName +
                                 ' is not available!',
                         );
                     } else {
                         plainxml = stringifyVisuXML(xml);
-                        await set(visuname, plainxml);
+                        await set(visuName, plainxml);
                     }
                 } else {
-                    plainxml = await get(visuname);
+                    plainxml = await get(visuName);
                 }
 
                 if (plainxml !== null) {
-                    let xmlDoc = parseVisuXML(plainxml);
+                    const xmlDoc = parseVisuXML(plainxml);
                     await initVariables(xmlDoc);
                     setAdaptedXML(xmlDoc.children[0]);
                     setOriginSize(
@@ -90,13 +147,13 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
                 }
             };
             fetchXML();
-        }, [visuname]);
+        }, [visuName]);
 
         // Scaling on main window resize for responsive behavior
         React.useEffect(() => {
-            let xscaleFactor = width / (originSize[0] + 2);
-            let yscaleFactor = height / (originSize[1] + 2);
-            if (original_frame) {
+            const xscaleFactor = width / (originSize[0] + 2);
+            const yscaleFactor = height / (originSize[1] + 2);
+            if (originalFrame) {
                 setScale(
                     'scale(' +
                         (
@@ -106,7 +163,7 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
                         ).toString() +
                         ')',
                 );
-            } else if (iso_frame) {
+            } else if (isoFrame) {
                 setScale(
                     'scale(' +
                         Math.min(
@@ -124,14 +181,14 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
                         ')',
                 );
             }
-        }, [width, height, originSize, original_frame, iso_frame]);
+        }, [width, height, originSize, originalFrame, isoFrame]);
 
         return (
             <div
                 style={{
                     display: 'block',
                     position: 'absolute',
-                    overflow: clip_frame ? 'hidden' : 'visible',
+                    overflow: clipFrame ? 'hidden' : 'visible',
                     left: 0,
                     top: 0,
                     width: originSize[0] + 1,
@@ -149,25 +206,3 @@ export const Visualisation: React.FunctionComponent<Props> = React.memo(
         );
     },
 );
-
-async function initVariables(XML: XMLDocument) {
-    let com = ComSocket.singleton();
-    // We have to reset the varibales on comsocket, if necessary
-    com.stopCyclicUpdate();
-    com.initObservables();
-    // Rip all of <variable> in <variablelist> section
-    let variables = XML.getElementsByTagName('visualisation')[0]
-        .getElementsByTagName('variablelist')[0]
-        .getElementsByTagName('variable');
-    for (let i = 0; i < variables.length; i++) {
-        let varName = variables[i].getAttribute('name');
-        let rawAddress = variables[i].innerHTML;
-        let varAddress = rawAddress.split(',').slice(0, 4).join(',');
-        // Add the variable to the observables if not already existent
-        if (!com.oVisuVariables.has(varName.toLowerCase())) {
-            com.addObservableVar(varName, varAddress);
-        }
-    }
-    await com.updateVarList(1000);
-    com.startCyclicUpdate();
-}

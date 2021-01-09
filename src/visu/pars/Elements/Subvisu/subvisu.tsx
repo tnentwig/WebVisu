@@ -2,7 +2,7 @@ import * as React from 'react';
 import { VisuElements } from '../../elementparser';
 import * as util from '../../Utils/utilfunctions';
 import { ISubvisuShape } from '../../../Interfaces/javainterfaces';
-import { parseDynamicShapeParameters } from '../Features/Events/eventManager';
+import { parseShapeParameters } from '../Features/Events/eventManager';
 import { createVisuObject } from '../../Objectmanagement/objectManager';
 import { useObserver, useLocalStore } from 'mobx-react-lite';
 
@@ -13,69 +13,72 @@ type Props = {
 export const Subvisu: React.FunctionComponent<Props> = ({
     section,
 }) => {
-    let children = section.children;
-    let referenceObject: { [id: string]: Element } = {};
+    const children = section.children;
+    const referenceObject: { [id: string]: Element } = {};
     for (let i = 0; i < children.length; i++) {
         referenceObject[children[i].nodeName] = children[i];
     }
 
-    let subvisu: ISubvisuShape = {
+    const subvisu: ISubvisuShape = {
         shape: 'subvisu',
-        has_inside_color: util.stringToBoolean(
+        hasInsideColor: util.stringToBoolean(
             referenceObject['has-inside-color'].textContent,
         ),
-        fill_color: util.rgbToHexString(
+        fillColor: util.rgbToHexString(
             referenceObject['fill-color'].textContent,
         ),
-        fill_color_alarm: util.rgbToHexString(
+        fillColorAlarm: util.rgbToHexString(
             referenceObject['fill-color-alarm'].textContent,
         ),
-        has_frame_color: util.stringToBoolean(
+        hasFrameColor: util.stringToBoolean(
             referenceObject['has-frame-color'].textContent,
         ),
-        frame_color: util.rgbToHexString(
+        frameColor: util.rgbToHexString(
             referenceObject['frame-color'].textContent,
         ),
-        frame_color_alarm: util.rgbToHexString(
+        frameColorAlarm: util.rgbToHexString(
             referenceObject['frame-color-alarm'].textContent,
         ),
-        line_width: Number(referenceObject['line-width'].textContent),
-        elem_id: referenceObject['elem-id'].textContent,
+        lineWidth: Number(referenceObject['line-width'].textContent),
+        elementId: referenceObject['elem-id'].textContent,
         rect: util.stringToArray(referenceObject['rect'].textContent),
         center: util.stringToArray(
             referenceObject['center'].textContent,
         ),
-        hidden_input: util.stringToBoolean(
+        hiddenInput: util.stringToBoolean(
             referenceObject['hidden-input'].textContent,
         ),
-        enable_text_input: util.stringToBoolean(
+        enableTextInput: util.stringToBoolean(
             referenceObject['enable-text-input'].textContent,
         ),
-        visuname: referenceObject['name'].textContent,
-        show_frame: util.stringToBoolean(
+        visuName: referenceObject['name'].textContent,
+        showFrame: util.stringToBoolean(
             referenceObject['show-frame'].textContent,
         ),
-        clip_frame: util.stringToBoolean(
+        clipFrame: util.stringToBoolean(
             referenceObject['clip-frame'].textContent,
         ),
-        iso_frame: util.stringToBoolean(
+        isoFrame: util.stringToBoolean(
             referenceObject['iso-frame'].textContent,
         ),
-        original_frame: util.stringToBoolean(
+        originalFrame: util.stringToBoolean(
             referenceObject['original-frame'].textContent,
         ),
-        original_scrollable_frame: util.stringToBoolean(
+        originalScrollableFrame: util.stringToBoolean(
             referenceObject['original-scrollable-frame'].textContent,
         ),
-        visu_size: util.stringToArray(
+        visuSize: util.stringToArray(
             referenceObject['size'].textContent,
         ),
         // Optional properties
         tooltip:
             section.getElementsByTagName('tooltip').length > 0
-                ? section.getElementsByTagName('tooltip')[0].innerHTML
+                ? util.parseText(
+                      section.getElementsByTagName('tooltip')[0]
+                          .textContent,
+                  )
                 : '',
-        access_levels: section.getElementsByTagName('access-levels')
+        accessLevels: section.getElementsByTagName('access-levels')
             .length
             ? util.parseAccessLevels(
                   section.getElementsByTagName('access-levels')[0]
@@ -85,9 +88,9 @@ export const Subvisu: React.FunctionComponent<Props> = ({
     };
 
     // Parsing of observable events (like toggle color)
-    let dynamicShapeParameters = parseDynamicShapeParameters(section);
+    const shapeParameters = parseShapeParameters(section);
 
-    let initial = createVisuObject(subvisu, dynamicShapeParameters);
+    const initial = createVisuObject(subvisu, shapeParameters);
 
     // Convert object to an observable one
     const state = useLocalStore(() => initial);
@@ -95,10 +98,10 @@ export const Subvisu: React.FunctionComponent<Props> = ({
     // Return of the react node
     return useObserver(() => (
         <div
-            title={subvisu.visuname}
+            title={subvisu.visuName}
             style={{
                 display:
-                    state.display == 'visible' ? 'inline' : 'none',
+                    state.display === 'visible' ? 'inline' : 'none',
                 position: 'absolute',
                 left: state.transformedCornerCoord.x1 - state.edge,
                 top: state.transformedCornerCoord.y1 - state.edge,

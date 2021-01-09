@@ -2,10 +2,10 @@ import ComSocket from '../../../../communication/comsocket';
 import StateManager from '../../../../statemanagement/statemanager';
 // This function is parsing all <expr-...> tags like toggle color and returns a map with the expression as key and the variable as value
 
-export function parseDynamicShapeParameters(
+export function parseShapeParameters(
     section: Element,
 ): Map<string, string[][]> {
-    let exprMap: Map<string, string[][]> = new Map();
+    const exprMap: Map<string, string[][]> = new Map();
     let tags: Array<string> = [];
     // Styling tags
     tags = [
@@ -27,7 +27,7 @@ export function parseDynamicShapeParameters(
         'expr-xpos', // Absolute x-position
         'expr-ypos', // Absolute y-position
         'expr-scale', // Scale with middle reference point
-        'expr-angle', // Turn around center with angle
+        'expr-angle', // Turn around the reference point with angle
 
         // Tooltip
         'expr-tooltip-display', // tooltip variable
@@ -42,33 +42,48 @@ export function parseDynamicShapeParameters(
         'expr-lower-bound',
         'expr-upper-bound',
         'expr-tap-var',
+        'expr-toggle-var',
     ];
 
-    let children = section.children;
+    const children = section.children;
     for (let i = 0; i < children.length; i++) {
-        let exprName = children[i].nodeName;
+        const exprName = children[i].nodeName;
         if (tags.includes(exprName)) {
-            // Now parse the expression stacky
+            // Now parse the expression stack
             // The stack is included in a <expr></expr>
-            let expressions = children[i].getElementsByTagName(
+            const expressions = children[i].getElementsByTagName(
                 'expr',
             )[0].children;
             // Init a helper stack
-            let stack: string[][] = [];
+            const stack: string[][] = [];
             // Iterate over all expressions
             for (let j = 0; j < expressions.length; j++) {
-                let ident = expressions[j].tagName;
-                let value = expressions[j].textContent;
+                const ident = expressions[j].tagName;
+                const value = expressions[j].textContent;
                 switch (ident) {
-                    case 'var':
+                    case 'var': {
                         stack.push(['var', value.toLowerCase()]);
                         break;
-                    case 'const':
+                    }
+                    case 'const': {
                         stack.push(['const', value]);
                         break;
-                    case 'op':
+                    }
+                    case 'op': {
                         stack.push(['op', value]);
                         break;
+                    }
+                    default: {
+                        console.warn(
+                            'The expression ' +
+                                exprName +
+                                ' with ident ' +
+                                ident +
+                                ' which has for value ' +
+                                value +
+                                ' is not attached!',
+                        );
+                    }
                 }
             }
             exprMap.set(exprName, stack);
@@ -77,11 +92,11 @@ export function parseDynamicShapeParameters(
     return exprMap;
 }
 
-export function parseDynamicTextParameters(
+export function parseTextParameters(
     section: Element,
-    shape: string,
-): Map<string, string> {
-    let exprMap: Map<string, string> = new Map();
+    // shape: string,
+): Map<string, string[][]> {
+    const exprMap: Map<string, string[][]> = new Map();
     let tags: Array<string> = [];
     // Styling tags
     tags = [
@@ -93,49 +108,48 @@ export function parseDynamicTextParameters(
         'expr-font-height', // 6) Sets the font height
     ];
 
-    let children = section.children;
+    const children = section.children;
     for (let i = 0; i < children.length; i++) {
-        let exprName = children[i].nodeName;
+        const exprName = children[i].nodeName;
         if (tags.includes(exprName)) {
-            let expressions = children[i].getElementsByTagName(
+            // Now parse the expression stack
+            // The stack is included in a <expr></expr>
+            const expressions = children[i].getElementsByTagName(
                 'expr',
-            );
-            // The text could be dynamic with a expression reference
+            )[0].children;
+            // Init a helper stack
+            const stack: string[][] = [];
+            // Iterate over all expressions
             for (let j = 0; j < expressions.length; j++) {
-                if (
-                    expressions[j].getElementsByTagName('var')[0] !==
-                    undefined
-                ) {
-                    let varName = expressions[j]
-                        .getElementsByTagName('var')[0]
-                        .textContent.toLowerCase();
-                    if (
-                        ComSocket.singleton().oVisuVariables.has(
-                            varName,
-                        )
-                    ) {
-                        exprMap.set(exprName, varName);
-                    } else {
-                        console.log(
-                            'A variable textfield has no valid variable attached!',
-                        );
+                const ident = expressions[j].tagName;
+                const value = expressions[j].textContent;
+                switch (ident) {
+                    case 'var': {
+                        stack.push(['var', value.toLowerCase()]);
+                        break;
                     }
-                } else {
-                    if (
-                        expressions[j].getElementsByTagName(
-                            'const',
-                        )[0] !== undefined
-                    ) {
-                        let constName = expressions[j]
-                            .getElementsByTagName('const')[0]
-                            .textContent.toLowerCase();
-                    } else {
-                        console.log(
-                            'A variable textfield has no valid variable attached!',
+                    case 'const': {
+                        stack.push(['const', value]);
+                        break;
+                    }
+                    case 'op': {
+                        stack.push(['op', value]);
+                        break;
+                    }
+                    default: {
+                        console.warn(
+                            'The expression ' +
+                                exprName +
+                                ' with ident ' +
+                                ident +
+                                ' which has for value ' +
+                                value +
+                                ' is not attached!',
                         );
                     }
                 }
             }
+            exprMap.set(exprName, stack);
         }
     }
     return exprMap;
@@ -143,26 +157,27 @@ export function parseDynamicTextParameters(
 
 export function parseClickEvent(section: Element): Function {
     let clickFunction: Function = null;
-    let stack: Array<Function> = [];
+    const stack: Array<Function> = [];
     let clickEventDetected = false;
 
-    let children = section.children;
+    const children = section.children;
+
     for (let i = 0; i < children.length; i++) {
-        let exprName = children[i].nodeName;
+        const exprName = children[i].nodeName;
         // Parse the <expr-toggle-var><expr><var> ... elements => toggle color
         if (exprName === 'expr-toggle-var') {
             // Parse all detected expressions
-            let expressions = children[i].getElementsByTagName(
+            const expressions = children[i].getElementsByTagName(
                 'expr',
             );
             for (let i = 0; i < expressions.length; i++) {
                 // Check if variable exists
-                let variable = expressions[i].getElementsByTagName(
+                const variable = expressions[i].getElementsByTagName(
                     'var',
                 );
                 if (variable.length) {
-                    let varName = variable[0].textContent.toLowerCase();
-                    let com = ComSocket.singleton();
+                    const varName = variable[0].textContent.toLowerCase();
+                    const com = ComSocket.singleton();
                     if (com.oVisuVariables.has(varName)) {
                         clickFunction = function (): void {
                             com.toggleValue(varName);
@@ -176,16 +191,16 @@ export function parseClickEvent(section: Element): Function {
 
         if (exprName === 'expr-zoom') {
             // Parse all detected expressions
-            let expressions = children[i].getElementsByTagName(
+            const expressions = children[i].getElementsByTagName(
                 'expr',
             );
             for (let i = 0; i < expressions.length; i++) {
                 // The zoom expression can be a parameter (placeholder) or a variable (var)
-                let expr = expressions[i].children;
+                const expr = expressions[i].children;
                 if (expr.length) {
-                    let tagName = expr[0].tagName;
+                    const tagName = expr[0].tagName;
                     if (tagName === 'placeholder') {
-                        let visuname = expr[0].textContent;
+                        const visuName = expr[0].textContent;
                         if (
                             StateManager.singleton().oState.get(
                                 'USECURRENTVISU',
@@ -194,41 +209,41 @@ export function parseClickEvent(section: Element): Function {
                             clickFunction = function (): void {
                                 ComSocket.singleton().setValue(
                                     '.currentvisu',
-                                    visuname,
+                                    visuName,
                                 );
                             };
                         } else {
                             clickFunction = function (): void {
                                 StateManager.singleton().oState.set(
                                     'ZOOMVISU',
-                                    visuname,
+                                    visuName,
                                 );
                             };
                         }
                     } else if (tagName === 'var') {
-                        let visuVariable = expr[0].textContent.toLowerCase();
+                        const visuVariable = expr[0].textContent.toLowerCase();
                         if (
                             StateManager.singleton().oState.get(
                                 'USECURRENTVISU',
                             ) === 'TRUE'
                         ) {
                             clickFunction = function (): void {
-                                let visuname = ComSocket.singleton().oVisuVariables.get(
+                                const visuName = ComSocket.singleton().oVisuVariables.get(
                                     visuVariable,
                                 )!.value;
                                 ComSocket.singleton().setValue(
                                     '.currentvisu',
-                                    visuname,
+                                    visuName,
                                 );
                             };
                         } else {
                             clickFunction = function (): void {
-                                let visuname = ComSocket.singleton().oVisuVariables.get(
+                                const visuName = ComSocket.singleton().oVisuVariables.get(
                                     visuVariable,
                                 )!.value;
                                 StateManager.singleton().oState.set(
                                     'ZOOMVISU',
-                                    visuname,
+                                    visuName,
                                 );
                             };
                         }
@@ -241,49 +256,52 @@ export function parseClickEvent(section: Element): Function {
         }
         // The object has properties on "Execute program" if input-action-list is detected
         if (exprName === 'input-action-list') {
-            let actionList = children[i];
+            const actionList = children[i];
             // Assign expression
             if (
                 actionList.getElementsByTagName('expr-assign').length
             ) {
-                let assigns = actionList.getElementsByTagName(
+                const assigns = actionList.getElementsByTagName(
                     'expr-assign',
                 );
                 for (let i = 0; i < assigns.length; i++) {
-                    let action = assigns[0];
+                    const action = assigns[i];
                     // Left side value. Must be a variable.
-                    let lvalue = action
+                    const lvalue = action
                         .getElementsByTagName('lvalue')[0]
                         .getElementsByTagName('expr')[0]
                         .getElementsByTagName('var')[0].textContent;
                     // Right sided expression
-                    let rpnStack: string[][] = [];
-                    let rvalue = action
+                    const rpnStack: string[][] = [];
+                    const rvalue = action
                         .getElementsByTagName('rvalue')[0]
                         .getElementsByTagName('expr')[0].children;
                     for (let j = 0; j < rvalue.length; j++) {
-                        let ident = rvalue[j].tagName;
-                        let value = rvalue[j].textContent;
+                        const ident = rvalue[j].tagName;
+                        const value = rvalue[j].textContent;
                         switch (ident) {
-                            case 'var':
+                            case 'var': {
                                 rpnStack.push([
                                     'var',
                                     value.toLowerCase(),
                                 ]);
                                 break;
-                            case 'const':
+                            }
+                            case 'const': {
                                 rpnStack.push(['const', value]);
                                 break;
-                            case 'op':
+                            }
+                            case 'op': {
                                 rpnStack.push(['op', value]);
                                 break;
+                            }
                         }
                     }
                     clickFunction = function (): void {
-                        let rvalue = ComSocket.singleton().evalFunction(
+                        const rvalue = ComSocket.singleton().evalFunction(
                             rpnStack,
                         )();
-                        let com = ComSocket.singleton();
+                        const com = ComSocket.singleton();
                         com.setValue(lvalue, rvalue);
                     };
                     stack.push(clickFunction);
@@ -293,36 +311,55 @@ export function parseClickEvent(section: Element): Function {
             // Execute expression
             if (actionList.getElementsByTagName('execute').length) {
                 // There are many available executable actions
-                let executes = actionList.getElementsByTagName(
+                const executes = actionList.getElementsByTagName(
                     'execute',
                 );
                 for (let i = 0; i < executes.length; i++) {
-                    let execName = executes[i].textContent;
-                    switch (execName) {
-                        case 'INTERN CHANGEUSERLEVEL':
-                            clickFunction = function (): void {
-                                StateManager.singleton().openPopup.set(
-                                    true,
-                                );
-                            };
-                            stack.push(clickFunction);
-                            clickEventDetected = true;
-                            break;
+                    const execName = executes[i].textContent;
+                    const execList = execName.split(' ');
+                    if (
+                        typeof execList[0] !== 'undefined' &&
+                        execList[0] !== null
+                    ) {
+                        switch (execList[0]) {
+                            case 'INTERN': {
+                                if (
+                                    typeof execList[1] !==
+                                        'undefined' &&
+                                    execList[1] !== null
+                                ) {
+                                    switch (execList[1]) {
+                                        case 'CHANGEUSERLEVEL': {
+                                            clickFunction = function (): void {
+                                                StateManager.singleton().openPopup.set(
+                                                    true,
+                                                );
+                                            };
+                                            stack.push(clickFunction);
+                                            clickEventDetected = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        }
                     }
                 }
             }
             // Hyperlink
             if (actionList.getElementsByTagName('expr-link').length) {
-                let links = actionList.getElementsByTagName(
+                const links = actionList.getElementsByTagName(
                     'expr-link',
                 );
                 for (let i = 0; i < links.length; i++) {
-                    let link = actionList
-                        .getElementsByTagName('expr-link')
-                        [i].getElementsByTagName('expr')[0]
+                    // prettier-ignore
+                    const link = actionList
+                        .getElementsByTagName('expr-link')[i]
+                        .getElementsByTagName('expr')[0]
                         .children[0];
-                    let type = link.tagName;
-                    let content = link.textContent;
+                    const type = link.tagName;
+                    const content = link.textContent;
                     if (type === 'var') {
                         clickFunction = function (): void {
                             if (
@@ -330,7 +367,7 @@ export function parseClickEvent(section: Element): Function {
                                     content.toLowerCase(),
                                 )
                             ) {
-                                let varContent = ComSocket.singleton().oVisuVariables.get(
+                                const varContent = ComSocket.singleton().oVisuVariables.get(
                                     content.toLowerCase(),
                                 )!.value;
                                 window.open(varContent.split(' ')[0]);
@@ -338,10 +375,18 @@ export function parseClickEvent(section: Element): Function {
                         };
                     } else {
                         clickFunction = function (): void {
-                            let value = ComSocket.singleton().evalFunction(
+                            // TODO: shouldn't we open the value instead ???
+                            /*
+                            const value = ComSocket.singleton().evalFunction(
                                 [[type, content.toLowerCase()]],
                             )();
                             window.open(content);
+                            */
+                            // TODO: check if this is right ???
+                            const value = ComSocket.singleton().evalFunction(
+                                [[type, content.toLowerCase()]],
+                            )();
+                            window.open(value);
                         };
                     }
                     stack.push(clickFunction);
@@ -369,14 +414,14 @@ export function parseTapEvent(
     direction: string,
 ): Function {
     let tapFunction: Function = null;
-    let children = section.children;
+    const children = section.children;
 
     let tapElement: Element = null;
     let tapDown: number;
     let tapUp: number;
 
     for (let i = 0; i < children.length; i++) {
-        let exprName = children[i].nodeName;
+        const exprName = children[i].nodeName;
         if (exprName === 'expr-tap-var') {
             tapElement = children[i];
         } else if (exprName === 'tap-false') {
@@ -386,16 +431,18 @@ export function parseTapEvent(
         }
 
         if (tapElement !== null) {
-            let expressions = tapElement.getElementsByTagName('expr');
+            const expressions = tapElement.getElementsByTagName(
+                'expr',
+            );
             // Parse the <expr-toggle-var><expr><var> ... elements => toggle color
             for (let i = 0; i < expressions.length; i++) {
                 // Check if variable exists
-                let variable = expressions[i].getElementsByTagName(
+                const variable = expressions[i].getElementsByTagName(
                     'var',
                 );
                 if (variable.length) {
-                    let varName = variable[0].textContent.toLowerCase();
-                    let com = ComSocket.singleton();
+                    const varName = variable[0].textContent.toLowerCase();
+                    const com = ComSocket.singleton();
                     if (com.oVisuVariables.has(varName)) {
                         // On mouse down or mouse up?
                         if (direction === 'down') {
@@ -417,12 +464,12 @@ export function parseTapEvent(
 
 export function parseScrollUpdate(section: Element): Function {
     let update: Function;
-    let updateExpr = section.getElementsByTagName('expr-tap-var');
+    const updateExpr = section.getElementsByTagName('expr-tap-var');
     if (updateExpr.length) {
-        let content = updateExpr[0].getElementsByTagName('expr')[0]
+        const content = updateExpr[0].getElementsByTagName('expr')[0]
             .children[0];
-        let varName = content.textContent.toLowerCase();
-        let com = ComSocket.singleton();
+        const varName = content.textContent.toLowerCase();
+        const com = ComSocket.singleton();
         if (com.oVisuVariables.has(varName)) {
             update = function (setValue: string): void {
                 com.setValue(varName, setValue);

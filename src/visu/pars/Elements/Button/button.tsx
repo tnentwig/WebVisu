@@ -1,16 +1,17 @@
 import * as React from 'react';
 import * as util from '../../Utils/utilfunctions';
-import { IBasicShape } from '../../../Interfaces/javainterfaces';
+import { ImageField } from '../Features/Image/image';
 import { Textfield } from '../Features/Text/textManager';
+import { Inputfield } from '../Features/Input/inputManager';
+import { IBasicShape } from '../../../Interfaces/javainterfaces';
 import {
-    parseDynamicShapeParameters,
-    parseDynamicTextParameters,
+    parseShapeParameters,
+    parseTextParameters,
     parseClickEvent,
     parseTapEvent,
 } from '../Features/Events/eventManager';
 import { createVisuObject } from '../../Objectmanagement/objectManager';
 import { useObserver, useLocalStore } from 'mobx-react-lite';
-import { Image } from '../Features/Image/image';
 import { ErrorBoundary } from 'react-error-boundary';
 
 type Props = {
@@ -21,53 +22,56 @@ export const Button: React.FunctionComponent<Props> = ({
     section,
 }) => {
     // Parsing of the fixed parameters
-    let button: IBasicShape = {
+    const button: IBasicShape = {
         shape: 'button',
-        has_inside_color: util.stringToBoolean(
+        hasInsideColor: util.stringToBoolean(
             section.getElementsByTagName('has-inside-color')[0]
                 .innerHTML,
         ),
-        fill_color: util.rgbToHexString(
+        fillColor: util.rgbToHexString(
             section.getElementsByTagName('fill-color')[0].innerHTML,
         ),
-        fill_color_alarm: util.rgbToHexString(
+        fillColorAlarm: util.rgbToHexString(
             section.getElementsByTagName('fill-color-alarm')[0]
                 .innerHTML,
         ),
-        has_frame_color: util.stringToBoolean(
+        hasFrameColor: util.stringToBoolean(
             section.getElementsByTagName('has-frame-color')[0]
                 .innerHTML,
         ),
-        frame_color: util.rgbToHexString(
+        frameColor: util.rgbToHexString(
             section.getElementsByTagName('frame-color')[0].innerHTML,
         ),
-        frame_color_alarm: util.rgbToHexString(
+        frameColorAlarm: util.rgbToHexString(
             section.getElementsByTagName('frame-color-alarm')[0]
                 .innerHTML,
         ),
-        line_width: Number(
+        lineWidth: Number(
             section.getElementsByTagName('line-width')[0].innerHTML,
         ),
-        elem_id: section.getElementsByTagName('elem-id')[0].innerHTML,
+        elementId: section.getElementsByTagName('elem-id')[0]
+            .innerHTML,
         rect: util.stringToArray(
             section.getElementsByTagName('rect')[0].innerHTML,
         ),
         center: util.stringToArray(
             section.getElementsByTagName('center')[0].innerHTML,
         ),
-        hidden_input: util.stringToBoolean(
+        hiddenInput: util.stringToBoolean(
             section.getElementsByTagName('hidden-input')[0].innerHTML,
         ),
-        enable_text_input: util.stringToBoolean(
+        enableTextInput: util.stringToBoolean(
             section.getElementsByTagName('enable-text-input')[0]
                 .innerHTML,
         ),
         // Optional properties
-        tooltip:
-            section.getElementsByTagName('tooltip').length > 0
-                ? section.getElementsByTagName('tooltip')[0].innerHTML
-                : '',
-        access_levels: section.getElementsByTagName('access-levels')
+        tooltip: section.getElementsByTagName('tooltip').length
+            ? util.parseText(
+                  section.getElementsByTagName('tooltip')[0]
+                      .textContent,
+              )
+            : '',
+        accessLevels: section.getElementsByTagName('access-levels')
             .length
             ? util.parseAccessLevels(
                   section.getElementsByTagName('access-levels')[0]
@@ -76,47 +80,80 @@ export const Button: React.FunctionComponent<Props> = ({
             : ['rw', 'rw', 'rw', 'rw', 'rw', 'rw', 'rw', 'rw'],
     };
 
+    // Parsing of observable events (like toggle color)
+    const shapeParameters = parseShapeParameters(section);
+
+    // Parsing of user events that causes a reaction like toggle or pop up input
+    const onclick = parseClickEvent(section);
+    const onmousedown = parseTapEvent(section, 'down');
+    const onmouseup = parseTapEvent(section, 'up');
+    const cursor =
+        (typeof onclick !== 'undefined' && onclick !== null) ||
+        (typeof onmousedown !== 'undefined' &&
+            onmousedown !== null) ||
+        (typeof onmouseup !== 'undefined' && onmouseup !== null)
+            ? 'pointer'
+            : null;
+    // Parsing the inputfield and returning a jsx object if it exists
+    let inputField: JSX.Element;
+    if (section.getElementsByTagName('enable-text-input').length) {
+        if (
+            section.getElementsByTagName('enable-text-input')[0]
+                .innerHTML === 'true'
+        ) {
+            inputField = <Inputfield section={section}></Inputfield>;
+        } else {
+            inputField = null;
+        }
+    } else {
+        inputField = null;
+    }
+
+    // Parsing the imageField and returning a jsx object if it exists
+    let imageField: JSX.Element;
+    if (
+        section.getElementsByTagName('file-name').length ||
+        section.getElementsByTagName('expr-fill-color').length
+    ) {
+        imageField = (
+            <ImageField
+                section={section}
+                inlineElement={true}
+            ></ImageField>
+        );
+    } else {
+        imageField = null;
+    }
+
     // Parsing the textfields and returning a jsx object if it exists
     let textField: JSX.Element;
     if (section.getElementsByTagName('text-format').length) {
-        let dynamicTextParameters = parseDynamicTextParameters(
-            section,
-            button.shape,
-        );
+        const textParameters = parseTextParameters(section);
         textField = (
             <Textfield
                 section={section}
-                dynamicParameters={dynamicTextParameters}
+                textParameters={textParameters}
+                shapeParameters={shapeParameters}
             ></Textfield>
         );
     } else {
         textField = null;
     }
 
-    // Parsing the inline picture if necessary
-    let pictureInside = false;
-    if (section.getElementsByTagName('file-name').length) {
-        pictureInside = true;
-    }
-
-    // Parsing of observable events (like toggle color)
-    let dynamicShapeParameters = parseDynamicShapeParameters(section);
-    // Parsing of user events that causes a reaction like toggle or pop up input
-    let onclick = parseClickEvent(section);
-    let onmousedown = parseTapEvent(section, 'down');
-    let onmouseup = parseTapEvent(section, 'up');
-
-    let initial = createVisuObject(button, dynamicShapeParameters);
-
     // Convert object to an observable one
-    const state = useLocalStore(() => initial);
+    const state = useLocalStore(() =>
+        createVisuObject(button, shapeParameters),
+    );
 
     // Return of the react node
     return useObserver(() => (
         <div
             style={{
-                position: 'absolute',
+                cursor: 'auto',
+                overflow: 'visible',
+                pointerEvents: state.eventType,
                 visibility: state.display,
+                position: 'absolute',
                 left: state.transformedCornerCoord.x1,
                 top: state.transformedCornerCoord.y1,
                 width: state.relCoord.width,
@@ -125,67 +162,75 @@ export const Button: React.FunctionComponent<Props> = ({
         >
             {state.readAccess ? (
                 <ErrorBoundary fallback={<div>Oh no</div>}>
+                    {inputField}
                     <button
                         title={state.tooltip}
                         onClick={
-                            onclick == null
+                            typeof onclick === 'undefined' ||
+                            onclick === null
                                 ? null
                                 : state.writeAccess
                                 ? () => onclick()
                                 : null
                         }
                         onMouseDown={
-                            onmousedown == null
+                            typeof onmousedown === 'undefined' ||
+                            onmousedown === null
                                 ? null
                                 : state.writeAccess
                                 ? () => onmousedown()
                                 : null
                         }
                         onMouseUp={
-                            onmouseup == null
+                            typeof onmouseup === 'undefined' ||
+                            onmouseup === null
                                 ? null
                                 : state.writeAccess
                                 ? () => onmouseup()
                                 : null
                         }
                         onMouseLeave={
-                            onmouseup == null
+                            typeof onmouseup === 'undefined' ||
+                            onmouseup === null
                                 ? null
                                 : state.writeAccess
                                 ? () => onmouseup()
                                 : null
                         } // We have to reset if somebody leaves the object with pressed key
                         style={{
+                            cursor: cursor,
                             backgroundColor: state.fill,
+                            borderColor: state.fill,
                             width: state.relCoord.width,
                             height: state.relCoord.height,
                             position: 'absolute',
-                        }}
-                    ></button>
-                    {pictureInside ? (
-                        <Image
-                            section={section}
-                            inlineElement={true}
-                        ></Image>
-                    ) : null}
-                    <div
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                            position: 'absolute',
-                            textAlign: 'center',
-                            margin: 'auto',
-                            top: 0,
-                            left: 0,
-                            bottom: 0,
-                            right: 0,
-                            pointerEvents: 'none',
+                            textIndent: '-45%',
                         }}
                     >
-                        <svg width="100%" height="100%">
-                            {textField}
+                        <svg
+                            width={state.relCoord.width - 4}
+                            height={state.relCoord.height - 4}
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                position: 'absolute',
+                                textAlign: 'center',
+                                // margin: 'auto',
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                right: 0,
+                                pointerEvents: 'none',
+                            }}
+                            overflow="visible"
+                        >
+                            {imageField}
+                            {typeof textField === 'undefined' ||
+                            textField === null
+                                ? null
+                                : textField}
                         </svg>
-                    </div>
+                    </button>
                 </ErrorBoundary>
             ) : null}
         </div>

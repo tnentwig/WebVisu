@@ -10,7 +10,7 @@ export interface IComSocket {
         varAddr: string,
     ): void;
     addGlobalVar(varName: string | undefined, varAddr: string): void;
-    updateVarList(timeoutTime : number): Promise<boolean>;
+    updateVarList(timeoutTime: number): Promise<boolean>;
     setValue(
         varName: string,
         varValue: number | string | boolean,
@@ -22,6 +22,7 @@ export interface IComSocket {
     toggleValue(varName: string): void;
     initObservables(): void;
     evalFunction(stack: string[][]): Function;
+    getFunction(stack: string[][]): Function;
 }
 
 export interface IBasicObject {
@@ -49,6 +50,7 @@ export interface IBasicObject {
     edge: number;
     scale: number;
     angle: number;
+    transform: string;
     normalFillColor: string;
     alarmFillColor: string;
     normalFrameColor: string;
@@ -103,6 +105,7 @@ export interface IScrollbarObject {
     value: number;
     scrollvalue: number;
     display: string;
+    tooltip: string;
     a: number;
     b1: number;
     b2: number;

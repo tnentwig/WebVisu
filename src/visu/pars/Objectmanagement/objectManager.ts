@@ -13,7 +13,7 @@ import {
 
 export function createVisuObject(
     javaObject: any,
-    dynamicElements: Map<string, string[][]>,
+    shapeParameters: Map<string, string[][]>,
 ): any {
     // This function acts as broker for different objects
     if (
@@ -22,7 +22,7 @@ export function createVisuObject(
         // Its a polyform
         return createPolyObject(
             javaObject as IPolyShape,
-            dynamicElements,
+            shapeParameters,
         );
     } else if (
         [
@@ -34,28 +34,28 @@ export function createVisuObject(
             'button',
         ].includes(javaObject.shape)
     ) {
-        // Its a simpleshape, bitmap, button or subvisu
+        // Its a simpleshape, bitmap or button
         return createBasicObject(
             javaObject as IBasicShape,
-            dynamicElements,
+            shapeParameters,
         );
     } else if (javaObject.shape === 'subvisu') {
         // Its a subvisu
         return createSubvisuObject(
             javaObject as ISubvisuShape,
-            dynamicElements,
+            shapeParameters,
         );
     } else if (javaObject.shape === 'piechart') {
         // Its a piechart
         return createPiechartObject(
             javaObject as IPiechartShape,
-            dynamicElements,
+            shapeParameters,
         );
     } else if (javaObject.shape === 'scrollbar') {
         // Its a scrollbar
         return createScrollbarObject(
             javaObject as IScrollbarShape,
-            dynamicElements,
+            shapeParameters,
         );
     }
 }

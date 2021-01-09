@@ -5,10 +5,12 @@
     display: grid;
     grid-gap: 10px;
 }
+
 .sup-exec-header {
     background: #6ec800;
     font-size: large;
 }
+
 .sup-exec-error {
     font-style: italic;
     color: crimson;

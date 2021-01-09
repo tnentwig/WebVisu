@@ -7,8 +7,8 @@ import { Polyline } from './PolySubunits/polyline';
 import { Textfield } from '../Features/Text/textManager';
 import { Inputfield } from '../Features/Input/inputManager';
 import {
-    parseDynamicShapeParameters,
-    parseDynamicTextParameters,
+    parseShapeParameters,
+    parseTextParameters,
     parseClickEvent,
     parseTapEvent,
 } from '../Features/Events/eventManager';
@@ -21,52 +21,52 @@ export const PolyShape: React.FunctionComponent<Props> = ({
     section,
 }) => {
     // Check if its on of the allowed shapes like polygon, bezier or polyline
-    let shape = section.getElementsByTagName('poly-shape')[0]
+    const shape = section.getElementsByTagName('poly-shape')[0]
         .innerHTML;
     // Parse the common informations
     if (['polygon', 'bezier', 'polyline'].includes(shape)) {
         // Parsing of the fixed parameters
-        let polyShapeBasis: IPolyShape = {
+        const polyShapeBasis: IPolyShape = {
             shape: shape,
-            has_inside_color: util.stringToBoolean(
+            hasInsideColor: util.stringToBoolean(
                 section.getElementsByTagName('has-inside-color')[0]
                     .innerHTML,
             ),
-            fill_color: util.rgbToHexString(
+            fillColor: util.rgbToHexString(
                 section.getElementsByTagName('fill-color')[0]
                     .innerHTML,
             ),
-            fill_color_alarm: util.rgbToHexString(
+            fillColorAlarm: util.rgbToHexString(
                 section.getElementsByTagName('fill-color-alarm')[0]
                     .innerHTML,
             ),
-            has_frame_color: util.stringToBoolean(
+            hasFrameColor: util.stringToBoolean(
                 section.getElementsByTagName('has-frame-color')[0]
                     .innerHTML,
             ),
-            frame_color: util.rgbToHexString(
+            frameColor: util.rgbToHexString(
                 section.getElementsByTagName('frame-color')[0]
                     .innerHTML,
             ),
-            frame_color_alarm: util.rgbToHexString(
+            frameColorAlarm: util.rgbToHexString(
                 section.getElementsByTagName('frame-color-alarm')[0]
                     .innerHTML,
             ),
-            line_width: Number(
+            lineWidth: Number(
                 section.getElementsByTagName('line-width')[0]
                     .innerHTML,
             ),
-            elem_id: section.getElementsByTagName('elem-id')[0]
+            elementId: section.getElementsByTagName('elem-id')[0]
                 .innerHTML,
             rect: [],
             center: util.stringToArray(
                 section.getElementsByTagName('center')[0].innerHTML,
             ),
-            hidden_input: util.stringToBoolean(
+            hiddenInput: util.stringToBoolean(
                 section.getElementsByTagName('hidden-input')[0]
                     .innerHTML,
             ),
-            enable_text_input: util.stringToBoolean(
+            enableTextInput: util.stringToBoolean(
                 section.getElementsByTagName('enable-text-input')[0]
                     .innerHTML,
             ),
@@ -74,10 +74,12 @@ export const PolyShape: React.FunctionComponent<Props> = ({
             // Optional properties
             tooltip:
                 section.getElementsByTagName('tooltip').length > 0
-                    ? section.getElementsByTagName('tooltip')[0]
-                          .innerHTML
+                    ? util.parseText(
+                          section.getElementsByTagName('tooltip')[0]
+                              .textContent,
+                      )
                     : '',
-            access_levels: section.getElementsByTagName(
+            accessLevels: section.getElementsByTagName(
                 'access-levels',
             ).length
                 ? util.parseAccessLevels(
@@ -88,9 +90,9 @@ export const PolyShape: React.FunctionComponent<Props> = ({
         };
 
         // Parsing the point coordinates
-        let xmlPoints = section.getElementsByTagName('point');
+        const xmlPoints = section.getElementsByTagName('point');
         for (let i = 0; i < xmlPoints.length; i++) {
-            let points = util.stringToArray(xmlPoints[i].innerHTML);
+            const points = util.stringToArray(xmlPoints[i].innerHTML);
             polyShapeBasis.points.push(points);
         }
         // Auxiliary values
@@ -98,22 +100,13 @@ export const PolyShape: React.FunctionComponent<Props> = ({
             polyShapeBasis.points,
         );
 
-        // Parsing the textfields and returning a jsx object if it exists
-        let textField: JSX.Element;
-        if (section.getElementsByTagName('text-format').length) {
-            let dynamicTextParameters = parseDynamicTextParameters(
-                section,
-                shape,
-            );
-            textField = (
-                <Textfield
-                    section={section}
-                    dynamicParameters={dynamicTextParameters}
-                ></Textfield>
-            );
-        } else {
-            textField = null;
-        }
+        // Parsing of observable events (like toggle color)
+        const shapeParameters = parseShapeParameters(section);
+
+        // Parsing of user events that causes a reaction like toggle or pop up input
+        const onclick = parseClickEvent(section);
+        const onmousedown = parseTapEvent(section, 'down');
+        const onmouseup = parseTapEvent(section, 'up');
 
         // Parsing the inputfield
         let inputField: JSX.Element;
@@ -122,7 +115,7 @@ export const PolyShape: React.FunctionComponent<Props> = ({
         ) {
             if (
                 section.getElementsByTagName('enable-text-input')[0]
-                    .innerHTML == 'true'
+                    .innerHTML === 'true'
             ) {
                 inputField = (
                     <Inputfield section={section}></Inputfield>
@@ -134,60 +127,65 @@ export const PolyShape: React.FunctionComponent<Props> = ({
             inputField = null;
         }
 
-        // Parsing of observable events (like toggle color)
-        let dynamicShapeParameters = parseDynamicShapeParameters(
-            section,
-        );
-
-        // Parsing of user events that causes a reaction like toggle or pop up input
-        let onclick = parseClickEvent(section);
-        let onmousedown = parseTapEvent(section, 'down');
-        let onmouseup = parseTapEvent(section, 'up');
+        // Parsing the textfields and returning a jsx object if it exists
+        let textField: JSX.Element;
+        if (section.getElementsByTagName('text-format').length) {
+            const textParameters = parseTextParameters(section);
+            textField = (
+                <Textfield
+                    section={section}
+                    textParameters={textParameters}
+                    shapeParameters={shapeParameters}
+                ></Textfield>
+            );
+        } else {
+            textField = null;
+        }
 
         // Return of the React-Node
         switch (shape) {
-            case 'polygon':
+            case 'polygon': {
                 return (
                     <Polygon
                         polyShape={polyShapeBasis}
                         textField={textField}
-                        input={inputField}
-                        dynamicParameters={dynamicShapeParameters}
+                        inputField={inputField}
+                        dynamicParameters={shapeParameters}
                         onclick={onclick}
                         onmousedown={onmousedown}
                         onmouseup={onmouseup}
                     />
                 );
-                break;
-            case 'bezier':
+            }
+            case 'bezier': {
                 return (
                     <Bezier
                         polyShape={polyShapeBasis}
                         textField={textField}
-                        input={inputField}
-                        dynamicParameters={dynamicShapeParameters}
+                        inputField={inputField}
+                        dynamicParameters={shapeParameters}
                         onclick={onclick}
                         onmousedown={onmousedown}
                         onmouseup={onmouseup}
                     />
                 );
-                break;
-            case 'polyline':
+            }
+            case 'polyline': {
                 return (
                     <Polyline
                         polyShape={polyShapeBasis}
                         textField={textField}
-                        input={inputField}
-                        dynamicParameters={dynamicShapeParameters}
+                        inputField={inputField}
+                        dynamicParameters={shapeParameters}
                         onclick={onclick}
                         onmousedown={onmousedown}
                         onmouseup={onmouseup}
                     />
                 );
-                break;
+            }
         }
     } else {
-        console.log('Poly-Shape: <' + shape + '> is not supported!');
+        console.warn('Poly-Shape: <' + shape + '> is not supported!');
         return null;
     }
 };

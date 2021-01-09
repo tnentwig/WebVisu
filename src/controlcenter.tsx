@@ -10,20 +10,24 @@ import { Visualisation } from './visu/visuparser';
 import { ConnectionFault } from './supplements/InfoBox/infobox';
 import { ExecutionPopup } from './supplements/PopUps/popup';
 import {
-    getVisuxml,
+    getVisuXML,
     stringifyVisuXML,
 } from './visu/pars/Utils/fetchfunctions';
 import { Spinner } from './supplements/Spinner/spinner';
 
 export default class HTML5Visu {
     rootDir: string;
+
     @observable windowWidth: number;
+
     @observable windowsHeight: number;
+
     loading: boolean;
+
     spinningText: string;
 
     constructor() {
-        let path = location.protocol + '//' + window.location.host;
+        const path = location.protocol + '//' + window.location.host;
         this.rootDir = path;
         this.windowWidth = window.innerWidth;
         this.windowsHeight = window.innerHeight;
@@ -33,6 +37,7 @@ export default class HTML5Visu {
             this.updateWindowDimensions,
         );
     }
+
     // For responsive behavior
     @action.bound
     updateWindowDimensions() {
@@ -53,7 +58,7 @@ export default class HTML5Visu {
             document.getElementById('visualisation'),
         );
         // Get a reference to the global state manager
-        let stateManager = StateManager.singleton().oState;
+        const stateManager = StateManager.singleton().oState;
         // Get the path to the files
         await this.pathConfiguration();
         stateManager.set('ROOTDIR', this.rootDir);
@@ -82,17 +87,17 @@ export default class HTML5Visu {
                 >
                     {stateManager.get('ISONLINE') === 'TRUE' ? (
                         <Visualisation
-                            visuname={stateManager!
+                            visuName={stateManager!
                                 .get('CURRENTVISU')!
                                 .toLowerCase()}
                             width={this.windowWidth}
                             height={this.windowsHeight}
-                            show_frame={false}
-                            clip_frame={true}
-                            iso_frame={true}
-                            original_frame={false}
-                            original_scrollable_frame={false}
-                            no_frame_offset={true}
+                            showFrame={false}
+                            clipFrame={true}
+                            isoFrame={true}
+                            originalFrame={false}
+                            originalScrollableFrame={false}
+                            noFrameOffset={true}
                         ></Visualisation>
                     ) : (
                         <ConnectionFault></ConnectionFault>
@@ -122,7 +127,7 @@ export default class HTML5Visu {
     }
 
     initCommunication() {
-        let com = ComSocket.singleton();
+        const com = ComSocket.singleton();
         com.setServerURL(this.rootDir + '/webvisu.htm');
         com.startCyclicUpdate();
         com.initObservables();
@@ -130,13 +135,13 @@ export default class HTML5Visu {
 
     appendGlobalVariables(visuIniXML: XMLDocument) {
         // Rip all of <variable> in <variablelist> section
-        let variables = visuIniXML
+        const variables = visuIniXML
             .getElementsByTagName('visu-ini-file')[0]
             .getElementsByTagName('variablelist')[0]
             .getElementsByTagName('variable');
         for (let i = 0; i < variables.length; i++) {
-            let name = variables[i].getAttribute('name');
-            let address = variables[i].textContent;
+            const name = variables[i].getAttribute('name');
+            const address = variables[i].textContent;
             ComSocket.singleton().addGlobalVar(name, address);
         }
     }
@@ -144,119 +149,133 @@ export default class HTML5Visu {
     pathConfiguration(): Promise<boolean> {
         return new Promise((resolve) => {
             // Get the current path
-            let path = window.location.pathname.replace(
+            const path = window.location.pathname.replace(
                 '/webvisu.html',
                 '',
             );
-            fetch(this.rootDir + path + '/visu_ini.xml').then(
-                (response) => {
-                    // Path is correct
-                    if (response.ok) {
-                        // Path must be adapted
-                        this.rootDir = this.rootDir + path;
-                        resolve(true);
-                    } else {
-                        // roll back to manual "try ? success : fail" style
-                        // The request will automatically forwarded to the CoDeSys folder on a PFC. On older controllers we have to forward to /PLC manually
-                        // A first try for get a manually forwarding
-                        fetch(this.rootDir + '/visu_ini.xml').then(
-                            (response) => {
+            fetch(
+                this.rootDir +
+                    path +
+                    '/visu_ini.xml' +
+                    '?v=' +
+                    Date.now(),
+            ).then((response) => {
+                // Path is correct
+                if (response.ok) {
+                    // Path must be adapted
+                    this.rootDir = this.rootDir + path;
+                    resolve(true);
+                } else {
+                    // roll back to manual 'try ? success : fail' style
+                    // The request will automatically forwarded to the CoDeSys folder on a PFC. On older controllers we have to forward to /PLC manually
+                    // A first try for get a manually forwarding
+                    fetch(
+                        this.rootDir +
+                            '/visu_ini.xml' +
+                            '?v=' +
+                            Date.now(),
+                    ).then((response) => {
+                        // Path is correct
+                        if (response.ok) {
+                            resolve(true);
+                        } else {
+                            fetch(
+                                this.rootDir +
+                                    '/plc/visu_ini.xml' +
+                                    '?v=' +
+                                    Date.now(),
+                            ).then((response) => {
                                 // Path is correct
                                 if (response.ok) {
+                                    // Path must be adapted for an older Linux Controller without Linux
+                                    this.rootDir =
+                                        this.rootDir + '/plc';
                                     resolve(true);
                                 } else {
                                     fetch(
                                         this.rootDir +
-                                            '/plc/visu_ini.xml',
+                                            '/webvisu/visu_ini.xml' +
+                                            '?v=' +
+                                            Date.now(),
                                     ).then((response) => {
                                         // Path is correct
                                         if (response.ok) {
-                                            // Path must be adapted for an older Linux Controller without Linux
+                                            // Path must be adapted for a Linux-PFC
                                             this.rootDir =
-                                                this.rootDir + '/plc';
+                                                this.rootDir +
+                                                '/webvisu';
                                             resolve(true);
                                         } else {
-                                            fetch(
-                                                this.rootDir +
-                                                    '/webvisu/visu_ini.xml',
-                                            ).then((response) => {
-                                                // Path is correct
-                                                if (response.ok) {
-                                                    // Path must be adapted for a Linux-PFC
-                                                    this.rootDir =
-                                                        this.rootDir +
-                                                        '/webvisu';
-                                                    resolve(true);
-                                                } else {
-                                                    resolve(false);
-                                                }
-                                            });
+                                            resolve(false);
                                         }
                                     });
                                 }
-                            },
-                        );
-                    }
-                },
-            );
+                            });
+                        }
+                    });
+                }
+            });
         });
     }
 
     processingWebvisuHtm(): Promise<boolean> {
         return new Promise((resolve) => {
             // Get a reference to the global state manager
-            let stateManager = StateManager.singleton().oState;
+            const stateManager = StateManager.singleton().oState;
             // Get the webvisu.htm file. There are the startvisu and updatetime listed
-            fetch(this.rootDir + '/webvisu.htm', {
-                headers: {
-                    'Content-Type': 'text/plain; charset=UTF8',
+            fetch(
+                this.rootDir + '/webvisu.htm' + '?v=' + Date.now(),
+                {
+                    headers: {
+                        'Content-Type': 'text/plain; charset=UTF8',
+                    },
+                    method: 'get',
                 },
-                method: 'get',
-            }).then((response) => {
+            ).then((response) => {
                 if (response.ok) {
                     response.text().then((data) => {
-                        let parser = new DOMParser();
-                        let htmlDoc = parser.parseFromString(
+                        const parser = new DOMParser();
+                        const htmlDoc = parser.parseFromString(
                             data,
                             'text/html',
                         );
 
                         // Width, height - Definition of the size of the screen. Regard the possibility to make visible this size
                         // already during creating a visualization in CoDeSys (Target Settings: Display width/height in pixel).
-                        let appletElement = htmlDoc.getElementsByTagName(
+                        const appletElement = htmlDoc.getElementsByTagName(
                             'APPLET',
                         );
-                        let visuWidth = appletElement[0].getAttribute(
+                        const visuWidth = appletElement[0].getAttribute(
                             'width',
                         );
                         stateManager.set('VISUWIDTH', visuWidth);
-                        let visuHeight = appletElement[0].getAttribute(
+                        const visuHeight = appletElement[0].getAttribute(
                             'height',
                         );
                         stateManager.set('VISUHEIGHT', visuHeight);
 
-                        let htmlElement = htmlDoc.getElementsByTagName(
+                        const htmlElement = htmlDoc.getElementsByTagName(
                             'param',
                         );
                         for (let i = 0; i < htmlElement.length; i++) {
-                            let name = htmlElement[i]
+                            const name = htmlElement[i]
                                 .getAttribute('name')
                                 .toString();
                             switch (name) {
                                 // Standard parameters
-                                case 'STARTVISU':
+                                case 'STARTVISU': {
                                     // Definition of the start POU
                                     // Default: PLC_VISU
-                                    let visuName = htmlElement[i]
+                                    const visuName = htmlElement[i]
                                         .getAttribute('value')
                                         .toLowerCase();
                                     stateManager.set(name, visuName);
                                     break;
-
-                                case 'UPDATETIME':
+                                }
+                                case 'UPDATETIME': {
                                     // Definition of the monitoring interval (msec)
                                     // Default: 100
-                                    let updateTime = htmlElement[
+                                    const updateTime = htmlElement[
                                         i
                                     ].getAttribute('value');
                                     stateManager.set(
@@ -264,12 +283,12 @@ export default class HTML5Visu {
                                         updateTime,
                                     );
                                     break;
-
-                                case 'USECURRENTVISU':
+                                }
+                                case 'USECURRENTVISU': {
                                     // Definition whether an automatic change to another visualization will be done,
                                     // as soon as the system variable 'CurrentVisu' is changed by the PLC program.
                                     // Default: FALSE
-                                    let useCurrentVisu = htmlElement[
+                                    const useCurrentVisu = htmlElement[
                                         i
                                     ].getAttribute('value');
                                     stateManager.set(
@@ -277,30 +296,33 @@ export default class HTML5Visu {
                                         useCurrentVisu,
                                     );
                                     break;
+                                }
                                 // Optionnal Parameters
                                 /*
-                                case "USEFIXSOCKETCONNECTION":
+                                case 'USEFIXSOCKETCONNECTION': {
                                     // If this parameter is TRUE, a fix socket connection will be used for monitoring; 
                                     // if it is FALSE or if the entry is missing at all, 
                                     // for each monitoring request a new socket will be used. 
                                     // Example: FALSE
                                     // Example: TRUE
                                     break;
+                                }
                                     
-                                case "FORCEDLOAD":
+                                case 'FORCEDLOAD': {
                                     // The visualizations specified here will be loaded already when the Web-Visualization is loaded,
                                     // not just when they are opened for the first time. Thus time is saved at later changes of
                                     // visualizations, because then the data not have to be transferred first by the WebServer.
                                     // Example: VISU_1, VISU_2, VISU_3
                                     // Example: TREND
                                     break;
+                                }
                                 */
-                                case 'COMPRESSEDFILES':
+                                case 'COMPRESSEDFILES': {
                                     // The files to be transferred for the Web-Visualization to the Web-Server can be provided by
-                                    // CoDeSys in a packed format ("<filename>_<extension original format>.zip").
+                                    // CoDeSys in a packed format ('<filename>_<extension original format>.zip').
                                     // Example: FALSE
                                     // Example: TRUE
-                                    let compressedFiles = htmlElement[
+                                    const compressedFiles = htmlElement[
                                         i
                                     ].getAttribute('value');
                                     stateManager.set(
@@ -308,65 +330,67 @@ export default class HTML5Visu {
                                         compressedFiles,
                                     );
                                     break;
+                                }
                                 /*
-                                case "USEURLCONNECTION":
+                                case 'USEURLCONNECTION': {
                                     // If this parameter is configured, the communication will be done via the specified URLconnection.
                                     // Per default a simple socket connection is used.
                                     // Attention: If parameter USEFIXSOCKETCONNECTION (see above) is set TRUE,
                                     // USEFIXSOCKETCONNECTION may not be used additionally.
                                     // Exemple: http://192.168.100.19:8080/webvisu.htm
                                     break;
-                                    
-                                case "SELECTION":
+                                }
+                                case 'SELECTION': {
                                     // Here the line width and color for the display of the current selection can be defined. 
                                     // Syntax:LINEWIDTH|RED|GREEN|BLUE; 
                                     // Example: 4|0|0|255
                                     break;
-                                    
-                                case "ERROR_SENSITIVITY":
+                                }
+                                case 'ERROR_SENSITIVITY': {
                                     // This parameter defines how many trials will be done to get a visualization file transferred from
                                     // the Web-Server, before an applet error will appear.
                                     // Example: 3
                                     break;
-                                    
-                                case "KEYPADINDIALOGS":
+                                }
+                                case 'KEYPADINDIALOGS': {
                                     // If a touch panel is used for working with the Web-Visualization, this parameter should be set
                                     // TRUE in order to get an input possibility in any case for each dialog; 
                                     // if applicable via numpad/keypad.
                                     // Example: FALSE
                                     // Example: TRUE
                                     break;
-                                    
-                                case "KEYBOARDUSAGEFROMDIALOGS":
+                                }
+                                case 'KEYBOARDUSAGEFROMDIALOGS': {
                                     // If this parameter is set TRUE, the keyboard usage is always active, 
                                     // even if a modal dialog - like e.g. the numpad - is currently opened.
                                     // Example: FALSE
                                     // Example: TRUE
                                     break;
-                                    
-                                case "WRITEACCESSLOCK":
+                                }
+                                case 'WRITEACCESSLOCK': {
                                     // This parameter only should be set TRUE, if the Web-Server supports multi-client processing
                                     // and if an access lock for various clients is desired. Concerning access control in multi-client
                                     // operation please see HERE.
                                     // Example: FALSE
                                     // Example: TRUE
                                     break;
-                                    
-                                case "DEFAULTENCODING":
+                                }
+                                case 'DEFAULTENCODING': {
                                     // If this parameter is set TRUE and the language switching is done via ASCII language files, the
                                     // default encoding - currently set in the system - will be used for the interpretation of the language
                                     // file.
                                     // Example: FALSE
                                     // Example: TRUE
                                     break;
+                                }
                                 */
-                                case 'ENCODINGSTRING':
+                                case 'ENCODINGSTRING': {
                                     // If the default encoding of the system is not set as desired,
                                     // you can define here the desired encoding by entering the appropriate string.
                                     // Example (German): ISO-8859-1
                                     // Example (Russian): ISO-8859-5
                                     // Example (Japanese): MS932
-                                    let encodingString = htmlElement[
+                                    const encodingString = htmlElement[
                                         i
                                     ].getAttribute('value');
                                     stateManager.set(
@@ -374,22 +398,23 @@ export default class HTML5Visu {
                                         encodingString,
                                     );
                                     break;
+                                }
                                 /*
-                                case "PLCSTATEINTERVAL":
+                                case 'PLCSTATEINTERVAL': {
                                     // Cycle time in milliseconds according to which the Web-Client will check the PLC status. 
                                     // It will be checked whether the PLC is in Start or Stop status and whether a download has been done.
                                     // Example: 5000
                                     break;
-                                    
-                                case "ALARMUPDATEBLOCKSIZE":
+                                }
+                                case 'ALARMUPDATEBLOCKSIZE': {
                                     // This parameter can be set in order to change the update of the alarm states. 
                                     // Due to the fact that not all alarm states can be updated within one cycle, 
                                     // it might be useful to exactly defined the number of alarms which should be updated per cycle. 
                                     // This number can be specified as a numeric value.
                                     // Example: 50
                                     break;
-                                    
-                                case "SUPPORTTOOLTIPSINALARMTABLE":
+                                }
+                                case 'SUPPORTTOOLTIPSINALARMTABLE': {
                                     // If this parameter is set TRUE, the tooltip functionality in the alarm table will be activated. 
                                     // This means: If any text entry in the alarm table cannot be displayed completely, a tooltip will be
                                     // available showing the full text string as soon as the mouse pointer is moved on the respective
@@ -397,26 +422,26 @@ export default class HTML5Visu {
                                     // Example: FALSE
                                     // Example: TRUE
                                     break;
-                                    
-                                case "TOOLTIPFONT":
+                                }
+                                case 'TOOLTIPFONT': {
                                     // This parameter serves to define the font for all tooltips. 
                                     // Example: Dialog
                                     // Example: Arial|11
                                     break;
-                                    
-                                case "FILEOPENSAVEDIALOGFONT":
+                                }
+                                case 'FILEOPENSAVEDIALOGFONT': {
                                     // This parameter serves to define the font for the File-Open-dialog.
                                     // Example: Dialog
                                     // Example: Arial|11
                                     break;
-                                    
-                                case "ALARMTABLEFONT":
+                                }
+                                case 'ALARMTABLEFONT': {
                                     // This parameter serves to define the font for the alarm table.
                                     // Example: Dialog
                                     // Example: Arial|11|0|0|false|left|center
                                     break;
-                                    
-                                case "USECURRENTLANGUAGE":
+                                }
+                                case 'USECURRENTLANGUAGE': {
                                     // If this parameter is set TRUE, the current language setting always will be synchronized
                                     // between Web- and Target-Visualization (via implicit variable CurrentLanguage);
                                     // i.e. at a language switch caused by an input in one of the both visualization
@@ -425,6 +450,7 @@ export default class HTML5Visu {
                                     // Example: FALSE
                                     // Example: TRUE
                                     break;
+                                }
                                 */
                             }
                         }
@@ -436,9 +462,9 @@ export default class HTML5Visu {
     }
 
     processingVisuIni(): Promise<XMLDocument> {
-        let url = this.rootDir + '/visu_ini.xml';
+        const url = this.rootDir + '/visu_ini.xml';
         return new Promise((resolve) => {
-            fetch(url, {
+            fetch(url + '?v=' + Date.now(), {
                 headers: {
                     'Content-Type': 'text/plain; charset=UTF8',
                 },
@@ -446,18 +472,18 @@ export default class HTML5Visu {
                 if (response.ok) {
                     response.arrayBuffer().then(async (buffer) => {
                         // Get a reference to the global state manager
-                        let stateManager = StateManager.singleton()
+                        const stateManager = StateManager.singleton()
                             .oState;
-                        let decoder = new TextDecoder('iso-8859-1');
-                        let text = decoder.decode(buffer);
-                        let data = new window.DOMParser().parseFromString(
+                        const decoder = new TextDecoder('iso-8859-1');
+                        const text = decoder.decode(buffer);
+                        const data = new window.DOMParser().parseFromString(
                             text,
                             'text/xml',
                         );
                         // Append the global variables
                         this.appendGlobalVariables(data);
                         // Get the download ID
-                        let xmlDownloadID = data.getElementsByTagName(
+                        const xmlDownloadID = data.getElementsByTagName(
                             'download-id',
                         )[0].textContent;
                         // Check, if saved id and received id are not equal
@@ -467,7 +493,7 @@ export default class HTML5Visu {
                         ) {
                             // Clear old indexedDB
                             clear();
-                            // Save the downlaod id
+                            // Save the download-id
                             localStorage.setItem(
                                 'download-id',
                                 xmlDownloadID,
@@ -476,7 +502,7 @@ export default class HTML5Visu {
                             //await this.preloadVisus();
                         }
                         // Get the compression value
-                        let xmlCompression = data.getElementsByTagName(
+                        const xmlCompression = data.getElementsByTagName(
                             'compression',
                         )[0].textContent;
                         if (xmlCompression === 'true') {
@@ -485,7 +511,7 @@ export default class HTML5Visu {
                             stateManager.set('COMPRESSION', 'FALSE');
                         }
                         // Get the best-fit value
-                        let xmlBestFit = data.getElementsByTagName(
+                        const xmlBestFit = data.getElementsByTagName(
                             'best-fit',
                         )[0].textContent;
                         if (xmlBestFit === 'true') {
@@ -501,40 +527,42 @@ export default class HTML5Visu {
     }
 
     async preloadVisus() {
-        let mainVisus: Array<string> = [];
-        let loadedVisus: Array<string> = [];
-        let visusToBeLoaded = [
+        const mainVisus: Array<string> = [];
+        const loadedVisus: Array<string> = [];
+        const visusToBeLoaded = [
             StateManager.singleton()
                 .oState.get('STARTVISU')
                 .toLowerCase(),
         ];
-        let notExistingVisus: Array<string> = [];
+        const notExistingVisus: Array<string> = [];
         while (visusToBeLoaded.length) {
-            let visuname = visusToBeLoaded.pop();
+            const visuName = visusToBeLoaded.pop();
             // Check if its a placeholder variable
-            let regEx = new RegExp(/\$(.*)\$/gm);
-            let match = regEx.exec(visuname);
-            if (match == null) {
-                let thisVisuXML = await getVisuxml(
-                    this.rootDir + '/' + visuname + '.xml',
+            const regEx = new RegExp(/\$(.*)\$/gm);
+            const match = regEx.exec(visuName);
+            if (typeof match === 'undefined' || match === null) {
+                const thisVisuXML = await getVisuXML(
+                    this.rootDir + '/' + visuName + '.xml',
                 );
                 // The visu does not exist on server if thisVisuXML is null
                 if (thisVisuXML !== null) {
-                    let xmlDict = StateManager.singleton().xmlDict;
-                    if (!xmlDict.has(visuname)) {
-                        let plainxml = stringifyVisuXML(thisVisuXML);
-                        xmlDict.set(visuname, plainxml);
+                    const xmlDict = StateManager.singleton().xmlDict;
+                    if (!xmlDict.has(visuName)) {
+                        const plainxml = stringifyVisuXML(
+                            thisVisuXML,
+                        );
+                        xmlDict.set(visuName, plainxml);
                     }
-                    loadedVisus.push(visuname);
+                    loadedVisus.push(visuName);
                     // Get the visualisations which are used as main visush
-                    let mainVisunames = thisVisuXML.getElementsByTagName(
+                    const mainVisunames = thisVisuXML.getElementsByTagName(
                         'expr-zoom',
                     );
                     Array.from(mainVisunames).forEach(function (
                         nameNode,
                     ) {
                         /// können auch vars sein
-                        let nextVisuname = nameNode
+                        const nextVisuname = nameNode
                             .getElementsByTagName('placeholder')[0]
                             .textContent.toLowerCase();
                         if (
@@ -544,18 +572,18 @@ export default class HTML5Visu {
                         ) {
                             visusToBeLoaded.push(nextVisuname);
                         }
-                        if (!mainVisus.includes(visuname)) {
-                            mainVisus.push(visuname);
+                        if (!mainVisus.includes(visuName)) {
+                            mainVisus.push(visuName);
                         }
                     });
                     // Get the visualisations that are used as subvisus
-                    let subVisunames = thisVisuXML.querySelectorAll(
+                    const subVisunames = thisVisuXML.querySelectorAll(
                         'element[type="reference"]',
                     );
                     Array.from(subVisunames).forEach(function (
                         nameNode,
                     ) {
-                        let nextVisuname = nameNode
+                        const nextVisuname = nameNode
                             .getElementsByTagName('name')[0]
                             .textContent.toLowerCase();
                         if (
@@ -567,10 +595,10 @@ export default class HTML5Visu {
                         }
                     });
                 } else {
-                    notExistingVisus.push(visuname);
-                    console.log(
+                    notExistingVisus.push(visuName);
+                    console.warn(
                         'There is a internal problem in your CoDeSys Project. The visualisation named ' +
-                            visuname +
+                            visuName +
                             ' is referenced but not available on the server!',
                     );
                 }

@@ -4,47 +4,49 @@ import { IPolyShape } from '../../../Interfaces/javainterfaces';
 import {
     numberToHexColor,
     computeMinMaxCoord,
-    pointArrayToPiechartString,
+    // pointArrayToPiechartString,
 } from '../../Utils/utilfunctions';
+import { sprintf } from 'sprintf-js';
 
 export function createPolyObject(
     polyShape: IPolyShape,
-    dynamicElements: Map<string, string[][]>,
+    shapeParameters: Map<string, string[][]>,
 ): IPolyObject {
     // absCornerCoord are the absolute coordinates of the <div> element in relation to the origin in the top left
-    let absCornerCoord = {
+    const absCornerCoord = {
         x1: polyShape.rect[0],
         y1: polyShape.rect[1],
         x2: polyShape.rect[2],
         y2: polyShape.rect[3],
     };
     // absCenterCoord are the coordinates of the rotation and scale center
-    let absCenterCoord = {
+    const absCenterCoord = {
         x: polyShape.center[0],
         y: polyShape.center[1],
     };
     // relCoord are the width and the height in relation the div
-    let relCoord = {
+    const relCoord = {
         width: polyShape.rect[2] - polyShape.rect[0],
         height: polyShape.rect[3] - polyShape.rect[1],
     };
     // the relCenterCoord are the coordinates of the midpoint of the div
-    let relMidpointCoord = {
+    const relMidpointCoord = {
         x: (polyShape.rect[2] - polyShape.rect[0]) / 2,
         y: (polyShape.rect[3] - polyShape.rect[1]) / 2,
     };
-    // The line_width is 0 in the xml if border width is 1 in the codesys dev env. Otherwise line_width is equal to the target border width. Very strange.
-    let edge = polyShape.line_width === 0 ? 1 : polyShape.line_width;
-    // Compute the strokeWidth through has_frame_color
-    let lineWidth = polyShape.has_frame_color ? edge : 0;
+    // The lineWidth is 0 in the xml if border width is 1 in the codesys dev env. Otherwise lineWidth is equal to the target border width. Very strange.
+    const edge = polyShape.lineWidth === 0 ? 1 : polyShape.lineWidth;
+    // Compute the strokeWidth through hasFrameColor
+    const lineWidth = polyShape.hasFrameColor ? edge : 0;
     // Compute the fill color through has_fill_color
-    let fillColor = polyShape.has_inside_color
-        ? polyShape.fill_color
+    const fillColor = polyShape.hasInsideColor
+        ? polyShape.fillColor
         : 'none';
     // Tooltip
-    let tooltip = polyShape.tooltip;
-    let relPoints = [] as number[][];
-    polyShape.points.forEach(function (item, index) {
+    const tooltip = polyShape.tooltip;
+    const relPoints = [] as number[][];
+    // polyShape.points.forEach(function (item, index) {
+    polyShape.points.forEach(function (item) {
         relPoints.push([
             item[0] - absCornerCoord.x1,
             item[1] - absCornerCoord.y1,
@@ -52,14 +54,14 @@ export function createPolyObject(
     });
 
     // Create an object with the initial parameters
-    let initial: IPolyObject = {
+    const initial: IPolyObject = {
         // Variables will be initialised with the parameter values
-        normalFillColor: polyShape.fill_color,
-        alarmFillColor: polyShape.fill_color_alarm,
-        normalFrameColor: polyShape.frame_color,
-        alarmFrameColor: polyShape.frame_color_alarm,
-        hasFillColor: polyShape.has_inside_color,
-        hasFrameColor: polyShape.has_frame_color,
+        normalFillColor: polyShape.fillColor,
+        alarmFillColor: polyShape.fillColorAlarm,
+        normalFrameColor: polyShape.frameColor,
+        alarmFrameColor: polyShape.frameColorAlarm,
+        hasFillColor: polyShape.hasInsideColor,
+        hasFrameColor: polyShape.hasFrameColor,
         lineWidth: lineWidth,
         // Positional arguments
         absCornerCoord: absCornerCoord,
@@ -71,14 +73,16 @@ export function createPolyObject(
         bottom: 0,
         xpos: 0,
         ypos: 0,
-        scale: 1000, // a scale of 1000 means a representation of 1:1
+        // scale: 1000, // a scale of 1000 means a representation of 1:1
+        scale: 10, // a scale of 10 means a representation of 1:1
         angle: 0,
+        transform: 'scale(1) rotate(0)',
         // Activate / deactivate input
         eventType: 'visible',
         // Computed
         fill: fillColor,
         edge: edge,
-        stroke: polyShape.frame_color,
+        stroke: polyShape.frameColor,
         strokeDashArray: '0',
         display: 'visible' as any,
         alarm: false,
@@ -102,63 +106,83 @@ export function createPolyObject(
     // We have to implement the const value, the variable or the placeholdervalue if available for the static value
     // Polyshapes and Simpleshapes have the same <expr-...> possibilities
 
-    if (dynamicElements.has('expr-toggle-color')) {
-        let element = dynamicElements.get('expr-toggle-color');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
-        let wrapperFunc = () => {
-            let value = returnFunc();
-            return value;
+    if (shapeParameters.has('expr-toggle-color')) {
+        const element = shapeParameters.get('expr-toggle-color');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
+        const wrapperFunc = () => {
+            const value = Number(returnFunc());
+            if (value !== null && typeof value !== 'undefined') {
+                return value !== 0;
+            } else {
+                return false;
+            }
         };
         Object.defineProperty(initial, 'alarm', {
             get: () => wrapperFunc(),
         });
     }
+
     // 2) Set fill color
-    if (dynamicElements.has('expr-fill-color')) {
-        let element = dynamicElements!.get('expr-fill-color');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
-        let wrapperFunc = () => {
-            let value = returnFunc();
-            let hexcolor = numberToHexColor(value);
+    if (shapeParameters.has('expr-fill-color')) {
+        const element = shapeParameters!.get('expr-fill-color');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
+        const wrapperFunc = () => {
+            const value = returnFunc();
+            const hexcolor = numberToHexColor(value);
             return hexcolor;
         };
         Object.defineProperty(initial, 'normalFillColor', {
             get: () => wrapperFunc(),
         });
     }
+
     // 3) Set alarm color
-    if (dynamicElements.has('expr-fill-color-alarm')) {
-        let element = dynamicElements!.get('expr-fill-color-alarm');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
-        let wrapperFunc = () => {
-            let value = returnFunc();
-            let hexcolor = numberToHexColor(value);
+    if (shapeParameters.has('expr-fill-color-alarm')) {
+        const element = shapeParameters!.get('expr-fill-color-alarm');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
+        const wrapperFunc = () => {
+            const value = returnFunc();
+            const hexcolor = numberToHexColor(value);
             return hexcolor;
         };
         Object.defineProperty(initial, 'alarmFillColor', {
             get: () => wrapperFunc(),
         });
     }
+
     // 4) Set frame color
-    if (dynamicElements.has('expr-frame-color')) {
-        let element = dynamicElements!.get('expr-frame-color');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
-        let wrapperFunc = () => {
-            let value = returnFunc();
-            let hexcolor = numberToHexColor(value);
+    if (shapeParameters.has('expr-frame-color')) {
+        const element = shapeParameters!.get('expr-frame-color');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
+        const wrapperFunc = () => {
+            const value = returnFunc();
+            const hexcolor = numberToHexColor(value);
             return hexcolor;
         };
         Object.defineProperty(initial, 'normalFrameColor', {
             get: () => wrapperFunc(),
         });
     }
+
     // 5) Set alarm frame color
-    if (dynamicElements.has('expr-frame-color-alarm')) {
-        let element = dynamicElements!.get('expr-frame-color-alarm');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
-        let wrapperFunc = () => {
-            let value = returnFunc();
-            let hexcolor = numberToHexColor(value);
+    if (shapeParameters.has('expr-frame-color-alarm')) {
+        const element = shapeParameters!.get(
+            'expr-frame-color-alarm',
+        );
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
+        const wrapperFunc = () => {
+            const value = returnFunc();
+            const hexcolor = numberToHexColor(value);
             return hexcolor;
         };
         Object.defineProperty(initial, 'alarmFrameColor', {
@@ -167,31 +191,42 @@ export function createPolyObject(
     }
 
     // 6) Set invisible state
-    if (dynamicElements.has('expr-invisible')) {
-        let element = dynamicElements!.get('expr-invisible');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
-        let wrapperFunc = () => {
-            let value = returnFunc();
-            if (value !== undefined) {
-                if (value == 0) {
+    if (shapeParameters.has('expr-invisible')) {
+        const element = shapeParameters!.get('expr-invisible');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
+        const wrapperFunc = () => {
+            const value = Number(returnFunc());
+            if (value !== null && typeof value !== 'undefined') {
+                if (value === 0) {
                     return 'visible';
                 } else {
                     return 'hidden';
                 }
+            } else {
+                return 'visible';
             }
         };
         Object.defineProperty(initial, 'display', {
             get: () => wrapperFunc(),
         });
     }
-    // 7) Set fill flag state
-    if (dynamicElements.has('expr-fill-flags')) {
-        let element = dynamicElements!.get('expr-fill-flags');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
-        let wrapperFunc = () => {
-            let value = returnFunc();
-            if (value == '1') {
-                return false;
+
+    // 7) The fill flags state: 0 = show color, >0 = ignore setting
+    if (shapeParameters.has('expr-fill-flags')) {
+        const element = shapeParameters!.get('expr-fill-flags');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
+        const wrapperFunc = () => {
+            const value = Number(returnFunc());
+            if (value !== null && typeof value !== 'undefined') {
+                if (value === 0) {
+                    return true;
+                } else {
+                    return false;
+                }
             } else {
                 return true;
             }
@@ -200,45 +235,51 @@ export function createPolyObject(
             get: () => wrapperFunc(),
         });
     }
-    // 8) Set frame flag state
-    if (dynamicElements.has('expr-frame-flags')) {
-        let element = dynamicElements!.get('expr-frame-flags');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
+
+    // 8) Display of frame: 0 full, 1 dashed ( _ _ _ ), 2 dotted ( .... ), 3 dash-point ( _._._ ), 4 dash-point-point (_.._.. ), 8 blind out line
+    if (shapeParameters.has('expr-frame-flags')) {
+        const element = shapeParameters!.get('expr-frame-flags');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
         Object.defineProperty(initial, 'hasFrameColor', {
             get: function () {
-                let value = returnFunc() == '8' ? false : true;
-                return value;
+                const value = Number(returnFunc());
+                return (value & 8) === 0;
             },
         });
         Object.defineProperty(initial, 'strokeDashArray', {
             get: function () {
-                let value = returnFunc();
-                if (initial.lineWidth <= 1) {
-                    if (value == '4') {
-                        return '20,10,5,5,5,10';
-                    } else if (value == '3') {
-                        return '20,5,5,5';
-                    } else if (value == '2') {
-                        return '5,5';
-                    } else if (value == '1') {
-                        return '10,10';
-                    } else {
-                        return '0';
-                    }
+                const value = Number(returnFunc());
+                // if (initial.lineWidth <= 1) {
+                if (value === 4) {
+                    return '8,2,2,2,2,2';
+                } else if (value === 3) {
+                    return '8,4,2,4';
+                } else if (value === 2) {
+                    return '2, 2';
+                } else if (value === 1) {
+                    return '13, 5';
                 } else {
                     return '0';
                 }
+                // } else {
+                //     return '0';
+                // }
             },
         });
     }
+
     // 9) line-width
-    if (dynamicElements.has('expr-line-width')) {
-        let element = dynamicElements!.get('expr-line-width');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
-        let wrapperFunc = () => {
-            let value = returnFunc();
-            let width = Number(value);
-            if (width == 0) {
+    if (shapeParameters.has('expr-line-width')) {
+        const element = shapeParameters!.get('expr-line-width');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
+        const wrapperFunc = () => {
+            const value = returnFunc();
+            const width = Number(value);
+            if (width === 0) {
                 return 1;
             } else {
                 return width;
@@ -250,84 +291,147 @@ export function createPolyObject(
     }
 
     // 10) Left-Position
-    if (dynamicElements.has('expr-left')) {
-        let element = dynamicElements!.get('expr-left');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
+    if (shapeParameters.has('expr-left')) {
+        const element = shapeParameters!.get('expr-left');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
         Object.defineProperty(initial, 'left', {
             get: () => returnFunc(),
         });
     }
+
     // 11) Right-Position
-    if (dynamicElements.has('expr-right')) {
-        let element = dynamicElements!.get('expr-right');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
+    if (shapeParameters.has('expr-right')) {
+        const element = shapeParameters!.get('expr-right');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
         Object.defineProperty(initial, 'right', {
             get: () => returnFunc(),
         });
     }
+
     // 12) Top-Position
-    if (dynamicElements.has('expr-top')) {
-        let element = dynamicElements!.get('expr-top');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
+    if (shapeParameters.has('expr-top')) {
+        const element = shapeParameters!.get('expr-top');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
         Object.defineProperty(initial, 'top', {
             get: () => returnFunc(),
         });
     }
+
     // 13) Bottom-Position
-    if (dynamicElements.has('expr-bottom')) {
-        let element = dynamicElements!.get('expr-bottom');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
+    if (shapeParameters.has('expr-bottom')) {
+        const element = shapeParameters!.get('expr-bottom');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
         Object.defineProperty(initial, 'bottom', {
             get: () => returnFunc(),
         });
     }
+
     // 14) x-Position
-    if (dynamicElements.has('expr-xpos')) {
-        let element = dynamicElements!.get('expr-xpos');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
+    if (shapeParameters.has('expr-xpos')) {
+        const element = shapeParameters!.get('expr-xpos');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
         Object.defineProperty(initial, 'xpos', {
             get: () => returnFunc(),
         });
     }
+
     // 15) y-Position
-    if (dynamicElements.has('expr-ypos')) {
-        let element = dynamicElements!.get('expr-ypos');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
+    if (shapeParameters.has('expr-ypos')) {
+        const element = shapeParameters!.get('expr-ypos');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
         Object.defineProperty(initial, 'ypos', {
             get: () => returnFunc(),
         });
     }
+
     // 16) Scaling
-    if (dynamicElements.has('expr-scale')) {
-        let element = dynamicElements!.get('expr-scale');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
+    if (shapeParameters.has('expr-scale')) {
+        const element = shapeParameters!.get('expr-scale');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
         Object.defineProperty(initial, 'scale', {
             get: () => returnFunc(),
         });
     }
+
     // 17) Rotating
-    if (dynamicElements.has('expr-angle')) {
-        let element = dynamicElements!.get('expr-angle');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
+    if (shapeParameters.has('expr-angle')) {
+        const element = shapeParameters!.get('expr-angle');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
         Object.defineProperty(initial, 'angle', {
             get: () => returnFunc(),
         });
     }
+
     // 18) Tooltip
-    if (dynamicElements.has('expr-tooltip-display')) {
-        let element = dynamicElements!.get('expr-tooltip-display');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
+    if (shapeParameters.has('expr-tooltip-display')) {
+        const element = shapeParameters!.get('expr-tooltip-display');
         Object.defineProperty(initial, 'tooltip', {
-            get: () => returnFunc(),
+            get: function () {
+                let output = '';
+                let parsedTooltip =
+                    tooltip === null || typeof tooltip === 'undefined'
+                        ? ''
+                        : tooltip;
+                const value = ComSocket.singleton().getFunction(
+                    element,
+                )();
+                try {
+                    if (
+                        parsedTooltip.includes('|<|') ||
+                        parsedTooltip.includes('|>|')
+                    ) {
+                        parsedTooltip = parsedTooltip.replace(
+                            /\|<\|/g,
+                            '<',
+                        );
+                        parsedTooltip = parsedTooltip.replace(
+                            /\|>\|/g,
+                            '>',
+                        );
+                        output = parsedTooltip;
+                    } else {
+                        output = sprintf(parsedTooltip, value);
+                    }
+                } catch {
+                    if (
+                        !(
+                            !parsedTooltip ||
+                            /^\s*$/.test(parsedTooltip)
+                        )
+                    ) {
+                        output = parsedTooltip;
+                    }
+                }
+                return output;
+            },
         });
     }
+
     // 19) Deactivate Input
-    if (dynamicElements.has('expr-input-disabled')) {
-        let element = dynamicElements!.get('expr-input-disabled');
-        let returnFunc = ComSocket.singleton().evalFunction(element);
-        let wrapperFunc = () => {
-            let value = returnFunc();
-            if (value == '1') {
+    if (shapeParameters.has('expr-input-disabled')) {
+        const element = shapeParameters!.get('expr-input-disabled');
+        const returnFunc = ComSocket.singleton().evalFunction(
+            element,
+        );
+        const wrapperFunc = () => {
+            const value = returnFunc();
+            if (value === '1') {
                 return 'none';
             } else {
                 return 'visible';
@@ -338,21 +442,21 @@ export function createPolyObject(
         });
     }
 
-    // We have to compute the dependent values after all the required static values ​​have been replaced by variables, placeholders or constant values
+    // We have to compute the dependent values after all the required static values have been replaced by variables, placeholders or constant values
     // E.g. the fillcolor depends on hasFillColor and alarm. This variables are called "computed" values. MobX will track their dependents and rerender the object by change.
     // We have to note that the rotation of polylines is not the same like simpleshapes. Simpleshapes keep their originally alignment, polyhapes transform every coordinate.
 
     // The fill color
     Object.defineProperty(initial, 'fill', {
         get: function () {
-            if (initial.alarm == false) {
+            if (initial.alarm) {
+                return initial.alarmFillColor;
+            } else {
                 if (initial.hasFillColor) {
                     return initial.normalFillColor;
                 } else {
                     return 'none';
                 }
-            } else {
-                return initial.alarmFillColor;
             }
         },
     });
@@ -364,35 +468,29 @@ export function createPolyObject(
 
     Object.defineProperty(initial, 'stroke', {
         get: function () {
-            if (initial.alarm == false) {
+            if (initial.alarm) {
+                return initial.alarmFrameColor;
+            } else {
                 if (initial.hasFrameColor) {
                     return initial.normalFrameColor;
                 } else {
                     return 'none';
                 }
-            } else {
-                return initial.alarmFrameColor;
             }
         },
     });
 
     Object.defineProperty(initial, 'edge', {
         get: function () {
-            if (initial.hasFrameColor || initial.alarm) {
-                if (initial.lineWidth == 0) {
-                    return 1;
-                } else {
-                    return initial.lineWidth;
-                }
-            } else {
-                return 0;
-            }
+            return initial.lineWidth;
         },
     });
 
+    // The transformed corner coordinates depends on the shapetype. The rotating operation is different for simpleshapes and polyshapes
+    // Polyshapes:
     Object.defineProperty(initial, 'transformedCornerCoord', {
         get: function () {
-            let corners = computeMinMaxCoord(initial.absPoints);
+            const corners = computeMinMaxCoord(initial.absPoints);
             return {
                 x1: corners[0],
                 y1: corners[1],
@@ -404,10 +502,10 @@ export function createPolyObject(
 
     Object.defineProperty(initial, 'relCoord', {
         get: function () {
-            let width =
+            const width =
                 initial.transformedCornerCoord.x2 -
                 initial.transformedCornerCoord.x1;
-            let height =
+            const height =
                 initial.transformedCornerCoord.y2 -
                 initial.transformedCornerCoord.y1;
             return { width: width, height: height };
@@ -416,15 +514,15 @@ export function createPolyObject(
 
     Object.defineProperty(initial, 'relPoints', {
         get: function () {
-            let points = initial.absPoints;
-            let interim = [];
-            let xoff =
+            const points = initial.absPoints;
+            const interim = [];
+            const xoff =
                 initial.transformedCornerCoord.x1 - initial.edge;
-            let yoff =
+            const yoff =
                 initial.transformedCornerCoord.y1 - initial.edge;
             for (let i = 0; i < points.length; i++) {
-                let x = points[i][0] - xoff;
-                let y = points[i][1] - yoff;
+                const x = points[i][0] - xoff;
+                const y = points[i][1] - yoff;
                 interim.push([x, y]);
             }
             return interim;
@@ -433,7 +531,7 @@ export function createPolyObject(
 
     Object.defineProperty(initial, 'cssTransformOrigin', {
         get: function () {
-            let interim = ('' +
+            const interim = ('' +
                 (absCenterCoord.x - absCornerCoord.x1) +
                 'px ' +
                 (absCenterCoord.y - absCornerCoord.y1) +
@@ -444,8 +542,9 @@ export function createPolyObject(
 
     Object.defineProperty(initial, 'cssTransform', {
         get: function () {
-            let scale = initial.scale / 1000;
-            let interim =
+            // const scale = initial.scale / 1000;
+            const scale = initial.scale / 10;
+            const interim =
                 'scale(' +
                 scale +
                 ') rotate(' +
@@ -462,13 +561,13 @@ export function createPolyObject(
     // Define the object access variables
     Object.defineProperty(initial, 'writeAccess', {
         get: function () {
-            let current = ComSocket.singleton().oVisuVariables.get(
+            const current = ComSocket.singleton().oVisuVariables.get(
                 '.currentuserlevel',
             )!.value;
-            let currentNum = Number(current);
-            if (currentNum !== NaN) {
+            const currentNum = Number(current);
+            if (!isNaN(currentNum)) {
                 if (
-                    polyShape.access_levels[currentNum].includes('w')
+                    polyShape.accessLevels[currentNum].includes('w')
                 ) {
                     return true;
                 } else {
@@ -482,13 +581,13 @@ export function createPolyObject(
 
     Object.defineProperty(initial, 'readAccess', {
         get: function () {
-            let current = ComSocket.singleton().oVisuVariables.get(
+            const current = ComSocket.singleton().oVisuVariables.get(
                 '.currentuserlevel',
             )!.value;
-            let currentNum = Number(current);
-            if (currentNum !== NaN) {
+            const currentNum = Number(current);
+            if (!isNaN(currentNum)) {
                 if (
-                    polyShape.access_levels[currentNum].includes('r')
+                    polyShape.accessLevels[currentNum].includes('r')
                 ) {
                     return true;
                 } else {

@@ -21,10 +21,11 @@ export const Inputfield: React.FunctionComponent<Props> = ({
     // Define the click handler functions as null
     let handleClick: Function = null;
     let handleEnter: Function = null;
+    let cursor = '';
 
     // The expected behavior would be, that every called input field has a text-display node. Its an internal problem of the codesys project if not.
     let handleClickOutside: Function = () =>
-        console.log(
+        console.warn(
             'An inputfield has no corresponding text-display field!',
         );
 
@@ -52,7 +53,7 @@ export const Inputfield: React.FunctionComponent<Props> = ({
                 section.getElementsByTagName('text-input-max-expr')
                     .length
             ) {
-                minvalue = Number(
+                maxvalue = Number(
                     section
                         .getElementsByTagName(
                             'text-input-max-expr',
@@ -65,11 +66,11 @@ export const Inputfield: React.FunctionComponent<Props> = ({
     }
 
     if (section.getElementsByTagName('text-display').length) {
-        let expr = section
+        const expr = section
             .getElementsByTagName('text-display')[0]
             .getElementsByTagName('expr')[0];
         if (expr.getElementsByTagName('var').length) {
-            let varName = expr
+            const varName = expr
                 .getElementsByTagName('var')[0]
                 .innerHTML.toLowerCase();
             handleClickOutside = () => {
@@ -80,23 +81,27 @@ export const Inputfield: React.FunctionComponent<Props> = ({
             };
             handleEnter = (event: any) => {
                 // Close on Enter
-                if (event.keyCode == 13) {
+                if (parseInt(event.keyCode) === 13) {
                     setOpen(false);
                     ComSocket.singleton().setValue(varName, value);
                 }
             };
+
+            cursor =
+                (typeof handleClickOutside !== 'undefined' &&
+                    handleClickOutside !== null) ||
+                (typeof handleClick !== 'undefined' &&
+                    handleClick !== null) ||
+                (typeof handleEnter !== 'undefined' &&
+                    handleEnter !== null)
+                    ? 'text'
+                    : null;
         }
     }
 
     return (
         <ClickAwayListener onClickAway={() => handleClickOutside()}>
             <div
-                style={{
-                    position: 'absolute',
-                    width: '100%',
-                    height: '100%',
-                    pointerEvents: 'auto',
-                }}
                 onClick={
                     handleClick === null ? null : () => handleClick()
                 }
@@ -105,6 +110,13 @@ export const Inputfield: React.FunctionComponent<Props> = ({
                         ? null
                         : () => handleEnter(event)
                 }
+                style={{
+                    cursor: cursor,
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    pointerEvents: 'auto',
+                }}
             >
                 {open ? (
                     <input

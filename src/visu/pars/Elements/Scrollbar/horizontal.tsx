@@ -1,29 +1,29 @@
 import * as React from 'react';
-import ComSocket from '../../../communication/comsocket';
+// import ComSocket from '../../../communication/comsocket';
 import { useObserver, useLocalStore } from 'mobx-react-lite';
 import { IScrollbarShape } from '../../../Interfaces/javainterfaces';
 import { createVisuObject } from '../../Objectmanagement/objectManager';
 
 type Props = {
     shape: IScrollbarShape;
-    dynamicParameters: Map<string, string[][]>;
+    shapeParameters: Map<string, string[][]>;
     updateFunction: Function;
 };
 
 export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
     shape,
-    dynamicParameters,
+    shapeParameters,
     updateFunction,
 }) => {
     // Convert object to an observable one
     const state = useLocalStore(() =>
-        createVisuObject(shape, dynamicParameters),
+        createVisuObject(shape, shapeParameters),
     );
     // We have to calculate the values that are specific of orientation
-    let centerx = state.b1 / 2;
-    let centery = state.a / 2;
+    const centerx = state.b1 / 2;
+    const centery = state.a / 2;
     // The paths are describing the triangles at the ends of the scrollbar
-    let path1 =
+    const path1 =
         '' +
         0.4 * centerx +
         ',' +
@@ -36,7 +36,7 @@ export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
         1.6 * centerx +
         ',' +
         1.6 * centery;
-    let path2 =
+    const path2 =
         '' +
         1.6 * centerx +
         ',' +
@@ -60,7 +60,7 @@ export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
 
     // Increment and decrement the value by click on the ends
     const increment = () => {
-        let upper =
+        const upper =
             state.lowerBound < state.upperBound
                 ? state.upperBound
                 : state.lowerBound;
@@ -69,7 +69,7 @@ export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
         }
     };
     const decrement = () => {
-        let upper =
+        const upper =
             state.lowerBound < state.upperBound
                 ? state.lowerBound
                 : state.upperBound;
@@ -78,7 +78,8 @@ export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
         }
     };
     // On click of the slider the selected bit is set to true and the size of scroll area is queried
-    const start = (e: React.MouseEvent) => {
+    // const start = (e: React.MouseEvent) => {
+    const start = () => {
         setSelected(true);
         setInitial([
             ref.current.getBoundingClientRect().left,
@@ -87,22 +88,22 @@ export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
     };
     // Handling the movement of the slider
     const move = (e: React.MouseEvent) => {
-        if (selected && updateFunction !== undefined) {
-            let delta = e.pageX - initial[0];
-            let spacing = initial[1] - initial[0];
-            let scrollIntervall = Math.abs(
+        if (selected && typeof updateFunction !== 'undefined') {
+            const delta = e.pageX - initial[0];
+            const spacing = initial[1] - initial[0];
+            const scrollIntervall = Math.abs(
                 state.upperBound - state.lowerBound,
             );
 
             if (!(delta < 0 || delta > spacing)) {
                 // Conversion of delta to scrollvalue
                 if (state.lowerBound > state.upperBound) {
-                    let nextScrollvalue =
+                    const nextScrollvalue =
                         state.lowerBound -
                         (delta / spacing) * scrollIntervall;
                     updateFunction(nextScrollvalue);
                 } else {
-                    let nextScrollvalue =
+                    const nextScrollvalue =
                         state.lowerBound +
                         (delta / spacing) * scrollIntervall;
                     updateFunction(nextScrollvalue);
@@ -129,7 +130,7 @@ export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
             onMouseUp={() => setSelected(false)}
             onMouseLeave={() => setSelected(false)}
         >
-            {/*Left button*/}
+            {/* Left button */}
             <svg
                 onClick={
                     state.lowerBound < state.upperBound
@@ -151,7 +152,7 @@ export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
                 />
                 <polygon points={path1} />
             </svg>
-            {/*Scroll area*/}
+            {/* Scroll area */}
             <svg
                 cursor={selected ? 'pointer' : null}
                 ref={ref}
@@ -163,7 +164,7 @@ export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
                     backgroundColor: '#e6e6e6',
                 }}
             ></svg>
-            {/*Slider*/}
+            {/* Slider */}
             <svg
                 cursor={'pointer'}
                 style={{
@@ -180,14 +181,14 @@ export const HorizontalScrollbar: React.FunctionComponent<Props> = ({
                     onMouseDown={start}
                 />
             </svg>
-            {/*Right button*/}
+            {/* Right button */}
             <svg
-                cursor={'pointer'}
                 onClick={
                     state.lowerBound < state.upperBound
                         ? increment
                         : decrement
                 }
+                cursor={'pointer'}
                 style={{
                     height: state.a,
                     width: state.b1,
