@@ -513,9 +513,16 @@ export function createPiechartObject(
             }
         },
     });
+
     Object.defineProperty(initial, 'strokeWidth', {
         get: function () {
-            return initial.lineWidth;
+            if (initial.alarm) {
+                return initial.lineWidth === 0
+                    ? 1
+                    : initial.lineWidth;
+            } else {
+                return initial.hasFrameColor ? initial.lineWidth : 0;
+            }
         },
     });
 
