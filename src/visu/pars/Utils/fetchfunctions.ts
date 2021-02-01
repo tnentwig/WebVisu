@@ -1,4 +1,4 @@
-import * as JsZip from 'jszip';
+import { loadAsync } from 'jszip';
 import StateManager from '../../statemanagement/statemanager';
 
 function replacePlaceholders(
@@ -110,7 +110,7 @@ export function getVisuXML_(url: string): Promise<XMLDocument> {
         }
         // Fetch the visu as zipped file
         else if (zipped) {
-            const zip = new JsZip();
+            //const zip = new JsZip();
             const urlStack = url.split('/');
             const filename = urlStack.pop();
             const zipName = filename.split('.')[0] + '_xml.zip';
@@ -122,7 +122,7 @@ export function getVisuXML_(url: string): Promise<XMLDocument> {
                 if (response.ok) {
                     response
                         .arrayBuffer()
-                        .then((buffer) => zip.loadAsync(buffer))
+                        .then((buffer) => loadAsync(buffer))
                         .then((unzipped) =>
                             unzipped
                                 .file(filename)
@@ -247,7 +247,7 @@ export function getImage(url: string): Promise<string> {
         }
         // Fetch the image as zipped file
         else if (zipped) {
-            const zip = new JsZip();
+            //const zip = new JsZip();
             const urlStack = url.split('/');
             const filename = urlStack.pop();
             const zipName =
@@ -259,7 +259,7 @@ export function getImage(url: string): Promise<string> {
                     if (response.ok) {
                         response
                             .arrayBuffer()
-                            .then((buffer) => zip.loadAsync(buffer))
+                            .then((buffer) => loadAsync(buffer))
                             .then((unzipped) =>
                                 unzipped
                                     .file(filename)

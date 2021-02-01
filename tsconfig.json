@@ -25,17 +25,18 @@
         ],
         // Sets the module system for the program. See the Modules chapter of the handbook for more information. You very likely want "CommonJS".
         // Allowed: CommonJS (default if target is ES3 or ES5), ES6/ES2015 (synonymous, default for target ES6 and higher), ES2020, None, UMD, AMD, System, ESNext 
-        "module": "CommonJS",
+        //"module": "CommonJS",
         // If specified, .js (as well as .d.ts, .js.map, etc.) files will be emitted into this directory. 
         "outDir": "./dist/",
         // Strips all comments from TypeScript files when converting into JavaScript. Defaults to false
         "removeComments": true,
         // Enables the generation of sourcemap files. These files allow debuggers and other tools to display the original TypeScript source code when actually working with the emitted JavaScript files. 
-        "sourceMap": true,
+        //"sourceMap": true,
         // Modern browsers support all ES6 features, so ES6 is a good choice.
         // Allowed: ES3 (default), ES5, ES6/ES2015 (synonomous), ES7/ES2016, ES2017, ES2018, ES2019, ES2020, ESNext
-        "target": "ES6",
-        
+        "target": "esnext",
+        "moduleResolution": "node",
+        "module": "esnext",
         /* Strict Checks */
         // In some cases where no type annotations are present, TypeScript will fall back to a type of any for a variable when it cannot infer the type.
         "noImplicitAny": true,

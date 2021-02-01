@@ -1,14 +1,12 @@
 const path = require('path');
-// const webpack = require('webpack'); // used for image transparency modification (failed)
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-// Only to enable compression
-// const CompressionPlugin = require('compression-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
     mode: 'production', // "production" | "development" | "none"
     // Chosen mode tells webpack to use its built-in optimizations accordingly
-    devtool: 'source-map', // enum
+    //devtool: 'source-map', // enum
     // enhance debugging by adding meta info for the browser devtools
     // source-map most detailed at the expense of build speed.
     entry: './src/index.ts', // string | object | array
@@ -35,27 +33,19 @@ module.exports = {
             template: './src/index.html',
             title: 'WebVisualisation',
         }),
-        // Only to enable compression
-        /*
+        // Compress
         new CompressionPlugin({
             filename: '[path][base].gz',
             algorithm: 'gzip',
             test: /\.js$|\.css$|\.html$/,
             threshold: 10240,
             minRatio: 0.8,
-        }),
-        */
+        })
     ],
     resolve: {
         // options for resolving module requests
         // (does not apply to resolving to loaders)
         extensions: ['.ts', '.tsx', '.js'],
-        // extensions that are used
-        /* // used for image transparency modification (failed)
-        alias: {
-            buffer: 'buffer',
-        },
-        */
     },
     module: {
         // configuration regarding modules
@@ -111,9 +101,5 @@ module.exports = {
                 extractComments: false,
             }),
         ],
-        // removeAvailableModules: true,
-        // removeEmptyChunks: true,
-        // providedExports: true,
-        // usedExports: 'global',
     },
 };
