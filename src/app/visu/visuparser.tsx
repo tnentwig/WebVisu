@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { get, set } from 'idb-keyval';
-import { VisuElements } from '../visu/pars/elementparser';
+import { VisuElements } from './pars/elementparser';
 import { stringToArray } from './pars/Utils/utilfunctions';
 import {
     getLastModified,
@@ -9,7 +9,7 @@ import {
     parseVisuXML,
 } from './pars/Utils/fetchfunctions';
 import ComSocket from './communication/comsocket';
-import StateManager from '../visu/statemanagement/statemanager';
+import StateManager from './statemanagement/statemanager';
 
 type Props = {
     visuName: string;
