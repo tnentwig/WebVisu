@@ -1,4 +1,4 @@
-import { loadAsync } from 'jszip';
+import { unzipSync, strFromU8 } from 'fflate';
 import StateManager from '../../statemanagement/statemanager';
 
 function replacePlaceholders(
@@ -110,7 +110,6 @@ export function getVisuXML_(url: string): Promise<XMLDocument> {
         }
         // Fetch the visu as zipped file
         else if (zipped) {
-            //const zip = new JsZip();
             const urlStack = url.split('/');
             const filename = urlStack.pop();
             const zipName = filename.split('.')[0] + '_xml.zip';
@@ -120,23 +119,17 @@ export function getVisuXML_(url: string): Promise<XMLDocument> {
                 headers: { 'Content-Type': 'binary;' },
             }).then((response) => {
                 if (response.ok) {
-                    response
-                        .arrayBuffer()
-                        .then((buffer) => loadAsync(buffer))
-                        .then((unzipped) =>
-                            unzipped
-                                .file(filename)
-                                .async('arraybuffer'),
-                        )
-                        .then((buffer) => {
-                            const decoder = new TextDecoder(encoding);
-                            const text = decoder.decode(buffer);
-                            const data = new window.DOMParser().parseFromString(
-                                text,
-                                'text/xml',
-                            );
-                            resolve(data);
-                        });
+                    response.arrayBuffer().then((buffer) => {
+                        const dataArray = unzipSync(
+                            new Uint8Array(buffer),
+                        );
+                        const text = strFromU8(dataArray[filename]);
+                        const data = new window.DOMParser().parseFromString(
+                            text,
+                            'text/xml',
+                        );
+                        resolve(data);
+                    });
                 } else {
                     resolve(null);
                 }
@@ -247,7 +240,6 @@ export function getImage(url: string): Promise<string> {
         }
         // Fetch the image as zipped file
         else if (zipped) {
-            //const zip = new JsZip();
             const urlStack = url.split('/');
             const filename = urlStack.pop();
             const zipName =
@@ -257,26 +249,20 @@ export function getImage(url: string): Promise<string> {
             fetch(urlStack.join('/') + '?v=' + Date.now()).then(
                 (response) => {
                     if (response.ok) {
-                        response
-                            .arrayBuffer()
-                            .then((buffer) => loadAsync(buffer))
-                            .then((unzipped) =>
-                                unzipped
-                                    .file(filename)
-                                    .async('arraybuffer'),
-                            )
-                            .then((buffer) => {
-                                let binary = '';
-                                const bytes = new Uint8Array(buffer);
-                                bytes.forEach(
-                                    (b) =>
-                                        (binary += String.fromCharCode(
-                                            b,
-                                        )),
-                                );
-                                const base64 = window.btoa(binary);
-                                resolve(base64Flag + base64);
-                            });
+                        response.arrayBuffer().then((buffer) => {
+                            const dataArray = unzipSync(
+                                new Uint8Array(buffer),
+                            );
+                            let binary = '';
+                            dataArray[filename].forEach(
+                                (b) =>
+                                    (binary += String.fromCharCode(
+                                        b,
+                                    )),
+                            );
+                            const base64 = window.btoa(binary);
+                            resolve(base64Flag + base64);
+                        });
                     } else {
                         resolve(null);
                     }
