@@ -1,4 +1,4 @@
-import { unzipSync, strFromU8 } from 'fflate';
+import { unzipSync } from 'fflate';
 import StateManager from '../../statemanagement/statemanager';
 
 function replacePlaceholders(
@@ -123,7 +123,10 @@ export function getVisuXML_(url: string): Promise<XMLDocument> {
                         const dataArray = unzipSync(
                             new Uint8Array(buffer),
                         );
-                        const text = strFromU8(dataArray[filename]);
+                        const decoder = new TextDecoder(encoding);
+                        const text = decoder.decode(
+                            dataArray[filename],
+                        );
                         const data = new window.DOMParser().parseFromString(
                             text,
                             'text/xml',
