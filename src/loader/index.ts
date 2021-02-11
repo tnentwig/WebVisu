@@ -1,5 +1,4 @@
 import { decompressSync, strFromU8 } from 'fflate';
-
 const prefixList: Array<String> = ['', '/PLC', '/webvisu'];
 
 prefixList.forEach((prefix) => {
@@ -10,8 +9,12 @@ prefixList.forEach((prefix) => {
                     new Uint8Array(data),
                 );
                 const WebVisuAppScript = strFromU8(dataArray);
-                eval(WebVisuAppScript);
+                const WebVisuApp = document.createElement('script');
+                WebVisuApp.innerHTML = WebVisuAppScript;
+                document.body.appendChild(WebVisuApp);
             });
+        } else {
+            return null;
         }
     });
 });
