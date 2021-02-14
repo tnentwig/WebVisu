@@ -1,61 +1,50 @@
 const path = require('path');
-// const webpack = require('webpack'); // used for image transparency modification (failed)
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-// Only to enable compression
-// const CompressionPlugin = require('compression-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
+const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin');
 
 module.exports = {
     mode: 'production', // "production" | "development" | "none"
-    // Chosen mode tells webpack to use its built-in optimizations accordingly
-    devtool: 'source-map', // enum
-    // enhance debugging by adding meta info for the browser devtools
-    // source-map most detailed at the expense of build speed.
-    entry: './src/index.ts', // string | object | array
-    // defaults to ./src
-    // Here the application starts executing
-    // and webpack starts bundling
+    //devtool: 'source-map', // enum
+    entry: {
+        Loader: './src/loader/index.ts',
+        WebVisuApp: './src/app/index.ts'
+    }, 
+
     output: {
-        // options related to how webpack emits results
         path: path.resolve(__dirname, 'dist'), // string
-        // the target directory for all output files
-        // must be an absolute path (use the Node.js path module)
-        filename: 'webvisu.js', // string
-        // the filename template for entry chunks
+        filename: '[name].js'
+
     },
     plugins: [
-        /* // used for image transparency modification (failed)
-        new webpack.ProvidePlugin({
-            Buffer: ['buffer', 'Buffer'],
-        }),
-        */
-        // list of additional plugins
+        // Add the script tag of loader to the HTML
         new HtmlWebpackPlugin({
-            filename: 'webvisu.html',
-            template: './src/index.html',
             title: 'WebVisualisation',
+            filename: 'webvisu.html',
+            inject: 'body',
+            template: './src/index.html'
         }),
-        // Only to enable compression
-        /*
+
+        // Compress
         new CompressionPlugin({
             filename: '[path][base].gz',
+            exclude: 'Loader',
             algorithm: 'gzip',
             test: /\.js$|\.css$|\.html$/,
             threshold: 10240,
             minRatio: 0.8,
+            deleteOriginalAssets: true
         }),
-        */
+
+        // Inline the loader to the webvisu.html to reduce the number of files to 2
+        new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/Loader/]),
     ],
     resolve: {
         // options for resolving module requests
         // (does not apply to resolving to loaders)
         extensions: ['.ts', '.tsx', '.js'],
-        // extensions that are used
-        /* // used for image transparency modification (failed)
-        alias: {
-            buffer: 'buffer',
-        },
-        */
+        fallback: { "path": false, "fs": false},
     },
     module: {
         // configuration regarding modules
@@ -73,7 +62,7 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 enforce: 'pre',
-                use: ['source-map-loader', 'eslint-loader'],
+                use: [ 'eslint-loader'],
             },
         ],
     },
@@ -111,9 +100,5 @@ module.exports = {
                 extractComments: false,
             }),
         ],
-        // removeAvailableModules: true,
-        // removeEmptyChunks: true,
-        // providedExports: true,
-        // usedExports: 'global',
     },
 };
