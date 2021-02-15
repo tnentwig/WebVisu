@@ -5,7 +5,6 @@ import { observable, action } from 'mobx';
 import Popup from 'reactjs-popup';
 import ComSocket from './visu/communication/comsocket';
 import StateManager from './visu/statemanagement/statemanager';
-import { clear } from 'idb-keyval';
 import { Visualisation } from './visu/visuparser';
 import { ConnectionFault } from './supplements/InfoBox/infobox';
 import { ExecutionPopup } from './supplements/PopUps/popup';
@@ -491,8 +490,6 @@ export default class HTML5Visu {
                             localStorage.getItem('download-id') !==
                             xmlDownloadID
                         ) {
-                            // Clear old indexedDB
-                            clear();
                             // Save the download-id
                             localStorage.setItem(
                                 'download-id',
