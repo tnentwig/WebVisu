@@ -150,7 +150,7 @@ export default class HTML5Visu {
         return new Promise((resolve) => {
             // Get the current path
             const path = window.location.pathname.replace(
-                '/webvisu.html',
+                /\/[^/]*$/,
                 '',
             );
             fetch(
