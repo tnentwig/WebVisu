@@ -77,70 +77,6 @@ function checkCompression() {
     return compressedFiles;
 }
 
-export function getVisuXML_(url: string): Promise<XMLDocument> {
-    return new Promise((resolve) => {
-        let encoding = StateManager.singleton().oState.get(
-            'ENCODINGSTRING',
-        );
-        if (typeof encoding === 'undefined') {
-            encoding = 'iso-8859-1';
-        }
-        const zipped = checkCompression();
-        // Fetch the xml as unzipped file
-        if (!zipped) {
-            fetch(url + '?v=' + Date.now(), {
-                headers: {
-                    'Content-Type': 'text/plain; charset=UTF-8',
-                },
-            }).then((response) => {
-                if (response.ok) {
-                    response.arrayBuffer().then((buffer) => {
-                        const decoder = new TextDecoder(encoding);
-                        const text = decoder.decode(buffer);
-                        const data = new window.DOMParser().parseFromString(
-                            text,
-                            'text/xml',
-                        );
-                        resolve(data);
-                    });
-                } else {
-                    resolve(null);
-                }
-            });
-        }
-        // Fetch the visu as zipped file
-        else if (zipped) {
-            const urlStack = url.split('/');
-            const filename = urlStack.pop();
-            const zipName = filename.split('.')[0] + '_xml.zip';
-            // Push the zip filename to stack
-            urlStack.push(zipName);
-            fetch(urlStack.join('/') + '?v=' + Date.now(), {
-                headers: { 'Content-Type': 'binary;' },
-            }).then((response) => {
-                if (response.ok) {
-                    response.arrayBuffer().then((buffer) => {
-                        const dataArray = unzipSync(
-                            new Uint8Array(buffer),
-                        );
-                        const decoder = new TextDecoder(encoding);
-                        const text = decoder.decode(
-                            dataArray[filename],
-                        );
-                        const data = new window.DOMParser().parseFromString(
-                            text,
-                            'text/xml',
-                        );
-                        resolve(data);
-                    });
-                } else {
-                    resolve(null);
-                }
-            });
-        }
-    });
-}
-
 export function stringifyVisuXML(toStringify: XMLDocument): string {
     const serializer = new XMLSerializer();
     const stringCopy = serializer.serializeToString(toStringify);
@@ -197,7 +133,7 @@ export function getLastModified(
     });
 }
 
-export function getImage(url: string): Promise<string> {
+export function getImage_(url: string): Promise<string> {
     // Calculate the mimeType
     let mimeType = '';
     const fileFormat = url.split('.').pop();
@@ -220,12 +156,13 @@ export function getImage(url: string): Promise<string> {
         }
     }
 
-    return new Promise((resolve) => {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve) => {
         const base64Flag = 'data:' + mimeType + ';base64,';
         const zipped = checkCompression();
         // Fetch the image as unzipped file
         if (!zipped) {
-            fetch(url + '?v=' + Date.now()).then((response) => {
+            fetch(url).then((response) => {
                 if (response.ok) {
                     response.arrayBuffer().then((buffer) => {
                         let binary = '';
@@ -249,28 +186,105 @@ export function getImage(url: string): Promise<string> {
                 filename.split('.')[0] + '_' + fileFormat + '.zip';
             // Push the zip filename to stack
             urlStack.push(zipName);
-            fetch(urlStack.join('/') + '?v=' + Date.now()).then(
-                (response) => {
-                    if (response.ok) {
-                        response.arrayBuffer().then((buffer) => {
-                            const dataArray = unzipSync(
-                                new Uint8Array(buffer),
-                            );
-                            let binary = '';
-                            dataArray[filename].forEach(
-                                (b) =>
-                                    (binary += String.fromCharCode(
-                                        b,
-                                    )),
-                            );
-                            const base64 = window.btoa(binary);
-                            resolve(base64Flag + base64);
-                        });
-                    } else {
-                        resolve(null);
-                    }
+            fetch(urlStack.join('/')).then((response) => {
+                if (response.ok) {
+                    response.arrayBuffer().then((buffer) => {
+                        const dataArray = unzipSync(
+                            new Uint8Array(buffer),
+                        );
+                        let binary = '';
+                        dataArray[filename].forEach(
+                            (b) => (binary += String.fromCharCode(b)),
+                        );
+                        const base64 = window.btoa(binary);
+                        resolve(base64Flag + base64);
+                    });
+                } else {
+                    resolve(null);
+                }
+            });
+        }
+    });
+}
+
+export function getImage(url: string): Promise<string> {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve) => {
+        const urlStack = url.split('/');
+        const fileName = urlStack.pop();
+        let base64Img: string;
+        if (sessionStorage.getItem(fileName)) {
+            base64Img = sessionStorage.getItem(fileName);
+            console.log(base64Img);
+            resolve(base64Img);
+        } else {
+            base64Img = await getImage_(url);
+            sessionStorage.setItem(fileName, base64Img);
+            resolve(base64Img);
+        }
+    });
+}
+
+export function getVisuXML_(url: string): Promise<XMLDocument> {
+    return new Promise((resolve) => {
+        let encoding = StateManager.singleton().oState.get(
+            'ENCODINGSTRING',
+        );
+        if (typeof encoding === 'undefined') {
+            encoding = 'iso-8859-1';
+        }
+        const zipped = checkCompression();
+        // Fetch the xml as unzipped file
+        if (!zipped) {
+            fetch(url + Date.now(), {
+                headers: {
+                    'Content-Type': 'text/plain; charset=UTF-8',
                 },
-            );
+            }).then((response) => {
+                if (response.ok) {
+                    response.arrayBuffer().then((buffer) => {
+                        const decoder = new TextDecoder(encoding);
+                        const text = decoder.decode(buffer);
+                        const data = new window.DOMParser().parseFromString(
+                            text,
+                            'text/xml',
+                        );
+                        resolve(data);
+                    });
+                } else {
+                    resolve(null);
+                }
+            });
+        }
+        // Fetch the visu as zipped file
+        else if (zipped) {
+            const urlStack = url.split('/');
+            const filename = urlStack.pop();
+            const zipName = filename.split('.')[0] + '_xml.zip';
+            // Push the zip filename to stack
+            urlStack.push(zipName);
+            fetch(urlStack.join('/') + '?v=' + Date.now(), {
+                headers: { 'Content-Type': 'binary;' },
+            }).then((response) => {
+                if (response.ok) {
+                    response.arrayBuffer().then((buffer) => {
+                        const dataArray = unzipSync(
+                            new Uint8Array(buffer),
+                        );
+                        const decoder = new TextDecoder(encoding);
+                        const text = decoder.decode(
+                            dataArray[filename],
+                        );
+                        const data = new window.DOMParser().parseFromString(
+                            text,
+                            'text/xml',
+                        );
+                        resolve(data);
+                    });
+                } else {
+                    resolve(null);
+                }
+            });
         }
     });
 }
@@ -296,7 +310,6 @@ export function getVisuXML(url: string): Promise<XMLDocument> {
                 mainVariables[g].getAttribute('name').toLowerCase(),
             );
         }
-
         for (let i = 0; i < elements.length; i++) {
             // Search for subvisualisations which have to be requested subsequently
             if (elements[i].hasAttribute('type')) {
@@ -309,16 +322,21 @@ export function getVisuXML(url: string): Promise<XMLDocument> {
                     const length = childs.length;
                     // Get the placeholders of the reference
                     const placeholders = getPlaceholders(elements[i]);
-
                     // Iterate over the childs to find the subvisu name
                     for (let j = 0; j < length; j++) {
                         if (childs[j].nodeName === 'name') {
                             const visuName = childs[j].textContent;
-                            const subvisuXml = await getVisuXML_(
-                                rootPath +
-                                    visuName.toLowerCase() +
-                                    '.xml',
-                            );
+                            let subvisuXml : XMLDocument;
+                            if (sessionStorage.getItem(visuName)) {
+                                subvisuXml = parseVisuXML(sessionStorage.getItem(visuName));
+                            } else {
+                                subvisuXml = await getVisuXML(
+                                    rootPath +
+                                        visuName.toLowerCase() +
+                                        '.xml',
+                                );
+                                sessionStorage.setItem(visuName, stringifyVisuXML(subvisuXml));
+                            }
                             // Replace the found placeholders
                             replacePlaceholders(
                                 subvisuXml,
@@ -366,6 +384,10 @@ export function getVisuXML(url: string): Promise<XMLDocument> {
                             }
                         }
                     }
+                } else if (
+                    elements[i].getAttribute('type') === 'bitmap'
+                ) {
+                    null;
                 }
             }
         }
