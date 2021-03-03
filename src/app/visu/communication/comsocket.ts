@@ -1,5 +1,5 @@
 import { IComSocket } from '../Interfaces/jsinterfaces';
-import { observable, action } from 'mobx';
+import { observable, action, runInAction } from 'mobx';
 import StateManager from '../statemanagement/statemanager';
 import { evalRPN } from '../pars/Utils/utilfunctions';
 
@@ -243,10 +243,12 @@ export default class ComSocket implements IComSocket {
                                                 );
                                             }
                                         }
-                                        StateManager.singleton().oState.set(
-                                            'ISONLINE',
-                                            'TRUE',
-                                        );
+                                        runInAction(() => {
+                                            StateManager.singleton().oState.set(
+                                                'ISONLINE',
+                                                'TRUE',
+                                            );
+                                        });
                                     }
                                     resolve(true);
                                 });
@@ -257,10 +259,12 @@ export default class ComSocket implements IComSocket {
                     )
                     .catch(() => {
                         console.warn('Connection lost');
-                        StateManager.singleton().oState.set(
-                            'ISONLINE',
-                            'FALSE',
-                        );
+                        runInAction(() => {
+                            StateManager.singleton().oState.set(
+                                'ISONLINE',
+                                'FALSE',
+                            );
+                        });
                         resolve(false);
                     })
                     .finally(() => {
@@ -290,7 +294,7 @@ export default class ComSocket implements IComSocket {
         this.intervalID = window.setInterval(
             () =>
                 this.updateVarList(timeout).catch((error) => {
-                    console.warn(error, timeout + 'ms');
+                    // console.warn(error, timeout + 'ms');
                 }),
             updateTime,
         );
