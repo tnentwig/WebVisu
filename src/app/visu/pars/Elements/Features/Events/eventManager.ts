@@ -11,9 +11,9 @@ export function parseShapeParameters(
     tags = [
         'expr-toggle-color', // 1) Set alarm
         'expr-fill-color', // 2) Variable for the fill color
-        'expr-fill-color-alarm',
+        'expr-fill-color-alarm', // 3) Variable for the fill color alarm
         'expr-frame-color', // 4) Variable for the frame color
-        'expr-frame-color-alarm',
+        'expr-frame-color-alarm', // 5) Variable for the frame color alarm
         'expr-invisible', // 6) Flag to make the object invisible
         'expr-fill-flags', // 7) Toggles the "has-inside-color"
         'expr-frame-flags', // 8) Toggles the "has-frame-color"
@@ -106,6 +106,8 @@ export function parseTextParameters(
         'text-display', // 4) Sets the variable that has to be displayed
         'expr-text-color', // 5) Sets the text color
         'expr-font-height', // 6) Sets the font height
+        'text-var-offset', // 7) Sets the text variable offset
+        'text-var-gain', // 8) Sets the text variable gain
     ];
 
     const children = section.children;
