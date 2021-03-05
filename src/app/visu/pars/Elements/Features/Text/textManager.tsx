@@ -85,6 +85,8 @@ export const Textfield: React.FunctionComponent<Props> = ({
         textAlignVert: textAlignVert,
         textVariable: '',
         textLines: '',
+        varOffset: 0,
+        varGain: 1,
         // Computed Elements
         // Horizontal orientation has three arguments textAnchor and the relative x- and y-position
         textAnchor: 'middle',
@@ -96,7 +98,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
         // local variables
         relCoord: relCoord,
         relMidpointCoord: relMidpointCoord,
-        scale: 10, // a scale of 10 means a representation of 1:1
+        // scale: 1000, // a scale of 1000 means a representation of 1:1
         angle: 0,
         transform: 'scale(1) rotate(0)',
     };
@@ -146,7 +148,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
             return { x: x, y: y };
         },
     });
-
+    /*
     // x) Scaling
     if (shapeParameters.has('expr-scale')) {
         const element = shapeParameters!.get('expr-scale');
@@ -157,6 +159,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
             get: () => returnFunc(),
         });
     }
+    */
     // y) Rotating
     if (shapeParameters.has('expr-angle')) {
         const element = shapeParameters!.get('expr-angle');
@@ -167,13 +170,13 @@ export const Textfield: React.FunctionComponent<Props> = ({
             get: () => returnFunc(),
         });
     }
+
     // z) Transforming
     Object.defineProperty(initial, 'transform', {
         get: function () {
             // scale(<x> [<y>])
             // rotate(<a> [<x> <y>])
-            let transform =
-                'scale(' + initial.scale / 10 + ') rotate(';
+            let transform = 'scale(1) rotate(';
             if (initial.angle !== 0) {
                 transform =
                     transform +
@@ -354,6 +357,30 @@ export const Textfield: React.FunctionComponent<Props> = ({
             },
         });
     }
+    // 7) The text variable offset:
+    if (textParameters.has('text-var-offset')) {
+        const element = textParameters!.get('text-var-offset');
+        Object.defineProperty(initial, 'varOffset', {
+            get: function () {
+                const value = Number(
+                    ComSocket.singleton().evalFunction(element)(),
+                );
+                return value;
+            },
+        });
+    }
+    // 8) The text variable gain:
+    if (textParameters.has('text-var-gain')) {
+        const element = textParameters!.get('text-var-gain');
+        Object.defineProperty(initial, 'varGain', {
+            get: function () {
+                const value = Number(
+                    ComSocket.singleton().evalFunction(element)(),
+                );
+                return value;
+            },
+        });
+    }
 
     Object.defineProperty(initial, 'textAnchor', {
         get: function () {
@@ -483,9 +510,16 @@ export const Textfield: React.FunctionComponent<Props> = ({
         const element = textParameters!.get('text-display');
         Object.defineProperty(initial, 'textVariable', {
             get: function () {
-                const value = ComSocket.singleton().getFunction(
+                let value = ComSocket.singleton().getFunction(
                     element,
                 )();
+                // If the token is a number:
+                if (!isNaN(parseFloat(value))) {
+                    value =
+                        initial.varOffset +
+                        parseFloat(value) * initial.varGain;
+                    value = value.toString();
+                }
                 return value;
             },
         });

@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { IBasicShape } from '../../../../Interfaces/javainterfaces';
+import { IPolyShape } from '../../../../Interfaces/javainterfaces';
 import { createVisuObject } from '../../../Objectmanagement/objectManager';
 import { useObserver, useLocalStore } from 'mobx-react-lite';
 import { coordArrayToBezierString } from '../../../Utils/utilfunctions';
 import { ErrorBoundary } from 'react-error-boundary';
 
 type Props = {
-    polyShape: IBasicShape;
+    polyShape: IPolyShape;
     textField: JSX.Element | undefined;
     inputField: JSX.Element;
     dynamicParameters: Map<string, string[][]>;
@@ -95,7 +95,7 @@ export const Bezier: React.FunctionComponent<Props> = ({
                                 state.relPoints,
                             )}
                             fill="none"
-                            pointer-events="stroke"
+                            pointerEvents="stroke"
                             strokeWidth={state.strokeWidth}
                             stroke={state.stroke}
                             transform={state.transform}
