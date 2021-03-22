@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { IBasicShape } from '../../../../Interfaces/javainterfaces';
+import { ISimpleShape } from '../../../../Interfaces/javainterfaces';
 import { createVisuObject } from '../../../Objectmanagement/objectManager';
 import { useObserver, useLocalStore } from 'mobx-react-lite';
 import { ErrorBoundary } from 'react-error-boundary';
 
 type Props = {
-    simpleShape: IBasicShape;
-    textField: JSX.Element | undefined;
+    simpleShape: ISimpleShape;
+    textField: JSX.Element;
     inputField: JSX.Element;
     dynamicParameters: Map<string, string[][]>;
     onmousedown: Function;
@@ -34,23 +34,28 @@ export const Line: React.FunctionComponent<Props> = React.memo(
                 style={{
                     cursor: 'auto',
                     overflow: 'visible',
-                    pointerEvents: state.eventType,
-                    visibility: state.display,
+                    pointerEvents: state.pointerEvents,
+                    visibility: state.visibility,
                     position: 'absolute',
                     left:
-                        (state.transformedCornerCoord.x1 >
-                        state.transformedCornerCoord.x2
-                            ? state.transformedCornerCoord.x2
-                            : state.transformedCornerCoord.x1) -
-                        state.edge,
+                        Math.min(
+                            state.transformedCornerCoord.x1,
+                            state.transformedCornerCoord.x2,
+                        ) +
+                        state.transformedStartCoord.left -
+                        state.lineWidth,
                     top:
-                        (state.transformedCornerCoord.y1 >
-                        state.transformedCornerCoord.y2
-                            ? state.transformedCornerCoord.y2
-                            : state.transformedCornerCoord.y1) -
-                        state.edge,
-                    width: state.relCoord.width + state.edge,
-                    height: state.relCoord.height + state.edge,
+                        Math.min(
+                            state.transformedCornerCoord.y1,
+                            state.transformedCornerCoord.y2,
+                        ) +
+                        state.transformedStartCoord.top -
+                        state.lineWidth,
+                    width:
+                        state.transformedSize.width + state.lineWidth,
+                    height:
+                        state.transformedSize.height +
+                        state.lineWidth,
                 }}
             >
                 {state.readAccess ? (
@@ -59,10 +64,12 @@ export const Line: React.FunctionComponent<Props> = React.memo(
                         <svg
                             style={{ float: 'left' }}
                             width={
-                                state.relCoord.width + 2 * state.edge
+                                state.transformedSize.width +
+                                2 * state.lineWidth
                             }
                             height={
-                                state.relCoord.height + 2 * state.edge
+                                state.transformedSize.height +
+                                2 * state.lineWidth
                             }
                             overflow="visible"
                         >
@@ -115,28 +122,33 @@ export const Line: React.FunctionComponent<Props> = React.memo(
                                         : null
                                 }
                                 width={
-                                    state.relCoord.width +
+                                    state.transformedSize.width *
+                                        (state.motionAbsScale /
+                                            1000) +
                                     state.strokeWidth
                                 }
                                 height={
-                                    state.relCoord.height +
+                                    state.transformedSize.height *
+                                        (state.motionAbsScale /
+                                            1000) +
                                     state.strokeWidth
                                 }
                                 overflow="visible"
                             >
                                 <line
-                                    x2={
+                                    x1={
                                         state.transformedCornerCoord
                                             .x1 >
                                         state.transformedCornerCoord
                                             .x2
-                                            ? Math.min(
+                                            ? state.transformedSize
+                                                  .width +
+                                              Math.min(
                                                   1,
                                                   state.strokeWidth /
                                                       2,
                                               )
-                                            : state.relCoord.width +
-                                              Math.min(
+                                            : Math.min(
                                                   1,
                                                   state.strokeWidth /
                                                       2,
@@ -152,25 +164,27 @@ export const Line: React.FunctionComponent<Props> = React.memo(
                                                   state.strokeWidth /
                                                       2,
                                               )
-                                            : state.relCoord.height +
+                                            : state.transformedSize
+                                                  .height +
                                               Math.min(
                                                   1,
                                                   state.strokeWidth /
                                                       2,
                                               )
                                     }
-                                    x1={
+                                    x2={
                                         state.transformedCornerCoord
                                             .x1 >
                                         state.transformedCornerCoord
                                             .x2
-                                            ? state.relCoord.width +
-                                              Math.min(
+                                            ? Math.min(
                                                   1,
                                                   state.strokeWidth /
                                                       2,
                                               )
-                                            : Math.min(
+                                            : state.transformedSize
+                                                  .width +
+                                              Math.min(
                                                   1,
                                                   state.strokeWidth /
                                                       2,
@@ -181,7 +195,8 @@ export const Line: React.FunctionComponent<Props> = React.memo(
                                             .y1 >
                                         state.transformedCornerCoord
                                             .y2
-                                            ? state.relCoord.height +
+                                            ? state.transformedSize
+                                                  .height +
                                               Math.min(
                                                   1,
                                                   state.strokeWidth /
@@ -193,6 +208,7 @@ export const Line: React.FunctionComponent<Props> = React.memo(
                                                       2,
                                               )
                                     }
+                                    fill="none"
                                     stroke={state.stroke}
                                     strokeWidth={state.strokeWidth}
                                     strokeDasharray={
@@ -204,13 +220,7 @@ export const Line: React.FunctionComponent<Props> = React.memo(
                                 </line>
                                 {typeof textField === 'undefined' ||
                                 textField === null ? null : (
-                                    <svg
-                                        width={state.relCoord.width}
-                                        height={state.relCoord.height}
-                                        x={state.edge}
-                                        y={state.edge}
-                                        overflow="visible"
-                                    >
+                                    <svg overflow="visible">
                                         {textField}
                                     </svg>
                                 )}

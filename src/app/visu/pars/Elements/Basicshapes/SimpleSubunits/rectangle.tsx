@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { IBasicShape } from '../../../../Interfaces/javainterfaces';
+import { ISimpleShape } from '../../../../Interfaces/javainterfaces';
 import { createVisuObject } from '../../../Objectmanagement/objectManager';
 import { useObserver, useLocalStore } from 'mobx-react-lite';
 import { ErrorBoundary } from 'react-error-boundary';
 
 type Props = {
-    simpleShape: IBasicShape;
+    simpleShape: ISimpleShape;
     textField: JSX.Element;
     inputField: JSX.Element;
     dynamicParameters: Map<string, string[][]>;
@@ -34,14 +34,29 @@ export const Rectangle: React.FunctionComponent<Props> = React.memo(
                 style={{
                     cursor: 'auto',
                     overflow: 'visible',
-                    pointerEvents: state.eventType,
-                    visibility: state.display,
+                    pointerEvents: state.pointerEvents,
+                    visibility: state.visibility,
                     position: 'absolute',
                     left:
-                        state.transformedCornerCoord.x1 - state.edge,
-                    top: state.transformedCornerCoord.y1 - state.edge,
-                    width: state.relCoord.width + 2 * state.edge,
-                    height: state.relCoord.height + 2 * state.edge,
+                        Math.min(
+                            state.transformedCornerCoord.x1,
+                            state.transformedCornerCoord.x2,
+                        ) +
+                        state.transformedStartCoord.left -
+                        state.lineWidth,
+                    top:
+                        Math.min(
+                            state.transformedCornerCoord.y1,
+                            state.transformedCornerCoord.y2,
+                        ) +
+                        state.transformedStartCoord.top -
+                        state.lineWidth,
+                    width:
+                        state.transformedSize.width +
+                        2 * state.lineWidth,
+                    height:
+                        state.transformedSize.height +
+                        2 * state.lineWidth,
                 }}
             >
                 {state.readAccess ? (
@@ -50,10 +65,12 @@ export const Rectangle: React.FunctionComponent<Props> = React.memo(
                         <svg
                             style={{ float: 'left' }}
                             width={
-                                state.relCoord.width + 2 * state.edge
+                                state.transformedSize.width +
+                                2 * state.lineWidth
                             }
                             height={
-                                state.relCoord.height + 2 * state.edge
+                                state.transformedSize.height +
+                                2 * state.lineWidth
                             }
                             overflow="visible"
                         >
@@ -106,38 +123,39 @@ export const Rectangle: React.FunctionComponent<Props> = React.memo(
                                         : null
                                 }
                                 width={
-                                    state.relCoord.width +
-                                    2 * state.edge
+                                    state.transformedSize.width *
+                                        (state.motionAbsScale /
+                                            1000) +
+                                    2 * state.lineWidth
                                 }
                                 height={
-                                    state.relCoord.height +
-                                    2 * state.edge
-                                }
-                                strokeDasharray={
-                                    state.strokeDashArray
+                                    state.transformedSize.height *
+                                        (state.motionAbsScale /
+                                            1000) +
+                                    2 * state.lineWidth
                                 }
                                 overflow="visible"
                             >
                                 <rect
-                                    width={state.relCoord.width}
-                                    height={state.relCoord.height}
-                                    x={state.edge}
-                                    y={state.edge}
+                                    width={
+                                        state.transformedSize.width
+                                    }
+                                    height={
+                                        state.transformedSize.height
+                                    }
                                     fill={state.fill}
                                     stroke={state.stroke}
                                     strokeWidth={state.strokeWidth}
+                                    strokeDasharray={
+                                        state.strokeDashArray
+                                    }
                                     transform={state.transform}
                                 >
                                     <title>{state.tooltip}</title>
                                 </rect>
                                 {typeof textField === 'undefined' ||
                                 textField === null ? null : (
-                                    <svg
-                                        width={state.relCoord.width}
-                                        height={state.relCoord.height}
-                                        x={state.edge}
-                                        y={state.edge}
-                                    >
+                                    <svg overflow="visible">
                                         {textField}
                                     </svg>
                                 )}

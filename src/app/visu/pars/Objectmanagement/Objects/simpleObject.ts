@@ -1,87 +1,94 @@
 import ComSocket from '../../../communication/comsocket';
-import { IBasicObject } from '../../../Interfaces/jsinterfaces';
-import { IBasicShape } from '../../../Interfaces/javainterfaces';
+import { ISimpleObject } from '../../../Interfaces/jsinterfaces';
+import { ISimpleShape } from '../../../Interfaces/javainterfaces';
 import { numberToHexColor } from '../../Utils/utilfunctions';
 import { sprintf } from 'sprintf-js';
 
-export function createBasicObject(
-    basicShape: IBasicShape,
+export function createSimpleObject(
+    simpleShape: ISimpleShape,
     shapeParameters: Map<string, string[][]>,
-): IBasicObject {
-    // absCornerCoord are the absolute coordinates of the <div> element in relation to the origin in the top left
-    const absCornerCoord = {
-        x1: basicShape.rect[0],
-        y1: basicShape.rect[1],
-        x2: basicShape.rect[2],
-        y2: basicShape.rect[3],
-    };
-    // absCenterCoord are the coordinates of the rotation and scale center
-    const absCenterCoord = {
-        x: basicShape.center[0],
-        y: basicShape.center[1],
-    };
-    // relCoord are the width and the height in relation the div
-    const relCoord = {
-        width: basicShape.rect[2] - basicShape.rect[0],
-        height: basicShape.rect[3] - basicShape.rect[1],
-    };
-    // the relCenterCoord are the coordinates of the midpoint of the div
-    const relMidpointCoord = {
-        x: (basicShape.rect[2] - basicShape.rect[0]) / 2,
-        y: (basicShape.rect[3] - basicShape.rect[1]) / 2,
-    };
-    // The lineWidth is 0 in the xml if border width is 1 in the codesys dev env. Otherwise lineWidth is equal to the target border width. Very strange.
-    const edge =
-        basicShape.lineWidth === 0 ? 1 : basicShape.lineWidth;
-    // Compute the strokeWidth through hasFrameColor
-    const lineWidth = basicShape.hasFrameColor ? edge : 0;
+): ISimpleObject {
     // Compute the fill color through has_fill_color
-    const fillColor = basicShape.hasInsideColor
-        ? basicShape.fillColor
+    const fill = simpleShape.hasInsideColor
+        ? simpleShape.fillColor
         : 'none';
     // Tooltip
-    const tooltip = basicShape.tooltip;
-
-    const shape = basicShape.shape;
-
+    const tooltip = simpleShape.tooltip;
+    // AccessLevels
+    const accessLevels = simpleShape.accessLevels;
     // Create an object with the initial parameters
-    const initial: IBasicObject = {
+    const initial: ISimpleObject = {
         // Variables will be initialised with the parameter values
-        normalFillColor: basicShape.fillColor,
-        alarmFillColor: basicShape.fillColorAlarm,
-        normalFrameColor: basicShape.frameColor,
-        alarmFrameColor: basicShape.frameColorAlarm,
-        hasFillColor: basicShape.hasInsideColor,
-        hasFrameColor: basicShape.hasFrameColor,
-        lineWidth: lineWidth,
+        cornerCoord: {
+            x1: simpleShape.rect[0],
+            y1: simpleShape.rect[1],
+            x2: simpleShape.rect[2],
+            y2: simpleShape.rect[3],
+        },
+        centerCoord: {
+            x: simpleShape.center[0],
+            y: simpleShape.center[1],
+        },
+        isAlarm: false,
+        fillColor: simpleShape.fillColor,
+        fillColorAlarm: simpleShape.fillColorAlarm,
+        frameColor: simpleShape.frameColor,
+        frameColorAlarm: simpleShape.frameColorAlarm,
+        hasFillColor: simpleShape.hasInsideColor,
+        hasFrameColor: simpleShape.hasFrameColor,
+        lineWidth: simpleShape.lineWidth,
         // Positional arguments
-        absCornerCoord: absCornerCoord,
-        absCenterCoord: absCenterCoord,
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-        xpos: 0,
-        ypos: 0,
-        // scale: 1000, // a scale of 1000 means a representation of 1:1
-        scale: 10, // a scale of 10 means a representation of 1:1
-        angle: 0,
-        transform: 'scale(1) rotate(0)',
-        // Activate / deactivate input
-        eventType: 'visible',
+        motionRelLeft: null,
+        motionRelRight: null,
+        motionRelTop: null,
+        motionRelBottom: null,
+        motionAbsX: null,
+        motionAbsY: null,
+        motionAbsScale: 1000, // a scale of 1000 means a representation of 1:1
+        motionAbsAngle: 0,
         // Computed
-        fill: fillColor,
-        edge: edge,
-        stroke: basicShape.frameColor,
-        strokeDashArray: '0',
-        display: 'visible' as any,
-        alarm: false,
-        tooltip: tooltip,
-        strokeWidth: lineWidth,
-        // Transformed corner coordinates, relative width and height
-        transformedCornerCoord: absCornerCoord,
-        relCoord: relCoord,
-        relMidpointCoord: relMidpointCoord,
+        transformedCornerCoord: {
+            // Transformed corner coordinates
+            x1: simpleShape.rect[0],
+            y1: simpleShape.rect[1],
+            x2: simpleShape.rect[2],
+            y2: simpleShape.rect[3],
+        },
+        transformedCenterCoord: {
+            // Transformed center coordinates
+            x: simpleShape.center[0],
+            y: simpleShape.center[1],
+        },
+        transformedSize: {
+            // Transformed width and height
+            width:
+                simpleShape.rect[2] -
+                simpleShape.rect[0] +
+                2 * simpleShape.lineWidth,
+            height:
+                simpleShape.rect[3] -
+                simpleShape.rect[1] +
+                2 * simpleShape.lineWidth,
+        },
+        transformedStartCoord: {
+            // Transformed center coordinates
+            left: 0,
+            top: 0,
+            x: 0,
+            y: 0,
+        },
+        /// <div> variables
+        pointerEvents: 'visible', // Activate / deactivate input
+        visibility: 'visible', // Show / Hide the object
+        /// <svg> variables
+        fill: fill, // Inside color
+        stroke: simpleShape.frameColor, // Frame color
+        strokeWidth: simpleShape.hasFrameColor
+            ? simpleShape.lineWidth
+            : 0, // Frame width
+        strokeDashArray: '0', // Frame style
+        transform: 'scale(1) rotate(0)', // Transform the object (scale and rotation only)
+        tooltip: tooltip, // Tooltip of the object.
         // Access variables
         writeAccess: true,
         readAccess: true,
@@ -91,6 +98,8 @@ export function createBasicObject(
     // A <expr-..-> tag initiate a variable, const or a placeholder
     // We have to implement the const value, the variable or the placeholdervalue if available for the static value
     // Polyshapes and Simpleshapes have the same <expr-...> possibilities
+
+    // 1) Set alarm variable
     if (shapeParameters.has('expr-toggle-color')) {
         const element = shapeParameters.get('expr-toggle-color');
         const returnFunc = ComSocket.singleton().evalFunction(
@@ -104,39 +113,12 @@ export function createBasicObject(
                 return false;
             }
         };
-        Object.defineProperty(initial, 'alarm', {
+        Object.defineProperty(initial, 'isAlarm', {
             get: () => wrapperFunc(),
         });
     }
-    if (shape === 'button') {
-        Object.defineProperty(initial, 'alarm', {
-            get: function () {
-                let value = 0;
-                if (shapeParameters.has('expr-toggle-var')) {
-                    const element = shapeParameters.get(
-                        'expr-toggle-var',
-                    );
-                    value = Number(
-                        ComSocket.singleton().evalFunction(element)(),
-                    );
-                } else if (shapeParameters.has('expr-tap-var')) {
-                    const element = shapeParameters.get(
-                        'expr-tap-var',
-                    );
-                    value = Number(
-                        ComSocket.singleton().evalFunction(element)(),
-                    );
-                }
-                if (value !== null && typeof value !== 'undefined') {
-                    return value !== 0;
-                } else {
-                    return false;
-                }
-            },
-        });
-    }
 
-    // 2) Set fill color
+    // 2) Set fill color (normal)
     if (shapeParameters.has('expr-fill-color')) {
         const element = shapeParameters!.get('expr-fill-color');
         const returnFunc = ComSocket.singleton().evalFunction(
@@ -147,12 +129,12 @@ export function createBasicObject(
             const hexcolor = numberToHexColor(value);
             return hexcolor;
         };
-        Object.defineProperty(initial, 'normalFillColor', {
+        Object.defineProperty(initial, 'fillColor', {
             get: () => wrapperFunc(),
         });
     }
 
-    // 3) Set alarm color
+    // 3) Set fill color (alarm)
     if (shapeParameters.has('expr-fill-color-alarm')) {
         const element = shapeParameters!.get('expr-fill-color-alarm');
         const returnFunc = ComSocket.singleton().evalFunction(
@@ -163,12 +145,12 @@ export function createBasicObject(
             const hexcolor = numberToHexColor(value);
             return hexcolor;
         };
-        Object.defineProperty(initial, 'alarmFillColor', {
+        Object.defineProperty(initial, 'fillColorAlarm', {
             get: () => wrapperFunc(),
         });
     }
 
-    // 4) Set frame color
+    // 4) Set frame color (normal)
     if (shapeParameters.has('expr-frame-color')) {
         const element = shapeParameters!.get('expr-frame-color');
         const returnFunc = ComSocket.singleton().evalFunction(
@@ -179,12 +161,12 @@ export function createBasicObject(
             const hexcolor = numberToHexColor(value);
             return hexcolor;
         };
-        Object.defineProperty(initial, 'normalFrameColor', {
+        Object.defineProperty(initial, 'frameColor', {
             get: () => wrapperFunc(),
         });
     }
 
-    // 5) Set alarm frame color
+    // 5) Set frame color (alarm)
     if (shapeParameters.has('expr-frame-color-alarm')) {
         const element = shapeParameters!.get(
             'expr-frame-color-alarm',
@@ -197,7 +179,7 @@ export function createBasicObject(
             const hexcolor = numberToHexColor(value);
             return hexcolor;
         };
-        Object.defineProperty(initial, 'alarmFrameColor', {
+        Object.defineProperty(initial, 'frameColorAlarm', {
             get: () => wrapperFunc(),
         });
     }
@@ -220,7 +202,7 @@ export function createBasicObject(
                 return 'visible';
             }
         };
-        Object.defineProperty(initial, 'display', {
+        Object.defineProperty(initial, 'visibility', {
             get: () => wrapperFunc(),
         });
     }
@@ -263,7 +245,6 @@ export function createBasicObject(
         Object.defineProperty(initial, 'strokeDashArray', {
             get: function () {
                 const value = Number(returnFunc());
-                // if (initial.lineWidth <= 1) {
                 if (value === 4) {
                     return '8,2,2,2,2,2';
                 } else if (value === 3) {
@@ -275,9 +256,6 @@ export function createBasicObject(
                 } else {
                     return '0';
                 }
-                // } else {
-                //     return '0';
-                // }
             },
         });
     }
@@ -302,90 +280,93 @@ export function createBasicObject(
         });
     }
 
-    // 10) Left-Position
+    // 10) Motion relative left edge
     if (shapeParameters.has('expr-left')) {
         const element = shapeParameters!.get('expr-left');
         const returnFunc = ComSocket.singleton().evalFunction(
             element,
         );
-        Object.defineProperty(initial, 'left', {
+        Object.defineProperty(initial, 'motionRelLeft', {
             get: () => returnFunc(),
         });
     }
 
-    // 11) Right-Position
+    // 11) Motion relative right edge
     if (shapeParameters.has('expr-right')) {
         const element = shapeParameters!.get('expr-right');
         const returnFunc = ComSocket.singleton().evalFunction(
             element,
         );
-        Object.defineProperty(initial, 'right', {
+        Object.defineProperty(initial, 'motionRelRight', {
             get: () => returnFunc(),
         });
     }
 
-    // 12) Top-Position
+    // 12) Motion relative top edge
     if (shapeParameters.has('expr-top')) {
         const element = shapeParameters!.get('expr-top');
         const returnFunc = ComSocket.singleton().evalFunction(
             element,
         );
-        Object.defineProperty(initial, 'top', {
+        Object.defineProperty(initial, 'motionRelTop', {
             get: () => returnFunc(),
         });
     }
 
-    // 13) Bottom-Position
+    // 13) Motion relative bottom edge
     if (shapeParameters.has('expr-bottom')) {
         const element = shapeParameters!.get('expr-bottom');
         const returnFunc = ComSocket.singleton().evalFunction(
             element,
         );
-        Object.defineProperty(initial, 'bottom', {
+        Object.defineProperty(initial, 'motionRelBottom', {
             get: () => returnFunc(),
         });
     }
 
-    // 14) x-Position
+    // 14) Motion absolute x-Offset
     if (shapeParameters.has('expr-xpos')) {
         const element = shapeParameters!.get('expr-xpos');
         const returnFunc = ComSocket.singleton().evalFunction(
             element,
         );
-        Object.defineProperty(initial, 'xpos', {
+        Object.defineProperty(initial, 'motionAbsX', {
             get: () => returnFunc(),
         });
     }
 
-    // 15) y-Position
+    // 15) Motion absolute y-Offset
     if (shapeParameters.has('expr-ypos')) {
         const element = shapeParameters!.get('expr-ypos');
         const returnFunc = ComSocket.singleton().evalFunction(
             element,
         );
-        Object.defineProperty(initial, 'ypos', {
+        Object.defineProperty(initial, 'motionAbsY', {
             get: () => returnFunc(),
         });
     }
 
-    // 16) Scaling
+    // 16) Motion absolute scale
     if (shapeParameters.has('expr-scale')) {
         const element = shapeParameters!.get('expr-scale');
         const returnFunc = ComSocket.singleton().evalFunction(
             element,
         );
-        Object.defineProperty(initial, 'scale', {
-            get: () => returnFunc(),
+        Object.defineProperty(initial, 'motionAbsScale', {
+            get: function () {
+                const scale = returnFunc();
+                return scale === 0 ? 1 : scale;
+            },
         });
     }
 
-    // 17) Rotating
+    // 17) Motion absolute angle
     if (shapeParameters.has('expr-angle')) {
         const element = shapeParameters!.get('expr-angle');
         const returnFunc = ComSocket.singleton().evalFunction(
             element,
         );
-        Object.defineProperty(initial, 'angle', {
+        Object.defineProperty(initial, 'motionAbsAngle', {
             get: () => returnFunc(),
         });
     }
@@ -449,35 +430,7 @@ export function createBasicObject(
                 return 'visible';
             }
         };
-        Object.defineProperty(initial, 'eventType', {
-            get: () => wrapperFunc(),
-        });
-    }
-
-    // Piechart specific stuff ( start- and endangle)
-    if (shapeParameters.has('expr-angle1')) {
-        const element = shapeParameters!.get('expr-angle1');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
-        const wrapperFunc = () => {
-            const value = returnFunc();
-            return value % 360;
-        };
-        Object.defineProperty(initial, 'startAngle', {
-            get: () => wrapperFunc(),
-        });
-    }
-    if (shapeParameters.has('expr-angle2')) {
-        const element = shapeParameters!.get('expr-angle2');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
-        const wrapperFunc = () => {
-            const value = returnFunc();
-            return value % 360;
-        };
-        Object.defineProperty(initial, 'endAngle', {
+        Object.defineProperty(initial, 'pointerEvents', {
             get: () => wrapperFunc(),
         });
     }
@@ -489,11 +442,11 @@ export function createBasicObject(
     // The fill color
     Object.defineProperty(initial, 'fill', {
         get: function () {
-            if (initial.alarm) {
-                return initial.alarmFillColor;
+            if (initial.isAlarm) {
+                return initial.fillColorAlarm;
             } else {
                 if (initial.hasFillColor) {
-                    return initial.normalFillColor;
+                    return initial.fillColor;
                 } else {
                     return 'none';
                 }
@@ -503,27 +456,115 @@ export function createBasicObject(
 
     Object.defineProperty(initial, 'strokeWidth', {
         get: function () {
-            if (initial.alarm) {
-                return initial.lineWidth === 0
-                    ? 1
-                    : initial.lineWidth;
+            const lineWidth = initial.lineWidth;
+            if (initial.isAlarm) {
+                return lineWidth === 0 ? 1 : lineWidth;
             } else {
-                return initial.hasFrameColor ? initial.lineWidth : 0;
+                return initial.hasFrameColor ? lineWidth : 0;
             }
         },
     });
 
     Object.defineProperty(initial, 'stroke', {
         get: function () {
-            if (initial.alarm) {
-                return initial.alarmFrameColor;
+            if (initial.isAlarm) {
+                return initial.frameColorAlarm;
             } else {
                 if (initial.hasFrameColor) {
-                    return initial.normalFrameColor;
+                    return initial.frameColor;
                 } else {
                     return 'none';
                 }
             }
+        },
+    });
+
+    // The transformed center coordinates.
+    Object.defineProperty(initial, 'transformedCenterCoord', {
+        get: function () {
+            // The center coordinate are only shifted with the Motion absolute X-Offset and Y-Offset
+            const centerCoord = initial.centerCoord;
+            const x = centerCoord.x + initial.motionAbsX / 2;
+            const y = centerCoord.y + initial.motionAbsY / 2;
+            // Init the interim return object
+            const coord = { x: x, y: y };
+            return coord;
+        },
+    });
+
+    // The transformed corner coordinates depends on the shapetype.
+    Object.defineProperty(initial, 'transformedCornerCoord', {
+        get: function () {
+            // The corner coordinater are shifted with the Motion absolute X-Offset and Y-Offset
+            const cornerCoord = initial.cornerCoord;
+            let x1 = cornerCoord.x1;
+            let y1 = cornerCoord.y1;
+            let x2 = cornerCoord.x2;
+            let y2 = cornerCoord.y2;
+            const motionAbsX = initial.motionAbsX;
+            if (
+                motionAbsX !== null &&
+                typeof motionAbsX !== undefined
+            ) {
+                x1 = x1 + motionAbsX;
+                x2 = x2 + motionAbsX;
+            }
+            const motionAbsY = initial.motionAbsY;
+            if (
+                motionAbsY !== null &&
+                typeof motionAbsY !== undefined
+            ) {
+                y1 = y1 + motionAbsY;
+                y2 = y2 + motionAbsY;
+            }
+
+            // The corner are ovveriten by the Motion relative left, right, top and bottom
+            const motionRelLeft = initial.motionRelLeft;
+            const motionRelTop = initial.motionRelTop;
+            const motionRelRight = initial.motionRelRight;
+            const motionRelBottom = initial.motionRelBottom;
+            if (
+                motionRelLeft !== null &&
+                typeof motionRelLeft !== undefined
+            ) {
+                x1 = x1 + motionRelLeft;
+            }
+            if (
+                motionRelTop !== null &&
+                typeof motionRelTop !== undefined
+            ) {
+                y1 = y1 + motionRelTop;
+            }
+            if (
+                motionRelRight !== null &&
+                typeof motionRelRight !== undefined
+            ) {
+                x2 = x2 + motionRelRight;
+            }
+            if (
+                motionRelBottom !== null &&
+                typeof motionRelBottom !== undefined
+            ) {
+                y2 = y2 + motionRelBottom;
+            }
+            // Init the interim return object
+            const coord = { x1: x1, y1: y1, x2: x2, y2: y2 };
+            return coord;
+        },
+    });
+
+    // The transformed width.
+    Object.defineProperty(initial, 'transformedSize', {
+        get: function () {
+            const transformedCornerCoord =
+                initial.transformedCornerCoord;
+            const width = Math.abs(
+                transformedCornerCoord.x2 - transformedCornerCoord.x1,
+            );
+            const height = Math.abs(
+                transformedCornerCoord.y2 - transformedCornerCoord.y1,
+            );
+            return { width: width, height: height };
         },
     });
 
@@ -532,15 +573,19 @@ export function createBasicObject(
             // scale(<x> [<y>])
             // rotate(<a> [<x> <y>])
             let transform =
-                'scale(' + initial.scale / 10 + ') rotate(';
-            if (initial.angle !== 0) {
+                'scale(' +
+                initial.motionAbsScale / 1000 +
+                ') rotate(';
+            const motionAbsAngle = initial.motionAbsAngle;
+            if (motionAbsAngle !== 0) {
+                const transformedSize = initial.transformedSize;
                 transform =
                     transform +
-                    initial.angle +
+                    motionAbsAngle +
                     ',' +
-                    initial.relMidpointCoord.x +
+                    transformedSize.width / 2 +
                     ',' +
-                    initial.relMidpointCoord.y +
+                    transformedSize.height / 2 +
                     ')';
             } else {
                 transform = transform + '0)';
@@ -549,82 +594,36 @@ export function createBasicObject(
         },
     });
 
-    Object.defineProperty(initial, 'edge', {
+    Object.defineProperty(initial, 'transformedStartCoord', {
         get: function () {
-            return initial.lineWidth;
-        },
-    });
-
-    // The transformed corner coordinates depends on the shapetype. The rotating operation is different for simpleshapes and polyshapes
-    // Simpleshape:
-    Object.defineProperty(initial, 'transformedCornerCoord', {
-        get: function () {
-            const x1 = initial.absCornerCoord.x1;
-            const x2 = initial.absCornerCoord.x2;
-            const y1 = initial.absCornerCoord.y1;
-            const y2 = initial.absCornerCoord.y2;
-            /*
-            const xc = initial.absCenterCoord.x;
-            const yc = initial.absCenterCoord.y;
-            // Scaling: the vector isnt normalized to 1
-            // const scale = initial.scale / 1000;
-            const scale = initial.scale / 10;
-            x1 = scale * (x1 - xc) + xc;
-            y1 = scale * (y1 - yc) + yc;
-            x2 = scale * (x2 - xc) + xc;
-            y2 = scale * (y2 - yc) + yc;
-            // Rotating
-            const sinphi = Math.sin(
-                (initial.angle * (2 * Math.PI)) / 360,
-            );
-            const cosphi = Math.cos(
-                (initial.angle * (2 * Math.PI)) / 360,
-            );
-            const xoff =
-                (x1 - xc) * cosphi - (y1 - yc) * sinphi - (x1 - xc);
-            const yoff =
-                (x1 - xc) * sinphi + (y1 - yc) * cosphi - (y1 - yc);
-            // Add the offset
-            x1 += initial.xpos + initial.left + xoff;
-            x2 += initial.xpos + initial.right + xoff;
-            y1 += initial.ypos + initial.top + yoff;
-            y2 += initial.ypos + initial.bottom + yoff;
-            */
+            let left = 0;
+            let top = 0;
+            let x = 0;
+            let y = 0;
+            const motionAbsScale = initial.motionAbsScale;
+            if (motionAbsScale !== 1000 && motionAbsScale !== 0) {
+                const scale = motionAbsScale / 1000;
+                const transformedSize = initial.transformedSize;
+                left =
+                    (transformedSize.width -
+                        transformedSize.width * scale) /
+                    2;
+                top =
+                    (transformedSize.height -
+                        transformedSize.height * scale) /
+                    2;
+                x =
+                    (transformedSize.width -
+                        transformedSize.width * scale) /
+                    (2 * scale);
+                y =
+                    (transformedSize.height -
+                        transformedSize.height * scale) /
+                    (2 * scale);
+            }
             // Init the interim return object
-            const coord = { x1: x1, y1: y1, x2: x2, y2: y2 };
-            /*
-            if (x1 > x2){
-                coord.x1 = x2;
-                coord.x2 = x1;
-            }
-            if (y1 > y2){
-                coord.y1 = y2;
-                coord.y2 = y1;
-            }
-            */
+            const coord = { left: left, top: top, x: x, y: y };
             return coord;
-        },
-    });
-
-    Object.defineProperty(initial, 'relCoord', {
-        get: function () {
-            const width = Math.abs(
-                initial.transformedCornerCoord.x2 -
-                    initial.transformedCornerCoord.x1,
-            );
-            const height = Math.abs(
-                initial.transformedCornerCoord.y2 -
-                    initial.transformedCornerCoord.y1,
-            );
-            return { width: width, height: height };
-        },
-    });
-
-    Object.defineProperty(initial, 'relMidpointCoord', {
-        get: function () {
-            const x = initial.relCoord.width / 2;
-            const y = initial.relCoord.height / 2;
-            return { x: x, y: y };
         },
     });
 
@@ -636,9 +635,7 @@ export function createBasicObject(
             )!.value;
             const currentNum = Number(current);
             if (!isNaN(currentNum)) {
-                if (
-                    basicShape.accessLevels[currentNum].includes('w')
-                ) {
+                if (accessLevels[currentNum].includes('w')) {
                     return true;
                 } else {
                     return false;
@@ -656,9 +653,7 @@ export function createBasicObject(
             )!.value;
             const currentNum = Number(current);
             if (!isNaN(currentNum)) {
-                if (
-                    basicShape.accessLevels[currentNum].includes('r')
-                ) {
+                if (accessLevels[currentNum].includes('r')) {
                     return true;
                 } else {
                     return false;

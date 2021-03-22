@@ -3,7 +3,7 @@ import * as util from '../../Utils/utilfunctions';
 import { ImageField } from '../Features/Image/image';
 import { Textfield } from '../Features/Text/textManager';
 import { Inputfield } from '../Features/Input/inputManager';
-import { IBasicShape } from '../../../Interfaces/javainterfaces';
+import { IButtonShape } from '../../../Interfaces/javainterfaces';
 import {
     parseShapeParameters,
     parseTextParameters,
@@ -22,62 +22,81 @@ export const Button: React.FunctionComponent<Props> = ({
     section,
 }) => {
     // Parsing of the fixed parameters
-    const button: IBasicShape = {
+    const button: IButtonShape = {
+        // ICommonShape properties
         shape: 'button',
-        hasInsideColor: util.stringToBoolean(
-            section.getElementsByTagName('has-inside-color')[0]
-                .innerHTML,
+        elementId: util.getElementHTML(section, 'elem-id', '0'),
+        center: util.stringToArray(
+            util.getElementHTML(section, 'center', '0,0'),
         ),
-        fillColor: util.rgbToHexString(
-            section.getElementsByTagName('fill-color')[0].innerHTML,
-        ),
-        fillColorAlarm: util.rgbToHexString(
-            section.getElementsByTagName('fill-color-alarm')[0]
-                .innerHTML,
-        ),
+        // The lineWidth is 0 in the xml if border width is 1 in the codesys dev env.
+        // Otherwise lineWidth is equal to the target border width. Very strange.
+        lineWidth:
+            Number(
+                util.getElementHTML(section, 'line-width', '1'),
+            ) === 0
+                ? 1
+                : Number(
+                      util.getElementHTML(section, 'line-width', '1'),
+                  ),
         hasFrameColor: util.stringToBoolean(
-            section.getElementsByTagName('has-frame-color')[0]
-                .innerHTML,
+            util.getElementHTML(section, 'has-frame-color', 'true'),
+        ),
+        hasInsideColor: util.stringToBoolean(
+            util.getElementHTML(section, 'has-inside-color', 'true'),
         ),
         frameColor: util.rgbToHexString(
-            section.getElementsByTagName('frame-color')[0].innerHTML,
+            util.getElementHTML(section, 'frame-color', '0,0,0'),
         ),
         frameColorAlarm: util.rgbToHexString(
-            section.getElementsByTagName('frame-color-alarm')[0]
-                .innerHTML,
+            util.getElementHTML(
+                section,
+                'frame-color-alarm',
+                '0,0,0',
+            ),
         ),
-        lineWidth: Number(
-            section.getElementsByTagName('line-width')[0].innerHTML,
+        fillColor: util.rgbToHexString(
+            util.getElementHTML(section, 'fill-color', '255,255,255'),
         ),
-        elementId: section.getElementsByTagName('elem-id')[0]
-            .innerHTML,
-        rect: util.stringToArray(
-            section.getElementsByTagName('rect')[0].innerHTML,
-        ),
-        center: util.stringToArray(
-            section.getElementsByTagName('center')[0].innerHTML,
-        ),
-        hiddenInput: util.stringToBoolean(
-            section.getElementsByTagName('hidden-input')[0].innerHTML,
+        fillColorAlarm: util.rgbToHexString(
+            util.getElementHTML(
+                section,
+                'fill-color-alarm',
+                '255,255,255',
+            ),
         ),
         enableTextInput: util.stringToBoolean(
-            section.getElementsByTagName('enable-text-input')[0]
-                .innerHTML,
+            util.getElementHTML(
+                section,
+                'enable-text-input',
+                'false',
+            ),
         ),
-        // Optional properties
-        tooltip: section.getElementsByTagName('tooltip').length
-            ? util.parseText(
-                  section.getElementsByTagName('tooltip')[0]
-                      .textContent,
-              )
-            : '',
-        accessLevels: section.getElementsByTagName('access-levels')
-            .length
-            ? util.parseAccessLevels(
-                  section.getElementsByTagName('access-levels')[0]
-                      .innerHTML,
-              )
-            : ['rw', 'rw', 'rw', 'rw', 'rw', 'rw', 'rw', 'rw'],
+        hiddenInput: util.stringToBoolean(
+            util.getElementHTML(section, 'hidden-input', 'false'),
+        ),
+
+        // ICommonShape optional properties
+        tooltip: util.parseText(
+            util.getElementText(section, 'tooltip', ''),
+        ),
+        accessLevels: util.parseAccessLevels(
+            util.getElementHTML(
+                section,
+                'access-levels',
+                'rw,rw,rw,rw,rw,rw,rw,rw',
+            ),
+        ),
+
+        // IButtonShape properties
+        frameType: util.getElementHTML(
+            section,
+            'frame-type',
+            'anisotropic',
+        ),
+        rect: util.stringToArray(
+            util.getElementHTML(section, 'rect', '0,0,0,0'),
+        ),
     };
 
     // Parsing of observable events (like toggle color)
@@ -145,6 +164,25 @@ export const Button: React.FunctionComponent<Props> = ({
         createVisuObject(button, shapeParameters),
     );
 
+    const [buttonPressed, setButtonPressed] = React.useState(false);
+
+    const mouseUp = () => {
+        if (state.writeAccess) {
+            if ((typeof onmouseup !== 'undefined') && (onmouseup !== null)) {
+                onmouseup();
+            }
+            setButtonPressed(false);
+        }
+    };
+    const mouseDown = () => {
+        if (state.writeAccess) {
+            if ((typeof onmousedown !== 'undefined') && (onmousedown !== null)) {
+                onmousedown();
+            }
+            setButtonPressed(true);
+        }
+    };
+
     // Return of the react node
     return useObserver(() => (
         <div
@@ -174,33 +212,18 @@ export const Button: React.FunctionComponent<Props> = ({
                                 : null
                         }
                         onMouseDown={
-                            typeof onmousedown === 'undefined' ||
-                            onmousedown === null
-                                ? null
-                                : state.writeAccess
-                                ? () => onmousedown()
-                                : null
+                            () => mouseDown() 
                         }
                         onMouseUp={
-                            typeof onmouseup === 'undefined' ||
-                            onmouseup === null
-                                ? null
-                                : state.writeAccess
-                                ? () => onmouseup()
-                                : null
+                            () => mouseUp()
                         }
                         onMouseLeave={
-                            typeof onmouseup === 'undefined' ||
-                            onmouseup === null
-                                ? null
-                                : state.writeAccess
-                                ? () => onmouseup()
-                                : null
+                            () => mouseUp()
                         } // We have to reset if somebody leaves the object with pressed key
                         style={{
                             cursor: cursor,
-                            backgroundColor: state.fill,
-                            borderColor: state.fill,
+                            backgroundColor: buttonPressed ? state.alarmFillColor : state.fill,
+                            borderColor: buttonPressed ? state.alarmFillColor : state.fill,
                             width: state.relCoord.width,
                             height: state.relCoord.height,
                             position: 'absolute',

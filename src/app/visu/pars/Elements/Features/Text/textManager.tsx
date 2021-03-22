@@ -60,15 +60,15 @@ export const Textfield: React.FunctionComponent<Props> = ({
         section.getElementsByTagName('text-id')[0].textContent,
     );
     */
-    // relCoord are the width and the height in relation the div
-    const relCoord = {
+    // baseSize are the width and the height in relation the div
+    const baseSize = {
         width: 0,
         height: 0,
     };
     // the relCenterCoord are the coordinates of the midpoint of the div
-    const relMidpointCoord = {
-        x: relCoord.width / 2,
-        y: relCoord.height / 2,
+    const baseCenterCoord = {
+        x: baseSize.width / 2,
+        y: baseSize.height / 2,
     };
 
     const initial = {
@@ -96,15 +96,15 @@ export const Textfield: React.FunctionComponent<Props> = ({
         fontStyle: 'normal',
         textDecoration: 'initial',
         // local variables
-        relCoord: relCoord,
-        relMidpointCoord: relMidpointCoord,
-        // scale: 1000, // a scale of 1000 means a representation of 1:1
+        size: baseSize,
+        centerCoord: baseCenterCoord,
+        scale: 1000, // a scale of 1000 means a representation of 1:1
         angle: 0,
         transform: 'scale(1) rotate(0)',
     };
 
-    // relCoord are the width and the height in relation the div
-    Object.defineProperty(initial, 'relCoord', {
+    // size are the width and the height in relation the div
+    Object.defineProperty(initial, 'size', {
         get: function () {
             const coord = { x1: 0, y1: 0, x2: 0, y2: 0 };
             if (section.getElementsByTagName('rect').length) {
@@ -121,7 +121,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
                 const xmlPoints = section.getElementsByTagName(
                     'point',
                 );
-                let points: number[][];
+                const points = [];
                 for (let i = 0; i < xmlPoints.length; i++) {
                     const point = util.stringToArray(
                         xmlPoints[i].innerHTML,
@@ -141,14 +141,14 @@ export const Textfield: React.FunctionComponent<Props> = ({
         },
     });
 
-    Object.defineProperty(initial, 'relMidpointCoord', {
+    Object.defineProperty(initial, 'centerCoord', {
         get: function () {
-            const x = initial.relCoord.width / 2;
-            const y = initial.relCoord.height / 2;
+            const x = initial.size.width / 2;
+            const y = initial.size.height / 2;
             return { x: x, y: y };
         },
     });
-    /*
+
     // x) Scaling
     if (shapeParameters.has('expr-scale')) {
         const element = shapeParameters!.get('expr-scale');
@@ -156,10 +156,13 @@ export const Textfield: React.FunctionComponent<Props> = ({
             element,
         );
         Object.defineProperty(initial, 'scale', {
-            get: () => returnFunc(),
+            get: function () {
+                const scale = returnFunc();
+                return scale === 0 ? 1 : scale;
+            },
         });
     }
-    */
+
     // y) Rotating
     if (shapeParameters.has('expr-angle')) {
         const element = shapeParameters!.get('expr-angle');
@@ -178,18 +181,37 @@ export const Textfield: React.FunctionComponent<Props> = ({
             // rotate(<a> [<x> <y>])
             let transform = 'scale(1) rotate(';
             if (initial.angle !== 0) {
+                const scale = initial.scale / 1000;
                 transform =
                     transform +
                     initial.angle +
                     ',' +
-                    initial.relMidpointCoord.x +
+                    initial.centerCoord.x * scale +
                     ',' +
-                    initial.relMidpointCoord.y +
+                    initial.centerCoord.y * scale +
                     ')';
             } else {
                 transform = transform + '0)';
             }
             return transform;
+            /*
+            const motionAbsScale = initial.motionAbsScale;
+            if (
+                motionAbsScale !== 1000 &&
+                motionAbsScale !== 0
+            ) {
+                const scale = motionAbsScale / 1000;
+                const transformedSize = initial.transformedSize;
+                x =
+                    (transformedSize.width -
+                        transformedSize.width * scale) /
+                    (2 * scale);
+                y =
+                    (transformedSize.height -
+                        transformedSize.height * scale) /
+                    (2 * scale);
+            }
+            */
         },
     });
 
@@ -222,19 +244,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
                 }
             },
         });
-        /**
-    const element = shapeParameters!.get('expr-angle2');
-    const returnFunc = ComSocket.singleton().evalFunction(
-        element,
-    );
-    const wrapperFunc = () => {
-        const value = returnFunc();
-        return value % 360;
-    };
-    Object.defineProperty(initial, 'endAngle', {
-        get: () => wrapperFunc(),
-    });
-    */
+
         Object.defineProperty(initial, 'textAlignVert', {
             get: function () {
                 const value = Number(

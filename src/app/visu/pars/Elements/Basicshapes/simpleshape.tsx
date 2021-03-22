@@ -6,7 +6,7 @@ import { Circle } from './SimpleSubunits/circle';
 import { Rectangle } from './SimpleSubunits/rectangle';
 import { Textfield } from '../Features/Text/textManager';
 import { Inputfield } from '../Features/Input/inputManager';
-import { IBasicShape } from '../../../Interfaces/javainterfaces';
+import { ISimpleShape } from '../../../Interfaces/javainterfaces';
 import {
     parseShapeParameters,
     parseTextParameters,
@@ -29,22 +29,33 @@ export const SimpleShape: React.FunctionComponent<Props> = ({
         ['round-rect', 'circle', 'line', 'rectangle'].includes(shape)
     ) {
         // Parsing of the fixed parameters
-        const simpleShapeBasis: IBasicShape = {
+        const simpleShapeBasis: ISimpleShape = {
+            // ICommonShape properties
             shape: shape,
-            hasInsideColor: util.stringToBoolean(
-                section.getElementsByTagName('has-inside-color')[0]
-                    .innerHTML,
+            elementId: section.getElementsByTagName('elem-id')[0]
+                .innerHTML,
+            center: util.stringToArray(
+                section.getElementsByTagName('center')[0].innerHTML,
             ),
-            fillColor: util.rgbToHexString(
-                section.getElementsByTagName('fill-color')[0]
-                    .innerHTML,
-            ),
-            fillColorAlarm: util.rgbToHexString(
-                section.getElementsByTagName('fill-color-alarm')[0]
-                    .innerHTML,
-            ),
+            // The lineWidth is 0 in the xml if border width is 1 in the codesys dev env.
+            // Otherwise lineWidth is equal to the target border width. Very strange.
+            lineWidth:
+                Number(
+                    section.getElementsByTagName('line-width')[0]
+                        .innerHTML,
+                ) === 0
+                    ? 1
+                    : Number(
+                          section.getElementsByTagName(
+                              'line-width',
+                          )[0].innerHTML,
+                      ),
             hasFrameColor: util.stringToBoolean(
                 section.getElementsByTagName('has-frame-color')[0]
+                    .innerHTML,
+            ),
+            hasInsideColor: util.stringToBoolean(
+                section.getElementsByTagName('has-inside-color')[0]
                     .innerHTML,
             ),
             frameColor: util.rgbToHexString(
@@ -55,33 +66,31 @@ export const SimpleShape: React.FunctionComponent<Props> = ({
                 section.getElementsByTagName('frame-color-alarm')[0]
                     .innerHTML,
             ),
-            lineWidth: Number(
-                section.getElementsByTagName('line-width')[0]
+            fillColor: util.rgbToHexString(
+                section.getElementsByTagName('fill-color')[0]
                     .innerHTML,
             ),
-            elementId: section.getElementsByTagName('elem-id')[0]
-                .innerHTML,
-            rect: util.stringToArray(
-                section.getElementsByTagName('rect')[0].innerHTML,
-            ),
-            center: util.stringToArray(
-                section.getElementsByTagName('center')[0].innerHTML,
-            ),
-            hiddenInput: util.stringToBoolean(
-                section.getElementsByTagName('hidden-input')[0]
+            fillColorAlarm: util.rgbToHexString(
+                section.getElementsByTagName('fill-color-alarm')[0]
                     .innerHTML,
             ),
             enableTextInput: util.stringToBoolean(
                 section.getElementsByTagName('enable-text-input')[0]
                     .innerHTML,
             ),
-            // Optional properties
-            tooltip: section.getElementsByTagName('tooltip').length
-                ? util.parseText(
-                      section.getElementsByTagName('tooltip')[0]
-                          .textContent,
-                  )
-                : '',
+            hiddenInput: util.stringToBoolean(
+                section.getElementsByTagName('hidden-input')[0]
+                    .innerHTML,
+            ),
+
+            // ICommonShape optional properties
+            tooltip:
+                section.getElementsByTagName('tooltip').length > 0
+                    ? util.parseText(
+                          section.getElementsByTagName('tooltip')[0]
+                              .textContent,
+                      )
+                    : '',
             accessLevels: section.getElementsByTagName(
                 'access-levels',
             ).length
@@ -90,6 +99,11 @@ export const SimpleShape: React.FunctionComponent<Props> = ({
                           .innerHTML,
                   )
                 : ['rw', 'rw', 'rw', 'rw', 'rw', 'rw', 'rw', 'rw'],
+
+            // ISimpleShape properties
+            rect: util.stringToArray(
+                section.getElementsByTagName('rect')[0].innerHTML,
+            ),
         };
 
         // Parsing of observable events (like toggle color)

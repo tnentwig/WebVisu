@@ -1,9 +1,16 @@
 import * as React from 'react';
 import * as util from '../../Utils/utilfunctions';
-import { ImageField } from '../Features/Image/image';
+import { uid } from 'react-uid';
+import ComSocket from '../../../communication/comsocket';
+import { Button } from '../Button/button';
+import { Bitmap } from '../Bitmap/bitmap';
+import { SimpleShape } from '../Basicshapes/simpleshape';
+import { PolyShape } from '../Basicshapes/polyshape';
+import { stringToArray } from '../../Utils/utilfunctions';
+
 import { Textfield } from '../Features/Text/textManager';
 import { Inputfield } from '../Features/Input/inputManager';
-import { IBitmapShape } from '../../../Interfaces/javainterfaces';
+import { IGroupShape } from '../../../Interfaces/javainterfaces';
 import {
     parseShapeParameters,
     parseTextParameters,
@@ -11,106 +18,213 @@ import {
     parseTapEvent,
 } from '../Features/Events/eventManager';
 import { createVisuObject } from '../../Objectmanagement/objectManager';
-import { useObserver, useLocalStore } from 'mobx-react-lite';
+import { useLocalStore, useObserver } from 'mobx-react-lite';
 import { ErrorBoundary } from 'react-error-boundary';
 
 type Props = {
     section: Element;
 };
 
-export const Bitmap: React.FunctionComponent<Props> = ({
+function getDimension(
+    actualDimension: Array<number>,
+    newRect: Array<number>,
+) {
+    const len = newRect.length;
+    if (len === 4) {
+        actualDimension[0] < newRect[2]
+            ? (actualDimension[0] = newRect[2])
+            : 0;
+        actualDimension[1] < newRect[3]
+            ? (actualDimension[1] = newRect[3])
+            : 0;
+    } else if (len === 2) {
+        for (let i = 0; i < 2; i++) {
+            actualDimension[i] < newRect[i]
+                ? (actualDimension[i] = newRect[0])
+                : 0;
+        }
+    }
+}
+
+export const Group: React.FunctionComponent<Props> = ({
     section,
 }) => {
+
     // Parsing of the fixed parameters
-    const bitmap: IBitmapShape = {
+    const group: IGroupShape = {
         // ICommonShape properties
-        shape: 'bitmap',
-        elementId: section.getElementsByTagName('elem-id')[0]
-            .innerHTML,
+        shape: 'group',
+        elementId: util.getElementHTML(section, 'elem-id', '0'),
         center: util.stringToArray(
-            section.getElementsByTagName('center')[0].innerHTML,
+            util.getElementHTML(section, 'center', '0,0'),
         ),
         // The lineWidth is 0 in the xml if border width is 1 in the codesys dev env.
         // Otherwise lineWidth is equal to the target border width. Very strange.
         lineWidth:
             Number(
-                section.getElementsByTagName('line-width')[0]
-                    .innerHTML,
+                util.getElementHTML(section, 'line-width', '1'),
             ) === 0
                 ? 1
                 : Number(
-                      section.getElementsByTagName('line-width')[0]
-                          .innerHTML,
+                      util.getElementHTML(section, 'line-width', '1'),
                   ),
         hasFrameColor: util.stringToBoolean(
-            section.getElementsByTagName('has-frame-color')[0]
-                .innerHTML,
+            util.getElementHTML(section, 'has-frame-color', 'true'),
         ),
         hasInsideColor: util.stringToBoolean(
-            section.getElementsByTagName('has-inside-color')[0]
-                .innerHTML,
+            util.getElementHTML(section, 'has-inside-color', 'true'),
         ),
         frameColor: util.rgbToHexString(
-            section.getElementsByTagName('frame-color')[0].innerHTML,
+            util.getElementHTML(section, 'frame-color', '0,0,0'),
         ),
         frameColorAlarm: util.rgbToHexString(
-            section.getElementsByTagName('frame-color-alarm')[0]
-                .innerHTML,
+            util.getElementHTML(
+                section,
+                'frame-color-alarm',
+                '0,0,0',
+            ),
         ),
         fillColor: util.rgbToHexString(
-            section.getElementsByTagName('fill-color')[0].innerHTML,
+            util.getElementHTML(section, 'fill-color', '255,255,255'),
         ),
         fillColorAlarm: util.rgbToHexString(
-            section.getElementsByTagName('fill-color-alarm')[0]
-                .innerHTML,
+            util.getElementHTML(
+                section,
+                'fill-color-alarm',
+                '255,255,255',
+            ),
         ),
         enableTextInput: util.stringToBoolean(
-            section.getElementsByTagName('enable-text-input')[0]
-                .innerHTML,
+            util.getElementHTML(
+                section,
+                'enable-text-input',
+                'false',
+            ),
         ),
         hiddenInput: util.stringToBoolean(
-            section.getElementsByTagName('hidden-input')[0].innerHTML,
+            util.getElementHTML(section, 'hidden-input', 'false'),
         ),
 
         // ICommonShape optional properties
-        tooltip:
-            section.getElementsByTagName('tooltip').length > 0
-                ? util.parseText(
-                      section.getElementsByTagName('tooltip')[0]
-                          .textContent,
-                  )
-                : '',
-        accessLevels: section.getElementsByTagName('access-levels')
-            .length
-            ? util.parseAccessLevels(
-                  section.getElementsByTagName('access-levels')[0]
-                      .innerHTML,
-              )
-            : ['rw', 'rw', 'rw', 'rw', 'rw', 'rw', 'rw', 'rw'],
+        tooltip: util.parseText(
+            util.getElementText(section, 'tooltip', ''),
+        ),
+        accessLevels: util.parseAccessLevels(
+            util.getElementHTML(
+                section,
+                'access-levels',
+                'rw,rw,rw,rw,rw,rw,rw,rw',
+            ),
+        ),//
 
-        // IBitmapShape properties
-        fileName:
-            section.getElementsByTagName('file-name').length > 0
-                ? util.parseText(
-                      section.getElementsByTagName('file-name')[0]
-                          .innerHTML,
-                  )
-                : '',
-        transparent: util.stringToBoolean(
-            section.getElementsByTagName('transparent')[0].innerHTML,
+        // IGroupShape properties
+        rect: util.stringToArray(
+            util.getElementHTML(section, 'rect', '0,0,0,0'),
         ),
         showFrame: util.stringToBoolean(
-            section.getElementsByTagName('show-frame')[0].innerHTML,
+            util.getElementHTML(section, 'show-frame', 'false'),
         ),
         clipFrame: util.stringToBoolean(
-            section.getElementsByTagName('clip-frame')[0].innerHTML,
+            util.getElementHTML(section, 'clip-frame', 'false'),
         ),
-        frameType: section.getElementsByTagName('frame-type')[0]
-            .innerHTML,
-        rect: util.stringToArray(
-            section.getElementsByTagName('rect')[0].innerHTML,
+        isoFrame: util.stringToBoolean(
+            util.getElementHTML(section, 'iso-frame', 'false'),
         ),
+        originalFrame: util.stringToBoolean(
+            util.getElementHTML(section, 'original-frame', 'false'),
+        ),
+        animateChilds: util.stringToBoolean(
+            util.getElementHTML(section, 'animate-childs', 'false'),
+        ),
+        // Computed values
+        rightDownCorner: [0, 0],
     };
+    
+    // Create an array of visu object from the group childs
+    const visuObjects: Array<{
+        obj: JSX.Element;
+        id: string;
+    }> = [];
+    // Create the function to parse the group childs
+    const addVisuObject = (visuObject: JSX.Element) => {
+        const obj = { obj: visuObject, id: uid(visuObject) };
+        visuObjects.push(obj);
+    };
+    // The rightdown corner coordinates of the subvisu will be stored
+    for (let i = 0; i < section.children.length; i++) {
+        const element = section.children[i];
+        if (element.nodeName === 'element') {
+            // Determine the type of the element
+            const type = element.getAttribute('type');
+            switch (type) {
+                case 'simple': {
+                    addVisuObject(
+                        <SimpleShape section={element}></SimpleShape>,
+                    );
+                    getDimension(
+                        group.rightDownCorner,
+                        stringToArray(
+                            element.getElementsByTagName('rect')[0]
+                                .innerHTML,
+                        ),
+                    );
+                    break;
+                }
+                case 'polygon': {
+                    addVisuObject(
+                        <PolyShape section={element}></PolyShape>,
+                    );
+                    const points = element.getElementsByTagName(
+                        'point',
+                    );
+                    for (let i = 0; i < points.length; i++) {
+                        getDimension(
+                            group.rightDownCorner,
+                            stringToArray(points[i].innerHTML),
+                        );
+                    }
+                    break;
+                }
+                case 'button': {
+                    addVisuObject(
+                        <Button section={element}></Button>,
+                    );
+                    getDimension(
+                        group.rightDownCorner,
+                        stringToArray(
+                            element.getElementsByTagName('rect')[0]
+                                .innerHTML,
+                        ),
+                    );
+                    break;
+                }
+                case 'bitmap': {
+                    addVisuObject(
+                        <Bitmap section={element}></Bitmap>,
+                    );
+                    getDimension(
+                        group.rightDownCorner,
+                        stringToArray(
+                            element.getElementsByTagName('rect')[0]
+                                .innerHTML,
+                        ),
+                    );
+                    break;
+                }
+                case 'group': {
+                    addVisuObject(<Group section={element}></Group>);
+                    getDimension(
+                        group.rightDownCorner,
+                        stringToArray(
+                            element.getElementsByTagName('rect')[0]
+                                .innerHTML,
+                        ),
+                    );
+                    break;
+                }
+            }
+        }
+    }
 
     // Parsing of observable events (like toggle color)
     const shapeParameters = parseShapeParameters(section);
@@ -134,22 +248,6 @@ export const Bitmap: React.FunctionComponent<Props> = ({
         inputField = null;
     }
 
-    // Parsing the imageField and returning a jsx object if it exists
-    let imageField: JSX.Element;
-    if (
-        section.getElementsByTagName('file-name').length ||
-        section.getElementsByTagName('expr-fill-color').length
-    ) {
-        imageField = (
-            <ImageField
-                section={section}
-                inlineElement={false}
-            ></ImageField>
-        );
-    } else {
-        imageField = null;
-    }
-
     // Parsing the textfields and returning a jsx object if it exists
     let textField: JSX.Element;
     if (section.getElementsByTagName('text-format').length) {
@@ -167,11 +265,10 @@ export const Bitmap: React.FunctionComponent<Props> = ({
 
     // Convert object to an observable one
     const state = useLocalStore(() =>
-        createVisuObject(bitmap, shapeParameters),
+        createVisuObject(group, shapeParameters),
     );
 
-    // Return of the react node
-    return useObserver(() => (
+    return useObserver(() =>
         <div
             style={{
                 cursor: 'auto',
@@ -204,8 +301,26 @@ export const Bitmap: React.FunctionComponent<Props> = ({
             {state.readAccess ? (
                 <ErrorBoundary fallback={<div>Oh no</div>}>
                     {inputField}
+                    <div
+                        style={{
+                            width: state.groupSize.width,
+                            height: state.groupSize.height,
+                            transformOrigin: 'left top',
+                            transform: 'scale(' + state.groupScale.x + ',' + state.groupScale.y + ')',
+                            overflow: group.clipFrame ? 'hidden' : 'visible',
+                        }}
+                    >
+                        {
+                            // visuObjects.map((element, index) => (
+                            visuObjects.map((element) => (
+                                <React.Fragment key={element.id}>
+                                    {element.obj}
+                                </React.Fragment>
+                            ))
+                        }
+                    </div>
                     <svg
-                        style={{ float: 'left' }}
+                        style={{position: 'absolute', left: 0 - (2 * state.lineWidth), top: 0 - (2 * state.lineWidth),}}
                         width={
                             state.transformedSize.width *
                                 (state.motionAbsScale /
@@ -279,7 +394,6 @@ export const Bitmap: React.FunctionComponent<Props> = ({
                             state.tooltip === '' ? null : (
                                 <title>{state.tooltip}</title>
                             )}
-                            {imageField}
                             {state.hasFrameColor ? (
                                 <rect
                                     width={
@@ -297,46 +411,6 @@ export const Bitmap: React.FunctionComponent<Props> = ({
                                         state.strokeDasharray
                                     }
                                 ></rect>
-                            ) : null}
-                            {typeof imageField === 'undefined' ||
-                            imageField === null ? (
-                                <line
-                                    x1={state.lineWidth}
-                                    y1={state.lineWidth}
-                                    x2={
-                                        state.transformedSize.width +
-                                        state.lineWidth
-                                    }
-                                    y2={
-                                        state.transformedSize.height +
-                                        state.lineWidth
-                                    }
-                                    stroke={state.stroke}
-                                    strokeWidth={state.strokeWidth}
-                                    strokeDasharray={
-                                        state.strokeDashArray
-                                    }
-                                ></line>
-                            ) : null}
-                            {typeof imageField === 'undefined' ||
-                            imageField === null ? (
-                                <line
-                                    x1={state.lineWidth}
-                                    y1={
-                                        state.transformedSize.height +
-                                        state.lineWidth
-                                    }
-                                    x2={
-                                        state.transformedSize.width +
-                                        state.lineWidth
-                                    }
-                                    y2={state.lineWidth}
-                                    stroke={state.stroke}
-                                    strokeWidth={state.strokeWidth}
-                                    strokeDasharray={
-                                        state.strokeDashArray
-                                    }
-                                ></line>
                             ) : null}
                             {typeof textField === 'undefined' ||
                             textField === null ? null : (
@@ -359,5 +433,5 @@ export const Bitmap: React.FunctionComponent<Props> = ({
                 </ErrorBoundary>
             ) : null}
         </div>
-    ));
+    );
 };

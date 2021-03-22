@@ -1,60 +1,40 @@
 import ComSocket from '../../../communication/comsocket';
-import { IPiechartObject } from '../../../Interfaces/jsinterfaces';
-import { IPiechartShape } from '../../../Interfaces/javainterfaces';
-import {
-    numberToHexColor,
-    // computeMinMaxCoord,
-    pointArrayToPiechartString,
-    computeEllipseRadius,
-} from '../../Utils/utilfunctions';
+import { IBitmapObject } from '../../../Interfaces/jsinterfaces';
+import { IBitmapShape } from '../../../Interfaces/javainterfaces';
+import { numberToHexColor } from '../../Utils/utilfunctions';
 import { sprintf } from 'sprintf-js';
 
-export function createPiechartObject(
-    piechartShape: IPiechartShape,
+export function createBitmapObject(
+    bitmapShape: IBitmapShape,
     shapeParameters: Map<string, string[][]>,
-): IPiechartObject {
-    const pointsCoord = [] as number[][];
-    // The piechartShape specific values will be generated if necessary
-    // piechartShape.points.forEach(function (item, index) {
-    piechartShape.points.forEach(function (item) {
-        pointsCoord.push([
-            item[0] - piechartShape.rect[0],
-            item[1] - piechartShape.rect[1],
-        ]);
-    });
-    // Compute the fill color through has_fill_color
-    const fill = piechartShape.hasInsideColor
-        ? piechartShape.fillColor
-        : 'none';
+): IBitmapObject {
     // Tooltip
-    const tooltip = piechartShape.tooltip;
+    const tooltip = bitmapShape.tooltip;
     // AccessLevels
-    const accessLevels = piechartShape.accessLevels;
+    const accessLevels = bitmapShape.accessLevels;
     // Create an object with the initial parameters
-    const initial: IPiechartObject = {
+    const initial: IBitmapObject = {
         // Variables will be initialised with the parameter values
         cornerCoord: {
-            x1: piechartShape.rect[0],
-            y1: piechartShape.rect[1],
-            x2: piechartShape.rect[2],
-            y2: piechartShape.rect[3],
+            x1: bitmapShape.rect[0],
+            y1: bitmapShape.rect[1],
+            x2: bitmapShape.rect[2],
+            y2: bitmapShape.rect[3],
         },
         centerCoord: {
-            x: piechartShape.center[0],
-            y: piechartShape.center[1],
+            x: bitmapShape.center[0],
+            y: bitmapShape.center[1],
         },
-        pointsCoord: pointsCoord,
         isAlarm: false,
-        fillColor: piechartShape.fillColor,
-        fillColorAlarm: piechartShape.fillColorAlarm,
-        frameColor: piechartShape.frameColor,
-        frameColorAlarm: piechartShape.frameColorAlarm,
-        hasFillColor: piechartShape.hasInsideColor,
-        hasFrameColor: piechartShape.hasFrameColor,
-        lineWidth: piechartShape.lineWidth,
-        // Variables for piechart
-        enableArc: piechartShape.enableArc,
+        frameColor: bitmapShape.frameColor,
+        frameColorAlarm: bitmapShape.frameColorAlarm,
+        hasFrameColor: bitmapShape.hasFrameColor,
+        lineWidth: bitmapShape.lineWidth,
         // Positional arguments
+        motionRelLeft: null,
+        motionRelRight: null,
+        motionRelTop: null,
+        motionRelBottom: null,
         motionAbsX: null,
         motionAbsY: null,
         motionAbsScale: 1000, // a scale of 1000 means a representation of 1:1
@@ -62,26 +42,26 @@ export function createPiechartObject(
         // Computed
         transformedCornerCoord: {
             // Transformed corner coordinates
-            x1: piechartShape.rect[0],
-            y1: piechartShape.rect[1],
-            x2: piechartShape.rect[2],
-            y2: piechartShape.rect[3],
+            x1: bitmapShape.rect[0],
+            y1: bitmapShape.rect[1],
+            x2: bitmapShape.rect[2],
+            y2: bitmapShape.rect[3],
         },
         transformedCenterCoord: {
             // Transformed center coordinates
-            x: piechartShape.center[0],
-            y: piechartShape.center[1],
+            x: bitmapShape.center[0],
+            y: bitmapShape.center[1],
         },
         transformedSize: {
             // Transformed width and height
             width:
-                piechartShape.rect[2] -
-                piechartShape.rect[0] +
-                2 * piechartShape.lineWidth,
+                bitmapShape.rect[2] -
+                bitmapShape.rect[0] +
+                2 * bitmapShape.lineWidth,
             height:
-                piechartShape.rect[3] -
-                piechartShape.rect[1] +
-                2 * piechartShape.lineWidth,
+                bitmapShape.rect[3] -
+                bitmapShape.rect[1] +
+                2 * bitmapShape.lineWidth,
         },
         transformedStartCoord: {
             // Transformed center coordinates
@@ -90,16 +70,13 @@ export function createPiechartObject(
             x: 0,
             y: 0,
         },
-        transformedPointsCoord: pointsCoord,
-        piechartPath: '',
         /// <div> variables
         pointerEvents: 'visible', // Activate / deactivate input
         visibility: 'visible', // Show / Hide the object
         /// <svg> variables
-        fill: fill, // Inside color
-        stroke: piechartShape.frameColor, // Frame color
-        strokeWidth: piechartShape.hasFrameColor
-            ? piechartShape.lineWidth
+        stroke: bitmapShape.frameColor, // Frame color
+        strokeWidth: bitmapShape.hasFrameColor
+            ? bitmapShape.lineWidth
             : 0, // Frame width
         strokeDashArray: '0', // Frame style
         transform: 'scale(1) rotate(0)', // Transform the object (scale and rotation only)
@@ -112,7 +89,7 @@ export function createPiechartObject(
     // Processing the variables for visual elements
     // A <expr-..-> tag initiate a variable, const or a placeholder
     // We have to implement the const value, the variable or the placeholdervalue if available for the static value
-    // Polyshapes and Simpleshapes have the same <expr-...> possibilities
+    // Polyshapes and Bitmapshapes have the same <expr-...> possibilities
 
     // 1) Set alarm variable
     if (shapeParameters.has('expr-toggle-color')) {
@@ -129,38 +106,6 @@ export function createPiechartObject(
             }
         };
         Object.defineProperty(initial, 'isAlarm', {
-            get: () => wrapperFunc(),
-        });
-    }
-
-    // 2) Set fill color (normal)
-    if (shapeParameters.has('expr-fill-color')) {
-        const element = shapeParameters!.get('expr-fill-color');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
-        const wrapperFunc = () => {
-            const value = returnFunc();
-            const hexcolor = numberToHexColor(value);
-            return hexcolor;
-        };
-        Object.defineProperty(initial, 'fillColor', {
-            get: () => wrapperFunc(),
-        });
-    }
-
-    // 3) Set fill color (alarm)
-    if (shapeParameters.has('expr-fill-color-alarm')) {
-        const element = shapeParameters!.get('expr-fill-color-alarm');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
-        const wrapperFunc = () => {
-            const value = returnFunc();
-            const hexcolor = numberToHexColor(value);
-            return hexcolor;
-        };
-        Object.defineProperty(initial, 'fillColorAlarm', {
             get: () => wrapperFunc(),
         });
     }
@@ -218,29 +163,6 @@ export function createPiechartObject(
             }
         };
         Object.defineProperty(initial, 'visibility', {
-            get: () => wrapperFunc(),
-        });
-    }
-
-    // 7) The fill flags state: 0 = show color, >0 = ignore setting
-    if (shapeParameters.has('expr-fill-flags')) {
-        const element = shapeParameters!.get('expr-fill-flags');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
-        const wrapperFunc = () => {
-            const value = Number(returnFunc());
-            if (value !== null && typeof value !== 'undefined') {
-                if (value === 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return true;
-            }
-        };
-        Object.defineProperty(initial, 'hasFillColor', {
             get: () => wrapperFunc(),
         });
     }
@@ -452,25 +374,7 @@ export function createPiechartObject(
 
     // We have to compute the dependent values after all the required static values have been replaced by variables, placeholders or constant values
     // E.g. the fillcolor depends on hasFillColor and alarm. This variables are called "computed" values. MobX will track their dependents and rerender the object by change.
-    // We have to note that the rotation of polylines is not the same like simpleshapes. Simpleshapes keep their originally alignment, polyhapes transform every coordinate.
-
-    // The fill color
-    Object.defineProperty(initial, 'fill', {
-        get: function () {
-            if (initial.enableArc) {
-                return 'none';
-            }
-            if (initial.isAlarm) {
-                return initial.fillColorAlarm;
-            } else {
-                if (initial.hasFillColor) {
-                    return initial.fillColor;
-                } else {
-                    return 'none';
-                }
-            }
-        },
-    });
+    // We have to note that the rotation of polylines is not the same like bitmapshapes. Bitmapshapes keep their originally alignment, polyhapes transform every coordinate.
 
     Object.defineProperty(initial, 'strokeWidth', {
         get: function () {
@@ -494,6 +398,19 @@ export function createPiechartObject(
                     return 'none';
                 }
             }
+        },
+    });
+
+    // The transformed center coordinates.
+    Object.defineProperty(initial, 'transformedCenterCoord', {
+        get: function () {
+            // The center coordinate are only shifted with the Motion absolute X-Offset and Y-Offset
+            const centerCoord = initial.centerCoord;
+            const x = centerCoord.x + initial.motionAbsX / 2;
+            const y = centerCoord.y + initial.motionAbsY / 2;
+            // Init the interim return object
+            const coord = { x: x, y: y };
+            return coord;
         },
     });
 
@@ -523,6 +440,35 @@ export function createPiechartObject(
                 y2 = y2 + motionAbsY;
             }
 
+            // The corner are ovveriten by the Motion relative left, right, top and bottom
+            const motionRelLeft = initial.motionRelLeft;
+            const motionRelTop = initial.motionRelTop;
+            const motionRelRight = initial.motionRelRight;
+            const motionRelBottom = initial.motionRelBottom;
+            if (
+                motionRelLeft !== null &&
+                typeof motionRelLeft !== undefined
+            ) {
+                x1 = x1 + motionRelLeft;
+            }
+            if (
+                motionRelTop !== null &&
+                typeof motionRelTop !== undefined
+            ) {
+                y1 = y1 + motionRelTop;
+            }
+            if (
+                motionRelRight !== null &&
+                typeof motionRelRight !== undefined
+            ) {
+                x2 = x2 + motionRelRight;
+            }
+            if (
+                motionRelBottom !== null &&
+                typeof motionRelBottom !== undefined
+            ) {
+                y2 = y2 + motionRelBottom;
+            }
             // Init the interim return object
             const coord = { x1: x1, y1: y1, x2: x2, y2: y2 };
             return coord;
@@ -602,120 +548,6 @@ export function createPiechartObject(
             return coord;
         },
     });
-
-    Object.defineProperty(initial, 'transformedPointsCoord', {
-        get: function () {
-            const pointsCoord = initial.pointsCoord;
-            // Calculate the radii of the ellipse (usefull to calculate the new coord with angles)
-            const centerCoord = {
-                x: pointsCoord[0][0],
-                y: pointsCoord[0][1],
-            };
-            const radii = {
-                x: Math.abs(pointsCoord[1][0] - centerCoord.x),
-                y: Math.abs(pointsCoord[1][1] - centerCoord.y),
-            };
-            // calculate the transformed start and end points coordinates
-            const newPointsCoord = [] as number[][];
-            // The piechart points consists of only 4 items
-            //   [0]-> center
-            newPointsCoord.push([
-                pointsCoord[0][0],
-                pointsCoord[0][1],
-            ]);
-            //   [1]-> point bottom right
-            newPointsCoord.push([
-                pointsCoord[1][0],
-                pointsCoord[1][1],
-            ]);
-            //   [2]-> point startAngle
-            if (shapeParameters.has('expr-angle1')) {
-                const element = shapeParameters!.get('expr-angle1');
-                const returnFunc = ComSocket.singleton().evalFunction(
-                    element,
-                );
-                const angle = (360 - returnFunc()) % 360;
-                const angleRad = (angle * Math.PI) / 180.0;
-                const cosAngleRad = Number.parseFloat(
-                    Math.cos(angleRad).toFixed(10),
-                );
-                const sinAngleRad = Number.parseFloat(
-                    Math.sin(angleRad).toFixed(10),
-                );
-                const ellipseRadius = Number.parseFloat(
-                    computeEllipseRadius(
-                        radii.x,
-                        radii.y,
-                        angleRad,
-                    ).toFixed(10),
-                );
-                const angleCoord = [
-                    centerCoord.x + ellipseRadius * cosAngleRad,
-                    centerCoord.y + ellipseRadius * sinAngleRad,
-                ];
-                newPointsCoord.push([
-                    Number.parseFloat(angleCoord[0].toFixed(1)),
-                    Number.parseFloat(angleCoord[1].toFixed(1)),
-                ]);
-            } else {
-                newPointsCoord.push([
-                    pointsCoord[2][0],
-                    pointsCoord[2][1],
-                ]);
-            }
-            //   [3]-> point endAngle
-            if (shapeParameters.has('expr-angle2')) {
-                const element = shapeParameters!.get('expr-angle2');
-                const returnFunc = ComSocket.singleton().evalFunction(
-                    element,
-                );
-                const angle = (360 - returnFunc()) % 360;
-                const angleRad = (angle * Math.PI) / 180.0;
-                const cosAngleRad = Number.parseFloat(
-                    Math.cos(angleRad).toFixed(10),
-                );
-                const sinAngleRad = Number.parseFloat(
-                    Math.sin(angleRad).toFixed(10),
-                );
-                const ellipseRadius = Number.parseFloat(
-                    computeEllipseRadius(
-                        radii.x,
-                        radii.y,
-                        angleRad,
-                    ).toFixed(10),
-                );
-                const angleCoord = [
-                    centerCoord.x + ellipseRadius * cosAngleRad,
-                    centerCoord.y + ellipseRadius * sinAngleRad,
-                ];
-                newPointsCoord.push([
-                    Number.parseFloat(angleCoord[0].toFixed(1)),
-                    Number.parseFloat(angleCoord[1].toFixed(1)),
-                ]);
-            } else {
-                newPointsCoord.push([
-                    pointsCoord[3][0],
-                    pointsCoord[3][1],
-                ]);
-            }
-            return newPointsCoord;
-        },
-    });
-
-    // Piechart path calculation
-    if (['piechart'].includes(piechartShape.shape)) {
-        Object.defineProperty(initial, 'piechartPath', {
-            get: function () {
-                // calculate the transformed points coordinates (in order to keep the piechart alined with the center)
-                const interim = pointArrayToPiechartString(
-                    initial.transformedPointsCoord,
-                    initial.enableArc,
-                );
-
-                return interim;
-            },
-        });
-    }
 
     // Define the object access variables
     Object.defineProperty(initial, 'writeAccess', {

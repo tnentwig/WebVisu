@@ -3,7 +3,7 @@ import * as util from '../../Utils/utilfunctions';
 
 import { Textfield } from '../Features/Text/textManager';
 import { Inputfield } from '../Features/Input/inputManager';
-import { IBasicShape } from '../../../Interfaces/javainterfaces';
+import { IArrayTableShape } from '../../../Interfaces/javainterfaces';
 import {
     parseShapeParameters,
     parseTextParameters,
