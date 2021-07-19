@@ -96,6 +96,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
         fontStyle: 'normal',
         textDecoration: 'initial',
         // local variables
+
         size: baseSize,
         centerCoord: baseCenterCoord,
         scale: 1000, // a scale of 1000 means a representation of 1:1
@@ -148,7 +149,7 @@ export const Textfield: React.FunctionComponent<Props> = ({
             return { x: x, y: y };
         },
     });
-
+    /*
     // x) Scaling
     if (shapeParameters.has('expr-scale')) {
         const element = shapeParameters!.get('expr-scale');
