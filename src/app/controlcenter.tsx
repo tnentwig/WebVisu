@@ -5,7 +5,6 @@ import { observable, action } from 'mobx';
 import Popup from 'reactjs-popup';
 import ComSocket from './visu/communication/comsocket';
 import StateManager from './visu/statemanagement/statemanager';
-import { clear } from 'idb-keyval';
 import { Visualisation } from './visu/visuparser';
 import { ConnectionFault } from './supplements/InfoBox/infobox';
 import { ExecutionPopup } from './supplements/PopUps/popup';
@@ -242,21 +241,17 @@ export default class HTML5Visu {
 
                         // Width, height - Definition of the size of the screen. Regard the possibility to make visible this size
                         // already during creating a visualization in CoDeSys (Target Settings: Display width/height in pixel).
-                        const appletElement = htmlDoc.getElementsByTagName(
-                            'APPLET',
-                        );
-                        const visuWidth = appletElement[0].getAttribute(
-                            'width',
-                        );
+                        const appletElement =
+                            htmlDoc.getElementsByTagName('APPLET');
+                        const visuWidth =
+                            appletElement[0].getAttribute('width');
                         stateManager.set('VISUWIDTH', visuWidth);
-                        const visuHeight = appletElement[0].getAttribute(
-                            'height',
-                        );
+                        const visuHeight =
+                            appletElement[0].getAttribute('height');
                         stateManager.set('VISUHEIGHT', visuHeight);
 
-                        const htmlElement = htmlDoc.getElementsByTagName(
-                            'param',
-                        );
+                        const htmlElement =
+                            htmlDoc.getElementsByTagName('param');
                         for (let i = 0; i < htmlElement.length; i++) {
                             const name = htmlElement[i]
                                 .getAttribute('name')
@@ -275,9 +270,10 @@ export default class HTML5Visu {
                                 case 'UPDATETIME': {
                                     // Definition of the monitoring interval (msec)
                                     // Default: 100
-                                    const updateTime = htmlElement[
-                                        i
-                                    ].getAttribute('value');
+                                    const updateTime =
+                                        htmlElement[i].getAttribute(
+                                            'value',
+                                        );
                                     stateManager.set(
                                         name,
                                         updateTime,
@@ -288,9 +284,10 @@ export default class HTML5Visu {
                                     // Definition whether an automatic change to another visualization will be done,
                                     // as soon as the system variable 'CurrentVisu' is changed by the PLC program.
                                     // Default: FALSE
-                                    const useCurrentVisu = htmlElement[
-                                        i
-                                    ].getAttribute('value');
+                                    const useCurrentVisu =
+                                        htmlElement[i].getAttribute(
+                                            'value',
+                                        );
                                     stateManager.set(
                                         name,
                                         useCurrentVisu,
@@ -322,9 +319,10 @@ export default class HTML5Visu {
                                     // CoDeSys in a packed format ('<filename>_<extension original format>.zip').
                                     // Example: FALSE
                                     // Example: TRUE
-                                    const compressedFiles = htmlElement[
-                                        i
-                                    ].getAttribute('value');
+                                    const compressedFiles =
+                                        htmlElement[i].getAttribute(
+                                            'value',
+                                        );
                                     stateManager.set(
                                         name,
                                         compressedFiles,
@@ -390,9 +388,10 @@ export default class HTML5Visu {
                                     // Example (German): ISO-8859-1
                                     // Example (Russian): ISO-8859-5
                                     // Example (Japanese): MS932
-                                    const encodingString = htmlElement[
-                                        i
-                                    ].getAttribute('value');
+                                    const encodingString =
+                                        htmlElement[i].getAttribute(
+                                            'value',
+                                        );
                                     stateManager.set(
                                         name,
                                         encodingString,
@@ -472,27 +471,27 @@ export default class HTML5Visu {
                 if (response.ok) {
                     response.arrayBuffer().then(async (buffer) => {
                         // Get a reference to the global state manager
-                        const stateManager = StateManager.singleton()
-                            .oState;
+                        const stateManager =
+                            StateManager.singleton().oState;
                         const decoder = new TextDecoder('iso-8859-1');
                         const text = decoder.decode(buffer);
-                        const data = new window.DOMParser().parseFromString(
-                            text,
-                            'text/xml',
-                        );
+                        const data =
+                            new window.DOMParser().parseFromString(
+                                text,
+                                'text/xml',
+                            );
                         // Append the global variables
                         this.appendGlobalVariables(data);
                         // Get the download ID
-                        const xmlDownloadID = data.getElementsByTagName(
-                            'download-id',
-                        )[0].textContent;
+                        const xmlDownloadID =
+                            data.getElementsByTagName(
+                                'download-id',
+                            )[0].textContent;
                         // Check, if saved id and received id are not equal
                         if (
                             localStorage.getItem('download-id') !==
                             xmlDownloadID
                         ) {
-                            // Clear old indexedDB
-                            clear();
                             // Save the download-id
                             localStorage.setItem(
                                 'download-id',
@@ -502,18 +501,19 @@ export default class HTML5Visu {
                             //await this.preloadVisus();
                         }
                         // Get the compression value
-                        const xmlCompression = data.getElementsByTagName(
-                            'compression',
-                        )[0].textContent;
+                        const xmlCompression =
+                            data.getElementsByTagName(
+                                'compression',
+                            )[0].textContent;
                         if (xmlCompression === 'true') {
                             stateManager.set('COMPRESSION', 'TRUE');
                         } else {
                             stateManager.set('COMPRESSION', 'FALSE');
                         }
                         // Get the best-fit value
-                        const xmlBestFit = data.getElementsByTagName(
-                            'best-fit',
-                        )[0].textContent;
+                        const xmlBestFit =
+                            data.getElementsByTagName('best-fit')[0]
+                                .textContent;
                         if (xmlBestFit === 'true') {
                             stateManager.set('BESTFIT', 'TRUE');
                         } else {
@@ -548,16 +548,14 @@ export default class HTML5Visu {
                 if (thisVisuXML !== null) {
                     const xmlDict = StateManager.singleton().xmlDict;
                     if (!xmlDict.has(visuName)) {
-                        const plainxml = stringifyVisuXML(
-                            thisVisuXML,
-                        );
+                        const plainxml =
+                            stringifyVisuXML(thisVisuXML);
                         xmlDict.set(visuName, plainxml);
                     }
                     loadedVisus.push(visuName);
                     // Get the visualisations which are used as main visush
-                    const mainVisunames = thisVisuXML.getElementsByTagName(
-                        'expr-zoom',
-                    );
+                    const mainVisunames =
+                        thisVisuXML.getElementsByTagName('expr-zoom');
                     Array.from(mainVisunames).forEach(function (
                         nameNode,
                     ) {
