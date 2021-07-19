@@ -108,9 +108,8 @@ export function createPolyObject(
 
     if (shapeParameters.has('expr-toggle-color')) {
         const element = shapeParameters.get('expr-toggle-color');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         const wrapperFunc = () => {
             const value = Number(returnFunc());
             if (value !== null && typeof value !== 'undefined') {
@@ -127,9 +126,8 @@ export function createPolyObject(
     // 2) Set fill color
     if (shapeParameters.has('expr-fill-color')) {
         const element = shapeParameters!.get('expr-fill-color');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         const wrapperFunc = () => {
             const value = returnFunc();
             const hexcolor = numberToHexColor(value);
@@ -143,9 +141,8 @@ export function createPolyObject(
     // 3) Set alarm color
     if (shapeParameters.has('expr-fill-color-alarm')) {
         const element = shapeParameters!.get('expr-fill-color-alarm');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         const wrapperFunc = () => {
             const value = returnFunc();
             const hexcolor = numberToHexColor(value);
@@ -159,9 +156,8 @@ export function createPolyObject(
     // 4) Set frame color
     if (shapeParameters.has('expr-frame-color')) {
         const element = shapeParameters!.get('expr-frame-color');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         const wrapperFunc = () => {
             const value = returnFunc();
             const hexcolor = numberToHexColor(value);
@@ -177,9 +173,8 @@ export function createPolyObject(
         const element = shapeParameters!.get(
             'expr-frame-color-alarm',
         );
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         const wrapperFunc = () => {
             const value = returnFunc();
             const hexcolor = numberToHexColor(value);
@@ -193,9 +188,8 @@ export function createPolyObject(
     // 6) Set invisible state
     if (shapeParameters.has('expr-invisible')) {
         const element = shapeParameters!.get('expr-invisible');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         const wrapperFunc = () => {
             const value = Number(returnFunc());
             if (value !== null && typeof value !== 'undefined') {
@@ -216,9 +210,8 @@ export function createPolyObject(
     // 7) The fill flags state: 0 = show color, >0 = ignore setting
     if (shapeParameters.has('expr-fill-flags')) {
         const element = shapeParameters!.get('expr-fill-flags');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         const wrapperFunc = () => {
             const value = Number(returnFunc());
             if (value !== null && typeof value !== 'undefined') {
@@ -239,9 +232,8 @@ export function createPolyObject(
     // 8) Display of frame: 0 full, 1 dashed ( _ _ _ ), 2 dotted ( .... ), 3 dash-point ( _._._ ), 4 dash-point-point (_.._.. ), 8 blind out line
     if (shapeParameters.has('expr-frame-flags')) {
         const element = shapeParameters!.get('expr-frame-flags');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         Object.defineProperty(initial, 'hasFrameColor', {
             get: function () {
                 const value = Number(returnFunc());
@@ -273,9 +265,8 @@ export function createPolyObject(
     // 9) line-width
     if (shapeParameters.has('expr-line-width')) {
         const element = shapeParameters!.get('expr-line-width');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         const wrapperFunc = () => {
             const value = returnFunc();
             const width = Number(value);
@@ -293,9 +284,8 @@ export function createPolyObject(
     // 10) Left-Position
     if (shapeParameters.has('expr-left')) {
         const element = shapeParameters!.get('expr-left');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         Object.defineProperty(initial, 'left', {
             get: () => returnFunc(),
         });
@@ -304,9 +294,8 @@ export function createPolyObject(
     // 11) Right-Position
     if (shapeParameters.has('expr-right')) {
         const element = shapeParameters!.get('expr-right');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         Object.defineProperty(initial, 'right', {
             get: () => returnFunc(),
         });
@@ -315,9 +304,8 @@ export function createPolyObject(
     // 12) Top-Position
     if (shapeParameters.has('expr-top')) {
         const element = shapeParameters!.get('expr-top');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         Object.defineProperty(initial, 'top', {
             get: () => returnFunc(),
         });
@@ -326,9 +314,8 @@ export function createPolyObject(
     // 13) Bottom-Position
     if (shapeParameters.has('expr-bottom')) {
         const element = shapeParameters!.get('expr-bottom');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         Object.defineProperty(initial, 'bottom', {
             get: () => returnFunc(),
         });
@@ -337,9 +324,8 @@ export function createPolyObject(
     // 14) x-Position
     if (shapeParameters.has('expr-xpos')) {
         const element = shapeParameters!.get('expr-xpos');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         Object.defineProperty(initial, 'xpos', {
             get: () => returnFunc(),
         });
@@ -348,9 +334,8 @@ export function createPolyObject(
     // 15) y-Position
     if (shapeParameters.has('expr-ypos')) {
         const element = shapeParameters!.get('expr-ypos');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         Object.defineProperty(initial, 'ypos', {
             get: () => returnFunc(),
         });
@@ -359,9 +344,8 @@ export function createPolyObject(
     // 16) Scaling
     if (shapeParameters.has('expr-scale')) {
         const element = shapeParameters!.get('expr-scale');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         Object.defineProperty(initial, 'scale', {
             get: () => returnFunc(),
         });
@@ -370,9 +354,8 @@ export function createPolyObject(
     // 17) Rotating
     if (shapeParameters.has('expr-angle')) {
         const element = shapeParameters!.get('expr-angle');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         Object.defineProperty(initial, 'angle', {
             get: () => returnFunc(),
         });
@@ -388,9 +371,8 @@ export function createPolyObject(
                     tooltip === null || typeof tooltip === 'undefined'
                         ? ''
                         : tooltip;
-                const value = ComSocket.singleton().getFunction(
-                    element,
-                )();
+                const value =
+                    ComSocket.singleton().getFunction(element)();
                 try {
                     if (
                         parsedTooltip.includes('|<|') ||
@@ -426,9 +408,8 @@ export function createPolyObject(
     // 19) Deactivate Input
     if (shapeParameters.has('expr-input-disabled')) {
         const element = shapeParameters!.get('expr-input-disabled');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         const wrapperFunc = () => {
             const value = returnFunc();
             if (value === '1') {

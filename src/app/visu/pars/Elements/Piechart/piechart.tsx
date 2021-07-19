@@ -48,8 +48,8 @@ export const Piechart: React.FunctionComponent<Props> = ({
         lineWidth: Number(
             section.getElementsByTagName('line-width')[0].textContent,
         ),
-        elementId: section.getElementsByTagName('elem-id')[0]
-            .textContent,
+        elementId:
+            section.getElementsByTagName('elem-id')[0].textContent,
         rect: [],
         center: util.stringToArray(
             section.getElementsByTagName('center')[0].textContent,

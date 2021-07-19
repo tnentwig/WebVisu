@@ -96,9 +96,10 @@ export default class ComSocket implements IComSocket {
                                 value,
                             )
                         ) {
-                            let varContent = ComSocket.singleton().oVisuVariables.get(
-                                value,
-                            )!.value;
+                            let varContent =
+                                ComSocket.singleton().oVisuVariables.get(
+                                    value,
+                                )!.value;
                             if (
                                 varContent === null ||
                                 typeof varContent === 'undefined' ||
@@ -143,9 +144,10 @@ export default class ComSocket implements IComSocket {
                                 value,
                             )
                         ) {
-                            const varContent = ComSocket.singleton().oVisuVariables.get(
-                                value,
-                            )!.value;
+                            const varContent =
+                                ComSocket.singleton().oVisuVariables.get(
+                                    value,
+                                )!.value;
                             if (
                                 varContent === null ||
                                 typeof varContent !== 'undefined'
@@ -210,12 +212,12 @@ export default class ComSocket implements IComSocket {
                                     const decoder = new TextDecoder(
                                         'iso-8859-1',
                                     );
-                                    const text = decoder.decode(
-                                        buffer,
-                                    );
-                                    const transferarray: Array<string> = text
-                                        .slice(1, text.length - 1)
-                                        .split('|');
+                                    const text =
+                                        decoder.decode(buffer);
+                                    const transferarray: Array<string> =
+                                        text
+                                            .slice(1, text.length - 1)
+                                            .split('|');
                                     if (
                                         transferarray.length ===
                                         this.requestFrame.listings
@@ -225,8 +227,10 @@ export default class ComSocket implements IComSocket {
                                             i < transferarray.length;
                                             i++
                                         ) {
-                                            const varName = this
-                                                .lutKeyVariable[i];
+                                            const varName =
+                                                this.lutKeyVariable[
+                                                    i
+                                                ];
                                             if (
                                                 this.oVisuVariables.get(
                                                     varName,

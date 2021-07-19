@@ -46,14 +46,14 @@ export const Textfield: React.FunctionComponent<Props> = ({
         section.getElementsByTagName('font-color')[0].textContent,
     );
     // The static text flags
-    const textAlignHorz = section.getElementsByTagName(
-        'text-align-horz',
-    )[0].textContent;
-    const textAlignVert = section.getElementsByTagName(
-        'text-align-vert',
-    )[0].textContent;
-    const text = section.getElementsByTagName('text-format')[0]
-        .textContent;
+    const textAlignHorz =
+        section.getElementsByTagName('text-align-horz')[0]
+            .textContent;
+    const textAlignVert =
+        section.getElementsByTagName('text-align-vert')[0]
+            .textContent;
+    const text =
+        section.getElementsByTagName('text-format')[0].textContent;
     // The id is used for static language change with a .vis file
     /*
     const textId = Number(
@@ -116,9 +116,8 @@ export const Textfield: React.FunctionComponent<Props> = ({
             }
             if (section.getElementsByTagName('point').length) {
                 // Parsing the point coordinates
-                const xmlPoints = section.getElementsByTagName(
-                    'point',
-                );
+                const xmlPoints =
+                    section.getElementsByTagName('point');
                 let points: number[][];
                 for (let i = 0; i < xmlPoints.length; i++) {
                     const point = util.stringToArray(
@@ -150,9 +149,8 @@ export const Textfield: React.FunctionComponent<Props> = ({
     // x) Scaling
     if (shapeParameters.has('expr-scale')) {
         const element = shapeParameters!.get('expr-scale');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         Object.defineProperty(initial, 'scale', {
             get: () => returnFunc(),
         });
@@ -160,9 +158,8 @@ export const Textfield: React.FunctionComponent<Props> = ({
     // y) Rotating
     if (shapeParameters.has('expr-angle')) {
         const element = shapeParameters!.get('expr-angle');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         Object.defineProperty(initial, 'angle', {
             get: () => returnFunc(),
         });
@@ -301,9 +298,8 @@ export const Textfield: React.FunctionComponent<Props> = ({
 
             if (textParameters.has('expr-font-name')) {
                 const element = textParameters!.get('expr-font-name');
-                const elementFont = ComSocket.singleton().getFunction(
-                    element,
-                )();
+                const elementFont =
+                    ComSocket.singleton().getFunction(element)();
                 if (
                     elementFont !== null &&
                     typeof elementFont !== 'undefined' &&
@@ -334,9 +330,8 @@ export const Textfield: React.FunctionComponent<Props> = ({
         const element = textParameters!.get('expr-text-color');
         Object.defineProperty(initial, 'fontColor', {
             get: function () {
-                const value = ComSocket.singleton().evalFunction(
-                    element,
-                )();
+                const value =
+                    ComSocket.singleton().evalFunction(element)();
                 const hex = util.numberToHexColor(value);
                 return hex;
             },
@@ -483,9 +478,8 @@ export const Textfield: React.FunctionComponent<Props> = ({
         const element = textParameters!.get('text-display');
         Object.defineProperty(initial, 'textVariable', {
             get: function () {
-                const value = ComSocket.singleton().getFunction(
-                    element,
-                )();
+                const value =
+                    ComSocket.singleton().getFunction(element)();
                 return value;
             },
         });
@@ -626,8 +620,9 @@ export const Textfield: React.FunctionComponent<Props> = ({
                     });
                     temp = dtf
                         .formatToParts(now)
-                        .find((part) => part.type === 'timeZoneName')
-                        .value;
+                        .find(
+                            (part) => part.type === 'timeZoneName',
+                        ).value;
                     parsedText = parsedText.replace(/%z/g, temp);
                 }
                 if (parsedText.includes('%Z')) {
@@ -636,8 +631,9 @@ export const Textfield: React.FunctionComponent<Props> = ({
                     });
                     temp = dtf
                         .formatToParts(now)
-                        .find((part) => part.type === 'timeZoneName')
-                        .value;
+                        .find(
+                            (part) => part.type === 'timeZoneName',
+                        ).value;
                     parsedText = parsedText.replace(/%Z/g, temp);
                 }
                 /*

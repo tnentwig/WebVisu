@@ -17,12 +17,10 @@ export const Textline: React.FunctionComponent<Props> = ({
     numberOfLines,
     firstItem,
 }) => {
-    const textAlignHorz = section.getElementsByTagName(
-        'text-align-horz',
-    )[0].innerHTML;
-    const textAlignVert = section.getElementsByTagName(
-        'text-align-vert',
-    )[0].innerHTML;
+    const textAlignHorz =
+        section.getElementsByTagName('text-align-horz')[0].innerHTML;
+    const textAlignVert =
+        section.getElementsByTagName('text-align-vert')[0].innerHTML;
     const initial = {
         // local variables
         textVariable: '',

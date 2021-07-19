@@ -22,8 +22,8 @@ export const SimpleShape: React.FunctionComponent<Props> = ({
     section,
 }) => {
     // Check if its on of the allowed shapes like rectangle, round-rectangle, circle or line
-    const shape = section.getElementsByTagName('simple-shape')[0]
-        .innerHTML;
+    const shape =
+        section.getElementsByTagName('simple-shape')[0].innerHTML;
     // Parse the common informations
     if (
         ['round-rect', 'circle', 'line', 'rectangle'].includes(shape)
@@ -59,8 +59,8 @@ export const SimpleShape: React.FunctionComponent<Props> = ({
                 section.getElementsByTagName('line-width')[0]
                     .innerHTML,
             ),
-            elementId: section.getElementsByTagName('elem-id')[0]
-                .innerHTML,
+            elementId:
+                section.getElementsByTagName('elem-id')[0].innerHTML,
             rect: util.stringToArray(
                 section.getElementsByTagName('rect')[0].innerHTML,
             ),

@@ -51,9 +51,8 @@ export function parseShapeParameters(
         if (tags.includes(exprName)) {
             // Now parse the expression stack
             // The stack is included in a <expr></expr>
-            const expressions = children[i].getElementsByTagName(
-                'expr',
-            )[0].children;
+            const expressions =
+                children[i].getElementsByTagName('expr')[0].children;
             // Init a helper stack
             const stack: string[][] = [];
             // Iterate over all expressions
@@ -114,9 +113,8 @@ export function parseTextParameters(
         if (tags.includes(exprName)) {
             // Now parse the expression stack
             // The stack is included in a <expr></expr>
-            const expressions = children[i].getElementsByTagName(
-                'expr',
-            )[0].children;
+            const expressions =
+                children[i].getElementsByTagName('expr')[0].children;
             // Init a helper stack
             const stack: string[][] = [];
             // Iterate over all expressions
@@ -167,16 +165,15 @@ export function parseClickEvent(section: Element): Function {
         // Parse the <expr-toggle-var><expr><var> ... elements => toggle color
         if (exprName === 'expr-toggle-var') {
             // Parse all detected expressions
-            const expressions = children[i].getElementsByTagName(
-                'expr',
-            );
+            const expressions =
+                children[i].getElementsByTagName('expr');
             for (let i = 0; i < expressions.length; i++) {
                 // Check if variable exists
-                const variable = expressions[i].getElementsByTagName(
-                    'var',
-                );
+                const variable =
+                    expressions[i].getElementsByTagName('var');
                 if (variable.length) {
-                    const varName = variable[0].textContent.toLowerCase();
+                    const varName =
+                        variable[0].textContent.toLowerCase();
                     const com = ComSocket.singleton();
                     if (com.oVisuVariables.has(varName)) {
                         clickFunction = function (): void {
@@ -191,9 +188,8 @@ export function parseClickEvent(section: Element): Function {
 
         if (exprName === 'expr-zoom') {
             // Parse all detected expressions
-            const expressions = children[i].getElementsByTagName(
-                'expr',
-            );
+            const expressions =
+                children[i].getElementsByTagName('expr');
             for (let i = 0; i < expressions.length; i++) {
                 // The zoom expression can be a parameter (placeholder) or a variable (var)
                 const expr = expressions[i].children;
@@ -221,16 +217,18 @@ export function parseClickEvent(section: Element): Function {
                             };
                         }
                     } else if (tagName === 'var') {
-                        const visuVariable = expr[0].textContent.toLowerCase();
+                        const visuVariable =
+                            expr[0].textContent.toLowerCase();
                         if (
                             StateManager.singleton().oState.get(
                                 'USECURRENTVISU',
                             ) === 'TRUE'
                         ) {
                             clickFunction = function (): void {
-                                const visuName = ComSocket.singleton().oVisuVariables.get(
-                                    visuVariable,
-                                )!.value;
+                                const visuName =
+                                    ComSocket.singleton().oVisuVariables.get(
+                                        visuVariable,
+                                    )!.value;
                                 ComSocket.singleton().setValue(
                                     '.currentvisu',
                                     visuName,
@@ -238,9 +236,10 @@ export function parseClickEvent(section: Element): Function {
                             };
                         } else {
                             clickFunction = function (): void {
-                                const visuName = ComSocket.singleton().oVisuVariables.get(
-                                    visuVariable,
-                                )!.value;
+                                const visuName =
+                                    ComSocket.singleton().oVisuVariables.get(
+                                        visuVariable,
+                                    )!.value;
                                 StateManager.singleton().oState.set(
                                     'ZOOMVISU',
                                     visuName,
@@ -261,9 +260,8 @@ export function parseClickEvent(section: Element): Function {
             if (
                 actionList.getElementsByTagName('expr-assign').length
             ) {
-                const assigns = actionList.getElementsByTagName(
-                    'expr-assign',
-                );
+                const assigns =
+                    actionList.getElementsByTagName('expr-assign');
                 for (let i = 0; i < assigns.length; i++) {
                     const action = assigns[i];
                     // Left side value. Must be a variable.
@@ -298,9 +296,10 @@ export function parseClickEvent(section: Element): Function {
                         }
                     }
                     clickFunction = function (): void {
-                        const rvalue = ComSocket.singleton().evalFunction(
-                            rpnStack,
-                        )();
+                        const rvalue =
+                            ComSocket.singleton().evalFunction(
+                                rpnStack,
+                            )();
                         const com = ComSocket.singleton();
                         com.setValue(lvalue, rvalue);
                     };
@@ -311,9 +310,8 @@ export function parseClickEvent(section: Element): Function {
             // Execute expression
             if (actionList.getElementsByTagName('execute').length) {
                 // There are many available executable actions
-                const executes = actionList.getElementsByTagName(
-                    'execute',
-                );
+                const executes =
+                    actionList.getElementsByTagName('execute');
                 for (let i = 0; i < executes.length; i++) {
                     const execName = executes[i].textContent;
                     const execList = execName.split(' ');
@@ -330,11 +328,12 @@ export function parseClickEvent(section: Element): Function {
                                 ) {
                                     switch (execList[1]) {
                                         case 'CHANGEUSERLEVEL': {
-                                            clickFunction = function (): void {
-                                                StateManager.singleton().openPopup.set(
-                                                    true,
-                                                );
-                                            };
+                                            clickFunction =
+                                                function (): void {
+                                                    StateManager.singleton().openPopup.set(
+                                                        true,
+                                                    );
+                                                };
                                             stack.push(clickFunction);
                                             clickEventDetected = true;
                                             break;
@@ -349,9 +348,8 @@ export function parseClickEvent(section: Element): Function {
             }
             // Hyperlink
             if (actionList.getElementsByTagName('expr-link').length) {
-                const links = actionList.getElementsByTagName(
-                    'expr-link',
-                );
+                const links =
+                    actionList.getElementsByTagName('expr-link');
                 for (let i = 0; i < links.length; i++) {
                     // prettier-ignore
                     const link = actionList
@@ -367,9 +365,10 @@ export function parseClickEvent(section: Element): Function {
                                     content.toLowerCase(),
                                 )
                             ) {
-                                const varContent = ComSocket.singleton().oVisuVariables.get(
-                                    content.toLowerCase(),
-                                )!.value;
+                                const varContent =
+                                    ComSocket.singleton().oVisuVariables.get(
+                                        content.toLowerCase(),
+                                    )!.value;
                                 window.open(varContent.split(' ')[0]);
                             }
                         };
@@ -383,9 +382,10 @@ export function parseClickEvent(section: Element): Function {
                             window.open(content);
                             */
                             // TODO: check if this is right ???
-                            const value = ComSocket.singleton().evalFunction(
-                                [[type, content.toLowerCase()]],
-                            )();
+                            const value =
+                                ComSocket.singleton().evalFunction([
+                                    [type, content.toLowerCase()],
+                                ])();
                             window.open(value);
                         };
                     }
@@ -431,17 +431,16 @@ export function parseTapEvent(
         }
 
         if (tapElement !== null) {
-            const expressions = tapElement.getElementsByTagName(
-                'expr',
-            );
+            const expressions =
+                tapElement.getElementsByTagName('expr');
             // Parse the <expr-toggle-var><expr><var> ... elements => toggle color
             for (let i = 0; i < expressions.length; i++) {
                 // Check if variable exists
-                const variable = expressions[i].getElementsByTagName(
-                    'var',
-                );
+                const variable =
+                    expressions[i].getElementsByTagName('var');
                 if (variable.length) {
-                    const varName = variable[0].textContent.toLowerCase();
+                    const varName =
+                        variable[0].textContent.toLowerCase();
                     const com = ComSocket.singleton();
                     if (com.oVisuVariables.has(varName)) {
                         // On mouse down or mouse up?
@@ -466,8 +465,8 @@ export function parseScrollUpdate(section: Element): Function {
     let update: Function;
     const updateExpr = section.getElementsByTagName('expr-tap-var');
     if (updateExpr.length) {
-        const content = updateExpr[0].getElementsByTagName('expr')[0]
-            .children[0];
+        const content =
+            updateExpr[0].getElementsByTagName('expr')[0].children[0];
         const varName = content.textContent.toLowerCase();
         const com = ComSocket.singleton();
         if (com.oVisuVariables.has(varName)) {
