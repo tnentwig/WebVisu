@@ -6,6 +6,7 @@ import {
     getLastModified,
     getImage,
 } from '../../../Utils/fetchfunctions';
+import { stringToBoolean } from '../../../Utils/utilfunctions';
 import { get, set } from 'idb-keyval';
 
 type Props = {
@@ -39,6 +40,7 @@ export const ImageField: React.FunctionComponent<Props> = ({
         // Name of the file
         fixedFileName: '',
         dynamicFileName: '',
+        clipFrame: true,
     };
 
     if (section.getElementsByTagName('expr-fill-color').length) {
@@ -107,6 +109,23 @@ export const ImageField: React.FunctionComponent<Props> = ({
                         .innerHTML.replace(/.*\\/, '')
                         .replace(/].*/, '');
                     return rawFileName;
+                },
+            });
+        }
+    }
+    
+    // Set the fileName, it could be a variable or static
+    if (section.getElementsByTagName('clip-frame').length) {
+        if (
+            section.getElementsByTagName('clip-frame')[0].innerHTML
+                .length
+        ) {
+            Object.defineProperty(initial, 'clipFrame', {
+                get: function () {
+                    const clipFrame = stringToBoolean(
+                        section.getElementsByTagName('clip-frame')[0].innerHTML,
+                    );
+                    return clipFrame;
                 },
             });
         }
@@ -188,6 +207,7 @@ export const ImageField: React.FunctionComponent<Props> = ({
                 height={
                     inlineElement ? initial.rectHeight - 4 : '100%'
                 }
+                overflow={state.clipFrame ? 'hidden' : 'visible'}
             >
                 <image
                     style={{

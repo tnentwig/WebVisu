@@ -30,6 +30,7 @@ export function createSubvisuObject(
         x: (subvisuShape.rect[2] - subvisuShape.rect[0]) / 2,
         y: (subvisuShape.rect[3] - subvisuShape.rect[1]) / 2,
     };
+    // TODO clean this, normally already checked the 0 condition in the shape.
     // The lineWidth is 0 in the xml if border width is 1 in the codesys dev env. Otherwise lineWidth is equal to the target border width. Very strange.
     const edge =
         subvisuShape.lineWidth === 0 ? 1 : subvisuShape.lineWidth;
@@ -61,8 +62,7 @@ export function createSubvisuObject(
         bottom: 0,
         xpos: 0,
         ypos: 0,
-        // scale: 1000, // a scale of 1000 means a representation of 1:1
-        scale: 10, // a scale of 10 means a representation of 1:1
+        scale: 1000, // a scale of 1000 means a representation of 1:1
         angle: 0,
         transform: 'scale(1) rotate(0)',
         // Activate / deactivate input
@@ -428,34 +428,6 @@ export function createSubvisuObject(
         });
     }
 
-    // Piechart specific stuff ( start- and endangle)
-    if (shapeParameters.has('expr-angle1')) {
-        const element = shapeParameters!.get('expr-angle1');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
-        const wrapperFunc = () => {
-            const value = returnFunc();
-            return value % 360;
-        };
-        Object.defineProperty(initial, 'startAngle', {
-            get: () => wrapperFunc(),
-        });
-    }
-    if (shapeParameters.has('expr-angle2')) {
-        const element = shapeParameters!.get('expr-angle2');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
-        const wrapperFunc = () => {
-            const value = returnFunc();
-            return value % 360;
-        };
-        Object.defineProperty(initial, 'endAngle', {
-            get: () => wrapperFunc(),
-        });
-    }
-
     // We have to compute the dependent values after all the required static values have been replaced by variables, placeholders or constant values
     // E.g. the fillcolor depends on hasFillColor and alarm. This variables are called "computed" values. MobX will track their dependents and rerender the object by change.
     // We have to note that the rotation of polylines is not the same like simpleshapes. Simpleshapes keep their originally alignment, polyhapes transform every coordinate.
@@ -518,8 +490,7 @@ export function createSubvisuObject(
             const xc = initial.absCenterCoord.x;
             const yc = initial.absCenterCoord.y;
             // Scaling: the vector isnt normalized to 1
-            // const scale = initial.scale / 1000;
-            const scale = initial.scale / 10;
+            const scale = initial.scale / 1000;
             x1 = scale * (x1 - xc) + xc;
             y1 = scale * (y1 - yc) + yc;
             x2 = scale * (x2 - xc) + xc;

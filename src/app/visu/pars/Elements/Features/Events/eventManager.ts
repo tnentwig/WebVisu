@@ -38,7 +38,7 @@ export function parseShapeParameters(
         'expr-angle1',
         'expr-angle2',
 
-        // Scrollbar specific
+        // slider specific
         'expr-lower-bound',
         'expr-upper-bound',
         'expr-tap-var',

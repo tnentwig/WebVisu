@@ -1,42 +1,90 @@
-export interface IBasicShape {
+export interface ICommonShape {
     shape: string;
-    hasInsideColor: boolean;
-    fillColor: string;
-    fillColorAlarm: string;
+    elementId: string;
+    center: number[];
+    lineWidth: number;
     hasFrameColor: boolean;
+    hasInsideColor: boolean;
     frameColor: string;
     frameColorAlarm: string;
-    lineWidth: number;
-    elementId: string;
-    rect: number[];
-    center: number[];
-    hiddenInput: boolean;
+    fillColor: string;
+    fillColorAlarm: string;
     enableTextInput: boolean;
+    hiddenInput: boolean;
+    // Optional properties
     tooltip: string;
     accessLevels: string[];
 }
 
-export interface IPolyShape extends IBasicShape {
+// ArrayTable
+export interface IArrayTableShape extends ICommonShape {}
+// BasicShapes
+// - PolyShapes
+export interface IPolyShape extends ICommonShape {
     points: number[][];
+    // Computed values
+    rect: number[];
 }
-
-export interface IPiechartShape extends IBasicShape {
+// - SimpleShapes
+export interface ISimpleShape extends ICommonShape {
+    rect: number[];
+}
+// Bitmap
+export interface IBitmapShape extends ICommonShape {
+    fileName: string;
+    transparent: boolean;
+    showFrame: boolean;
+    clipFrame: boolean;
+    frameType: string;
+    rect: number[];
+}
+// Button
+export interface IButtonShape extends ICommonShape {
+    frameType: string;
+    rect: number[];
+}
+// Group
+export interface IGroupShape extends ICommonShape {
+    rect: number[];
+    showFrame: boolean;
+    clipFrame: boolean;
+    isoFrame: boolean;
+    originalFrame: boolean;
+    animateChilds: boolean;
+    // Computed values
+    rightDownCorner: number[];
+}
+// PieChart
+export interface IPiechartShape extends ICommonShape {
     points: number[][];
+    enableArc: boolean;
+    // Computed values
+    rect: number[];
 }
-
-export interface ISubvisuShape extends IBasicShape {
-    visuName: string;
-    visuSize: number[];
+// Slider
+export interface ISliderShape extends ICommonShape {
+    rect: number[];
+    // Computed values
+    isHorizontal: boolean;
+}
+// Subvisu
+export interface ISubvisuShape extends ICommonShape {
     showFrame: boolean;
     clipFrame: boolean;
     isoFrame: boolean;
     originalFrame: boolean;
     originalScrollableFrame: boolean;
+    noFrameOffset: boolean;
+    name: string;
+    rect: number[];
+    // Computed values
+    visuName: string;
+    visuSize: number[];
 }
 
-export interface IScrollbarShape {
-    shape: string;
-    rect: number[];
-    tooltip: string;
-    horzPosition: boolean;
-}
+// Future
+export interface ITrendShape extends ICommonShape {}
+
+export interface IAlarmTableShape extends ICommonShape {}
+
+export interface IUserControlShape extends ICommonShape {}

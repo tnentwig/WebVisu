@@ -4,10 +4,10 @@ import { SimpleShape } from './Elements/Basicshapes/simpleshape';
 import { PolyShape } from './Elements/Basicshapes/polyshape';
 import { Button } from './Elements/Button/button';
 import { Piechart } from './Elements/Piechart/piechart';
-import { Scrollbar } from './Elements/Scrollbar/scrollbar';
+import { Slider } from './Elements/Slider/slider';
 // import { ArrayTable } from './Elements/Arraytable/arraytable';
 import { Bitmap } from './Elements/Bitmap/bitmap';
-import { Group } from './Elements/Group/group';
+import { Group } from './Elements/Group/groupElement';
 import { Subvisu } from './Elements/Subvisu/subvisu';
 
 type Props = {
@@ -75,10 +75,10 @@ export const VisuElements: React.FunctionComponent<Props> = React.memo(
                         );
                         break;
                     }
-                    // Is a Scrollbar
+                    // Is a Slider
                     case 'scrollbar': {
                         addVisuObject(
-                            <Scrollbar section={section}></Scrollbar>,
+                            <Slider section={section}></Slider>,
                         );
                         break;
                     }

@@ -1,3 +1,21 @@
+export function getElementHTML(
+    section: Element,
+    tagName: string,
+    fallback = '',
+): string {
+    const elements = section.getElementsByTagName(tagName);
+    return elements.length > 0 ? elements[0].innerHTML : fallback;
+}
+
+export function getElementText(
+    section: Element,
+    tagName: string,
+    fallback = '',
+): string {
+    const elements = section.getElementsByTagName(tagName);
+    return elements.length > 0 ? elements[0].textContent : fallback;
+}
+
 export function stringToBoolean(booleanExp: string): boolean {
     let interim = false;
     try {
@@ -87,7 +105,11 @@ export function computePiechartRectCoord(
 }
 
 // Calculate the radius of a specifc point
-function radius(a: number, b: number, angle: number) {
+export function computeEllipseRadius(
+    a: number,
+    b: number,
+    angle: number,
+) {
     const r =
         (a * b) /
         Math.sqrt(
@@ -99,86 +121,149 @@ function radius(a: number, b: number, angle: number) {
 
 export function pointArrayToPiechartString(
     pointArray: number[][],
-    startAngleDegree: number,
-    endAngleDegree: number,
-    strokeWidth: number,
+    enableArc: boolean,
 ): string {
-    // Calculate the angle in radiant
-    const startAngleRad = -startAngleDegree * 0.0174532925; // (2 * Math.PI) / 360 = 0.0174532925
-    const endAngleRad = -endAngleDegree * 0.0174532925;
+    // The piechart points consists of only 4 items
+    //   [0]-> center
+    const centerCoord = {
+        x: pointArray[0][0],
+        y: pointArray[0][1],
+    };
+    //   [1]-> point bottom right
+    const cornerCoord = {
+        x: pointArray[1][0],
+        y: pointArray[1][1],
+    };
+    //   [2]-> point startAngle
+    const startCoord = {
+        x: Math.min(pointArray[2][0], cornerCoord.x),
+        y: Math.min(pointArray[2][1], cornerCoord.y),
+    };
+    //   [3]-> point endAngle
+    const endCoord = {
+        x: Math.min(pointArray[3][0], cornerCoord.x),
+        y: Math.min(pointArray[3][1], cornerCoord.y),
+    };
+
     // Calculate the radii of the ellipse
-    const radiusx = Math.abs(pointArray[1][0] - pointArray[0][0]);
-    const radiusy = Math.abs(pointArray[1][1] - pointArray[0][1]);
-    // Calculate the radius of start and endpoint
-    const rStart = radius(radiusx, radiusy, startAngleRad);
-    const rEnd = radius(radiusx, radiusy, endAngleRad);
-    const start = [
-        Math.cos(startAngleRad) * rStart + radiusx,
-        Math.sin(startAngleRad) * rStart + radiusy,
-    ];
-    const end = [
-        Math.cos(endAngleRad) * rEnd + radiusx,
-        Math.sin(endAngleRad) * rEnd + radiusy,
-    ];
-    const interimArray = pointArray;
-    interimArray[2] = start;
-    interimArray[3] = end;
+    const radii = {
+        x: Math.abs(cornerCoord.x - centerCoord.x),
+        y: Math.abs(cornerCoord.y - centerCoord.y),
+    };
+
+    // Calculate start angle and end angle
+    const startAngle =
+        ((Math.atan2(
+            startCoord.y - centerCoord.y,
+            startCoord.x - centerCoord.x,
+        ) *
+            180) /
+            Math.PI) *
+        -1;
+    const endAngle =
+        ((Math.atan2(
+            endCoord.y - centerCoord.y,
+            endCoord.x - centerCoord.x,
+        ) *
+            180) /
+            Math.PI) *
+        -1;
+    const diffAngle = (endAngle - startAngle) % 360;
 
     let d: string;
-    const angleDiff = (endAngleDegree - startAngleDegree) % 360;
     // Angle with 0 degree difference is shown als full arc in codesys
-    if (angleDiff === 0) {
-        d = [
-            'M',
-            interimArray[0][0],
-            interimArray[0][1],
-            'L',
-            interimArray[2][0] + strokeWidth,
-            interimArray[2][1] + strokeWidth,
-            'M',
-            2 * radiusx + strokeWidth,
-            radiusy + strokeWidth,
-            'A',
-            radiusx - strokeWidth,
-            radiusy,
-            0,
-            1,
-            1,
-            strokeWidth,
-            radiusy + strokeWidth,
-            'A',
-            radiusx,
-            radiusy,
-            0,
-            1,
-            1,
-            2 * radiusx + strokeWidth,
-            radiusy + strokeWidth,
-        ].join(' ');
+    if (diffAngle === 0) {
+        if (enableArc) {
+            d = [
+                'M', // M = MoveTo (x, y)
+                startCoord.x,
+                startCoord.y,
+                'A', // A = elliptical Arc (rx ry angle large-arc-flag sweep-flag x y)
+                radii.x,
+                radii.y,
+                0, // angle
+                1, // large arc
+                1, // clockwise turning arc
+                centerCoord.x - (startCoord.x - centerCoord.x),
+                centerCoord.y,
+                'A', // A = elliptical Arc
+                radii.x,
+                radii.y,
+                0, // angle
+                1, // large arc
+                1, // clockwise turning arc
+                startCoord.x,
+                startCoord.y,
+            ].join(' ');
+        } else {
+            d = [
+                'M', // M = MoveTo (x, y)
+                centerCoord.x,
+                centerCoord.y,
+                'L', // L = LineTo (x, y)
+                startCoord.x,
+                startCoord.y,
+                'M', // M = MoveTo (x, y)
+                startCoord.x,
+                startCoord.y,
+                'A', // A = elliptical Arc
+                radii.x,
+                radii.y,
+                0, // angle
+                1, // large arc
+                1, // clockwise turning arc
+                centerCoord.x - (startCoord.x - centerCoord.x),
+                centerCoord.y,
+                'A', // A = elliptical Arc
+                radii.x,
+                radii.y,
+                0, // angle
+                1, // large arc
+                1, // clockwise turning arc
+                startCoord.x,
+                startCoord.y,
+            ].join(' ');
+        }
     } else {
         let largeArcFlag = 1;
-        if (angleDiff > 0) {
-            largeArcFlag = angleDiff <= 180 ? 1 : 0;
+        if (diffAngle > 0) {
+            largeArcFlag = diffAngle <= 180 ? 1 : 0;
         } else {
-            largeArcFlag = angleDiff <= -180 ? 1 : 0;
+            largeArcFlag = diffAngle <= -180 ? 1 : 0;
         }
-        d = [
-            'M',
-            interimArray[0][0],
-            interimArray[0][1],
-            'L',
-            interimArray[2][0] + strokeWidth,
-            interimArray[2][1] + strokeWidth,
-            'A',
-            radiusx,
-            radiusy,
-            0,
-            largeArcFlag,
-            1,
-            interimArray[3][0] + strokeWidth,
-            interimArray[3][1] + strokeWidth,
-            'Z',
-        ].join(' ');
+        if (enableArc) {
+            d = [
+                'M', // M = MoveTo (x, y)
+                startCoord.x,
+                startCoord.y,
+                'A', // A = elliptical Arc
+                radii.x,
+                radii.y,
+                0, // angle
+                largeArcFlag, // large arc (1) or small arc (0)
+                1, // clockwise turning arc
+                endCoord.x,
+                endCoord.y,
+            ].join(' ');
+        } else {
+            d = [
+                'M', // M = MoveTo (x, y)
+                centerCoord.x,
+                centerCoord.y,
+                'L', // L = LineTo (x, y)
+                startCoord.x,
+                startCoord.y,
+                'A', // A = elliptical Arc
+                radii.x,
+                radii.y,
+                0,
+                largeArcFlag,
+                1,
+                endCoord.x,
+                endCoord.y,
+                'Z', // Z = closepath
+            ].join(' ');
+        }
     }
     return d;
 }
@@ -275,28 +360,32 @@ export function evalRPN(
                 case '*': {
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
-                        result = result * operatingStack.pop();
+                        interim = operatingStack.pop();
+                        result = result * interim;
                     }
                     break;
                 }
                 case '/': {
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
-                        result = result / operatingStack.pop();
+                        interim = operatingStack.pop();
+                        result = result / interim;
                     }
                     break;
                 }
                 case '-': {
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
-                        result = -result + operatingStack.pop();
+                        interim = operatingStack.pop();
+                        result = -result + interim;
                     }
                     break;
                 }
                 case '+': {
                     result = operatingStack.pop();
                     for (let i = 1; i < numberOfOperands; i++) {
-                        result = result + operatingStack.pop();
+                        interim = operatingStack.pop();
+                        result = result + interim;
                     }
                     break;
                 }
@@ -400,6 +489,11 @@ export function evalRPN(
                     result = Number(!operatingStack.pop());
                     break;
                 }
+                case 'SEL': {
+                    // Error check (No idea what it does but may be useful in the future.)
+                    result = 0;
+                    break;
+                }
                 default: {
                     console.warn(
                         'The RPN-combi: ' +
@@ -408,6 +502,7 @@ export function evalRPN(
                             operator +
                             ' is not a valid one!',
                     );
+                    result = 0;
                 }
             }
             operatingStack.push(result);

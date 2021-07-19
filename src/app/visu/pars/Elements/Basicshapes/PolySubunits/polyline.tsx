@@ -32,92 +32,125 @@ export const Polyline: React.FunctionComponent<Props> = ({
     return useObserver(() => (
         <div
             style={{
-                transform: state.cssTransform,
-                transformOrigin: state.cssTransformOrigin,
                 cursor: 'auto',
-                pointerEvents: state.eventType,
-                visibility: state.display,
+                overflow: 'visible',
+                pointerEvents: state.pointerEvents,
+                visibility: state.visibility,
                 position: 'absolute',
-                left: state.absCornerCoord.x1 - state.edge,
-                top: state.absCornerCoord.y1 - state.edge,
-                width: state.relCoord.width + 2 * state.edge,
-                height: state.relCoord.height + 2 * state.edge,
+                left:
+                    Math.min(
+                        state.transformedCornerCoord.x1,
+                        state.transformedCornerCoord.x2,
+                    ) +
+                    state.transformedStartCoord.left -
+                    state.lineWidth,
+                top:
+                    Math.min(
+                        state.transformedCornerCoord.y1,
+                        state.transformedCornerCoord.y2,
+                    ) +
+                    state.transformedStartCoord.top -
+                    state.lineWidth,
+                width: state.transformedSize.width + state.lineWidth,
+                height:
+                    state.transformedSize.height + state.lineWidth,
             }}
         >
-            <ErrorBoundary fallback={<div>Oh no</div>}>
-                {inputField}
-                <svg
-                    style={{ float: 'left' }}
-                    width={state.relCoord.width + 2 * state.edge}
-                    height={state.relCoord.height + 2 * state.edge}
-                    overflow="visible"
-                >
+            {state.readAccess ? (
+                <ErrorBoundary fallback={<div>Oh no</div>}>
+                    {inputField}
                     <svg
-                        onClick={
-                            typeof onclick === 'undefined' ||
-                            onclick === null
-                                ? null
-                                : () => onclick()
+                        style={{ float: 'left' }}
+                        width={
+                            state.transformedSize.width +
+                            2 * state.lineWidth
                         }
-                        onMouseDown={
-                            typeof onmousedown === 'undefined' ||
-                            onmousedown === null
-                                ? null
-                                : () => onmousedown()
+                        height={
+                            state.transformedSize.height +
+                            2 * state.lineWidth
                         }
-                        onMouseUp={
-                            typeof onmouseup === 'undefined' ||
-                            onmouseup === null
-                                ? null
-                                : () => onmouseup()
-                        }
-                        onMouseLeave={
-                            typeof onmouseup === 'undefined' ||
-                            onmouseup === null
-                                ? null
-                                : () => onmouseup()
-                        } // We have to reset if somebody leaves the object with pressed key
-                        cursor={
-                            (typeof onclick !== 'undefined' &&
-                                onclick !== null) ||
-                            (typeof onmousedown !== 'undefined' &&
-                                onmousedown !== null) ||
-                            (typeof onmouseup !== 'undefined' &&
-                                onmouseup !== null)
-                                ? 'pointer'
-                                : null
-                        }
-                        strokeDasharray={state.strokeDashArray}
                         overflow="visible"
                     >
-                        <polyline
-                            points={coordArrayToString(
-                                state.relPoints,
-                            )}
-                            fill="none"
-                            pointerEvents="stroke"
-                            strokeWidth={state.strokeWidth}
-                            stroke={state.stroke}
-                            transform={state.transform}
-                        />
-                        <title>{state.tooltip}</title>
-                    </svg>
-                    {typeof textField === 'undefined' ||
-                    textField === null ? null : (
                         <svg
+                            onClick={
+                                typeof onclick === 'undefined' ||
+                                onclick === null
+                                    ? null
+                                    : state.writeAccess
+                                    ? () => onclick()
+                                    : null
+                            }
+                            onMouseDown={
+                                typeof onmousedown === 'undefined' ||
+                                onmousedown === null
+                                    ? null
+                                    : state.writeAccess
+                                    ? () => onmousedown()
+                                    : null
+                            }
+                            onMouseUp={
+                                typeof onmouseup === 'undefined' ||
+                                onmouseup === null
+                                    ? null
+                                    : state.writeAccess
+                                    ? () => onmouseup()
+                                    : null
+                            }
+                            onMouseLeave={
+                                typeof onmouseup === 'undefined' ||
+                                onmouseup === null
+                                    ? null
+                                    : state.writeAccess
+                                    ? () => onmouseup()
+                                    : null
+                            } // We have to reset if somebody leaves the object with pressed key
+                            cursor={
+                                (typeof onclick !== 'undefined' &&
+                                    onclick !== null) ||
+                                (typeof onmousedown !== 'undefined' &&
+                                    onmousedown !== null) ||
+                                (typeof onmouseup !== 'undefined' &&
+                                    onmouseup !== null)
+                                    ? 'pointer'
+                                    : null
+                            }
                             width={
-                                state.relCoord.width + 2 * state.edge
+                                state.transformedSize.width *
+                                    (state.motionAbsScale / 1000) +
+                                state.strokeWidth
                             }
                             height={
-                                state.relCoord.height + 2 * state.edge
+                                state.transformedSize.height *
+                                    (state.motionAbsScale / 1000) +
+                                state.strokeWidth
                             }
                             overflow="visible"
                         >
-                            {textField}
+                            <polyline
+                                points={coordArrayToString(
+                                    state.transformedPointsCoord,
+                                )}
+                                fill="none"
+                                pointerEvents="stroke"
+                                stroke={state.stroke}
+                                strokeWidth={state.strokeWidth}
+                                strokeDasharray={
+                                    state.strokeDashArray
+                                }
+                                transform={state.transform}
+                            >
+                                <title>{state.tooltip}</title>
+                            </polyline>
+                            {typeof textField === 'undefined' ||
+                            textField === null ? null : (
+                                <svg overflow="visible">
+                                    {textField}
+                                </svg>
+                            )}
                         </svg>
-                    )}
-                </svg>
-            </ErrorBoundary>
+                    </svg>
+                </ErrorBoundary>
+            ) : null}
         </div>
     ));
 };
