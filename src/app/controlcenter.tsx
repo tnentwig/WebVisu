@@ -152,68 +152,57 @@ export default class HTML5Visu {
                 '/webvisu.html',
                 '',
             );
-            fetch(
-                this.rootDir +
-                    path +
-                    '/visu_ini.xml' +
-                    '?v=' +
-                    Date.now(),
-            ).then((response) => {
-                // Path is correct
-                if (response.ok) {
-                    // Path must be adapted
-                    this.rootDir = this.rootDir + path;
-                    resolve(true);
-                } else {
-                    // roll back to manual 'try ? success : fail' style
-                    // The request will automatically forwarded to the CoDeSys folder on a PFC. On older controllers we have to forward to /PLC manually
-                    // A first try for get a manually forwarding
-                    fetch(
-                        this.rootDir +
-                            '/visu_ini.xml' +
-                            '?v=' +
-                            Date.now(),
-                    ).then((response) => {
-                        // Path is correct
-                        if (response.ok) {
-                            resolve(true);
-                        } else {
-                            fetch(
-                                this.rootDir +
-                                    '/plc/visu_ini.xml' +
-                                    '?v=' +
-                                    Date.now(),
-                            ).then((response) => {
+            fetch(this.rootDir + path + '/visu_ini.xml').then(
+                (response) => {
+                    // Path is correct
+                    if (response.ok) {
+                        // Path must be adapted
+                        this.rootDir = this.rootDir + path;
+                        resolve(true);
+                    } else {
+                        // roll back to manual 'try ? success : fail' style
+                        // The request will automatically forwarded to the CoDeSys folder on a PFC. On older controllers we have to forward to /PLC manually
+                        // A first try for get a manually forwarding
+                        fetch(this.rootDir + '/visu_ini.xml').then(
+                            (response) => {
                                 // Path is correct
                                 if (response.ok) {
-                                    // Path must be adapted for an older Linux Controller without Linux
-                                    this.rootDir =
-                                        this.rootDir + '/plc';
                                     resolve(true);
                                 } else {
                                     fetch(
                                         this.rootDir +
-                                            '/webvisu/visu_ini.xml' +
-                                            '?v=' +
-                                            Date.now(),
+                                            '/plc/visu_ini.xml',
                                     ).then((response) => {
                                         // Path is correct
                                         if (response.ok) {
-                                            // Path must be adapted for a Linux-PFC
+                                            // Path must be adapted for an older Linux Controller without Linux
                                             this.rootDir =
-                                                this.rootDir +
-                                                '/webvisu';
+                                                this.rootDir + '/plc';
                                             resolve(true);
                                         } else {
-                                            resolve(false);
+                                            fetch(
+                                                this.rootDir +
+                                                    '/webvisu/visu_ini.xml',
+                                            ).then((response) => {
+                                                // Path is correct
+                                                if (response.ok) {
+                                                    // Path must be adapted for a Linux-PFC
+                                                    this.rootDir =
+                                                        this.rootDir +
+                                                        '/webvisu';
+                                                    resolve(true);
+                                                } else {
+                                                    resolve(false);
+                                                }
+                                            });
                                         }
                                     });
                                 }
-                            });
-                        }
-                    });
-                }
-            });
+                            },
+                        );
+                    }
+                },
+            );
         });
     }
 
@@ -222,15 +211,12 @@ export default class HTML5Visu {
             // Get a reference to the global state manager
             const stateManager = StateManager.singleton().oState;
             // Get the webvisu.htm file. There are the startvisu and updatetime listed
-            fetch(
-                this.rootDir + '/webvisu.htm' + '?v=' + Date.now(),
-                {
-                    headers: {
-                        'Content-Type': 'text/plain; charset=UTF8',
-                    },
-                    method: 'get',
+            fetch(this.rootDir + '/webvisu.htm', {
+                headers: {
+                    'Content-Type': 'text/plain; charset=UTF8',
                 },
-            ).then((response) => {
+                method: 'get',
+            }).then((response) => {
                 if (response.ok) {
                     response.text().then((data) => {
                         const parser = new DOMParser();
@@ -463,7 +449,7 @@ export default class HTML5Visu {
     processingVisuIni(): Promise<XMLDocument> {
         const url = this.rootDir + '/visu_ini.xml';
         return new Promise((resolve) => {
-            fetch(url + '?v=' + Date.now(), {
+            fetch(url, {
                 headers: {
                     'Content-Type': 'text/plain; charset=UTF8',
                 },

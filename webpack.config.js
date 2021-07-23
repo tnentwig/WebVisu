@@ -14,8 +14,8 @@ module.exports = {
 
     output: {
         path: path.resolve(__dirname, 'dist'), // string
-        filename: '[name].js'
-
+        filename: '[name].js',
+        clean: true
     },
     plugins: [
         // Add the script tag of loader to the HTML

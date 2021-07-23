@@ -194,7 +194,7 @@ export function getVisuXML_(url: string): Promise<XMLDocument> {
         const zipped = checkCompression();
         // Fetch the xml as unzipped file
         if (!zipped) {
-            fetch(url + Date.now(), {
+            fetch(url, {
                 headers: {
                     'Content-Type': 'text/plain; charset=UTF-8',
                 },
@@ -222,7 +222,7 @@ export function getVisuXML_(url: string): Promise<XMLDocument> {
             const zipName = filename.split('.')[0] + '_xml.zip';
             // Push the zip filename to stack
             urlStack.push(zipName);
-            fetch(urlStack.join('/') + '?v=' + Date.now(), {
+            fetch(urlStack.join('/'), {
                 headers: { 'Content-Type': 'binary;' },
             }).then((response) => {
                 if (response.ok) {
