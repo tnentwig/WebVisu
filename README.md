@@ -1,6 +1,12 @@
+<div align="center">
+  
 # WebVisu
+A tiny **(~100 kB)** Javascript based alternative to the Java applet of **CoDeSys 2.3** applications
+  
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+</div>
+
 ## Introduction
 
 This is a single page application (SPA) for displaying the web visualisation pages build with the **CoDeSys 2.3** or **WAGO-I/O-PRO CAA** IDE without using Java. With this solution it's possible to display the existing visualisations on mobile devices or modern browsers that doesn't support Java applets anymore.
@@ -8,21 +14,27 @@ This is a single page application (SPA) for displaying the web visualisation pag
 > :point_right: : Every release has been tested with bigger CoDeSys projects but the components are currently not automatically tested. Create an issue or send me a mail to *tristan.nentwig+webvisu@gmail.com* if you encounter a problem.
 
 ## How to use
-
-Just copy the webvisu.html and webvisu.js from the release tab to the folder which contents are deployed by the webserver. **The webvisu folder path depend on which WAGO PLC is used**. The FTP transfer could be made with FileZilla for example.
-
-For displaying on client use a modern browser like Chrome, Firefox or Edge that supports ES6 constructs.
-
-### For the non Linux PLCs (like 750-88x, 750-89x series)
-
-Transfer them to the _/PLC_ folder. The visualisation is available afterwards on  
-_http://\<ip-address-of-your-plc>/PLC/webvisu.html_
-
-### For the Linux PLCs (like IPC or PFC200)
-
-Transfer it to _/home/codesys_. The visualisation is available afterwards on  
-_http://\<ip-address-of-your-plc>:8080/webvisu.html_ (IPC)
-_http://\<ip-address-of-your-plc>/webvisu/webvisu.html_ (PFC200)
+ <ol>
+  <li>Download the WebVisuSPA.zip file from the latest release here: <a href="https://github.com/tnentwig/WebVisu/releases">Releases</a>.</li>
+  <li>Unzip the three files it contains and transfer them to your PLC (e.t. via FTP with <a href="https://filezilla-project.org/">FileZilla</a>). The destination folder depends on the model of your PLC:
+    <p>
+  <details>
+    <summary><b>For the non Linux PLCs (like 750-88x, 750-89x series)</b></summary>
+    <p>Transfer them to the <i><b>/PLC</b></i> folder. The visualisation is available afterwards on:
+      <p>
+    <i>http://&lt;ip-address-of-your-plc&gt;/PLC/webvisu.html</i></p>
+</details>
+    <details>
+      <summary><b>For the Linux PLCs (like IPC or PFC200)</b></summary>
+  <p>Transfer them to <i><b>/home/codesys</b></i>. The visualisation is available afterwards on:
+    <p>
+      <b>IPC:</b> <i>http://&lt;ip-address-of-your-plc&gt;:8080/webvisu.html</i> 
+  <p>
+<b>PFC200:</b> <i>http://&lt;ip-address-of-your-plc&gt;/webvisu/webvisu.html</i> 
+</details>
+  </li>
+  <li>Use a modern browser like Chrome, Firefox or Edge.</li>
+</ol> 
 
 ## How it works
 
@@ -74,4 +86,5 @@ The WebVisu-SPA is still in progress but already contains numerous functionaliti
 ## Comments
 
 <sup>1</sup> : The "Background transparent" functionality (select a specific color to become transparent) doesn't work.
+
 <sup>2</sup> : Works fine with Firefox. Sliderchange has to be throttled on Chrome in the future.
