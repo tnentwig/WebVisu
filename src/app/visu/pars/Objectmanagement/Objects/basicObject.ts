@@ -64,7 +64,7 @@ export function createBasicObject(
         xpos: 0,
         ypos: 0,
         // scale: 1000, // a scale of 1000 means a representation of 1:1
-        scale: 10, // a scale of 10 means a representation of 1:1
+        scale: 1000, // a scale of 10 means a representation of 1:1
         angle: 0,
         transform: 'scale(1) rotate(0)',
         // Activate / deactivate input
@@ -509,7 +509,7 @@ export function createBasicObject(
             // scale(<x> [<y>])
             // rotate(<a> [<x> <y>])
             let transform =
-                'scale(' + initial.scale / 10 + ') rotate(';
+                'scale(' + initial.scale / 1000 + ') rotate(';
             if (initial.angle !== 0) {
                 transform =
                     transform +
@@ -536,16 +536,16 @@ export function createBasicObject(
     // Simpleshape:
     Object.defineProperty(initial, 'transformedCornerCoord', {
         get: function () {
-            const x1 = initial.absCornerCoord.x1;
-            const x2 = initial.absCornerCoord.x2;
-            const y1 = initial.absCornerCoord.y1;
-            const y2 = initial.absCornerCoord.y2;
-            /*
+            let x1 = initial.absCornerCoord.x1;
+            let x2 = initial.absCornerCoord.x2;
+            let y1 = initial.absCornerCoord.y1;
+            let y2 = initial.absCornerCoord.y2;
+
             const xc = initial.absCenterCoord.x;
             const yc = initial.absCenterCoord.y;
             // Scaling: the vector isnt normalized to 1
-            // const scale = initial.scale / 1000;
-            const scale = initial.scale / 10;
+            const scale = initial.scale / 1000;
+
             x1 = scale * (x1 - xc) + xc;
             y1 = scale * (y1 - yc) + yc;
             x2 = scale * (x2 - xc) + xc;
@@ -566,19 +566,19 @@ export function createBasicObject(
             x2 += initial.xpos + initial.right + xoff;
             y1 += initial.ypos + initial.top + yoff;
             y2 += initial.ypos + initial.bottom + yoff;
-            */
+
             // Init the interim return object
             const coord = { x1: x1, y1: y1, x2: x2, y2: y2 };
-            /*
-            if (x1 > x2){
+
+            if (x1 > x2) {
                 coord.x1 = x2;
                 coord.x2 = x1;
             }
-            if (y1 > y2){
+            if (y1 > y2) {
                 coord.y1 = y2;
                 coord.y2 = y1;
             }
-            */
+
             return coord;
         },
     });
