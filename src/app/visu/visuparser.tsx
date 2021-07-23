@@ -205,4 +205,3 @@ export const Visualisation: React.FunctionComponent<Props> =
             );
         },
     );
-
