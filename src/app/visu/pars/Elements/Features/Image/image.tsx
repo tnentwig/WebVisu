@@ -2,11 +2,7 @@ import * as React from 'react';
 import { useObserver, useLocalStore } from 'mobx-react-lite';
 import ComSocket from '../../../../communication/comsocket';
 import { stringToArray } from '../../../Utils/utilfunctions';
-import {
-    getLastModified,
-    getImage,
-} from '../../../Utils/fetchfunctions';
-import { get, set } from 'idb-keyval';
+import { getImage } from '../../../Utils/fetchfunctions';
 
 type Props = {
     section: Element;
@@ -130,46 +126,29 @@ export const ImageField: React.FunctionComponent<Props> = ({
             ) {
                 rawFileName = initial.fixedFileName;
             }
+
             if (
                 rawFileName !== null &&
                 typeof rawFileName !== 'undefined' &&
                 rawFileName !== ''
             ) {
-                // Try to get the image from cache
                 let plainImg: string = null;
                 const path =
                     ComSocket.singleton()
                         .getServerURL()
                         .replace('webvisu.htm', '') + rawFileName;
-                const lastModified = await getLastModified(
-                    path,
-                    true,
-                );
+
+                plainImg = await getImage(path);
+
                 if (
-                    typeof (await get(rawFileName)) === 'undefined' ||
-                    localStorage.getItem(rawFileName) !== lastModified
+                    typeof plainImg === 'undefined' ||
+                    plainImg === null
                 ) {
-                    console.log(
-                        rawFileName + ' Last-Modified: ',
-                        lastModified,
+                    console.warn(
+                        'The requested image ' +
+                            rawFileName +
+                            ' is not available!',
                     );
-                    // Save the last modified
-                    localStorage.setItem(rawFileName, lastModified);
-                    plainImg = await getImage(path);
-                    if (
-                        typeof plainImg === 'undefined' ||
-                        plainImg === null
-                    ) {
-                        console.warn(
-                            'The requested image ' +
-                                rawFileName +
-                                ' is not available!',
-                        );
-                    } else {
-                        await set(rawFileName, plainImg);
-                    }
-                } else {
-                    plainImg = await get(rawFileName);
                 }
 
                 if (plainImg !== null) {

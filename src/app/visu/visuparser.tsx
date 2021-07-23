@@ -1,9 +1,7 @@
 import * as React from 'react';
-import { get, set } from 'idb-keyval';
 import { VisuElements } from './pars/elementparser';
 import { stringToArray } from './pars/Utils/utilfunctions';
 import {
-    getLastModified,
     getVisuXML,
     stringifyVisuXML,
     parseVisuXML,
@@ -100,25 +98,16 @@ export const Visualisation: React.FunctionComponent<Props> =
                         '/' +
                         visuName +
                         '.xml';
-                    // Files that are needed several times will be saved internally for loading speed up
+                    /* 
+                        Files that are needed several times will be saved internally for loading speed up
+                        A suitable parameter to check if a Visualisation has changed would be the Last-Modified Parameter. Unfortunately older controller send the momentary timestamp.
+                        So the best solution is to save it inside the session.
+                    */
                     let plainxml: string;
 
-                    const lastModified = await getLastModified(
-                        url,
-                        false,
-                    );
-                    if (
-                        typeof (await get(visuName)) ===
-                            'undefined' ||
-                        localStorage.getItem(visuName) !==
-                            lastModified
-                    ) {
-                        console.log(
-                            visuName + ' Last-Modified: ',
-                            lastModified,
-                        );
-                        // Save the last modified
-                        localStorage.setItem(visuName, lastModified);
+                    if (sessionStorage.getItem(visuName)) {
+                        plainxml = sessionStorage.getItem(visuName);
+                    } else {
                         const xml = await getVisuXML(url);
                         if (
                             typeof xml === 'undefined' ||
@@ -131,10 +120,11 @@ export const Visualisation: React.FunctionComponent<Props> =
                             );
                         } else {
                             plainxml = stringifyVisuXML(xml);
-                            await set(visuName, plainxml);
+                            sessionStorage.setItem(
+                                visuName,
+                                plainxml,
+                            );
                         }
-                    } else {
-                        plainxml = await get(visuName);
                     }
 
                     if (plainxml !== null) {
