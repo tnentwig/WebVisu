@@ -45,9 +45,8 @@ function createInitial(section: Element) {
     // Invisble?
     if (shapeParameters.has('expr-invisible')) {
         const element = shapeParameters!.get('expr-invisible');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         const wrapperFunc = () => {
             const value = returnFunc();
             if (typeof value !== 'undefined') {
@@ -109,9 +108,8 @@ export const Group: React.FunctionComponent<Props> = ({
                     addVisuObject(
                         <PolyShape section={element}></PolyShape>,
                     );
-                    const points = element.getElementsByTagName(
-                        'point',
-                    );
+                    const points =
+                        element.getElementsByTagName('point');
                     for (let i = 0; i < points.length; i++) {
                         getDimension(
                             rightDownCorner,

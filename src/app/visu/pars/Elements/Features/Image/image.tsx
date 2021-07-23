@@ -24,8 +24,8 @@ export const ImageField: React.FunctionComponent<Props> = ({
 
     const initial = {
         // frameType defines the type of scaling. Possible are isotrophic, anisotrophic or static
-        frameType: section.getElementsByTagName('frame-type')[0]
-            .innerHTML,
+        frameType:
+            section.getElementsByTagName('frame-type')[0].innerHTML,
         inlineDimensions: '100%',
         // Dimensions of the surrounding div
         rectHeight: rect[3] - rect[1],

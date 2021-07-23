@@ -21,8 +21,8 @@ export const PolyShape: React.FunctionComponent<Props> = ({
     section,
 }) => {
     // Check if its on of the allowed shapes like polygon, bezier or polyline
-    const shape = section.getElementsByTagName('poly-shape')[0]
-        .innerHTML;
+    const shape =
+        section.getElementsByTagName('poly-shape')[0].innerHTML;
     // Parse the common informations
     if (['polygon', 'bezier', 'polyline'].includes(shape)) {
         // Parsing of the fixed parameters
@@ -56,8 +56,8 @@ export const PolyShape: React.FunctionComponent<Props> = ({
                 section.getElementsByTagName('line-width')[0]
                     .innerHTML,
             ),
-            elementId: section.getElementsByTagName('elem-id')[0]
-                .innerHTML,
+            elementId:
+                section.getElementsByTagName('elem-id')[0].innerHTML,
             rect: [],
             center: util.stringToArray(
                 section.getElementsByTagName('center')[0].innerHTML,

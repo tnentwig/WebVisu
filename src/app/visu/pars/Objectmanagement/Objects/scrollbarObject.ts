@@ -76,9 +76,8 @@ export function createScrollbarObject(
 
     if (shapeParameters.has('expr-invisible')) {
         const element = shapeParameters!.get('expr-invisible');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         const wrapperFunc = () => {
             const value = Number(returnFunc());
             if (value !== null && typeof value !== 'undefined') {
@@ -98,9 +97,8 @@ export function createScrollbarObject(
 
     if (shapeParameters.has('expr-lower-bound')) {
         const element = shapeParameters!.get('expr-lower-bound');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         const wrapperFunc = () => {
             const value = returnFunc();
             return Number(value);
@@ -112,9 +110,8 @@ export function createScrollbarObject(
 
     if (shapeParameters.has('expr-upper-bound')) {
         const element = shapeParameters!.get('expr-upper-bound');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         const wrapperFunc = () => {
             const value = returnFunc();
             return Number(value);
@@ -134,9 +131,8 @@ export function createScrollbarObject(
                     tooltip === null || typeof tooltip === 'undefined'
                         ? ''
                         : tooltip;
-                const value = ComSocket.singleton().getFunction(
-                    element,
-                )();
+                const value =
+                    ComSocket.singleton().getFunction(element)();
                 try {
                     if (
                         parsedTooltip.includes('|<|') ||
@@ -171,9 +167,8 @@ export function createScrollbarObject(
 
     if (shapeParameters.has('expr-tap-var')) {
         const element = shapeParameters!.get('expr-tap-var');
-        const returnFunc = ComSocket.singleton().evalFunction(
-            element,
-        );
+        const returnFunc =
+            ComSocket.singleton().evalFunction(element);
         Object.defineProperty(initial, 'value', {
             get: () => returnFunc(),
         });

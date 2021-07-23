@@ -79,9 +79,8 @@ function checkCompression() {
 
 export function getVisuXML_(url: string): Promise<XMLDocument> {
     return new Promise((resolve) => {
-        let encoding = StateManager.singleton().oState.get(
-            'ENCODINGSTRING',
-        );
+        let encoding =
+            StateManager.singleton().oState.get('ENCODINGSTRING');
         if (typeof encoding === 'undefined') {
             encoding = 'iso-8859-1';
         }
@@ -97,10 +96,11 @@ export function getVisuXML_(url: string): Promise<XMLDocument> {
                     response.arrayBuffer().then((buffer) => {
                         const decoder = new TextDecoder(encoding);
                         const text = decoder.decode(buffer);
-                        const data = new window.DOMParser().parseFromString(
-                            text,
-                            'text/xml',
-                        );
+                        const data =
+                            new window.DOMParser().parseFromString(
+                                text,
+                                'text/xml',
+                            );
                         resolve(data);
                     });
                 } else {
@@ -127,10 +127,11 @@ export function getVisuXML_(url: string): Promise<XMLDocument> {
                         const text = decoder.decode(
                             dataArray[filename],
                         );
-                        const data = new window.DOMParser().parseFromString(
-                            text,
-                            'text/xml',
-                        );
+                        const data =
+                            new window.DOMParser().parseFromString(
+                                text,
+                                'text/xml',
+                            );
                         resolve(data);
                     });
                 } else {
@@ -259,9 +260,8 @@ export function getImage(url: string): Promise<string> {
                             let binary = '';
                             dataArray[filename].forEach(
                                 (b) =>
-                                    (binary += String.fromCharCode(
-                                        b,
-                                    )),
+                                    (binary +=
+                                        String.fromCharCode(b)),
                             );
                             const base64 = window.btoa(binary);
                             resolve(base64Flag + base64);

@@ -13,8 +13,8 @@ import { Subvisu } from './Elements/Subvisu/subvisu';
 type Props = {
     visualisation: Element;
 };
-export const VisuElements: React.FunctionComponent<Props> = React.memo(
-    ({ visualisation }) => {
+export const VisuElements: React.FunctionComponent<Props> =
+    React.memo(({ visualisation }) => {
         const visuObjects: Array<{
             obj: JSX.Element;
             id: string;
@@ -104,5 +104,4 @@ export const VisuElements: React.FunctionComponent<Props> = React.memo(
                 }
             </React.Fragment>
         );
-    },
-);
+    });

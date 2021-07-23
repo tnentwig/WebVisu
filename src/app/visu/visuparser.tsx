@@ -66,143 +66,152 @@ async function initVariables(XML: XMLDocument) {
     com.startCyclicUpdate();
 }
 
-export const Visualisation: React.FunctionComponent<Props> = React.memo(
-    ({
-        visuName,
-        width,
-        height,
-        // showFrame,
-        clipFrame,
-        isoFrame,
-        originalFrame,
-        // originalScrollableFrame,
-        // noFrameOffset,
-    }) => {
-        const [loading, setLoading] = React.useState<boolean>(true);
-        const [adaptedXML, setAdaptedXML] = React.useState<Element>(
-            null,
-        );
-        const [originSize, setOriginSize] = React.useState<
-            Array<number>
-        >([0, 0]);
-        const [scale, setScale] = React.useState('scale(1)');
+export const Visualisation: React.FunctionComponent<Props> =
+    React.memo(
+        ({
+            visuName,
+            width,
+            height,
+            // showFrame,
+            clipFrame,
+            isoFrame,
+            originalFrame,
+            // originalScrollableFrame,
+            // noFrameOffset,
+        }) => {
+            const [loading, setLoading] =
+                React.useState<boolean>(true);
+            const [adaptedXML, setAdaptedXML] =
+                React.useState<Element>(null);
+            const [originSize, setOriginSize] = React.useState<
+                Array<number>
+            >([0, 0]);
+            const [scale, setScale] = React.useState('scale(1)');
 
-        // Get new xml on change of visuName
-        React.useEffect(() => {
-            const fetchXML = async function () {
-                // Set the loading flag. This will unmount all elements from calling visu
-                setLoading(true);
-                const url =
-                    StateManager.singleton().oState.get('ROOTDIR') +
-                    '/' +
-                    visuName +
-                    '.xml';
-                // Files that are needed several times will be saved internally for loading speed up
-                let plainxml: string;
+            // Get new xml on change of visuName
+            React.useEffect(() => {
+                const fetchXML = async function () {
+                    // Set the loading flag. This will unmount all elements from calling visu
+                    setLoading(true);
+                    const url =
+                        StateManager.singleton().oState.get(
+                            'ROOTDIR',
+                        ) +
+                        '/' +
+                        visuName +
+                        '.xml';
+                    // Files that are needed several times will be saved internally for loading speed up
+                    let plainxml: string;
 
-                const lastModified = await getLastModified(
-                    url,
-                    false,
-                );
-                if (
-                    typeof (await get(visuName)) === 'undefined' ||
-                    localStorage.getItem(visuName) !== lastModified
-                ) {
-                    console.log(
-                        visuName + ' Last-Modified: ',
-                        lastModified,
+                    const lastModified = await getLastModified(
+                        url,
+                        false,
                     );
-                    // Save the last modified
-                    localStorage.setItem(visuName, lastModified);
-                    const xml = await getVisuXML(url);
-                    if (typeof xml === 'undefined' || xml === null) {
-                        console.warn(
-                            'The requested visualisation ' +
-                                visuName +
-                                ' is not available!',
+                    if (
+                        typeof (await get(visuName)) ===
+                            'undefined' ||
+                        localStorage.getItem(visuName) !==
+                            lastModified
+                    ) {
+                        console.log(
+                            visuName + ' Last-Modified: ',
+                            lastModified,
                         );
+                        // Save the last modified
+                        localStorage.setItem(visuName, lastModified);
+                        const xml = await getVisuXML(url);
+                        if (
+                            typeof xml === 'undefined' ||
+                            xml === null
+                        ) {
+                            console.warn(
+                                'The requested visualisation ' +
+                                    visuName +
+                                    ' is not available!',
+                            );
+                        } else {
+                            plainxml = stringifyVisuXML(xml);
+                            await set(visuName, plainxml);
+                        }
                     } else {
-                        plainxml = stringifyVisuXML(xml);
-                        await set(visuName, plainxml);
+                        plainxml = await get(visuName);
                     }
-                } else {
-                    plainxml = await get(visuName);
-                }
 
-                if (plainxml !== null) {
-                    const xmlDoc = parseVisuXML(plainxml);
-                    await initVariables(xmlDoc);
-                    setAdaptedXML(xmlDoc.children[0]);
-                    setOriginSize(
-                        stringToArray(
-                            xmlDoc
-                                .getElementsByTagName(
-                                    'visualisation',
-                                )[0]
-                                .getElementsByTagName('size')[0]
-                                .innerHTML,
-                        ),
+                    if (plainxml !== null) {
+                        const xmlDoc = parseVisuXML(plainxml);
+                        await initVariables(xmlDoc);
+                        setAdaptedXML(xmlDoc.children[0]);
+                        setOriginSize(
+                            stringToArray(
+                                xmlDoc
+                                    .getElementsByTagName(
+                                        'visualisation',
+                                    )[0]
+                                    .getElementsByTagName('size')[0]
+                                    .innerHTML,
+                            ),
+                        );
+                        setLoading(false);
+                    }
+                };
+                fetchXML();
+            }, [visuName]);
+
+            // Scaling on main window resize for responsive behavior
+            React.useEffect(() => {
+                const xscaleFactor = width / (originSize[0] + 2);
+                const yscaleFactor = height / (originSize[1] + 2);
+                if (originalFrame) {
+                    setScale(
+                        'scale(' +
+                            (
+                                (originSize[0] / (originSize[0] + 2) +
+                                    originSize[1] /
+                                        (originSize[1] + 2)) /
+                                2
+                            ).toString() +
+                            ')',
                     );
-                    setLoading(false);
+                } else if (isoFrame) {
+                    setScale(
+                        'scale(' +
+                            Math.min(
+                                xscaleFactor,
+                                yscaleFactor,
+                            ).toString() +
+                            ')',
+                    );
+                } else {
+                    setScale(
+                        'scale(' +
+                            xscaleFactor.toString() +
+                            ',' +
+                            yscaleFactor.toString() +
+                            ')',
+                    );
                 }
-            };
-            fetchXML();
-        }, [visuName]);
+            }, [width, height, originSize, originalFrame, isoFrame]);
 
-        // Scaling on main window resize for responsive behavior
-        React.useEffect(() => {
-            const xscaleFactor = width / (originSize[0] + 2);
-            const yscaleFactor = height / (originSize[1] + 2);
-            if (originalFrame) {
-                setScale(
-                    'scale(' +
-                        (
-                            (originSize[0] / (originSize[0] + 2) +
-                                originSize[1] / (originSize[1] + 2)) /
-                            2
-                        ).toString() +
-                        ')',
-                );
-            } else if (isoFrame) {
-                setScale(
-                    'scale(' +
-                        Math.min(
-                            xscaleFactor,
-                            yscaleFactor,
-                        ).toString() +
-                        ')',
-                );
-            } else {
-                setScale(
-                    'scale(' +
-                        xscaleFactor.toString() +
-                        ',' +
-                        yscaleFactor.toString() +
-                        ')',
-                );
-            }
-        }, [width, height, originSize, originalFrame, isoFrame]);
-
-        return (
-            <div
-                style={{
-                    display: 'block',
-                    position: 'absolute',
-                    overflow: clipFrame ? 'hidden' : 'visible',
-                    left: 0,
-                    top: 0,
-                    width: originSize[0] + 1,
-                    height: originSize[1] + 1,
-                    transformOrigin: '0 0',
-                    transform: scale,
-                }}
-            >
-                {loading ? null : (
-                    <VisuElements
-                        visualisation={adaptedXML}
-                    ></VisuElements>
-                )}
-            </div>
-        );
-    },
-);
+            return (
+                <div
+                    style={{
+                        display: 'block',
+                        position: 'absolute',
+                        overflow: clipFrame ? 'hidden' : 'visible',
+                        left: 0,
+                        top: 0,
+                        width: originSize[0] + 1,
+                        height: originSize[1] + 1,
+                        transformOrigin: '0 0',
+                        transform: scale,
+                    }}
+                >
+                    {loading ? null : (
+                        <VisuElements
+                            visualisation={adaptedXML}
+                        ></VisuElements>
+                    )}
+                </div>
+            );
+        },
+    );
