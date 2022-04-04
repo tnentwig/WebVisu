@@ -209,8 +209,18 @@ export default class ComSocket implements IComSocket {
                             response
                                 .arrayBuffer()
                                 .then((buffer: ArrayBuffer) => {
+                                    let encoding =
+                                        StateManager.singleton().oState.get(
+                                            'ENCODINGSTRING',
+                                        );
+                                    if (
+                                        typeof encoding ===
+                                        'undefined'
+                                    ) {
+                                        encoding = 'iso-8859-1';
+                                    }
                                     const decoder = new TextDecoder(
-                                        'iso-8859-1',
+                                        encoding,
                                     );
                                     const text =
                                         decoder.decode(buffer);
